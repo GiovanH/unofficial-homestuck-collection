@@ -12,7 +12,7 @@
           <p v-if="$archive.music.albums[album.directory].date" class="date" v-text="getUTCDate($archive.music.albums[album.directory].date)" />
         </div>
         <div>
-          <a :href="`/music/album/${album}`" v-if="!album.isSpoiler"><h2 class="trackTitle">{{$archive.music.albums[album.directory].name}}</h2></a>
+          <a :href="`/music/album/${album.directory}`" v-if="!album.isSpoiler"><h2 class="trackTitle">{{$archive.music.albums[album.directory].name}}</h2></a>
           <h2 class="trackTitle" v-else>??????</h2>
           <ol>
             <li v-for="track in album.tracks" v-html="track"/>
@@ -123,7 +123,7 @@ export default {
       return keys.map(artist => `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`)
     },
     flashographySorted() {
-      //Always send unreleased-tracks to the bottom of the list. Otherwise, sort in chronological order of release
+      //Sort in chronological order of release
       let keys = Object.keys(this.$archive.music.flashes).sort((key1, key2) => {
         let timestamp1 = key1 in this.$archive.mspa.story && this.$archive.mspa.story[key1].timestamp ? this.$archive.mspa.story[key1].timestamp : new Date(this.$archive.music.flashes[key1].date).getTime()/1000
         let timestamp2 = key2 in this.$archive.mspa.story && this.$archive.mspa.story[key2].timestamp ? this.$archive.mspa.story[key2].timestamp : new Date(this.$archive.music.flashes[key2].date).getTime()/1000
