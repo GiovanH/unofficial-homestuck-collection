@@ -272,7 +272,7 @@
             <div class="description">
               <h2><a href="/archive/forum/Dear Andrew.html">The Man-On-Man Suckoff Challenge</a></h2>
               <p class="date">Jun 2008 - May 2009</p>
-              <p>A ferocious race to hit rock bottom.</p>
+              <p>Gaze deep into the uncanny valley.</p>
             </div>
           </div>
         </div>
