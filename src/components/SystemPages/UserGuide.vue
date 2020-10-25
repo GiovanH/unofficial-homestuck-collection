@@ -26,6 +26,13 @@
         <p>And remember, you can edit your SAVES at any time! Just click the pencil that shows up when you hover over the bookmark link.</p>
         <Media url="/archive/collection/userguide_saves2.png" />
       </div>
+      <div class="cardContent">
+        <h2>SEARCHING</h2>
+        <p>The <a href="/search">search page</a> functions fairly similarly to the one on the official Homestuck website: Just enter some keywords and see what happens. It'll return the results and link to whatever adventure page they came from.</p>
+        <p>There are some ways to spice up your results, though. They're not sorted in any particular way by default, but by entering <strong>SORT</strong> or <strong>ORDER</strong> and following it up with a <strong>DESC</strong> or <strong>ASC</strong>, you can tell it to sort the results in a specific way.</p>
+        <p>You can also filter results by adventure. For example, to only search for results in Problem Sleuth, you would type <strong>IN:PS</strong>, or <strong>IN:PS10</strong> for a specific chapter. For just results from the first act of Homestuck, you can do something like <strong>IN:A1</strong>. Try experimenting!</p>
+        <Media url="/archive/collection/userguide_search.png" />
+      </div>
     </div>
   </div>
 </template>
