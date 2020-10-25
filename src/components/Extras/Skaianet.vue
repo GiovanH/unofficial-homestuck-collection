@@ -402,7 +402,7 @@
                                 <p>Monsters in the yard. Monsters in the house. Monsters in the hall, beating on your door. Your brother's trapped in his treehouse, so he’s not gonna be much help. You're going to have to get yourself out of this. But where did they come from? How are you supposed to deal with this? Well, certainly not by cowering in your room. That's for, uh, cowards.</p><br>
                                 <p>First things first. You need to open the door.</p><br>
                                 <p>HIVESWAP: Act 1 is the first of a four-part series set in Andrew Hussie’s Homestuck universe, with a companion series, <em>Hauntswitch</em>, to follow. Continue your save from chapter to chapter, then from game to game, to carry your story, choices, friendships and frenemies across them all--then do it again! Once released, HIVESWAP and <em>Hauntswitch</em> will be playable in either order. Haven’t read Homestuck? That’s fine! This game is set in 1994! Homestuck hasn’t even been invented yet!</p><br>
-
+                                <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | ???</em></p>
                                 <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Description from Steam store page.</a></em></p>
                                 <p><em>14 September 2017 - Ongoing</em></p>
                               </center>
