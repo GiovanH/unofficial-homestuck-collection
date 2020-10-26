@@ -119,21 +119,6 @@ export default {
     },
     footnote() {
       return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
-    },
-    footerBanner() {            
-      let num = parseInt(this.pageNum)
-      switch (this.$root.theme) {
-        case 'scratch':
-          return 'customScratchFooter.png'
-        case 'sbahj':
-          return 'mspalogo_sbahj.jpg'
-        case 'trickster':
-          return 'trickster_sitegraphics/bannerframe2.gif'
-        case 'A6A6':
-          return 'a6a6_bannerframe.png'
-        default:
-          return 'bannerframe.png'
-      }
     }
   },
   methods:{
