@@ -233,30 +233,6 @@ export default {
       else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
-    },
-    filterLinksAndImages(){
-      let el = this.$el.querySelector('.main-wrapper')
-
-      // Check if this is a comment
-      if (el.nodeType !== 8){
-        let links = el.getElementsByTagName('A')
-        for(let i = 0;i < links.length; i++) {
-          links[i].href = this.$filterURL(links[i].href)
-        }
-        
-        //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-        let images = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
-        for(let i = 0;i < images.length; i++) {
-          images[i].src = this.$mspaURL(images[i].src)
-          if (images[i].tagName == 'IMG') {  
-            images[i].ondragstart = (e) => {
-              e.preventDefault()
-              e.dataTransfer.effectAllowed = 'copy'
-              require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-            }
-          }
-        }
-      }
     }
   },
   watch: {
@@ -265,11 +241,11 @@ export default {
     }
   },
   updated() {
-    this.filterLinksAndImages()
+    this.$filterLinksAndImages(this.$el.querySelector('.main-wrapper'))
   },
   mounted(){
     this.jumpToClass(this.routeParams.id)
-    this.filterLinksAndImages()
+    this.$filterLinksAndImages(this.$el.querySelector('.main-wrapper'))
   }
 }
 </script>
