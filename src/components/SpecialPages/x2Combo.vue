@@ -33,6 +33,7 @@
       </div>
     </div>
     <PageFooter pageWidth="1660px" />
+    <PageNews :thisPage="thisPage[1]" />
   </div>
 </template>
 
@@ -44,6 +45,7 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/SpecialPages/x2ComboNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import PageNews from '@/components/Page/PageNews.vue'
 
 export default {
   name: 'x2Combo',
@@ -51,7 +53,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, PageNews
   },
   data: function() {
     return {

@@ -22,7 +22,7 @@
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
-    <PageNews :thisPage="thisPage" />
+    <PageNews :thisPage="thisPage"/>
   </div>
 </template>
 

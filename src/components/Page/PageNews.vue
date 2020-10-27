@@ -1,5 +1,5 @@
 <template>
-    <div class="pageBody">
+    <div class="newsBody">
     <div class="news">
         <Media class="logo" :url="newsLogo" />
         <div v-for="post in newsposts" v-html="post.html" :key="post.id"><br><br></div>
@@ -55,6 +55,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .newsBody { // these rules keep it centered on x2 combo pages
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        align-self: center;
+    }
     .sbahj .logo::before {
         content: "NEWNS";
         font-size: 24px;
@@ -65,6 +71,7 @@ export default {
         font-size: 12px;
         font-weight: normal;
         text-align: justify;
+        align-items: normal;
 
         display: flex;
         flex-flow: column;
