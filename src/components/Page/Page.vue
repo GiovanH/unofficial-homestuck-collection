@@ -22,6 +22,7 @@
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
+    <PageNews :thisPage="thisPage" />
   </div>
 </template>
 
@@ -33,9 +34,11 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import PageNews from '@/components/Page/PageNews.vue'
 
 import Firefly from '@/components/SpecialPages/Firefly.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
+
 
 export default {
   name: 'page',
@@ -43,7 +46,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, PageNews, Firefly, FlashCredit
   },
   data: function() {
     return {
