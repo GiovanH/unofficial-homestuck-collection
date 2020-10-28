@@ -1,4 +1,4 @@
-module.exports = {  
+module.exports = {
   notifData: {
     notif_enabled: {
       title: 'NOTIFICATIONS ENABLED',
@@ -11,6 +11,13 @@ module.exports = {
       desc: 'Click here to check it out!',
       url: '/music/album/homestuck-vol-1',
       thumb: '/archive/notifications/notif_hsvol1.png'
+    },
+
+    notif_morse: {
+      title: 'UNLOCKED DECODING TOOL: MORSE CODE',
+      desc: 'Use it to understand what Serenity is saying!',
+      url: '/decode/morse',
+      thumb: '/archive/collection/decode_morse.png'
     },
 
     notif_blogspot: {
@@ -145,7 +152,7 @@ module.exports = {
       url: '/music/album',
       thumb: '/archive/notifications/notif_hsvol6mtahk.png'
     },
-    
+
     notif_sburbwanderers: {
       title: 'UNLOCKED ALBUMS: SBURB & THE WANDERERS',
       desc: 'Click here to check them out!',
@@ -215,7 +222,7 @@ module.exports = {
       url: '/decode/damaramegido',
       thumb: '/archive/collection/decode_damara.png'
     },
-    
+
     notif_cherubim: {
       title: 'UNLOCKED ALBUM: CHERUBIM',
       desc: 'Click here to check it out!',
@@ -235,7 +242,7 @@ module.exports = {
       desc: 'Tales from the depths of canon. Short-form stories written by community figures.',
       url: '/pxs',
       thumb: '/archive/collection/archive_pxs.png'
-    },  
+    },
 
     notif_collide: {
       title: 'UNLOCKED ALBUM: [S] Collide.',
@@ -265,10 +272,13 @@ module.exports = {
       thumb: '/archive/collection/archive_skaianet.png'
     }
   },
-  
+
   notifPages: {
     "002340": [ //During third Rose GameFAQs, after Nanna expodump (override)
       "notif_hsvol1"
+    ],
+    "002653": [ //First time Serenity speaks
+      "notif_morse"
     ],
     "002821": [ //Just after grandpa strife
       "notif_blogspot"

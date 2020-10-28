@@ -30,10 +30,14 @@
         <h2 class="pageTitle">Decoding Tools</h2>
         <div class="toolLinks">
           <div class="tool">
-            <a href="/decode/morse">
+            <a href="/decode/morse" v-if="!$pageIsSpoiler('002653')">
               <Media url="/archive/collection/decode_morse.png" /><br>
               Morse Decoder
             </a>
+            <span v-else>
+              <Media url="/archive/collection/spoiler_medium.png" /><br>
+              ??????<br>[Page {{$mspaOrVizNumber('002653')}}]
+            </span>
           </div>
           <div class="tool">
             <a href="/decode/alternian" v-if="!$pageIsSpoiler('003890')">
@@ -216,7 +220,7 @@ export default {
             width: 165px;
             img{
               display: block;
-            }         
+            }
           }
         }
 
@@ -229,7 +233,7 @@ export default {
           p {
             margin-top: 15px;
           }
-          
+
           textarea {
             width: 595px;
             max-width: 595px;
@@ -247,8 +251,7 @@ export default {
           font-family: serif
         }
 
-      }	
+      }
     }
   }
 </style>
-
