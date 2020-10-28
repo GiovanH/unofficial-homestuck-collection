@@ -3,7 +3,7 @@
         <div class="nextArrow" v-if="nextPages.length > 0">
             <div v-for="page in nextPages" :key="page.pageId">
                 <p v-if="('pageId' in page && 'title' in page)">
-                    &gt;<a :href="nextUrl(page)" class="nextArrowLink" v-text="page.title" />
+                    &gt; <a :href="nextUrl(page)" class="nextArrowLink" v-text="page.title" />
                 </p>
             </div>
         </div>
