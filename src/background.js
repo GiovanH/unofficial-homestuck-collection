@@ -110,6 +110,20 @@ try {
           click: () => {win.webContents.send('ZOOM_OUT')}
         },
         {
+          label: 'Zoom In',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          accelerator: 'CommandOrControl+numadd',
+          click: () => {win.webContents.send('ZOOM_IN')}
+        },
+        {
+          label: 'Zoom Out',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          accelerator: 'CommandOrControl+numsub',
+          click: () => {win.webContents.send('ZOOM_OUT')}
+        },
+        {
           label: 'Reset Zoom',
           accelerator: 'CmdOrCtrl+0',
           click: () => {win.webContents.send('ZOOM_RESET')}
