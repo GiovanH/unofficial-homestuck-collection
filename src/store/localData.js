@@ -50,10 +50,11 @@ class LocalData {
       
       switchToNewTabs: false,
       forceScrollBar: true,
+      noSmoothScrolling: false,
       mspaMode: false,
       bandcampEmbed: true,
-      devMode: false,
       arrowNav: true,
+      devMode: false,
 
       openLogs: false,
       hqAudio: true,

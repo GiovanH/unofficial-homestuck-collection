@@ -27,7 +27,10 @@
 
           <dt><label><input type="checkbox" name="forceScrollBar" v-model="$localData.settings['forceScrollBar']" @click="toggleSetting('forceScrollBar')">Always display scroll bar</label></dt>
           <dd class="settingDesc">Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this.</dd>
-
+          
+          <dt><label><input type="checkbox" name="noSmoothScrolling" v-model="$localData.settings['noSmoothScrolling']" @click="toggleSetting('noSmoothScrolling')">Disable smooth scrolling</label></dt>
+          <dd class="settingDesc">Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong></dd>
+          
           <dt><label><input type="checkbox" name="mspaMode" v-model="$localData.settings['mspaMode']" @click="toggleSetting('mspaMode')">Use MSPA page numbers</label></dt>
           <dd class="settingDesc">Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck.</dd>
           
