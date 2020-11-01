@@ -182,6 +182,7 @@
 </script>
 
 <style lang="scss">
+@import "@/css/fonts.scss";
 @import "@/css/fa/scss/fontawesome.scss";
 @import "@/css/fa/scss/solid.scss";
 

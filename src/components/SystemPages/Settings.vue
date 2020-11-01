@@ -54,6 +54,29 @@
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
 
+          <dt>Text Override</dt>
+          <dd>
+            <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
+              <br>If you want to zoom the entire application, try ctrl -/+ (or ⌘ -/+)!</span><br>
+            <div class="textOverrideSettings">
+              <div class="knobs">
+                <label>Font family:<br>
+                  <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
+                    <option v-for="font in fonts" :value="font.value">
+                      {{ font.text }}
+                    </option>
+                  </select>
+                </label>
+                <label v-if="$localData.settings.textOverride.fontFamily"> (Bold: <input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')">)</label>
+                <br><br>
+                <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
+                <br><br>
+                <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+              </div>
+              <PageText class="examplePrattle" content="|AUTHORLOG|<br/>A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!"/>
+            </div>
+          </dd>
+
           <dt><label><input type="checkbox" name="arrowNav" v-model="$localData.settings['arrowNav']" @click="toggleSetting('arrowNav')">Enable arrow key navigation</label></dt>
           <dd class="settingDesc">Allows you to navigate forward and backward between pages using the left and right arrow keys.</dd>
 
@@ -141,7 +164,7 @@
 
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageText from '@/components/Page/PageText.vue'
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -150,7 +173,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageFooter
+    NavBanner, PageText
   },
   data: function() {
     return {
@@ -166,6 +189,14 @@ export default {
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
+      ],
+      fonts: [
+        {text: "Default", value: ""},
+        {text: "Courier Prime", value: "courierPrime"},
+        {text: "Verdana / Arial", value: "verdana"},
+        {text: "Times New Roman", value: "times"},
+        {text: "Comic Sans", value: "comicSans"},
+        {text: "OpenDyslexic", value: "openDyslexic"},
       ],
       newReaderPage: '',
       newReaderValidation: true
@@ -206,8 +237,9 @@ export default {
         }
       })
     },
-    toggleSetting(setting){
-      if (!(setting in this.$localData.settings)) this.$set(this.$localData.settings, setting, true)
+    toggleSetting(setting, parentObject){
+      if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
+      else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
 
       if (setting == 'enableControversial' && !this.$localData.settings[setting]) {
@@ -301,11 +333,9 @@ export default {
         dt {
           margin: 20px 0 5px 10px;
         }
-        dd {
-          &.settingDesc {
-            color: var(--page-nav-meta);
-            font-weight: normal;
-          }
+        .settingDesc {
+          color: var(--page-nav-meta);
+          font-weight: normal;
         }
         
         .system {
@@ -340,8 +370,31 @@ export default {
           font-size: 13px;
           color: var(--page-nav-meta);
         }
-        .themeSelector {
+        .themeSelector, .fontSelector {
           font-size: 16px;
+        }
+        .textOverrideSettings {
+          margin-top: 16px;
+          text-align: center;
+
+          .knobs {
+            width: 75%;
+            margin: 0 auto 16px;
+            text-align: left;
+            select {
+              margin: 5px 0;
+            }
+            input[type="range"] {
+              width: 100%;
+            }
+          }
+          .examplePrattle {
+            margin: 0 auto;
+
+            ::v-deep .text{
+              text-align: center;
+            }
+          }
         }
       }
     }

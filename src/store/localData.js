@@ -46,16 +46,22 @@ class LocalData {
       },
       notifications: true,
 
-      themeOverride: "",
       
       switchToNewTabs: false,
       forceScrollBar: true,
       noSmoothScrolling: false,
       mspaMode: false,
       bandcampEmbed: true,
-      arrowNav: true,
       devMode: false,
 
+      themeOverride: "",
+      textOverride: {
+        fontFamily: "",
+        bold: false,
+        fontSize: 0,
+        lineHeight: 0
+      },
+      arrowNav: true,
       openLogs: false,
       hqAudio: true,
       jsFlashes: true,
