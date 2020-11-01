@@ -42,7 +42,7 @@ Vue.mixin({
   },
   methods: {
     $resolvePath(to){
-      let route = this.$router.resolve(to).route
+      let route = this.$router.resolve(to.toLowerCase()).route
       let resolvedUrl = route.path
       let base = route.path.slice(1).split("/")[0]
       let vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
@@ -80,14 +80,14 @@ Vue.mixin({
         this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
       }
       else if (auxClick) {
-        this.$localData.root.TABS_NEW(to, true)
+        this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
       }
       else {
         this.$pushURL(to)
       }
     },
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
-      let url = this.$resolvePath(to.toLowerCase())
+      let url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $filterURL(url){
