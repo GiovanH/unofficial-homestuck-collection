@@ -96,11 +96,11 @@ export default {
   max-width: 100%;
   margin: 0 auto 30px;
   padding: 2px;
-  box-shadow: 0 0 0 2px #ff9000;
+  background-color: #ff9000;
+  border: solid 2px #ff9000;
   transition: opacity 1s;
 }
 .frame {
-  box-shadow: 0 0 0 2px #ff9000;
   display: flex;
   text-decoration: none;
   color: white;
@@ -125,7 +125,6 @@ export default {
   font-size: 14px;
   background: black;
   border: 2px solid #ffff00;
-  box-shadow: 0 0 0 2px #ff9000;
   margin-right: 4px;
   padding: 4px;
   line-height: 0;
