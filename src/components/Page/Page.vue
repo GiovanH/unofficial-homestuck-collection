@@ -7,7 +7,7 @@
       <div class="pageContent">
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
-              <div class="media">
+              <div class="media" ref="media">
                   <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
               </div>
           </div>
@@ -166,6 +166,9 @@ export default {
       }
     }
   },
+  updated() {
+    if (this.hscroll) this.$refs.media.scrollLeft = 0
+  }
 }
 </script>
 
