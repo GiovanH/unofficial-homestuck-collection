@@ -378,7 +378,7 @@
                                     <tbody>
                                       <tr>
                                         <td>
-                                          <font size="6"><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/" target="_blank">HIVESWAP.EXE</a></font>
+                                          <font size="6"><a href="#" @click.prevent="openSteam(623940)">HIVESWAP.EXE</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
@@ -402,8 +402,8 @@
                                 <p>Monsters in the yard. Monsters in the house. Monsters in the hall, beating on your door. Your brother's trapped in his treehouse, so he’s not gonna be much help. You're going to have to get yourself out of this. But where did they come from? How are you supposed to deal with this? Well, certainly not by cowering in your room. That's for, uh, cowards.</p><br>
                                 <p>First things first. You need to open the door.</p><br>
                                 <p>HIVESWAP: Act 1 is the first of a four-part series set in Andrew Hussie’s Homestuck universe, with a companion series, <em>Hauntswitch</em>, to follow. Continue your save from chapter to chapter, then from game to game, to carry your story, choices, friendships and frenemies across them all--then do it again! Once released, HIVESWAP and <em>Hauntswitch</em> will be playable in either order. Haven’t read Homestuck? That’s fine! This game is set in 1994! Homestuck hasn’t even been invented yet!</p><br>
-                                <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | ???</em></p>
-                                <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Description from Steam store page.</a></em></p>
+                                <p><em><a href="#" @click.prevent="openSteam(623940)">Act 1</a> | <a href="#" @click.prevent="openSteam(623940)">Act 2</a> | ???</em></p>
+                                <p><em><a href="#" @click.prevent="openSteam(623940)">Description from Steam store page.</a></em></p>
                                 <p><em>14 September 2017 - Ongoing</em></p>
                               </center>
                             </td>
@@ -425,7 +425,7 @@
                                     <tbody>
                                       <tr>
                                         <td>
-                                          <font size="6"><a href="https://store.steampowered.com/agecheck/app/833040/" target="_blank">FRIENDSIM.EXE</a></font>
+                                          <font size="6"><a href="#" @click.prevent="openSteam(833040)">FRIENDSIM.EXE</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
@@ -449,7 +449,7 @@
                                 <p>You just crash-landed on Alternia, and you’re <strong>DESPERATE</strong> for friendship! Anyone will do...wait, who are those two trolls approaching you?.</p><br>
                                 <p>The Hiveswap Friendsim is a quick, loosely-canonical visual novel adventure following the efforts of the unnamed protagonist (that’s you!) to survive and maybe even thrive on the harsh surface of ALTERNIA. Set in the time of Hiveswap: Act 1, this episodic visual novel’s opening volume, written by Homestuck creator Andrew Hussie, is sure to satisfy Homestuck and Hiveswap fans who are eager for a darker stroll across the Alternian landscape.</p><br>
 
-                                <p><em><a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/">Description from Steam store page.</a></em></p>
+                                <p><em><a href="#" @click.prevent="openSteam(833040)">Description from Steam store page.</a></em></p>
                                 <p><em>13 April 2018 - 14 December 2018</em></p>
                               </center>
                             </td>
@@ -518,7 +518,7 @@
                                     <tbody>
                                       <tr>
                                         <td>
-                                          <font size="6"><a href="https://store.steampowered.com/agecheck/app/1144030/" target="_blank">PESTERQUEST.EXE</a></font>
+                                          <font size="6"><a href="#" @click.prevent="openSteam(1144030)">PESTERQUEST.EXE</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
@@ -543,7 +543,7 @@
                                 <p>Embark on a quest of epic importance in Pesterquest, a grimsical episodic visual novel set in the darkly funny Homestuck/Hiveswap universe created by American author and artist <strong>Andrew Hussie.</strong></p><br>
                                 <p>Find all the answers you're looking for across 14 volumes of idiosyncratic adventure packed with visual mastery and shrewdly written narrative. As you zap between Earth and Alternia, you’ll discover and reconnect with up to 20 friends both extra and terrestrial.</p><br>
 
-                                <p><em><a href="https://store.steampowered.com/app/1144030/Pesterquest/">Description from Steam store page.</a></em></p>
+                                <p><em><a href="#" @click.prevent="openSteam(1144030)">Description from Steam store page.</a></em></p>
                                 <p><em>4 September 2019 - 1 April 2020</em></p>
                               </center>
                             </td>
@@ -619,6 +619,7 @@
 
 <script>
 // @ is an alias to /src
+import { ipcRenderer } from 'electron'
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
@@ -704,6 +705,9 @@ export default {
     getFile(url) {
 			return require('fs').readFileSync(this.$mspaFileStream(url), 'utf8')
 		},
+    openSteam(id) {
+      ipcRenderer.send('steam-open', id)
+    },
   },
   updated() {
   },

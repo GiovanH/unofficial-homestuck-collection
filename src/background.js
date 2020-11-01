@@ -474,6 +474,16 @@ ipcMain.on('ondragstart', (event, filePath) => {
   })
 })
 
+ipcMain.on('steam-open', async (event, id) => {
+  const steamUrl = `steam://url/StoreAppPage/${id}`
+  const browserUrl = `https://store.steampowered.com/app/${id}`
+  if (app.getApplicationNameForProtocol(steamUrl)) {
+    await shell.openExternal(steamUrl)
+  } else {
+    await shell.openExternal(browserUrl)
+  }
+})
+
 //Define which URL schemes to be intercepted
 const filter = {
   urls: [
