@@ -84,7 +84,7 @@ Vue.mixin({
       }
     },
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
-      let url = this.$resolvePath(to)
+      let url = this.$resolvePath(to.toLowerCase())
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $filterURL(url){
