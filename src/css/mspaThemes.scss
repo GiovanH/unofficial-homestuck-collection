@@ -14,7 +14,7 @@
 	--nav-bg: #5a5a5a;
 	// --nav-link: #FFFFFF;
 	--nav-divider: #FFFFFF;
-	--nav-candyCornContent: url(css://images/candycorn.gif);
+	--nav-candyCornContent: url(assets://images/candycorn.gif);
 
 	--page-pageBody: #535353;
 	--page-pageFrame: #C6C6C6;
@@ -78,7 +78,7 @@
 		--nav-bg: #000000;
 		--nav-link: #FFFFFF;
 		--nav-divider: #FFFFFF;
-		--nav-candyCornContent: url(css://images/candycorn_scratch.png);
+		--nav-candyCornContent: url(assets://images/candycorn_scratch.png);
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #082a00;
@@ -260,8 +260,8 @@
 
 		--nav-bg: #000000;
 
-		--page-pageBody: url(css://images/trickster_sitegraphics/Z2.gif);
-		--page-pageFrame: url(css://images/trickster_sitegraphics/bluetile.gif);
+		--page-pageBody: url(assets://images/trickster_sitegraphics/Z2.gif);
+		--page-pageFrame: url(assets://images/trickster_sitegraphics/bluetile.gif);
 		--page-pageBorder: #00117e;
 		--page-pageContent: #ff73fd;
 		--page-log-bg: #ff73fd;
@@ -291,7 +291,7 @@
 				display: inline-block;
 				visibility: visible;
 				margin-left: 10px;
-				content: url(css://images/trickster_sitegraphics/sucker.gif);
+				content: url(assets://images/trickster_sitegraphics/sucker.gif);
 			}
 		}
 	}
@@ -315,7 +315,7 @@
 		--nav-bg: #042300;
 		--nav-link: #2ed73a;
 		--nav-divider: #2ed73a;
-		--nav-candyCornContent: url(css://images/a6a6_tooth.gif);
+		--nav-candyCornContent: url(assets://images/a6a6_tooth.gif);
 
 		--page-pageBody: #042300;
 		--page-pageFrame: #168500;
@@ -359,7 +359,7 @@
 		--nav-bg: #003b64;
 		--nav-link: #72abd2;
 		--nav-divider: #72abd2;
-		--nav-candyCornContent: url(css://archive/comics/pxs/candycorn_pxs.png);
+		--nav-candyCornContent: url(assets://archive/comics/pxs/candycorn_pxs.png);
 	
 		--page-pageBody: #00101a;
 		--page-pageFrame: #002d4d;

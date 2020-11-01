@@ -151,7 +151,7 @@ export default {
       justify-content: center;
       .candyCorn {
         margin: 0 9px;
-        content: url(css://images/candycorn.gif);
+        content: url(assets://images/candycorn.gif);
         image-rendering: pixelated;
       }
       ul {

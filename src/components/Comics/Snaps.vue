@@ -124,22 +124,22 @@ export default {
   align-items: center;
 
   &.c2016-10-24, &.c2016-12-25 {
-    background-image: url(css://archive/comics/snaps/bg1.png);
+    background-image: url(assets://archive/comics/snaps/bg1.png);
   }
   &.c2016-10-31 {
-    background-image: url(css://archive/comics/snaps/bg2.jpg);
+    background-image: url(assets://archive/comics/snaps/bg2.jpg);
   }
   &.c2016-11-11 {
-    background-image: url(css://archive/comics/snaps/bg3.jpg);
+    background-image: url(assets://archive/comics/snaps/bg3.jpg);
   }
   &.c2016-11-18, &.c2016-11-24 {
-    background-image: url(css://archive/comics/snaps/bg4.jpg);
+    background-image: url(assets://archive/comics/snaps/bg4.jpg);
   }
   &.c2016-12-02 {
-    background-image: url(css://archive/comics/snaps/bg5.jpg);
+    background-image: url(assets://archive/comics/snaps/bg5.jpg);
   }
   &.c2016-12-23 {
-    background-image: url(css://archive/comics/snaps/bg6.png);
+    background-image: url(assets://archive/comics/snaps/bg6.png);
   }
 
   .navBanner {
@@ -151,7 +151,7 @@ export default {
     flex: 1;
 
     margin: 0 auto;
-    background: url(css://archive/comics/snaps/frameSmall.png);
+    background: url(assets://archive/comics/snaps/frameSmall.png);
     background-repeat: no-repeat;
     width: 466px;
     min-height: 961px;

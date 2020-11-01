@@ -28,7 +28,7 @@ app.disableHardwareAcceleration()
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'css', privileges: { standard: true } }
+  { scheme: 'assets', privileges: { standard: true } }
 ])
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
@@ -478,7 +478,7 @@ ipcMain.on('ondragstart', (event, filePath) => {
 const filter = {
   urls: [
     '*://*.mspaintadventures.com/*', 
-    'css://*/*',
+    'assets://*/*',
     "http://www.turner.com/planet/mp3/cp_close.mp3", 
     "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
     "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
@@ -496,7 +496,7 @@ function filterURL(url) {
     .replace(/http:\/\/www\.sweetcred\.com/, `http://127.0.0.1:${port}/archive/sweetcred`)
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `127.0.0.1:${port}/storyfiles/hs2/00338`) // phat beat machine
     .replace(/www\.timelesschaos\.com\/transferFiles/, `127.0.0.1:${port}/storyfiles/hs2/03318` ) // return to core - 618heircut.mp3
-    .replace(/css\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect CSS resource requests to asset folder
+    .replace(/assets\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect resource requests to asset folder
     .replace(/http\:\/\/((www|cdn)\.)?mspaintadventures\.com/, `http://127.0.0.1:${port}`) //Complete, should ideally never happen and probably won't work properly if it does
 }
 

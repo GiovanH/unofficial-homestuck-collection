@@ -207,7 +207,7 @@ export default {
             width: 1100px;  
 
             &:after{
-              content: url(css://scraps2/hscrollarrow.gif);
+              content: url(assets://scraps2/hscrollarrow.gif);
             }
           }   
         }

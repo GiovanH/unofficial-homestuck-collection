@@ -435,7 +435,7 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
-    background: url(css://archive/collection/homebg_right.png) repeat-y, url(css://archive/collection/homebg_left.png) repeat-y;
+    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
     background-position: left top, right top;
     background-color: #35bfff;
     background-attachment: fixed;
@@ -606,7 +606,7 @@ export default {
             font-size: 15px;
           }
           .kermit {
-            background: url(css://archive/collection/kermit.png);
+            background: url(assets://archive/collection/kermit.png);
             width: 65px;
             height: 65px;
             img {

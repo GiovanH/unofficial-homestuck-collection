@@ -266,7 +266,7 @@ export default {
         }
       }
       .bottom {
-        background: url('css://archive/social/tumblr/shadow-post.png') top center no-repeat transparent;
+        background: url('assets://archive/social/tumblr/shadow-post.png') top center no-repeat transparent;
         width: 513px;
         height: 40px;
         margin: 0 auto;
@@ -329,7 +329,7 @@ export default {
     }
 
     .bottom {
-      background: url('css://archive/social/tumblr/sidebar-bottom.png') top center no-repeat transparent;
+      background: url('assets://archive/social/tumblr/sidebar-bottom.png') top center no-repeat transparent;
       width: 250px;
       height: 25px; 
     }
