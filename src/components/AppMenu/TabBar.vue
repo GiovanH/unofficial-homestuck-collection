@@ -283,11 +283,11 @@ export default {
       // }
 
       .newTabButton {
+        font-family: Arial, Helvetica, sans-serif;
         width: 28px;
         height: 28px;
         font-size: 28px;
-        display: flex;
-        align-items: center;
+        line-height: 1;
       }
     }
   }
