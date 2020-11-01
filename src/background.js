@@ -465,6 +465,16 @@ ipcMain.handle('search', async (event, payload) => {
   return foundText
 })
 
+ipcMain.handle('steam-open', async (event, browserUrl) => {
+  const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
+
+  if (app.getApplicationNameForProtocol(steamUrl)) {
+    await shell.openExternal(steamUrl)
+  } else {
+    await shell.openExternal(browserUrl)
+  }
+})
+
 
 //Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {

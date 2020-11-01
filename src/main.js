@@ -68,7 +68,10 @@ Vue.mixin({
             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
-        shell.openExternal(urlObject.href)
+        if (urlObject.href.includes('steampowered.com/app')) {
+          ipcRenderer.invoke('steam-open', urlObject.href)
+        }
+        else shell.openExternal(urlObject.href)
       }
       else if (/\.(html|pdf)$/i.test(to)){
         shell.openExternal(this.$mspaURL(to))
