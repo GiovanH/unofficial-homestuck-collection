@@ -103,7 +103,7 @@ export default {
   },
   watch: {
     'tab.history': function (to, from) {
-      if (/^question/.test(this.routeParams.id) && this.$isNewReader) this.profile = 'mspadventures'
+      if (/^question/.test(this.routeParams.id) && !this.$pageIsSpoiler('005198')) this.profile = 'mspadventures'
       else this.profile = 'andrewhussie'
 
       this.jumpToClass(this.routeParams.id)
@@ -113,7 +113,7 @@ export default {
     this.jumpToClass(this.routeParams.id)
   },
   created(){
-    if (/^question/.test(this.routeParams.id) && this.$isNewReader) this.profile = 'mspadventures'
+    if (/^question/.test(this.routeParams.id) && !this.$pageIsSpoiler('005198')) this.profile = 'mspadventures'
     else this.profile = 'andrewhussie'
   }
 }
