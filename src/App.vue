@@ -29,7 +29,7 @@
     },
     data() {
       return {
-        zoomLevel: 3,
+        zoomLevel: 0
       }
     },
     computed: {
@@ -42,23 +42,19 @@
         return this.$localData.tabData.tabs[key]
       },
       resetZoom() {
-        this.zoomLevel = 3
-        electron.webFrame.setZoomFactor(1)
+        this.zoomLevel = 0
+        electron.webFrame.setZoomLevel(this.zoomLevel)
       },
       zoomIn() {
-        let increments = [0.6, 0.75, 0.9, 1, 1.2, 1.5, 2.0]
-        if (!increments.includes(electron.webFrame.getZoomFactor())) this.zoomLevel = 2
-        if (this.zoomLevel < 6) {
-          let level = increments[++this.zoomLevel]
-          electron.webFrame.setZoomFactor(level)
+        if (this.zoomLevel < 5) {
+          this.zoomLevel += 0.5
+          electron.webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       zoomOut() {
-        let increments = [0.6, 0.75, 0.9, 1, 1.2, 1.5, 2.0]
-        if (!increments.includes(electron.webFrame.getZoomFactor())) this.zoomLevel = 4
-        if (this.zoomLevel > 0) {
-          let level = increments[--this.zoomLevel]
-          electron.webFrame.setZoomFactor(level)
+        if (this.zoomLevel > -5) {
+          this.zoomLevel -= 0.5
+          electron.webFrame.setZoomLevel(this.zoomLevel)
         }
       }
     },

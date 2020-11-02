@@ -45,7 +45,7 @@
       <li @mouseup="openImageFile()">Open in Folder</li>      
       <li @mouseup="saveImage()">Save Image</li>
     </ul>
-    <ul v-if="$parent.zoomLevel != 3">
+    <ul v-if="$parent.zoomLevel != 0">
       <li @mouseup="resetZoom()">Reset Zoom</li>
     </ul>
     <ul v-if="$localData.settings.devMode">
