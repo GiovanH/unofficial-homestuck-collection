@@ -24,6 +24,7 @@
     <ul v-if="tags.includes('Selection')">
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
+      <li @mouseup="googleSearch()">Search with Google</li>  
     </ul>
     <ul v-if="tags.includes('Input')">
       <li @mouseup="cut()">Cut</li>
@@ -144,6 +145,10 @@ export default {
     },
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
+    },
+    googleSearch() {
+      let query = window.getSelection().toString()
+      this.$openLink(`https://google.com/search?q=${encodeURIComponent(query)}`)
     },
 
     lendFocus(el) {
