@@ -95,7 +95,7 @@ export default {
     }
 
     .tabTitle {
-      flex: 0 10 auto;
+      flex: 1 10 auto;
       padding: 0 5px;
       white-space: nowrap;
       min-width: 0;
