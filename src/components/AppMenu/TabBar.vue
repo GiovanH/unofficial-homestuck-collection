@@ -6,7 +6,7 @@
       </div>
       <div id="tabSection">
         <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
-          <div class="tabTitle"/>
+          <div class="tabTitle" :class="{dragTitleFade}"></div>
           <div class="systemButton closeTabButton">✕</div>
         </div>
         <transition-group name="tab-list" tag="ul" id="tabs">
@@ -33,7 +33,8 @@ export default {
       thresholdDirection: undefined,
       clickAnchor: undefined,
       dragTarget: undefined,
-      showDragTab: false
+      showDragTab: false,
+      dragTitleFade: false
     }
   },
   computed: {
@@ -74,8 +75,7 @@ export default {
 
     getTabEl(el) {
       if (!el) return null
-      return (el.classList.contains('tabShell')) ? el.firstChild : 
-        (el.parentNode.classList.contains('tabShell')) ? el : el.parentNode
+      return (el.classList.contains('tabShell')) ? el.firstChild : el.closest('.tab')
     },
 
     constrainXToTabArea(tabX) {
@@ -132,6 +132,10 @@ export default {
         document.onmousemove = this.elementDrag
 
         this.$nextTick(()=>{
+          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 10 //10px of padding
+          let titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
+          this.dragTitleFade = titleWidth < titleTextWidth
+
           this.dragTab.focus()
           this.dragTab.onblur = this.closeDragElement
         })
@@ -227,6 +231,7 @@ export default {
 
       #dragTab {
         position: absolute;
+        z-index: 1;
         pointer-events: none;
 
         background: var(--header-bg);
@@ -246,6 +251,10 @@ export default {
           white-space: nowrap;
           min-width: 0;
           overflow: hidden;
+
+          &.dragTitleFade {
+            -webkit-mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
+          }
         }
 
         .closeTabButton {
