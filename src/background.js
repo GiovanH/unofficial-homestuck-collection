@@ -50,6 +50,14 @@ try {
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
+  
+  //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
+  let gankraSearchPage = archive.search.find(x => x.key == '002745')
+  if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+  archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+  archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+
+
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
