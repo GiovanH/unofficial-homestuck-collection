@@ -139,12 +139,12 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>    
-      .bannerDiv{
-          margin: 0;
-          * {
-              display: block;
-          }
+<style lang="scss" scoped>
+    .bannerDiv{
+        margin: 0;
+        * {
+            display: block;
+        }
         .imgTooltip {
             display: none;
             z-index: 1;
@@ -152,8 +152,5 @@ export default {
             left: 0;
             top: 0;
         }
-        img, ::v-deep{
-         image-rendering: pixelated;
-        }
-      }
+    }
 </style>

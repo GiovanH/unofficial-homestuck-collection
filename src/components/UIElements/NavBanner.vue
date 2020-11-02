@@ -1,9 +1,8 @@
 <template>
-  <nav class="navBanner" :class="{customNavBanner: useCustomStyles}">
+  <nav class="navBanner" :class="{customNavBanner: useCustomStyles, pixelated: $localData.settings.pixelScaling}">
     <div class="navList">
       <ul class="nav1">
         <li><a href="https://www.homestuck.com">{{this.navText[0]}}</a></li>
-        <!-- <li><a href="https://www.homestuck.com">{{$localData.settings.newReader.current}} - {{$localData.settings.newReader.limit}}</a></li> -->
       </ul>
       <div class="candyCorn" />
       <ul class="nav2">
@@ -83,7 +82,10 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>  
+<style lang="scss" scoped>
+  .pixelated .candyCorn {
+    image-rendering: pixelated;
+  }
 
   .customNavBanner {
     background: var(--nav-bg);
@@ -152,7 +154,6 @@ export default {
       .candyCorn {
         margin: 0 9px;
         content: url(assets://images/candycorn.gif);
-        image-rendering: pixelated;
       }
       ul {
         height: 17px;

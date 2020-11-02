@@ -50,6 +50,7 @@ class LocalData {
       switchToNewTabs: false,
       forceScrollBar: true,
       noSmoothScrolling: false,
+      pixelScaling: true,
       mspaMode: false,
       bandcampEmbed: true,
       devMode: false,

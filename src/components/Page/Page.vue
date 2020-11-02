@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody customStyles" :class="{supercartridge, hscroll, scratchIntermission}">
+  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}">
     <Banner :tab="tab" :page="thisPage"/>
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
@@ -105,6 +105,9 @@ export default {
       })
       return nextPages
     },
+    pixelated() {
+      return this.$localData.settings.pixelScaling
+    },
     scratchIntermission() {
       return this.thisPage.theme == 'scratch'
     },
@@ -173,6 +176,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .pixelated::v-deep img{
+    image-rendering: pixelated;
+  }
+
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);
@@ -267,9 +274,6 @@ export default {
             flex-flow: column;
 
             .panel {
-              ::v-deep {
-                image-rendering: pixelated;
-              }
               &:not(:last-child) {
                 margin-bottom: 17px;
               }

@@ -119,6 +119,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.pixelated::v-deep img{
+  image-rendering: pixelated;
+}
+
 .pageBody {
   color: var(--font-default);
   background: var(--page-pageBody);
@@ -185,9 +189,6 @@ export default {
           flex-flow: column;
 
           .panel {
-            ::v-deep {
-              image-rendering: pixelated;
-            }
             &:not(:last-child) {
               margin-bottom: 17px;
             }

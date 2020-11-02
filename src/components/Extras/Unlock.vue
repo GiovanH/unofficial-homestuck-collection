@@ -92,10 +92,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-  ::v-deep {
-    image-rendering: pixelated;
-  }
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);

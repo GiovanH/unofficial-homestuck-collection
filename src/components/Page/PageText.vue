@@ -149,8 +149,6 @@ export default {
 
 <style scoped lang="scss">
     ::v-deep {
-        image-rendering: pixelated;
-        
         a {
             color: var(--page-links);
             &.visited {
