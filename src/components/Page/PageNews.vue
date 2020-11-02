@@ -2,6 +2,15 @@
     <div class="newsBody">
     <div class="news">
         <Media class="logo" :url="newsLogo" />
+        <div v-if="tumblr">
+            Latest Tumblr post: <a :href="tumblr.link">{{tumblr.formattedDate}}</a>
+        </div>
+        <div v-if="formspring">
+            Latest Formspring answer: <a :href="formspring.link">{{formspring.formattedDate}}</a>
+        </div>
+        <div v-if="blogspot">
+            Latest Blogspot post: <a :href="blogspot.link">{{blogspot.title}}</a>
+        </div>
         <div v-for="post in newsposts" v-html="post.html" :key="post.id"><br><br></div>
     </div>
     </div>
@@ -41,6 +50,53 @@ export default {
             prevNewsposts.sort((a, b) => b.timestamp - a.timestamp)
             prevNewsposts = prevNewsposts.slice(0, 4)
             return prevNewsposts
+        },
+        blogspot() {
+            let yesterday = this.thisPage.timestamp * 1 - 60 * 60 * 24
+            for (let blog of this.$archive.social.blogspot)
+            {
+                if (!blog.timestamp) // if user has old version of the archive
+                    return null
+                else if (blog.timestamp < yesterday)
+                {
+                    return {
+                        link: "/blogspot/" + blog.id,
+                        title: blog.title
+                    }
+                }
+            }
+            return null
+        },
+        formspring() {
+            let yesterday = this.thisPage.timestamp * 1 - 60 * 60 * 24
+            let latestPost = null;
+            for (let account in this.$archive.social.formspring)
+                for (let post of this.$archive.social.formspring[account])
+                    if (post.timestamp < yesterday && !(latestPost && latestPost.timestamp > post.timestamp))
+                        latestPost = post
+            if (!latestPost)
+                return null
+            else {
+                return {
+                    link: "/formspring/" + latestPost.id,
+                    formattedDate: new Date(latestPost.timestamp * 1000).toDateString()
+                }
+            }
+        },
+        tumblr() {
+            let yesterday = this.thisPage.timestamp * 1 - 60 * 60 * 24
+            let latestPost = null;
+            for (let post of this.$archive.social.tumblr)
+                if (post.timestamp < yesterday && !(latestPost && latestPost.timestamp > post.timestamp))
+                    latestPost = post
+            if (!latestPost)
+                return null
+            else {
+                return {
+                    link: "/tumblr/" + latestPost.id,
+                    formattedDate: new Date(latestPost.timestamp * 1000).toDateString()
+                }
+            }
         }
     },
     methods: {
