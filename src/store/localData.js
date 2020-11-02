@@ -59,6 +59,7 @@ class LocalData {
       hqAudio: true,
       jsFlashes: true,
       credits: true,
+      newsposts: false,
       footnotes: false,
 
       retcon1: true,

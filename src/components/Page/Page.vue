@@ -22,7 +22,7 @@
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
-    <PageNews :thisPage="thisPage"/>
+    <PageNews :thisPage="thisPage" v-if="showNewsposts"/>
   </div>
 </template>
 
@@ -119,6 +119,9 @@ export default {
     },
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
+    },
+    showNewsposts() {
+      return this.$localData.settings.newsposts;
     },
     footnote() {
       return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
