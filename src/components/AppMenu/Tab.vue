@@ -47,11 +47,16 @@ export default {
     closeTab() {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
-    onResize(entries) { 
-      entries.forEach(entry => {
-        let textWidth = this.$refs.titleText.getBoundingClientRect().width
-        this.titleFade = entry.contentRect.width < textWidth
-      })
+    onResize() { 
+      let titleWidth = this.$refs.title.getBoundingClientRect().width - 10 //5px of padding on right
+      let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
+      console.log(titleWidth, titleTextWidth, titleWidth < titleTextWidth)
+      this.titleFade = titleWidth < titleTextWidth
+    }
+  },
+  watch: {
+    'tab.title'(){
+      this.$nextTick(this.onResize)
     }
   },
   mounted() {
@@ -103,7 +108,7 @@ export default {
       pointer-events: none;
       
       &.titleFade {
-        -webkit-mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
+        mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
       }
     }
 

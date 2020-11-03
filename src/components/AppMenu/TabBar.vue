@@ -253,7 +253,7 @@ export default {
           overflow: hidden;
 
           &.dragTitleFade {
-            -webkit-mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
+            mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
           }
         }
 

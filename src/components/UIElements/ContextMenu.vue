@@ -165,7 +165,7 @@ export default {
         if (target.id == 'tabNavigation' || target.closest('#tabNavigation')) this.tags.push('History')
         else if (target.classList.contains('tab') || target.parentNode.classList.contains('tab')) this.tags.push('Tab')
         else if (target.id == 'tabSection' || target.classList.contains('newTabButton')) this.tags.push('TabSection')
-        else if (target.tagName == 'INPUT') this.tags.push('Input')
+        else if ((target.tagName == 'INPUT' && target.type == 'text') || target.tagName == 'TEXTAREA') this.tags.push('Input')
         else if (window.getSelection().toString().length > 0) this.tags.push('Selection')
         if (target.tagName == 'IMG') this.tags.push("Image")
         if (target.closest('a') && target.closest('a').href) {
