@@ -1,6 +1,6 @@
 <template>
   <transition name="jumpbox">
-    <div class="jumpBox" v-show="isActive" @focusout="onFocusOut" tabindex="-1">
+    <div class="jumpBox" v-show="isActive" @keydown.esc="close()" @focusout="onFocusOut" tabindex="-1">
       <div class="wrapper">
         <a :href="jumpboxText" class="jumpboxLink" ref="link">
         </a>

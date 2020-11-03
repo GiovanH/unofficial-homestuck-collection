@@ -49,13 +49,14 @@ class LocalData {
       showAddressBar: false,
       switchToNewTabs: false,
       forceScrollBar: true,
-      noSmoothScrolling: false,
+      smoothScrolling: true,
       pixelScaling: true,
       mspaMode: false,
       bandcampEmbed: true,
       devMode: false,
 
       themeOverride: "",
+      forceThemeOverride: false,
       textOverride: {
         fontFamily: "",
         bold: false,

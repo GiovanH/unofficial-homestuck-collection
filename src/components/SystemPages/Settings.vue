@@ -31,7 +31,7 @@
           <dt><label><input type="checkbox" name="forceScrollBar" v-model="$localData.settings['forceScrollBar']" @click="toggleSetting('forceScrollBar')">Always display scroll bar</label></dt>
           <dd class="settingDesc">Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this.</dd>
           
-          <dt><label><input type="checkbox" name="noSmoothScrolling" v-model="$localData.settings['noSmoothScrolling']" @click="toggleSetting('noSmoothScrolling')">Disable smooth scrolling</label></dt>
+          <dt><label><input type="checkbox" name="smoothScrolling" v-model="$localData.settings['smoothScrolling']" @click="toggleSetting('smoothScrolling')">Enable smooth scrolling</label></dt>
           <dd class="settingDesc">Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong></dd>
           
           <dt><label><input type="checkbox" name="pixelScaling" v-model="$localData.settings['pixelScaling']" @click="toggleSetting('pixelScaling')">Pixelated image scaling</label></dt>
@@ -51,12 +51,14 @@
         <h2>Enhancements</h2>
         <dl>
           <dt>Theme Override</dt>
-          <dd class="settingDesc" v-if="!$isNewReader">
+          <dd v-if="!$isNewReader">
             <select class="themeSelector" v-model="$localData.settings.themeOverride" @change="$localData.root.saveLocalStorage()">
               <option v-for="theme in themes" :value="theme.value">
                 {{ theme.text }}
               </option>
             </select>
+            <br><br>
+            <label v-if="$localData.settings.themeOverride"><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
 
@@ -73,13 +75,16 @@
                     </option>
                   </select>
                 </label>
-                <label v-if="$localData.settings.textOverride.fontFamily"> (Bold: <input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')">)</label>
+                <span v-if="$localData.settings.textOverride.fontFamily">
+                  <br><br>
+                  <label ><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                </span>
                 <br><br>
                 <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
                 <br><br>
                 <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
               </div>
-              <PageText class="examplePrattle" content="|AUTHORLOG|<br/>A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!"/>
+              <PageText class="examplePrattle" content="|AUTHORLOG|<br/>A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
             </div>
           </dd>
 

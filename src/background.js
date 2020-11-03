@@ -79,7 +79,7 @@ try {
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.get('localData.settings.noSmoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
+    if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
   else throw `Flash plugin not located at ${flashPath}`
 
