@@ -7,7 +7,7 @@
       <div id="jumpBox">
         <div class="jumpBoxWrapper">
           <a :href="jumpboxText" class="jumpboxLink" ref="link" />
-          <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText"  @keydown.enter="focusLink()" />
+          <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText" @keydown.esc="resetJumpbox()" @keydown.enter="focusLink()" />
         </div>
       </div>
       <div class="lineBreak"/>
@@ -66,6 +66,13 @@ export default {
     focusLink(){
       this.$refs.link.click()
       document.activeElement.blur()
+    },
+    resetJumpbox() {
+      this.jumpboxText = this.$localData.root.activeTabObject.url
+      
+      this.$nextTick(()=> {
+        this.$refs.input.select()
+      })
     },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
@@ -202,6 +209,9 @@ export default {
   watch:{
     '$localData.root.activeTabObject.url'(to, from){
       this.jumpboxText = to
+    },
+    '$localData.tabData.activeTabKey'(to, from){
+      this.jumpboxText = this.$localData.root.activeTabObject.url
     }
   },
   created(){
