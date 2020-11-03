@@ -13,7 +13,7 @@
         <h2>THE JUMP BAR</h2>
         <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! Open it up by clicking the JUMP button at the top of the page, or by hitting <strong>CTRL+L</strong> (that's <strong>⌘+L</strong> if you're on MacOS).</p>
         <Media url="/archive/collection/userguide_jumpbar.png" />
-        <p>It functions just like the URL bar in your browser, because it pretty much is! The philosophy of this collection is that you generally shouldn't <em>have</em> to use URLs to get anywhere important. That said, the JUMP BAR will be there for you whenever you need it.</p>
+        <p>It functions just like the address bar in your browser, because it pretty much is one! If you really miss having it embedded in the header at all times, there's an option for that at the top of <a href="/settings">the settings page.</a></p>
       </div>
       <div class="cardContent">
         <h2>SAVING and LOADING your "game"</h2>

@@ -22,6 +22,9 @@
       <div class="settings application">
         <h2>Application Settings</h2>
         <dl>
+          <dt><label><input type="checkbox" name="showAddressBar" v-model="$localData.settings['showAddressBar']" @click="toggleSetting('showAddressBar')">Always show jump box</label></dt>
+          <dd class="settingDesc">Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L).</dd>
+
           <dt><label><input type="checkbox" name="switchToNewTabs" v-model="$localData.settings['switchToNewTabs']" @click="toggleSetting('switchToNewTabs')">Auto-switch to new tabs</label></dt>
           <dd class="settingDesc">Opening any link in a new tab will automatically switch you to that tab.</dd>
 

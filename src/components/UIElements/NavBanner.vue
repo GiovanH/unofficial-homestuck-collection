@@ -76,7 +76,7 @@ export default {
       this.tabComponent.$refs.bookmarks.toggle()
     },
     toggleJumpBox(){
-      this.tabComponent.$refs.jumpbox.toggle()
+      this.$root.$children[0].openJumpbox()
     }
   },
 }

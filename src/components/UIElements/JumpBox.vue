@@ -2,10 +2,9 @@
   <transition name="jumpbox">
     <div class="jumpBox" v-show="isActive" @focusout="onFocusOut" tabindex="-1">
       <div class="wrapper">
-        <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText"  @keydown.enter="focusLink()" />
         <a :href="jumpboxText" class="jumpboxLink" ref="link">
-          <fa-icon icon="chevron-right"></fa-icon>
         </a>
+        <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText"  @keydown.enter="focusLink()" />
       </div>
     </div>
   </transition>
@@ -73,7 +72,7 @@ export default {
     
     position: fixed;
     width: 100%;
-    top: 100px;
+    top: calc(var(--headerHeight) + 50px);
     z-index: 4;
 
     .wrapper {
@@ -84,23 +83,28 @@ export default {
       margin: 0 auto;
       display: flex;
 
-      input {
-        padding: 2px 0 2px 5px;
-        font-size: 22px;
-        height: 30px;
-        width: 500px;
-        border: none;
-      }
       .jumpboxLink {
         background: #fff;
         font-size: 25px;
-        padding: 0 7px;
         text-decoration: none;
         color: #000;
 
         justify-content: center;
         align-items: center;
         display: flex;
+
+        &::after {
+          text-align: center;
+          width: 34px;
+          margin: 0;
+        }
+      }
+      input {
+        padding: 2px 0;
+        font-size: 22px;
+        height: 30px;
+        width: 500px;
+        border: none;
       }
     }
   }

@@ -253,7 +253,7 @@ export default {
 		user-select: none;
 		position: fixed;
 		width: 350px;
-		height: calc(100% - 50px);
+		height: calc(100% - var(--headerHeight));
 		overflow-y: hidden;
 		overflow-x: hidden;
 		pointer-events: none;
