@@ -63,7 +63,7 @@ export default {
             let text = this.content.match(/\|(.*?)\|/)[1]
             let state = (this.logHidden) ? 'Show ' : 'Hide '
 
-            if (/P4SSWORD/i.test(text)){
+            if (/P4SSWORD H1NT/i.test(text)){
                 return text
             }
             else if (/trkstrlog/i.test(text)){
