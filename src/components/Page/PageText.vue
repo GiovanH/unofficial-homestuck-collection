@@ -203,6 +203,7 @@ export default {
         text-align: center;
         align-self: center;
         .logContent{
+            color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
         }
@@ -225,6 +226,7 @@ export default {
         }
         
         .logContent{
+            color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
         }
