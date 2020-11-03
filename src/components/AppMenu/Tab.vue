@@ -1,7 +1,9 @@
 <template>
   <li class="tabShell" :class="{activeTabShell: isActiveTab}" @mousedown.left="clickTab()" @click.middle="closeTab()">
     <div class="tab" tabindex="-1" :id="'tab_' + tab.key" :class="{activeTab: isActiveTab}">
-      <div class="tabTitle" v-html="title" />
+      <div class="tabTitle" :class="{titleFade}" ref="title" >
+        <span v-html="title" ref="titleText"/>
+      </div>
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -17,7 +19,9 @@ export default {
   ],
   data() {
     return {
-      pendingDeletion: false
+      pendingDeletion: false,
+      resizeObserver: undefined,
+      titleFade: false
     }
   },
   computed: {
@@ -42,7 +46,25 @@ export default {
     },
     closeTab() {
       this.$localData.root.TABS_CLOSE(this.tab.key)
+    },
+    onResize() { 
+      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 //Offsets 5px of padding on left
+      let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
+      
+      this.titleFade = titleWidth < titleTextWidth
     }
+  },
+  watch: {
+    'tab.title'(){
+      this.$nextTick(this.onResize)
+    }
+  },
+  mounted() {
+    this.resizeObserver = new ResizeObserver(this.onResize)
+    this.resizeObserver.observe(this.$refs.title)
+  },
+  beforeDestroy() {
+    this.resizeObserver.disconnect()
   }
 }
 </script>
@@ -78,11 +100,16 @@ export default {
     }
 
     .tabTitle {
-      flex: 0 10 auto;
-      padding: 0 5px;
+      flex: 1 10 auto;
+      padding-left: 5px;
       white-space: nowrap;
       min-width: 0;
       overflow: hidden;
+      pointer-events: none;
+      
+      &.titleFade {
+        mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
+      }
     }
 
     .closeTabButton {

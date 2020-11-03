@@ -425,7 +425,7 @@
                                     <tbody>
                                       <tr>
                                         <td>
-                                          <font size="6"><a href="https://store.steampowered.com/agecheck/app/833040/" target="_blank">FRIENDSIM.EXE</a></font>
+                                          <font size="6"><a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/" target="_blank">FRIENDSIM.EXE</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
@@ -518,7 +518,7 @@
                                     <tbody>
                                       <tr>
                                         <td>
-                                          <font size="6"><a href="https://store.steampowered.com/agecheck/app/1144030/" target="_blank">PESTERQUEST.EXE</a></font>
+                                          <font size="6"><a href="https://store.steampowered.com/app/1144030/Pesterquest/" target="_blank">PESTERQUEST.EXE</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />

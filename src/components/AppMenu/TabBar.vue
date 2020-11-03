@@ -1,12 +1,19 @@
 <template>
-    <div id="tabBar">
+    <div id="tabBar" :class="{showAddressBar: $localData.settings.showAddressBar}">
       <div id="tabNavigation">
         <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
         <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
       </div>
+      <div id="jumpBox">
+        <div class="jumpBoxWrapper">
+          <a :href="jumpboxText" class="jumpboxLink" ref="link" />
+          <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText"  @keydown.enter="focusLink()" />
+        </div>
+      </div>
+      <div class="lineBreak"/>
       <div id="tabSection">
         <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
-          <div class="tabTitle"/>
+          <div class="tabTitle" :class="{dragTitleFade}"></div>
           <div class="systemButton closeTabButton">✕</div>
         </div>
         <transition-group name="tab-list" tag="ul" id="tabs">
@@ -14,6 +21,7 @@
         </transition-group>
         <div class="systemButton newTabButton" @click="newTab()">＋</div>
       </div>
+      <div />
     </div>
 </template>
 
@@ -27,13 +35,14 @@ export default {
   },
   data(){
     return {
-      activeTab: this.$localData.tabData.activeTabKey,
       cursorXPrev: 0,
       threshold: undefined,
       thresholdDirection: undefined,
       clickAnchor: undefined,
       dragTarget: undefined,
-      showDragTab: false
+      showDragTab: false,
+      dragTitleFade: false,
+      jumpboxText: this.$localData.root.activeTabObject.url
     }
   },
   computed: {
@@ -54,6 +63,10 @@ export default {
     }
   },
   methods: {
+    focusLink(){
+      this.$refs.link.click()
+      document.activeElement.blur()
+    },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
     },
@@ -74,8 +87,7 @@ export default {
 
     getTabEl(el) {
       if (!el) return null
-      return (el.classList.contains('tabShell')) ? el.firstChild : 
-        (el.parentNode.classList.contains('tabShell')) ? el : el.parentNode
+      return (el.classList.contains('tabShell')) ? el.firstChild : el.closest('.tab')
     },
 
     constrainXToTabArea(tabX) {
@@ -132,6 +144,10 @@ export default {
         document.onmousemove = this.elementDrag
 
         this.$nextTick(()=>{
+          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 //Offsets 5px of padding on left
+          let titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
+          this.dragTitleFade = titleWidth < titleTextWidth
+
           this.dragTab.focus()
           this.dragTab.onblur = this.closeDragElement
         })
@@ -184,8 +200,8 @@ export default {
     }
   },
   watch:{
-    activeTab(to, from){
-      document.title = to.title
+    '$localData.root.activeTabObject.url'(to, from){
+      this.jumpboxText = to
     }
   },
   created(){
@@ -199,7 +215,25 @@ export default {
   #tabBar {
     height: 28px;
     display: flex;
+    flex-flow: row wrap;
     border-bottom: 1px solid var(--header-border);
+
+    &.showAddressBar {
+      height: 59px;
+      #tabSection {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    &:not(.showAddressBar) {
+      .lineBreak {
+        display: none;
+      }
+      #jumpBox {
+        display: none;
+      }
+    }
 
     #tabNavigation {
       display: inline-block;
@@ -218,6 +252,51 @@ export default {
           text-align: center;
         }
     }
+    #jumpBox {
+      flex: 1 0 auto;
+      margin: auto 5px;
+
+      .jumpBoxWrapper {
+        display: flex;
+        flex-flow: row nowrap;
+        
+        border-radius: 2px;
+        border: 1px solid var(--header-border);
+        background: var(--header-tabSection);
+
+        .jumpboxLink {
+          border-radius:  1px 0 0 1px ;
+          background: var(--header-tabSection);
+          color: var(--font-header);
+          font-size: 16px;
+          text-decoration: none;
+
+          justify-content: center;
+          align-items: center;
+          display: flex;
+          
+          &::after {
+            text-align: center;
+            width: 22px;
+            margin: 0;
+          }
+        }
+        input {
+          border-radius: 0 1px 1px 0;
+          padding: 2px 0;
+          font-size: 15px;
+          line-height: 20px;
+          width: 100%;
+          border: none;
+          background: var(--header-tabSection);
+          color: var(--font-header);
+        }
+      }
+    }
+    .lineBreak {
+      flex-basis: 100%;
+      height: 3px;
+    }
     #tabSection {
       background: var(--header-tabSection);
       width: calc(100vw - 58px);
@@ -227,6 +306,7 @@ export default {
 
       #dragTab {
         position: absolute;
+        z-index: 1;
         pointer-events: none;
 
         background: var(--header-bg);
@@ -241,11 +321,15 @@ export default {
         cursor: default;
 
         .tabTitle {
-          flex: 0 10 auto;
-          padding: 0 5px;
+          flex: 1 10 auto;
+          padding-left: 5px;
           white-space: nowrap;
           min-width: 0;
           overflow: hidden;
+
+          &.dragTitleFade {
+            mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
+          }
         }
 
         .closeTabButton {
@@ -283,11 +367,11 @@ export default {
       // }
 
       .newTabButton {
+        font-family: Arial, Helvetica, sans-serif;
         width: 28px;
         height: 28px;
         font-size: 28px;
-        display: flex;
-        align-items: center;
+        line-height: 1;
       }
     }
   }

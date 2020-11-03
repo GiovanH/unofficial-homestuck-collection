@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody customStyles" :class="{supercartridge, hscroll, scratchIntermission}">
+  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}">
     <Banner :tab="tab" :page="thisPage"/>
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
@@ -7,7 +7,7 @@
       <div class="pageContent">
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
-              <div class="media">
+              <div class="media" ref="media">
                   <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
               </div>
           </div>
@@ -105,6 +105,9 @@ export default {
       })
       return nextPages
     },
+    pixelated() {
+      return this.$localData.settings.pixelScaling
+    },
     scratchIntermission() {
       return this.thisPage.theme == 'scratch'
     },
@@ -166,10 +169,17 @@ export default {
       }
     }
   },
+  updated() {
+    if (this.hscroll) this.$refs.media.scrollLeft = 0
+  }
 }
 </script>
 
 <style scoped lang="scss">
+  .pixelated::v-deep img{
+    image-rendering: pixelated;
+  }
+
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);
@@ -207,7 +217,7 @@ export default {
             width: 1100px;  
 
             &:after{
-              content: url(css://scraps2/hscrollarrow.gif);
+              content: url(assets://scraps2/hscrollarrow.gif);
             }
           }   
         }
@@ -264,9 +274,6 @@ export default {
             flex-flow: column;
 
             .panel {
-              ::v-deep {
-                image-rendering: pixelated;
-              }
               &:not(:last-child) {
                 margin-bottom: 17px;
               }

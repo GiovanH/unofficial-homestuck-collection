@@ -309,7 +309,7 @@ export default {
     }
 
     .main-wrapper {
-        background: #214552 url(css://archive/social/blogspot/css/corner_main_left.gif) no-repeat right top;
+        background: #214552 url(assets://archive/social/blogspot/css/corner_main_left.gif) no-repeat right top;
         width: 460px;
         float: left;
         color: #ffffff;
@@ -324,7 +324,7 @@ export default {
     }
 
     .sidebar-wrapper {
-        background: #cedfbd url(css://archive/social/blogspot/css/corner_sidebar_left.gif) no-repeat left top;
+        background: #cedfbd url(assets://archive/social/blogspot/css/corner_sidebar_left.gif) no-repeat left top;
         width: 254px;
         float: right;
         padding: 0;
@@ -381,7 +381,7 @@ export default {
     }
 
     .header .titlewrapper {
-        background: #269 url(css://archive/social/blogspot/css/topleft_left.gif) no-repeat left bottom;
+        background: #269 url(assets://archive/social/blogspot/css/topleft_left.gif) no-repeat left bottom;
         padding-top: 0;
         padding-right: 0;
         padding-bottom: 0;
@@ -393,7 +393,7 @@ export default {
     }
 
     .header h1 {
-        background: url(css://archive/social/blogspot/css/bg_header.gif) no-repeat left top;
+        background: url(assets://archive/social/blogspot/css/bg_header.gif) no-repeat left top;
         margin: 0;
         padding: 70px 0 30px;
         line-height: 97px;
@@ -419,7 +419,7 @@ export default {
     /* Description
     ----------------------------------------------- */
     .header .descriptionwrapper {
-        background: #88ddff url(css://archive/social/blogspot/css/bg_desc_top_left.gif) no-repeat left top;
+        background: #88ddff url(assets://archive/social/blogspot/css/bg_desc_top_left.gif) no-repeat left top;
         margin: 0 0 6px;
         padding: 12px 0 0;
         color: #ffffff;
@@ -429,7 +429,7 @@ export default {
     }
 
     .header .description {
-        background: url(css://archive/social/blogspot/css/bg_desc_bot_left.gif) no-repeat left bottom;
+        background: url(assets://archive/social/blogspot/css/bg_desc_bot_left.gif) no-repeat left bottom;
         margin: 0;
         padding: 0 0 12px;
         display: block;
@@ -442,7 +442,7 @@ export default {
 
     .header .description span {
         /* To remove the word next to the description, delete the following background property */
-        background: url(css://archive/social/blogspot/css/temp_no.gif) no-repeat left center;
+        background: url(assets://archive/social/blogspot/css/temp_no.gif) no-repeat left center;
         /* Keep everything below */
         display: block;
         padding-top: 0;

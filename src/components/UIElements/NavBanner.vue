@@ -1,9 +1,8 @@
 <template>
-  <nav class="navBanner" :class="{customNavBanner: useCustomStyles}">
+  <nav class="navBanner" :class="{customNavBanner: useCustomStyles, pixelated: $localData.settings.pixelScaling}">
     <div class="navList">
       <ul class="nav1">
         <li><a href="https://www.homestuck.com">{{this.navText[0]}}</a></li>
-        <!-- <li><a href="https://www.homestuck.com">{{$localData.settings.newReader.current}} - {{$localData.settings.newReader.limit}}</a></li> -->
       </ul>
       <div class="candyCorn" />
       <ul class="nav2">
@@ -77,13 +76,16 @@ export default {
       this.tabComponent.$refs.bookmarks.toggle()
     },
     toggleJumpBox(){
-      this.tabComponent.$refs.jumpbox.toggle()
+      this.$root.$children[0].openJumpbox()
     }
   },
 }
 </script>
 
-<style lang="scss" scoped>  
+<style lang="scss" scoped>
+  .pixelated .candyCorn {
+    image-rendering: pixelated;
+  }
 
   .customNavBanner {
     background: var(--nav-bg);
@@ -151,8 +153,7 @@ export default {
       justify-content: center;
       .candyCorn {
         margin: 0 9px;
-        content: url(css://images/candycorn.gif);
-        image-rendering: pixelated;
+        content: url(assets://images/candycorn.gif);
       }
       ul {
         height: 17px;

@@ -171,7 +171,7 @@ export default {
 <style scoped lang="scss">
 .pageBody {
   background: #002d4d;
-  background-image: url(css://archive/comics/pxs/pixels_top.png), url(css://archive/comics/pxs/pixels_bottom.png) !important;
+  background-image: url(assets://archive/comics/pxs/pixels_top.png), url(assets://archive/comics/pxs/pixels_bottom.png) !important;
   background-position: center top, center bottom !important;
   background-repeat: no-repeat !important;
 
@@ -188,7 +188,7 @@ export default {
     }
     .navList {
       .candyCorn {
-        content: url(css://archive/comics/pxs/candycorn_pxs.png);
+        content: url(assets://archive/comics/pxs/candycorn_pxs.png);
       }
       ul li:not(:last-child):after {
         color:  #72abd2;
@@ -199,10 +199,10 @@ export default {
   .pageFrame {
     margin: 0 auto;
     width: 774px;
-    background: url(css://archive/comics/pxs/bgContainer.png) !important;
+    background: url(assets://archive/comics/pxs/bgContainer.png) !important;
 
     .pageContent {
-      background: url(css://archive/comics/pxs/bgPxs_logo.png) !important;
+      background: url(assets://archive/comics/pxs/bgPxs_logo.png) !important;
       background-repeat: no-repeat !important;
       background-position: 10px -20px !important;
 

@@ -28,7 +28,7 @@ app.disableHardwareAcceleration()
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'css', privileges: { standard: true } }
+  { scheme: 'assets', privileges: { standard: true } }
 ])
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
@@ -50,6 +50,18 @@ try {
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
+  
+  //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
+  let gankraSearchPage = archive.search.find(x => x.key == '002745')
+  if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+
+  archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+
+  archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+
+  archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+
+
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
@@ -67,6 +79,7 @@ try {
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
+    if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
   else throw `Flash plugin not located at ${flashPath}`
 
@@ -102,17 +115,31 @@ try {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {win.webContents.send('ZOOM_IN')}
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {win.webContents.send('ZOOM_OUT')}
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+        },
+        {
+          label: 'Zoom In',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          accelerator: 'CommandOrControl+numadd',
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+        },
+        {
+          label: 'Zoom Out',
+          visible: false,
+          acceleratorWorksWhenHidden: true,
+          accelerator: 'CommandOrControl+numsub',
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
         },
         {
           label: 'Reset Zoom',
           accelerator: 'CmdOrCtrl+0',
-          click: () => {win.webContents.send('ZOOM_RESET')}
+          click: () => {if (win) win.webContents.send('ZOOM_RESET')}
         },
         { type: 'separator' },
         { role: 'togglefullscreen' }
@@ -124,45 +151,45 @@ try {
         {
           label: 'Go back one page',
           accelerator: 'Alt+Left',
-          click: () => {win.webContents.send('TABS_HISTORY_BACK')}
+          click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
         },
         {
           label: 'Go forward one page',
           accelerator: 'Alt+Right',
-          click: () => {win.webContents.send('TABS_HISTORY_FORWARD')}
+          click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
         },
         { type: 'separator' },
         {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',
-          click: () => {win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+          click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
         },
         {
           label: 'Close Tab',
           accelerator: 'CmdOrCtrl+W',
-          click: () => {win.webContents.send('TABS_CLOSE')}
+          click: () => {if (win) win.webContents.send('TABS_CLOSE')}
         },
         { type: 'separator' },
         {
           label: 'Next Tab',
           accelerator: 'CmdOrCtrl+Tab',
-          click: () => {win.webContents.send('TABS_CYCLE', {amount: 1})}
+          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
         },
         {
           label: 'Previous Tab',
           accelerator: 'CmdOrCtrl+Shift+Tab',
-          click: () => {win.webContents.send('TABS_CYCLE', {amount: -1})}
+          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
         },
         { type: 'separator' },
         {
           label: 'Duplicate Tab',
           accelerator: 'CmdOrCtrl+Shift+D',
-          click: () => {win.webContents.send('TABS_DUPLICATE')}
+          click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
         },
         {
           label: 'Restore Closed Tab',
           accelerator: 'CmdOrCtrl+Shift+T',
-          click: () => {win.webContents.send('TABS_RESTORE')}
+          click: () => {if (win) win.webContents.send('TABS_RESTORE')}
         }
       ]
     },
@@ -173,12 +200,12 @@ try {
         {
           label: 'Open Jump Bar',
           accelerator: 'CmdOrCtrl+L',
-          click: () => { win.webContents.send('OPEN_JUMPBOX') }
+          click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
         },
         {
           label: 'Find in page',
           accelerator: 'CmdOrCtrl+F',
-          click: () => { win.webContents.send('OPEN_FINDBOX') }
+          click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
         },
         { role: 'minimize' },
       ]
@@ -232,12 +259,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {win.webContents.send('ZOOM_IN')}
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {win.webContents.send('ZOOM_OUT')}
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
         },
       ]
     }
@@ -450,6 +477,16 @@ ipcMain.handle('search', async (event, payload) => {
   return foundText
 })
 
+ipcMain.handle('steam-open', async (event, browserUrl) => {
+  const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
+
+  if (app.getApplicationNameForProtocol(steamUrl)) {
+    await shell.openExternal(steamUrl)
+  } else {
+    await shell.openExternal(browserUrl)
+  }
+})
+
 
 //Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {
@@ -463,7 +500,7 @@ ipcMain.on('ondragstart', (event, filePath) => {
 const filter = {
   urls: [
     '*://*.mspaintadventures.com/*', 
-    'css://*/*',
+    'assets://*/*',
     "http://www.turner.com/planet/mp3/cp_close.mp3", 
     "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
     "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
@@ -481,7 +518,7 @@ function filterURL(url) {
     .replace(/http:\/\/www\.sweetcred\.com/, `http://127.0.0.1:${port}/archive/sweetcred`)
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `127.0.0.1:${port}/storyfiles/hs2/00338`) // phat beat machine
     .replace(/www\.timelesschaos\.com\/transferFiles/, `127.0.0.1:${port}/storyfiles/hs2/03318` ) // return to core - 618heircut.mp3
-    .replace(/css\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect CSS resource requests to asset folder
+    .replace(/assets\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect resource requests to asset folder
     .replace(/http\:\/\/((www|cdn)\.)?mspaintadventures\.com/, `http://127.0.0.1:${port}`) //Complete, should ideally never happen and probably won't work properly if it does
 }
 

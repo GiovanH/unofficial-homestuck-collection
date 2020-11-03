@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="$root.theme" v-if="$archive">
+  <div id="app" :class="[$root.theme, $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive">
     <AppHeader />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications ref="notifications" />
@@ -20,7 +20,6 @@
   import Notifications from '@/components/UIElements/Notifications.vue'
   
   import ContextMenu from '@/components/UIElements/ContextMenu.vue'
-  require('@/css/mspaThemes.scss')
 
   export default {
     name: 'HomestuckCollection',
@@ -29,7 +28,7 @@
     },
     data() {
       return {
-        zoomLevel: 3,
+        zoomLevel: 0
       }
     },
     computed: {
@@ -42,23 +41,27 @@
         return this.$localData.tabData.tabs[key]
       },
       resetZoom() {
-        this.zoomLevel = 3
-        electron.webFrame.setZoomFactor(1)
+        this.zoomLevel = 0
+        electron.webFrame.setZoomLevel(this.zoomLevel)
       },
       zoomIn() {
-        let increments = [0.6, 0.75, 0.9, 1, 1.2, 1.5, 2.0]
-        if (!increments.includes(electron.webFrame.getZoomFactor())) this.zoomLevel = 2
-        if (this.zoomLevel < 6) {
-          let level = increments[++this.zoomLevel]
-          electron.webFrame.setZoomFactor(level)
+        if (this.zoomLevel < 5) {
+          this.zoomLevel += 0.5
+          electron.webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       zoomOut() {
-        let increments = [0.6, 0.75, 0.9, 1, 1.2, 1.5, 2.0]
-        if (!increments.includes(electron.webFrame.getZoomFactor())) this.zoomLevel = 4
-        if (this.zoomLevel > 0) {
-          let level = increments[--this.zoomLevel]
-          electron.webFrame.setZoomFactor(level)
+        if (this.zoomLevel > -5) {
+          this.zoomLevel -= 0.5
+          electron.webFrame.setZoomLevel(this.zoomLevel)
+        }
+      },
+      openJumpbox() {
+        if (this.$localData.settings.showAddressBar) {
+          document.querySelector('#jumpBox input').select()
+        }
+        else {
+          this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
         }
       }
     },
@@ -105,7 +108,7 @@
         this.$refs[this.$localData.tabData.activeTabKey][0].$refs.findbox.open()
       })      
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
-        this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
+        this.openJumpbox()
       })      
   
       document.addEventListener('dragover', event => event.preventDefault())
@@ -113,7 +116,7 @@
 
       window.addEventListener('keydown', event => {
         let activeFrame = document.getElementById(this.$localData.tabData.activeTabKey)
-        if (activeFrame && !activeFrame.contains(document.activeElement)) activeFrame.focus()
+        if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })
 
       window.addEventListener('click', event => {
@@ -182,8 +185,18 @@
 </script>
 
 <style lang="scss">
+@import "@/css/fonts.scss";
 @import "@/css/fa/scss/fontawesome.scss";
 @import "@/css/fa/scss/solid.scss";
+
+@import '@/css/mspaThemes.scss';
+
+  .addressBar {
+    --headerHeight: 79px;
+  }
+  .noAddressBar {
+    --headerHeight: 51px;
+  }
 
   html, body {
     height: 100%;
@@ -221,12 +234,17 @@
   }
 
   a, .bookmarkUrlDisplay {
+    &.jumpboxLink::after{
+      @extend %fa-icon;
+      @extend .fas;
+      content: fa-content($fa-var-chevron-right);
+    }
     &[href^="http://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href$=".pdf"],
     &[href$=".html"] {
-      &:after{
+      &::after{
         @extend %fa-icon;
         @extend .fas;
         content: fa-content($fa-var-external-link-alt);
@@ -235,7 +253,7 @@
       }
     }
     &[href$=".jpg"],&[href$=".png"],&[href$=".gif"],&[href$=".swf"],&[href$=".txt"],&[href$=".mp3"],&[href$=".wav"],&[href$=".mp4"],&[href$=".webm"]{
-      &:after{
+      &::after{
         @extend %fa-icon;
         @extend .fas;
         content: fa-content($fa-var-file-image);

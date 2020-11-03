@@ -1,15 +1,15 @@
 <template>
-    <p class="prattle" v-html="filteredPrattle" v-if="textType == 'prattle' && !!content"></p>
+    <p class="prattle text" :class="fontFamily" :style="fontScale" v-html="filteredPrattle" v-if="textType == 'prattle' && !!content"></p>
 
     <div class="log" :class="{logHidden: logHidden}" v-else-if="textType == 'log'">
 		<button class="logButton" @click="loggle()">
             {{ logButtonText }}
 		</button>
-		<p class="logContent" v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
+		<p class="logContent text" :class="fontFamily" :style="fontScale" v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
 	</div>
 
     <div class="authorlog" v-else-if="textType == 'authorlog'">
-		<p class="logContent" v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
+		<p class="logContent text" :class="fontFamily" :style="fontScale" v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
 	</div>
 
 </template>
@@ -42,6 +42,20 @@ export default {
         }
     },
     computed: {
+        fontFamily() {
+            let result = []
+            if (this.$localData.settings.textOverride.bold || !this.$localData.settings.textOverride.fontFamily) result.push('bold')
+            if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
+            return result
+        },
+        fontScale() {
+            let fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
+            let lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
+            return {
+                fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
+                lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight]
+            }
+        },
         textType() {
             return this.getTextType(this.content)
         },
@@ -49,7 +63,7 @@ export default {
             let text = this.content.match(/\|(.*?)\|/)[1]
             let state = (this.logHidden) ? 'Show ' : 'Hide '
 
-            if (/P4SSWORD/i.test(text)){
+            if (/P4SSWORD H1NT/i.test(text)){
                 return text
             }
             else if (/trkstrlog/i.test(text)){
@@ -75,10 +89,10 @@ export default {
         }
     },
     methods: {
-        loggle: function() {
+        loggle() {
             this.logHidden = !this.logHidden
         },
-        getTextType(content){
+        getTextType(content) {
             if (!content) return null
 
             if (/^\|AUTHORLOG\|/.test(content)){
@@ -135,13 +149,37 @@ export default {
 
 <style scoped lang="scss">
     ::v-deep {
-        image-rendering: pixelated;
-        
         a {
             color: var(--page-links);
             &.visited {
                 color: var(--page-links-visited);
             }
+        }
+    }
+
+    .text {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: normal;
+        font-size: 14px;
+
+        &.bold {
+            font-weight: bold;
+        }
+        
+        &.courierPrime {
+            font-family: 'Courier Prime';
+        }
+        &.verdana {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+        &.times {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        &.comicSans {
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+        }
+        &.openDyslexic {
+            font-family: 'OpenDyslexic';
         }
     }
 
@@ -165,6 +203,7 @@ export default {
         text-align: center;
         align-self: center;
         .logContent{
+            color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
         }
@@ -187,9 +226,9 @@ export default {
         }
         
         .logContent{
+            color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
-            line-height: 1.35;
         }
 
         &.logHidden {
@@ -197,7 +236,6 @@ export default {
                 display: none; 
             }
         }
-    
     }
 </style>
 

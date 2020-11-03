@@ -206,7 +206,7 @@ export default {
       .awyeahbitches {
         margin: 16px 0;
         width: 100%;
-        background-image: url(css://sweetbroandhellajeff/moneytile.gif) ;
+        background-image: url(assets://sweetbroandhellajeff/moneytile.gif) ;
         text-align: center;
         .ad {
           display: flex;

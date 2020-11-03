@@ -1,5 +1,5 @@
 <template>
-    <div :class="['footer', $root.theme]" :style="styleObject">
+    <div :class="['footer', $root.theme, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
         <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" />
         <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" />
     </div>
@@ -50,6 +50,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+    .pixelated img {
+        image-rendering: pixelated;
+    }
     .footer {
         height: 110px;
 

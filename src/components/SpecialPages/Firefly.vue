@@ -1,5 +1,5 @@
 <template>
-  <div class="fireflies">
+  <div class="fireflies" :class="{pixelated: $localData.settings.pixelScaling}">
     <canvas class="fbox fbox_0" :style="`top:${this.boxPos.top[0]}px; left:${this.boxPos.left[0]}px;`"></canvas>
     <canvas class="fbox fbox_1" :style="`top:${this.boxPos.top[1]}px; left:${this.boxPos.left[1]}px;`"></canvas>
     <canvas class="fbox fbox_2" :style="`top:${this.boxPos.top[2]}px; left:${this.boxPos.left[2]}px;`"></canvas>
@@ -199,13 +199,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.pixelated {
+  image-rendering: pixelated;
+}
 .fireflies {
   position: relative;
   width: 714px;
   margin-left: auto;
   margin-right: auto;
   .fbox {
-    image-rendering: pixelated;
     position: absolute;
     height: 150px;
     width: 200px;

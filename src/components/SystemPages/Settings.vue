@@ -22,12 +22,21 @@
       <div class="settings application">
         <h2>Application Settings</h2>
         <dl>
+          <dt><label><input type="checkbox" name="showAddressBar" v-model="$localData.settings['showAddressBar']" @click="toggleSetting('showAddressBar')">Always show jump box</label></dt>
+          <dd class="settingDesc">Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L).</dd>
+
           <dt><label><input type="checkbox" name="switchToNewTabs" v-model="$localData.settings['switchToNewTabs']" @click="toggleSetting('switchToNewTabs')">Auto-switch to new tabs</label></dt>
           <dd class="settingDesc">Opening any link in a new tab will automatically switch you to that tab.</dd>
 
           <dt><label><input type="checkbox" name="forceScrollBar" v-model="$localData.settings['forceScrollBar']" @click="toggleSetting('forceScrollBar')">Always display scroll bar</label></dt>
           <dd class="settingDesc">Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this.</dd>
-
+          
+          <dt><label><input type="checkbox" name="smoothScrolling" v-model="$localData.settings['smoothScrolling']" @click="toggleSetting('smoothScrolling')">Enable smooth scrolling</label></dt>
+          <dd class="settingDesc">Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong></dd>
+          
+          <dt><label><input type="checkbox" name="pixelScaling" v-model="$localData.settings['pixelScaling']" @click="toggleSetting('pixelScaling')">Pixelated image scaling</label></dt>
+          <dd class="settingDesc">By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors.</dd>
+          
           <dt><label><input type="checkbox" name="mspaMode" v-model="$localData.settings['mspaMode']" @click="toggleSetting('mspaMode')">Use MSPA page numbers</label></dt>
           <dd class="settingDesc">Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck.</dd>
           
@@ -42,14 +51,42 @@
         <h2>Enhancements</h2>
         <dl>
           <dt>Theme Override</dt>
-          <dd class="settingDesc" v-if="!$isNewReader">
+          <dd v-if="!$isNewReader">
             <select class="themeSelector" v-model="$localData.settings.themeOverride" @change="$localData.root.saveLocalStorage()">
               <option v-for="theme in themes" :value="theme.value">
                 {{ theme.text }}
               </option>
             </select>
+            <br><br>
+            <label v-if="$localData.settings.themeOverride"><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
+
+          <dt>Text Override</dt>
+          <dd>
+            <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
+              <br>If you want to zoom the entire application, try ctrl -/+ (or ⌘ -/+)!</span><br>
+            <div class="textOverrideSettings">
+              <div class="knobs">
+                <label>Font family:<br>
+                  <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
+                    <option v-for="font in fonts" :value="font.value">
+                      {{ font.text }}
+                    </option>
+                  </select>
+                </label>
+                <span v-if="$localData.settings.textOverride.fontFamily">
+                  <br><br>
+                  <label ><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                </span>
+                <br><br>
+                <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
+                <br><br>
+                <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+              </div>
+              <PageText class="examplePrattle" content="|AUTHORLOG|<br/>A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
+            </div>
+          </dd>
 
           <dt><label><input type="checkbox" name="arrowNav" v-model="$localData.settings['arrowNav']" @click="toggleSetting('arrowNav')">Enable arrow key navigation</label></dt>
           <dd class="settingDesc">Allows you to navigate forward and backward between pages using the left and right arrow keys.</dd>
@@ -138,7 +175,7 @@
 
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageText from '@/components/Page/PageText.vue'
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -147,7 +184,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageFooter
+    NavBanner, PageText
   },
   data: function() {
     return {
@@ -163,6 +200,14 @@ export default {
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
+      ],
+      fonts: [
+        {text: "Default", value: ""},
+        {text: "Courier Prime", value: "courierPrime"},
+        {text: "Verdana / Arial", value: "verdana"},
+        {text: "Times New Roman", value: "times"},
+        {text: "Comic Sans", value: "comicSans"},
+        {text: "OpenDyslexic", value: "openDyslexic"},
       ],
       newReaderPage: '',
       newReaderValidation: true
@@ -203,8 +248,9 @@ export default {
         }
       })
     },
-    toggleSetting(setting){
-      if (!(setting in this.$localData.settings)) this.$set(this.$localData.settings, setting, true)
+    toggleSetting(setting, parentObject){
+      if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
+      else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
 
       if (setting == 'enableControversial' && !this.$localData.settings[setting]) {
@@ -249,7 +295,7 @@ export default {
     flex: 1 0 auto;
     align-items: center;
 
-    background: url(css://archive/collection/homebg_right.png) repeat-y, url(css://archive/collection/homebg_left.png) repeat-y;
+    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
     background-position: left top, right top;
     background-color: #35bfff;
     background-attachment: fixed;
@@ -298,11 +344,9 @@ export default {
         dt {
           margin: 20px 0 5px 10px;
         }
-        dd {
-          &.settingDesc {
-            color: var(--page-nav-meta);
-            font-weight: normal;
-          }
+        .settingDesc {
+          color: var(--page-nav-meta);
+          font-weight: normal;
         }
         
         .system {
@@ -337,8 +381,31 @@ export default {
           font-size: 13px;
           color: var(--page-nav-meta);
         }
-        .themeSelector {
+        .themeSelector, .fontSelector {
           font-size: 16px;
+        }
+        .textOverrideSettings {
+          margin-top: 16px;
+          text-align: center;
+
+          .knobs {
+            width: 75%;
+            margin: 0 auto 16px;
+            text-align: left;
+            select {
+              margin: 5px 0;
+            }
+            input[type="range"] {
+              width: 100%;
+            }
+          }
+          .examplePrattle {
+            margin: 0 auto;
+
+            ::v-deep .text{
+              text-align: center;
+            }
+          }
         }
       }
     }

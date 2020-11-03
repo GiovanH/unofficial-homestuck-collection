@@ -3,7 +3,7 @@
         <div class="nextArrow" v-if="nextPages.length > 0">
             <div v-for="page in nextPages" :key="page.pageId">
                 <p v-if="('pageId' in page && 'title' in page)">
-                    &gt;<a v-if="isLeftPage" :href="nextUrl(page)" @click.prevent="resetScroll" class="tiltedArrow" >
+                    &gt; <a v-if="isLeftPage" :href="nextUrl(page)" @click.prevent="resetScroll" class="tiltedArrow" >
                             <div class="notTiltedArrowLink">==&gt;⠀</div>
                             <div class="tiltedArrowLink">==&gt;</div>
                         </a>

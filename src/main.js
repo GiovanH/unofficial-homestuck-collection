@@ -11,7 +11,6 @@ const store = new Store()
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { defaultCipherList } from 'constants'
 
 library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
 
@@ -29,7 +28,7 @@ let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 Vue.mixin({
   data(){
     return {
-      $appVersion: '1.0.0',
+      $appVersion: '1.1.0',
       $expectedAssetVersion: '1'
     }
   },
@@ -42,7 +41,7 @@ Vue.mixin({
   },
   methods: {
     $resolvePath(to){
-      let route = this.$router.resolve(to).route
+      let route = this.$router.resolve(to.toLowerCase()).route
       let resolvedUrl = route.path
       let base = route.path.slice(1).split("/")[0]
       let vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
@@ -68,7 +67,10 @@ Vue.mixin({
             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
-        shell.openExternal(urlObject.href)
+        if (urlObject.href.includes('steampowered.com/app')) {
+          ipcRenderer.invoke('steam-open', urlObject.href)
+        }
+        else shell.openExternal(urlObject.href)
       }
       else if (/\.(html|pdf)$/i.test(to)){
         shell.openExternal(this.$mspaURL(to))
@@ -77,7 +79,7 @@ Vue.mixin({
         this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
       }
       else if (auxClick) {
-        this.$localData.root.TABS_NEW(to, true)
+        this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
       }
       else {
         this.$pushURL(to)

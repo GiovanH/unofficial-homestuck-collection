@@ -612,7 +612,7 @@ export default {
 
 <style scoped lang="scss">
 .pageBody {  
-  background: #ccdbed url(css://archive/namcohigh/bg.jpg) no-repeat fixed center / cover;
+  background: #ccdbed url(assets://archive/namcohigh/bg.jpg) no-repeat fixed center / cover;
   text-align: center;
 
 	font-size: 11.2px;
@@ -681,7 +681,7 @@ export default {
     }
 
     .reservation_area {
-      background: url(css://archive/namcohigh/reservation_area2.png) center top no-repeat;
+      background: url(assets://archive/namcohigh/reservation_area2.png) center top no-repeat;
       margin: 64px auto 0;
       position: relative;
       width: 1072px;
@@ -713,7 +713,7 @@ export default {
       height: 640px;
       position: relative;
       margin: 20px auto 0;
-      background: url(css://archive/namcohigh/overview_area.png) center top no-repeat;
+      background: url(assets://archive/namcohigh/overview_area.png) center top no-repeat;
 
       div {
         width: 505px;
@@ -735,7 +735,7 @@ export default {
       margin: 30px auto 0;
       padding: 30px 0 0 0;
       text-align: center;
-      background: url(css://archive/namcohigh/bg_students.png) center top no-repeat;
+      background: url(assets://archive/namcohigh/bg_students.png) center top no-repeat;
 
       h3{
         width: 296px;
@@ -788,61 +788,61 @@ export default {
             }
           }
           &.students_01 {
-            background: url(css://archive/namcohigh/students/img_students_01.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_01.jpg) center top no-repeat;
           }
           &.students_02 {
-            background: url(css://archive/namcohigh/students/img_students_02.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_02.jpg) center top no-repeat;
           }
           &.students_03 {
-            background: url(css://archive/namcohigh/students/img_students_03.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_03.jpg) center top no-repeat;
           }
           &.students_04 {
-            background: url(css://archive/namcohigh/students/img_students_04.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_04.jpg) center top no-repeat;
           }
           &.students_05 {
-            background: url(css://archive/namcohigh/students/img_students_05.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_05.jpg) center top no-repeat;
           }
           &.students_06 {
-            background: url(css://archive/namcohigh/students/img_students_06.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_06.jpg) center top no-repeat;
           }
           &.students_07 {
-            background: url(css://archive/namcohigh/students/img_students_07.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_07.jpg) center top no-repeat;
           }
           &.students_08 {
-            background: url(css://archive/namcohigh/students/img_students_08.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_08.jpg) center top no-repeat;
           }
           &.students_09 {
-            background: url(css://archive/namcohigh/students/img_students_09.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_09.jpg) center top no-repeat;
           }
           &.students_10 {
-            background: url(css://archive/namcohigh/students/img_students_10.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_10.jpg) center top no-repeat;
           }
           &.students_11 {
-            background: url(css://archive/namcohigh/students/img_students_11.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_11.jpg) center top no-repeat;
           }
           &.students_12 {
-            background: url(css://archive/namcohigh/students/img_students_12.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_12.jpg) center top no-repeat;
           }
           &.students_13 {
-            background: url(css://archive/namcohigh/students/img_students_13.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_13.jpg) center top no-repeat;
           }
           &.students_14 {
-            background: url(css://archive/namcohigh/students/img_students_14.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_14.jpg) center top no-repeat;
           }
           &.students_15 {
-            background: url(css://archive/namcohigh/students/img_students_15.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_15.jpg) center top no-repeat;
           }
           &.students_16 {
-            background: url(css://archive/namcohigh/students/img_students_16.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_16.jpg) center top no-repeat;
           }
           &.students_17 {
-            background: url(css://archive/namcohigh/students/img_students_17.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_17.jpg) center top no-repeat;
           }
           &.students_18 {
-            background: url(css://archive/namcohigh/students/img_students_18.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_18.jpg) center top no-repeat;
           }
           &.students_19 {
-            background: url(css://archive/namcohigh/students/img_students_19.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/students/img_students_19.jpg) center top no-repeat;
           }
         }
       }
@@ -889,79 +889,79 @@ export default {
             background-position:0 -55px;
           }
           &.pager-1 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_01.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_01.png);
             margin: 0 10px 0 0;
           }
           &.pager-2 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_02.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_02.png);
             margin: 0 10px 0 0;
           }
           &.pager-3 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_03.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_03.png);
             margin: 0 10px 0 0;
           }
           &.pager-4 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_04.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_04.png);
             margin: 0 10px 0 0;
           }
           &.pager-5 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_05.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_05.png);
             margin: 0 10px 0 0;
           }
           &.pager-6 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_06.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_06.png);
             margin: 0 10px 0 0;
           }
           &.pager-7 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_07.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_07.png);
             margin: 0 10px 0 0;
           }
           &.pager-8 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_08.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_08.png);
             margin: 0 10px 0 0;
           }
           &.pager-9 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_09.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_09.png);
             margin: 0 10px 0 -34px;
           }
           &.pager-10 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_10.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_10.png);
             margin: 0 12px 0 0;
           }
           &.pager-11 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_11.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_11.png);
             margin: 0 12px 0 0;
           }
           &.pager-12 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_12.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_12.png);
             margin: 0 10px 0 0;
           }
           &.pager-13 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_13.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_13.png);
             margin: 0 10px 0 0;
           }
           &.pager-14 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_14.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_14.png);
             margin: 0 10px 0 0;
           }
           &.pager-15 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_15.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_15.png);
             margin: 0 10px 0 0;
           }
           &.pager-16 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_16.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_16.png);
             margin: 0 0 0 0;
           }
           &.pager-17 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_17.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_17.png);
             margin: 0 0 0 10px;
           }
           &.pager-18 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_18.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_18.png);
             margin: 0 0 0 0;
           }
           &.pager-19 {
-            background-image:url(css://archive/namcohigh/students/pagination_students_19.png);
+            background-image:url(assets://archive/namcohigh/students/pagination_students_19.png);
             margin: 0 0 0 10px;
           }
         }
@@ -975,7 +975,7 @@ export default {
       margin: 30px auto 0;
       padding: 30px 0 0 0;
       text-align: center;
-      background: url(css://archive/namcohigh/bg_students.png) center top no-repeat;
+      background: url(assets://archive/namcohigh/bg_students.png) center top no-repeat;
 
       h3{
         width: 296px;
@@ -1007,7 +1007,7 @@ export default {
             a {
               color: #ffff00;
               text-decoration: none;
-              background: url(css://archive/namcohigh/dot_01.png) left bottom repeat-x;
+              background: url(assets://archive/namcohigh/dot_01.png) left bottom repeat-x;
             }
           }
         }
@@ -1034,82 +1034,82 @@ export default {
             }
           }
           &.artist_01 {
-            background: url(css://archive/namcohigh/artists/img_artist_01.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_01.jpg) center top no-repeat;
           }
           &.artist_02 {
-            background: url(css://archive/namcohigh/artists/img_artist_02.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_02.jpg) center top no-repeat;
           }
           &.artist_03 {
-            background: url(css://archive/namcohigh/artists/img_artist_03.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_03.jpg) center top no-repeat;
           }
           &.artist_04 {
-            background: url(css://archive/namcohigh/artists/img_artist_04.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_04.jpg) center top no-repeat;
           }
           &.artist_05 {
-            background: url(css://archive/namcohigh/artists/img_artist_05.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_05.jpg) center top no-repeat;
           }
           &.artist_06 {
-            background: url(css://archive/namcohigh/artists/img_artist_06.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_06.jpg) center top no-repeat;
           }
           &.artist_07 {
-            background: url(css://archive/namcohigh/artists/img_artist_07.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_07.jpg) center top no-repeat;
           }
           &.artist_08 {
-            background: url(css://archive/namcohigh/artists/img_artist_08.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_08.jpg) center top no-repeat;
           }
           &.artist_09 {
-            background: url(css://archive/namcohigh/artists/img_artist_09.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_09.jpg) center top no-repeat;
           }
           &.artist_10 {
-            background: url(css://archive/namcohigh/artists/img_artist_10.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_10.jpg) center top no-repeat;
           }
           &.artist_11 {
-            background: url(css://archive/namcohigh/artists/img_artist_11.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_11.jpg) center top no-repeat;
           }
           &.artist_12 {
-            background: url(css://archive/namcohigh/artists/img_artist_12.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_12.jpg) center top no-repeat;
           }
           &.artist_13 {
-            background: url(css://archive/namcohigh/artists/img_artist_13.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_13.jpg) center top no-repeat;
           }
           &.artist_14 {
-            background: url(css://archive/namcohigh/artists/img_artist_14.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_14.jpg) center top no-repeat;
           }
           &.artist_15 {
-            background: url(css://archive/namcohigh/artists/img_artist_15.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_15.jpg) center top no-repeat;
           }
           &.artist_16 {
-            background: url(css://archive/namcohigh/artists/img_artist_16.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_16.jpg) center top no-repeat;
           }
           &.artist_17 {
-            background: url(css://archive/namcohigh/artists/img_artist_17.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_17.jpg) center top no-repeat;
           }
           &.artist_18 {
-            background: url(css://archive/namcohigh/artists/img_artist_18.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_18.jpg) center top no-repeat;
           }
           &.artist_19 {
-            background: url(css://archive/namcohigh/artists/img_artist_19.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_19.jpg) center top no-repeat;
           }
           &.artist_20 {
-            background: url(css://archive/namcohigh/artists/img_artist_20.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_20.jpg) center top no-repeat;
           }
           &.artist_21 {
-            background: url(css://archive/namcohigh/artists/img_artist_21.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_21.jpg) center top no-repeat;
           }
           &.artist_22 {
-            background: url(css://archive/namcohigh/artists/img_artist_22.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_22.jpg) center top no-repeat;
           }
           &.artist_23 {
-            background: url(css://archive/namcohigh/artists/img_artist_23.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_23.jpg) center top no-repeat;
           }
           &.artist_24 {
-            background: url(css://archive/namcohigh/artists/img_artist_24.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_24.jpg) center top no-repeat;
           }
           &.artist_25 {
-            background: url(css://archive/namcohigh/artists/img_artist_25.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_25.jpg) center top no-repeat;
           }
           &.artist_26 {
-            background: url(css://archive/namcohigh/artists/img_artist_26.jpg) center top no-repeat;
+            background: url(assets://archive/namcohigh/artists/img_artist_26.jpg) center top no-repeat;
           }
         }
       }
@@ -1161,107 +1161,107 @@ export default {
             background-position:0 -110px;
           }
           &.pager-1 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_01.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_01.png);
             margin: 0 10px 0 32px;
           }
           &.pager-2 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_02.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_02.png);
             margin: 0 10px 0 0;
           }
           &.pager-3 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_03.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_03.png);
             margin: 0 10px 0 0;
           }
           &.pager-4 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_04.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_04.png);
             margin: 0 10px 0 0;
           }
           &.pager-5 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_05.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_05.png);
             margin: 0 10px 0 0;
           }
           &.pager-6 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_06.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_06.png);
             margin: 0 10px 0 0;
           }
           &.pager-7 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_07.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_07.png);
             margin: 0 10px 0 0;
           }
           &.pager-8 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_08.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_08.png);
             margin: 0 10px 0 0;
           }
           &.pager-9 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_09.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_09.png);
             margin: 0 10px 0 0;
           }
           &.pager-10 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_10.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_10.png);
             margin: 0 10px 0 0;
           }
           &.pager-11 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_11.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_11.png);
             margin: 0 10px 0 0;
           }
           &.pager-12 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_12.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_12.png);
             margin: 0 70px 0 0;
           }
           &.pager-13 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_13.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_13.png);
             margin: 0 10px 0 0;
           }
           &.pager-14 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_14.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_14.png);
             margin: 0 10px 0 0;
           }
           &.pager-15 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_15.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_15.png);
             margin: 0 10px 0 0;
           }
           &.pager-16 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_16.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_16.png);
             margin: 0 10px 0 0;
           }
           &.pager-17 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_17.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_17.png);
             margin: 0 10px 0 0;
           }
           &.pager-18 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_18.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_18.png);
             margin: 0 10px 0 0;
           }
           &.pager-19 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_19.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_19.png);
             margin: 0 10px 0 0;
           }
           &.pager-20 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_20.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_20.png);
             margin: 0 10px 0 0;
           }
           &.pager-21 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_21.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_21.png);
             margin: 0 10px 0 0;
           }
           &.pager-22 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_22.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_22.png);
             margin: 0 10px 0 0;
           }
           &.pager-23 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_23.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_23.png);
             margin: 0 10px 0 0;
           }
           &.pager-24 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_24.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_24.png);
             margin: 0 10px 0 0;
           }
           &.pager-25 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_25.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_25.png);
             margin: 0 10px 0 0;
           }
           &.pager-26 {
-            background-image:url(css://archive/namcohigh/artists/pagination_artist_26.png);
+            background-image:url(assets://archive/namcohigh/artists/pagination_artist_26.png);
             margin: 0 10px 0 32px;
           }
         }
@@ -1288,7 +1288,7 @@ export default {
 }
 
 .gameBody {
-  background: #ccdbed url(css://archive/namcohigh/bg.jpg) no-repeat fixed center / cover;
+  background: #ccdbed url(assets://archive/namcohigh/bg.jpg) no-repeat fixed center / cover;
   justify-content: center;
   align-items: center;
   display: flex;

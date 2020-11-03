@@ -24,6 +24,7 @@
     <ul v-if="tags.includes('Selection')">
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
+      <li @mouseup="googleSearch()">Search with Google</li>  
     </ul>
     <ul v-if="tags.includes('Input')">
       <li @mouseup="cut()">Cut</li>
@@ -44,7 +45,7 @@
       <li @mouseup="openImageFile()">Open in Folder</li>      
       <li @mouseup="saveImage()">Save Image</li>
     </ul>
-    <ul v-if="$parent.zoomLevel != 3">
+    <ul v-if="$parent.zoomLevel != 0">
       <li @mouseup="resetZoom()">Reset Zoom</li>
     </ul>
     <ul v-if="$localData.settings.devMode">
@@ -145,6 +146,10 @@ export default {
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
     },
+    googleSearch() {
+      let query = window.getSelection().toString()
+      this.$openLink(`https://google.com/search?q=${encodeURIComponent(query)}`)
+    },
 
     lendFocus(el) {
       this.partnerEl = el
@@ -160,7 +165,7 @@ export default {
         if (target.id == 'tabNavigation' || target.closest('#tabNavigation')) this.tags.push('History')
         else if (target.classList.contains('tab') || target.parentNode.classList.contains('tab')) this.tags.push('Tab')
         else if (target.id == 'tabSection' || target.classList.contains('newTabButton')) this.tags.push('TabSection')
-        else if (target.tagName == 'INPUT') this.tags.push('Input')
+        else if ((target.tagName == 'INPUT' && target.type == 'text') || target.tagName == 'TEXTAREA') this.tags.push('Input')
         else if (window.getSelection().toString().length > 0) this.tags.push('Selection')
         if (target.tagName == 'IMG') this.tags.push("Image")
         if (target.closest('a') && target.closest('a').href) {
