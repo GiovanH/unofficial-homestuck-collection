@@ -111,31 +111,31 @@ try {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {win.webContents.send('ZOOM_IN')}
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {win.webContents.send('ZOOM_OUT')}
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
         },
         {
           label: 'Zoom In',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numadd',
-          click: () => {win.webContents.send('ZOOM_IN')}
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
         },
         {
           label: 'Zoom Out',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numsub',
-          click: () => {win.webContents.send('ZOOM_OUT')}
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
         },
         {
           label: 'Reset Zoom',
           accelerator: 'CmdOrCtrl+0',
-          click: () => {win.webContents.send('ZOOM_RESET')}
+          click: () => {if (win) win.webContents.send('ZOOM_RESET')}
         },
         { type: 'separator' },
         { role: 'togglefullscreen' }
@@ -147,45 +147,45 @@ try {
         {
           label: 'Go back one page',
           accelerator: 'Alt+Left',
-          click: () => {win.webContents.send('TABS_HISTORY_BACK')}
+          click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
         },
         {
           label: 'Go forward one page',
           accelerator: 'Alt+Right',
-          click: () => {win.webContents.send('TABS_HISTORY_FORWARD')}
+          click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
         },
         { type: 'separator' },
         {
           label: 'New Tab',
           accelerator: 'CmdOrCtrl+T',
-          click: () => {win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+          click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
         },
         {
           label: 'Close Tab',
           accelerator: 'CmdOrCtrl+W',
-          click: () => {win.webContents.send('TABS_CLOSE')}
+          click: () => {if (win) win.webContents.send('TABS_CLOSE')}
         },
         { type: 'separator' },
         {
           label: 'Next Tab',
           accelerator: 'CmdOrCtrl+Tab',
-          click: () => {win.webContents.send('TABS_CYCLE', {amount: 1})}
+          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
         },
         {
           label: 'Previous Tab',
           accelerator: 'CmdOrCtrl+Shift+Tab',
-          click: () => {win.webContents.send('TABS_CYCLE', {amount: -1})}
+          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
         },
         { type: 'separator' },
         {
           label: 'Duplicate Tab',
           accelerator: 'CmdOrCtrl+Shift+D',
-          click: () => {win.webContents.send('TABS_DUPLICATE')}
+          click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
         },
         {
           label: 'Restore Closed Tab',
           accelerator: 'CmdOrCtrl+Shift+T',
-          click: () => {win.webContents.send('TABS_RESTORE')}
+          click: () => {if (win) win.webContents.send('TABS_RESTORE')}
         }
       ]
     },
@@ -196,12 +196,12 @@ try {
         {
           label: 'Open Jump Bar',
           accelerator: 'CmdOrCtrl+L',
-          click: () => { win.webContents.send('OPEN_JUMPBOX') }
+          click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
         },
         {
           label: 'Find in page',
           accelerator: 'CmdOrCtrl+F',
-          click: () => { win.webContents.send('OPEN_FINDBOX') }
+          click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
         },
         { role: 'minimize' },
       ]
@@ -255,12 +255,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {win.webContents.send('ZOOM_IN')}
+          click: () => {if (win) win.webContents.send('ZOOM_IN')}
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {win.webContents.send('ZOOM_OUT')}
+          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
         },
       ]
     }
