@@ -54,7 +54,11 @@ try {
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   let gankraSearchPage = archive.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+
   archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+
+  archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+
   archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
 
