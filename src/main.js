@@ -11,7 +11,6 @@ const store = new Store()
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { defaultCipherList } from 'constants'
 
 library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
 
@@ -29,7 +28,7 @@ let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 Vue.mixin({
   data(){
     return {
-      $appVersion: '1.0.0',
+      $appVersion: '1.1.0',
       $expectedAssetVersion: '1'
     }
   },
