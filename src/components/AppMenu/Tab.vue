@@ -48,9 +48,9 @@ export default {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
     onResize() { 
-      let titleWidth = this.$refs.title.getBoundingClientRect().width - 10 //5px of padding on right
+      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 //Offsets 5px of padding on left
       let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
-      console.log(titleWidth, titleTextWidth, titleWidth < titleTextWidth)
+      
       this.titleFade = titleWidth < titleTextWidth
     }
   },
@@ -101,7 +101,7 @@ export default {
 
     .tabTitle {
       flex: 1 10 auto;
-      padding: 0 5px;
+      padding-left: 5px;
       white-space: nowrap;
       min-width: 0;
       overflow: hidden;

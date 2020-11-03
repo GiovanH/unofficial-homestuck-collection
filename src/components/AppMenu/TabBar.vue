@@ -132,7 +132,7 @@ export default {
         document.onmousemove = this.elementDrag
 
         this.$nextTick(()=>{
-          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 10 //10px of padding
+          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 //Offsets 5px of padding on left
           let titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
           this.dragTitleFade = titleWidth < titleTextWidth
 
@@ -247,7 +247,7 @@ export default {
 
         .tabTitle {
           flex: 1 10 auto;
-          padding: 0 5px;
+          padding-left: 5px;
           white-space: nowrap;
           min-width: 0;
           overflow: hidden;
