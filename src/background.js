@@ -111,9 +111,8 @@ try {
       ctrlPressed = (e.type === 'keydown');
     }
   }
-  $(document)
-    .keydown(ctrlCheck)
-    .keyup(ctrlCheck);
+  document.onkeydown = ctrlCheck;
+  document.onkeyup = ctrlCheck;
   
   function wheel(e) {
     if (ctrlPressed && e.deltaY !== 0.0) {
@@ -126,7 +125,7 @@ try {
       }
     }
   }
-  $(document).onwheel = wheel;
+  document.onwheel = wheel;
   
   //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
   menuTemplate = [
