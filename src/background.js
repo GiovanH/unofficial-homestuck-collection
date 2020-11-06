@@ -31,6 +31,18 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'assets', privileges: { standard: true } }
 ])
 
+// zoom functions
+function zoomIn() {
+  if (win) {
+    win.webContents.send('ZOOM_IN');
+  }
+}
+function zoomOut() {
+  if (win) {
+    win.webContents.send('ZOOM_OUT');
+  }
+}
+
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 var archive
 var port
@@ -93,6 +105,29 @@ try {
   })
   chapterIndex.add(archive.search)
   
+  var ctrlPressed = false;
+  function ctrlCheck(e) {
+    if (e.which === 17) {
+      ctrlPressed = (e.type === 'keydown');
+    }
+  }
+  $(document)
+    .keydown(ctrlCheck)
+    .keyup(ctrlCheck);
+  
+  function wheel(e) {
+    if (ctrlPressed && e.deltaY !== 0.0) {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        zoomIn();
+      }
+      else {
+        zoomOut();
+      }
+    }
+  }
+  $(document).onwheel = wheel;
+  
   //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
   menuTemplate = [
     {
@@ -115,26 +150,26 @@ try {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
         {
           label: 'Zoom In',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numadd',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numsub',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
         {
           label: 'Reset Zoom',
@@ -259,12 +294,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn()
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut()
         },
       ]
     }
