@@ -10,7 +10,7 @@ const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
-const http = require ('http')
+const http = require('http')
 
 const Store = require('electron-store')
 const store = new Store()
@@ -104,28 +104,6 @@ try {
     }
   })
   chapterIndex.add(archive.search)
-  
-  var ctrlPressed = false;
-  function ctrlCheck(e) {
-    if (e.which === 17) {
-      ctrlPressed = (e.type === 'keydown');
-    }
-  }
-  document.onkeydown = ctrlCheck;
-  document.onkeyup = ctrlCheck;
-  
-  function wheel(e) {
-    if (ctrlPressed && e.deltaY !== 0.0) {
-      e.preventDefault();
-      if (e.deltaY < 0) {
-        zoomIn();
-      }
-      else {
-        zoomOut();
-      }
-    }
-  }
-  document.onwheel = wheel;
   
   //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
   menuTemplate = [
@@ -561,7 +539,7 @@ async function createWindow () {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-		'minWidth': 1000,
+    'minWidth': 1000,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
@@ -573,6 +551,15 @@ async function createWindow () {
       plugins: true
     }
   })
+
+  win.webContents.on('zoom-changed', (e, zoomDirection) => {
+    if (zoomDirection === 'in') {
+      zoomIn()
+    }
+    if (zoomDirection === 'out') {
+      zoomOut()
+    }
+  });
 
   //Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
