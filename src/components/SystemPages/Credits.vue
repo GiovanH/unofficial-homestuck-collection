@@ -358,7 +358,7 @@
               By
               <a href="http://paperseverywhere.tumblr.com/" target="_blank">Adrienne Garcia</a>,
               <a href="http://tricksterair.tumblr.com/" target="_blank">Airin</a>,
-              <a href="http://www.neo-kosmos.com/" target="_blank">Amber Rogers</a>,
+              <a href="http://www.neo-kosmos.com/" target="_blank">Danny Cragg</a>,
               <a href="http://frozenmeatpopsicle.tumblr.com" target="_blank">Callan Bencich</a>,
               <a href="http://chazzerpan.tumblr.com/" target="_blank">Chaz</a>,
               <a href="http://guzusuru.tumblr.com/" target="_blank">Guzusuru</a>,
