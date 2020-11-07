@@ -61,6 +61,9 @@ try {
 
   archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
+  archive.music.albums['colours-and-mayhem-universe-a'].directory = 'coloUrs-and-mayhem-universe-a';
+  archive.music.albums['colours-and-mayhem-universe-b'].directory = 'coloUrs-and-mayhem-universe-b';
+
 
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin

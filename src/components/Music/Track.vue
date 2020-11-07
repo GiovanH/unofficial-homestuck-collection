@@ -77,6 +77,7 @@ export default {
     trackArtPath() {
       let dirName = this.track.album.find(album => this.$archive.music.albums[album].hasTrackArt && !this.$albumIsSpoiler(album)) || this.track.album[0]
       let fileName = this.track.coverArtists && this.$archive.music.albums[dirName].hasTrackArt ? this.track.directory : 'cover'
+      dirName = dirName.replace(/^colours/, 'coloUrs'); // FIXME: temporary workaround for asset pack issue
       return (this.$albumIsSpoiler(dirName) ) ? `/archive/music/spoiler.png` : `/archive/music/${dirName}/${fileName}.jpg`
     },
     linkAndJoinAlbums() {
