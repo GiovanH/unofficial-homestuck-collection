@@ -34,7 +34,125 @@ protocol.registerSchemesAsPrivileged([
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 var archive
 var port
-var menuTemplate 
+
+//Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
+var menuTemplate = [
+  {
+    label: 'File',
+    submenu: [
+      { role: 'quit' }
+    ]
+  },
+  {
+    role: 'editMenu'
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      {
+        label: 'Zoom In',
+        accelerator: 'CmdOrCtrl+=',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        accelerator: 'CmdOrCtrl+-',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Zoom In',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numadd',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numsub',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Reset Zoom',
+        accelerator: 'CmdOrCtrl+0',
+        click: () => {if (win) win.webContents.send('ZOOM_RESET')}
+      },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  {
+    label: 'Tabs',
+    submenu: [
+      {
+        label: 'Go back one page',
+        accelerator: 'Alt+Left',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
+      },
+      {
+        label: 'Go forward one page',
+        accelerator: 'Alt+Right',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
+      },
+      { type: 'separator' },
+      {
+        label: 'New Tab',
+        accelerator: 'CmdOrCtrl+T',
+        click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+      },
+      {
+        label: 'Close Tab',
+        accelerator: 'CmdOrCtrl+W',
+        click: () => {if (win) win.webContents.send('TABS_CLOSE')}
+      },
+      { type: 'separator' },
+      {
+        label: 'Next Tab',
+        accelerator: 'CmdOrCtrl+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
+      },
+      {
+        label: 'Previous Tab',
+        accelerator: 'CmdOrCtrl+Shift+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
+      },
+      { type: 'separator' },
+      {
+        label: 'Duplicate Tab',
+        accelerator: 'CmdOrCtrl+Shift+D',
+        click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
+      },
+      {
+        label: 'Restore Closed Tab',
+        accelerator: 'CmdOrCtrl+Shift+T',
+        click: () => {if (win) win.webContents.send('TABS_RESTORE')}
+      }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      {
+        label: 'Open Jump Bar',
+        accelerator: 'CmdOrCtrl+L',
+        click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
+      },
+      {
+        label: 'Find in page',
+        accelerator: 'CmdOrCtrl+F',
+        click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
+      },
+      { role: 'minimize' },
+    ]
+  }
+]
 
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
@@ -97,125 +215,6 @@ try {
     }
   })
   chapterIndex.add(archive.search)
-  
-  //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
-  menuTemplate = [
-    {
-      label: 'File',
-      submenu: [
-        { role: 'quit' }
-      ]
-    },
-    {
-      role: 'editMenu'
-    },
-    // { role: 'viewMenu' }
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        {
-          label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
-        },
-        {
-          label: 'Zoom In',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numadd',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
-        },
-        {
-          label: 'Zoom Out',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numsub',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
-        },
-        {
-          label: 'Reset Zoom',
-          accelerator: 'CmdOrCtrl+0',
-          click: () => {if (win) win.webContents.send('ZOOM_RESET')}
-        },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
-    {
-      label: 'Tabs',
-      submenu: [
-        {
-          label: 'Go back one page',
-          accelerator: 'Alt+Left',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
-        },
-        {
-          label: 'Go forward one page',
-          accelerator: 'Alt+Right',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
-        },
-        { type: 'separator' },
-        {
-          label: 'New Tab',
-          accelerator: 'CmdOrCtrl+T',
-          click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
-        },
-        {
-          label: 'Close Tab',
-          accelerator: 'CmdOrCtrl+W',
-          click: () => {if (win) win.webContents.send('TABS_CLOSE')}
-        },
-        { type: 'separator' },
-        {
-          label: 'Next Tab',
-          accelerator: 'CmdOrCtrl+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
-        },
-        {
-          label: 'Previous Tab',
-          accelerator: 'CmdOrCtrl+Shift+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
-        },
-        { type: 'separator' },
-        {
-          label: 'Duplicate Tab',
-          accelerator: 'CmdOrCtrl+Shift+D',
-          click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
-        },
-        {
-          label: 'Restore Closed Tab',
-          accelerator: 'CmdOrCtrl+Shift+T',
-          click: () => {if (win) win.webContents.send('TABS_RESTORE')}
-        }
-      ]
-    },
-    // { role: 'windowMenu' }
-    {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Open Jump Bar',
-          accelerator: 'CmdOrCtrl+L',
-          click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
-        },
-        {
-          label: 'Find in page',
-          accelerator: 'CmdOrCtrl+F',
-          click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
-        },
-        { role: 'minimize' },
-      ]
-    }
-  ]
   
   //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
