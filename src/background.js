@@ -35,8 +35,9 @@ var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir')
 var archive
 var port
 var menuTemplate 
-// Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-try {
+
+function loadArchiveData(){
+  // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   if (!assetDir) throw "No reference to asset directory"
 
   //Grab and parse all data jsons
@@ -50,6 +51,7 @@ try {
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
+  // Mod applications go here
   
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   let gankraSearchPage = archive.search.find(x => x.key == '002745')
@@ -60,8 +62,11 @@ try {
   archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
 
   archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+}
 
-
+try {
+  loadArchiveData()
+  
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
