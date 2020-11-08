@@ -156,10 +156,11 @@ var menuTemplate = [
 
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
+  // This returns an `archive` object, and does not modify the global archive directly. 
   if (!assetDir) throw "No reference to asset directory"
 
   //Grab and parse all data jsons
-  archive = {
+  let data = {
     ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
     mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
     log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
@@ -172,18 +173,20 @@ function loadArchiveData(){
   // Mod applications go here
   
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  let gankraSearchPage = archive.search.find(x => x.key == '002745')
+  let gankraSearchPage = data.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
-  archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+  data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
 
-  archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+  data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
 
-  archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+  data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+
+  return data
 }
 
 try {
-  loadArchiveData()
+  archive = loadArchiveData()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -323,15 +326,8 @@ ipcMain.handle('locate-assets', async (event, payload) => {
   if (newPath) {
     let validated = true
     try {
-      let testAssets = {
-        ...JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/version.json'), 'utf8')),
-        mspa : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/mspa.json'), 'utf8')),
-        log : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/log.json'), 'utf8')),
-        social : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/social.json'), 'utf8')),
-        music : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/music.json'), 'utf8')),
-        comics : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/comics.json'), 'utf8')),
-        search: JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/search.json'), 'utf8'))
-      }
+      // If there's an issue with the archive data, this should fail.
+      loadArchiveData()
 
       let flashPlugin
       switch (process.platform) {
