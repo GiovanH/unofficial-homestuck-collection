@@ -32,7 +32,10 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+var modRoot = path.join(assetDir, "mods")
+
 var archive
+var available_mods
 var port
 
 //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
@@ -185,8 +188,14 @@ function loadArchiveData(){
   return data
 }
 
+function loadAvailableMods(){
+  // TODO
+  return []
+}
+
 try {
   archive = loadArchiveData()
+  available_mods = loadAvailableMods()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -284,6 +293,10 @@ finally {
 //The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_REQUEST', (event) => {
   event.returnValue = { port, archive }
+})
+
+ipcMain.on('GET_AVAILABLE_MODS', (event) => {
+  event.returnValue = available_mods
 })
 
 ipcMain.handle('win-minimize', async (event) => {
