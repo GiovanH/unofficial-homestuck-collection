@@ -151,6 +151,7 @@
       </div>
 
       <div class="settings mod">
+        <!-- TODO: IF YOU CHANGE THE MODS YOU NEED TO RELOAD -->
         <h2>Mod Settings</h2>
 
         <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
