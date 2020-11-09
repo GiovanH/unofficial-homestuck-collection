@@ -6,6 +6,8 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
 import FlexSearch from 'flexsearch'
 
+import Resources from "./resources.js"
+
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -285,6 +287,12 @@ try {
   server.listen(0, '127.0.0.1', (error) => {
     if (error) throw error
     port = server.address().port
+  
+    // Initialize Resources
+    console.log(Resources)
+    Resources.init({
+      assets_root: `http://127.0.0.1:${port}/`
+    })
   })
 } 
 catch (error) {
@@ -568,19 +576,6 @@ const filter = {
     "*://*.sweetcred.com/*",
   ]
 }
-//Rules for transforming intercepted URLS
-function filterURL(url) {
-  return url
-    .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") //Linked from a few flashes
-    .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") //Covers for 99% of flashes that link to other pages
-    .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") //Covers for story links without page numbers
-    .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") //Link from CD rack flash
-    .replace(/http:\/\/www\.sweetcred\.com/, `http://127.0.0.1:${port}/archive/sweetcred`)
-    .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `127.0.0.1:${port}/storyfiles/hs2/00338`) // phat beat machine
-    .replace(/www\.timelesschaos\.com\/transferFiles/, `127.0.0.1:${port}/storyfiles/hs2/03318` ) // return to core - 618heircut.mp3
-    .replace(/assets\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect resource requests to asset folder
-    .replace(/http\:\/\/((www|cdn)\.)?mspaintadventures\.com/, `http://127.0.0.1:${port}`) //Complete, should ideally never happen and probably won't work properly if it does
-}
 
 async function createWindow () {
   // Create the browser window.
@@ -607,9 +602,13 @@ async function createWindow () {
   
   //This should only ever trigger from flashes requesting resources or page redirects
   win.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-    console.log(`onBeforeRequest: ${details.url} ===> ${filterURL(details.url)}`)
-    if (details.resourceType =="subFrame") win.webContents.send('TABS_PUSH_URL', filterURL(details.url))
-		else callback({redirectURL: filterURL(details.url)})
+    let destination_url = Resources.resolveURL(details.url)
+    console.log(`onBeforeRequest: ${details.url} ===> ${destination_url}`)
+    if (details.resourceType =="subFrame")
+      win.webContents.send('TABS_PUSH_URL', destination_url)
+		else callback({
+      redirectURL: destination_url
+    })
 	})
 
   //It's important that only one window is ever active at a time
@@ -617,10 +616,15 @@ async function createWindow () {
   //Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
-    let parsedURL = filterURL(url)
+    
+    let parsedURL = Resources.resolveURL(url)
     console.log(`new-window: ${url} ===> ${parsedURL}`)
-    if (/http/.test(parsedURL)) shell.openExternal(url) //if filterURL didnt work, open in the browser just to be safe
-    else win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+
+    // If the given URL is still external, open a browser window.
+    if (/http/.test(parsedURL))
+      shell.openExternal(url) 
+    else
+      win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
   })
 
 

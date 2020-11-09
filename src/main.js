@@ -26,6 +26,12 @@ const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 var modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
 
+const Resources = require("@/resources.js")
+
+Resources.init({
+  assets_root: `http://127.0.0.1:${port}/`
+})
+
 Vue.mixin({
   data(){
     return {
@@ -87,22 +93,11 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
+    $resolveURL: Resources.resolveURL,
+    $filterURL(u) {return this.$resolveURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       let url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
-    },
-    $filterURL(url){
-      return url
-        .replace(/^.+:\/\/(www\.|cdn\.)?mspaintadventures\.com\/?((scratch|trickster|ACT6ACT5ACT1x2CO|ACT6ACT6)\.php)?/, "")
-        .replace(/^(.+:\/\/127.0.0.1:\d*\/|.+:\/\/localhost:\d*\/|app:\/\/\.|)/, "")
-        .replace(/^extras\/(ps\d{6})\.html/, "/unlock\/$1")
-        // .replace(/\.html$/, "")
-        .replace(/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1")
-        .replace(/storyfiles\/hs2\/(waywardvagabond\/\w+\/)$/, "/$1")
-        .replace(/\?s=(\w*)&p=(\w*)/, "/mspa/$2")
-        .replace(/\?s=(\w*)/, "/mspa/$1")
-        .replace(/\/Sfiles/, "")
-        .replace(/%20/g, " ")
     },
     $mspaFileStream(url) {
       return path.join(this.$localData.assetDir, this.$filterURL(url))
