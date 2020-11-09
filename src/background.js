@@ -35,7 +35,7 @@ var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir')
 var modRoot = path.join(assetDir, "mods")
 
 var archive
-var available_mods
+var modChoices
 var port
 
 //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
@@ -188,14 +188,61 @@ function loadArchiveData(){
   return data
 }
 
-function loadAvailableMods(){
-  // TODO
-  return []
+function crawlFileTree(root, recursive=false){
+  const dir = fs.opendirSync(root);
+  let ret = {}
+  let dirent
+  while (dirent = dir.readSync()) {
+    if (dirent.isDirectory() && recursive) {
+      let subpath = path.join(root, dirent.name)
+      ret[dirent.name] = crawlFileTree(subpath, true)
+    } else {
+      ret[dirent.name] = true
+    }
+  }
+  dir.close()
+  return ret
+}
+
+function getModJs(mod_dir){
+  try {
+      let modjs_path = path.join(modRoot, mod_dir, "mod.js")
+      var mod = __non_webpack_require__(modjs_path)
+      return mod
+  } catch (e1) {
+    try {
+        // Look for a single-file mod
+        let modjs_path = path.join(modRoot, mod_dir)
+        var mod = __non_webpack_require__(modjs_path)
+        return mod
+    } catch (e2) {
+        console.error(e2)
+        throw e2
+    }
+  }
+}
+
+
+function loadModChoices(){
+  // TODO mod stuff
+
+  var mod_folders = Object.keys(crawlFileTree(modRoot, false))
+  var items = mod_folders.map((dir) => {
+    let js = getModJs(dir)
+    return {
+      label: js.title,
+      desc: js.desc,
+      key: dir
+    }
+  })
+
+  console.log(items)
+  return items
 }
 
 try {
   archive = loadArchiveData()
-  available_mods = loadAvailableMods()
+  modChoices = loadModChoices()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -296,7 +343,7 @@ ipcMain.on('STARTUP_REQUEST', (event) => {
 })
 
 ipcMain.on('GET_AVAILABLE_MODS', (event) => {
-  event.returnValue = available_mods
+  event.returnValue = modChoices
 })
 
 ipcMain.handle('win-minimize', async (event) => {

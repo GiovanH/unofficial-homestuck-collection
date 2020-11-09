@@ -24,7 +24,7 @@ Vue.use(localData, {
 
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
-var available_mods = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+var modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
 
 Vue.mixin({
   data(){
@@ -39,7 +39,7 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $available_mods: () => available_mods
+    $modChoices: () => modChoices
   },
   methods: {
     $resolvePath(to){
