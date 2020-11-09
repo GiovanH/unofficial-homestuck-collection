@@ -152,20 +152,31 @@
 
       <div class="settings mod">
         <h2>Mod Settings</h2>
-        <h3>All mods</h3>
-        <li v-for="mod in $modChoices">
-          <b>{{mod.label}}</b> - {{mod.desc}}
-        </li>
-        <h3>Enabled mods</h3>
-        <li v-for="mod in modsEnabled">
-          <b>{{mod.label}}</b> - {{mod.desc}}
-        </li>
-        <h3>Disabled mods</h3>
-        <li v-for="mod in modsDisabled">
-          <b>{{mod.label}}</b> - {{mod.desc}}
-        </li>
-        <!-- TODO mod stuff -->
-        <!-- @click="toggleSetting('notifications')" -->
+
+        <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
+        <section class="group sortable row">
+          <div class='col' title="Drag and drop!"><h2>Inactive</h2>
+            <draggable tag="ul" group="sortable-mods" data-setting="modListEnabled">
+              <li
+                v-for="option in modsDisabled"
+                :data-value="option.key"
+              >
+                <b>{{option.label}}</b> - {{option.desc}}
+              </li>
+            </draggable>
+          </div>
+
+          <div class='col' title="Drag and drop!"><h2>Active</h2>
+            <draggable tag="ol" group="sortable-mods" @sort="onUpdateSortable">
+              <li
+                v-for="option in modsEnabled"
+                :data-value="option.key"
+              >
+                <b>{{option.label}}</b> - {{option.desc}}
+              </li>
+            </draggable>
+          </div>
+        </section>
       </div>
 
       <div class="settings system">
@@ -196,6 +207,7 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
+import draggable from "vuedraggable";
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -204,7 +216,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText
+    NavBanner, PageText, draggable
   },
   data: function() {
     return {
@@ -299,6 +311,22 @@ export default {
     },
     factoryReset(){
       ipcRenderer.invoke('factory-reset')
+    },
+    onUpdateSortable: function(event){
+      console.log(event);
+      let el_active = event.target;
+      let setting_key = el_active.attributes['data-setting'] || "modListEnabled"
+
+      // let list_active = []
+      // for (var i = 0; i < el_active.children.length; i++) {
+      //     let child = el_active.children[i]
+      //     list_active.push(child.attributes['data-value'].value)
+      // }
+      let list_active = Array(...el_active.children).map((child) =>
+        child.attributes['data-value'].value
+      )
+      console.log(list_active)
+      this.$localData.settings[setting_key] = list_active
     }
   },
   watch: {
@@ -437,6 +465,47 @@ export default {
         }
       }
     }
+    .sortable {
+      ul, ol {  
+        text-align: left;
+        border: solid #c6c6c6;
+        border-width: 7px 7px 0 0;
+        padding-bottom: 6em;
+        height: 100%;
+      }
+
+      li {
+          /*list-style-position: inside;*/
+          background-color: #fff;
+          border: 1px solid rgba(0,0,0,.125);
+          margin-bottom: -1px;
+          padding: .2em;
+      }
+
+      ul li {
+          list-style: none;
+      }
+
+      ol li {
+        list-style: decimal;
+      }
+
+      .col {  
+          width: 100%;
+          margin: 0 20px;
+      }
+    }
+
+    .col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row {
+      display: flex;
+
+    }
   }
+
 </style>
 
