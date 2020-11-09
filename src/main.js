@@ -103,9 +103,15 @@ Vue.mixin({
       return path.join(this.$localData.assetDir, this.$filterURL(url))
     },
     $mspaURL(url) {
+      // TODO: Why? When?
       let resource = this.$filterURL(url)
-      if (resource.charAt(0) == '/') resource = resource.slice(1)
-      return this.$localhost + resource
+      if (resource.charAt(0) == '/') {
+        resource = resource.slice(1)
+        console.log("mspaURL'ing", url, resource)
+        return this.$localhost + resource
+      } else {
+        return resource
+      }
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber

@@ -565,17 +565,6 @@ ipcMain.on('ondragstart', (event, filePath) => {
 })
 
 //Define which URL schemes to be intercepted
-const filter = {
-  urls: [
-    '*://*.mspaintadventures.com/*', 
-    'assets://*/*',
-    "http://www.turner.com/planet/mp3/cp_close.mp3", 
-    "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
-    "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
-    "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
-    "*://*.sweetcred.com/*",
-  ]
-}
 
 async function createWindow () {
   // Create the browser window.
@@ -600,8 +589,29 @@ async function createWindow () {
     event.preventDefault()
   })
   
+  // Resolve asset URLs
+  win.webContents.session.webRequest.onBeforeRequest({
+    urls: [
+      'assets://*/*',
+    ]
+  }, (details, callback) => {
+    callback({
+      redirectURL: Resources.resolveAssetsProtocol(details.url)
+    })
+  })
+
   //This should only ever trigger from flashes requesting resources or page redirects
-  win.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+  win.webContents.session.webRequest.onBeforeRequest({
+    urls: [
+      '*://*.mspaintadventures.com/*', 
+      'assets://*/*',
+      "http://www.turner.com/planet/mp3/cp_close.mp3", 
+      "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
+      "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
+      "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://*.sweetcred.com/*",
+    ]
+  }, (details, callback) => {
     let destination_url = Resources.resolveURL(details.url)
     console.log(`onBeforeRequest: ${details.url} ===> ${destination_url}`)
     if (details.resourceType =="subFrame")
@@ -616,7 +626,7 @@ async function createWindow () {
   //Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
-    
+
     let parsedURL = Resources.resolveURL(url)
     console.log(`new-window: ${url} ===> ${parsedURL}`)
 
