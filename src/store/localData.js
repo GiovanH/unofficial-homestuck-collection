@@ -81,7 +81,9 @@ class LocalData {
       bolin: false,
       unpeachy: false,
       pxsTavros: false,
-      cursedHistory: false
+      cursedHistory: false,
+
+      modListEnabled: []
     }
 
     //Data will only contain settings if the app has already been used.

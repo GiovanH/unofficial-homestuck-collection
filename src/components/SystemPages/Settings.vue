@@ -149,6 +149,25 @@
           <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
         </dl>
       </div>
+
+      <div class="settings mod">
+        <h2>Mod Settings</h2>
+        <h3>All mods</h3>
+        <li v-for="mod in $modChoices">
+          <b>{{mod.label}}</b> - {{mod.desc}}
+        </li>
+        <h3>Enabled mods</h3>
+        <li v-for="mod in modsEnabled">
+          <b>{{mod.label}}</b> - {{mod.desc}}
+        </li>
+        <h3>Disabled mods</h3>
+        <li v-for="mod in modsDisabled">
+          <b>{{mod.label}}</b> - {{mod.desc}}
+        </li>
+        <!-- TODO mod stuff -->
+        <!-- @click="toggleSetting('notifications')" -->
+      </div>
+
       <div class="settings system">
         <h2>System Settings</h2>
         <div class="system">
@@ -169,6 +188,7 @@
           <button @click="factoryReset()">Factory reset</button>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -214,6 +234,14 @@ export default {
     }
   },
   computed: {
+    modsEnabled() {
+      return this.$modChoices.filter((key) => 
+        this.$localData.settings.modListEnabled.includes(key))
+    },
+    modsDisabled() {
+      return this.$modChoices.filter((key) => 
+        !this.modsEnabled.includes(key))
+    }
   },
   methods:{
     validateNewReader() {
