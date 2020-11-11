@@ -48,6 +48,8 @@ export default {
         ]
       ],
       labels: {
+        // list<theme => list<href => label>>
+        // default theme in settings is the empty string
         "": {
           "https://www.homestuck.com": "HOMESTUCK.COM",
           "/": "HOME",
@@ -81,6 +83,7 @@ export default {
       this.$root.$children[0].openJumpbox()
     },
     getLabel(href){
+      // Tries to get a themed label, otherwise just prints the URL
       return (this.labels[this.$root.theme] || this.labels[''])[href] || href
     }
   },
@@ -104,6 +107,7 @@ export default {
       .candyCorn {
         content: var(--nav-candyCornContent);
         &:last-child {
+          // The last candy corn is a rendering artifact and should be discarded
           display: none;
         }
       }
