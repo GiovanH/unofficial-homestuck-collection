@@ -100,18 +100,14 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
+      // TODO how is this different from mspaURL? can the filestream not be a file:/// url?
       return path.join(this.$localData.assetDir, this.$filterURL(url))
     },
     $mspaURL(url) {
       // TODO: Why? When?
-      let resource = this.$filterURL(url)
-      if (resource.charAt(0) == '/') {
-        resource = resource.slice(1)
-        console.log("mspaURL'ing", url, resource)
-        return this.$localhost + resource
-      } else {
-        return resource
-      }
+      let resource = Resources.resolveURL(url)
+      console.assert(!(resource.charAt(0) == '/'))
+      return resource
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber

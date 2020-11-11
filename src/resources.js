@@ -7,10 +7,10 @@ function resolveURL(url) {
     let resource_url = getResourceURL(url)
 
     if (resource_url.startsWith("assets://")) {
-        console.log("[Resource]", "[convAll]", url, "to", resource_url)
+        // console.log("[Resource]", "[convAll]", url, "to", resource_url)
         resource_url = resolveAssetsProtocol(resource_url, assets_root) 
     } else {
-        console.log("[Resource]", "[convAll]", "no change for", resource_url)
+        // console.log("[Resource]", "[convAll]", "no change for", resource_url)
     }
 
     return resource_url
@@ -104,7 +104,9 @@ const UrlFilterMixin = {
                     media[i].ondragstart = (e) => {
                         e.preventDefault()
                         e.dataTransfer.effectAllowed = 'copy'
-                        require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(media[i].src))
+                        let fileStreamPath = this.$mspaFileStream(media[i].src)
+                        console.log(fileStreamPath)
+                        require('electron').ipcRenderer.send('ondragstart', fileStreamPath)
                     }
                 }
             }
