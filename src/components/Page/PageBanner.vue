@@ -1,7 +1,9 @@
 <template>
     <div class="bannerDiv" v-if="!!banner"  @mouseover="mouseEnter" @mousemove="positionTooltip" @mouseleave="mouseLeave" >
         <Media :url="banner.url" :title="banner.title" class="bannerImage" />
-        <img v-if="imgTooltip" :src="$mspaURL(imgTooltip)" class="imgTooltip" />
+        <img v-if="imgTooltip" :src="$resolveURL(imgTooltip)" class="imgTooltip" />
+        <!-- TODO if imgTooltip is always an asset -->
+        <!-- using asset:// would be cheaper -->
     </div>
 </template>
 

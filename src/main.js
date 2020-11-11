@@ -49,6 +49,7 @@ Vue.mixin({
   },
   methods: {
     $resolvePath(to){
+      // Resolves a logical path within the vue router
       let route = this.$router.resolve(to.toLowerCase()).route
       let resolvedUrl = route.path
       let base = route.path.slice(1).split("/")[0]
@@ -81,7 +82,7 @@ Vue.mixin({
         else shell.openExternal(urlObject.href)
       }
       else if (/\.(html|pdf)$/i.test(to)){
-        shell.openExternal(this.$mspaURL(to))
+        shell.openExternal(Resources.resolveURL(to))
       }
       else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
         this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
@@ -100,15 +101,7 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
-      // TODO how is this different from mspaURL? can the filestream not be a file:/// url?
-      console.log(Resources.resolvePath(url, this.$localData.assetDir))
       return Resources.resolvePath(url, this.$localData.assetDir)
-    },
-    $mspaURL(url) {
-      // TODO: Why? When?
-      let resource = Resources.resolveURL(url)
-      console.assert(!(resource.charAt(0) == '/'))
-      return resource
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber

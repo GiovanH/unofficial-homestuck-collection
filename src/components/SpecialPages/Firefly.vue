@@ -155,8 +155,8 @@ export default {
         this.cobj.push(tname)	// The Object ID container for a specific <canvas> box
 
         //	Create needed images! - R and L facing types (BEER - right, BEEL - left)
-        this.sbeer.push(this.$mspaURL("images/firefly_sprite_opt.png"))
-        this.sbeel.push(this.$mspaURL("images/firefly_sprite_left_opt.png"))
+        this.sbeer.push(this.$resolveURL("images/firefly_sprite_opt.png"))
+        this.sbeel.push(this.$resolveURL("images/firefly_sprite_left_opt.png"))
 
         // IMAGE LOADER function - need to load the image to the canvas block so it will be seen
         // IMG Loader = handles setting up both 'Right' facing and 'Let' facing image animates for each canvas block
