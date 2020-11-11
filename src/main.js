@@ -94,7 +94,9 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    $resolveURL: Resources.resolveURL,
+    // TODO: resolveURL is perhaps a bad name because this doesn't resolve assets:// urls yet?
+    // that's not handled until Resources.resolveAssetsProtocol or Resources.resolveURL() (which does both)
+    $resolveURL: Resources.getResourceURL,
     $filterURL(u) {return this.$resolveURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       let url = this.$resolvePath(to)
