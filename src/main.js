@@ -101,7 +101,8 @@ Vue.mixin({
     },
     $mspaFileStream(url) {
       // TODO how is this different from mspaURL? can the filestream not be a file:/// url?
-      return path.join(this.$localData.assetDir, this.$filterURL(url))
+      console.log(Resources.resolvePath(url, this.$localData.assetDir))
+      return Resources.resolvePath(url, this.$localData.assetDir)
     },
     $mspaURL(url) {
       // TODO: Why? When?

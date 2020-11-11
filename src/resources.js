@@ -1,4 +1,5 @@
 //Rules for transforming intercepted URLS
+const path = require('path')
 
 var assets_root
 
@@ -32,6 +33,20 @@ function resolveURL(url) {
     }
 
     return resource_url
+}
+
+function resolvePath(url, root_dir) {
+    // Like resolveURL, but returns an os-path and not a file
+    let resource_path = getResourceURL(url)
+
+    if (resource_path.startsWith("assets://")) {
+        resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
+        console.log("[Resource]", "[resPath]", url, "to", resource_path)
+    } else {
+        console.log("[Resource]", "[resPath]", "no change for", resource_path)
+    }
+
+    return resource_path
 }
 
 function getResourceURL(request_url){
@@ -134,13 +149,12 @@ const UrlFilterMixin = {
             let media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
             for (let i = 0;i < media.length; i++) {
-                media[i].src = this.$mspaURL(media[i].src)
+                media[i].src = resolveURL(media[i].src)
                 if (media[i].tagName == 'IMG') {  
                     media[i].ondragstart = (e) => {
                         e.preventDefault()
                         e.dataTransfer.effectAllowed = 'copy'
                         let fileStreamPath = this.$mspaFileStream(media[i].src)
-                        console.log(fileStreamPath)
                         require('electron').ipcRenderer.send('ondragstart', fileStreamPath)
                     }
                 }
@@ -156,6 +170,7 @@ module.exports = {
     },
     UrlFilterMixin,
     resolveURL,
+    resolvePath,
     getResourceURL,
     resolveAssetsProtocol
 }
