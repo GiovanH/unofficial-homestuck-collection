@@ -1,6 +1,6 @@
 <template>
   <div class="gameBody" v-if="this.routeParams.play == 'play'">
-    <iframe class="gameFrame" ref="game" :src="$mspaURL('archive/namcohigh/game/index2.html')" :width="`${gameWidth}px`" :height="`${gameHeight}px`" @load="initLocalStorage"/>
+    <iframe class="gameFrame" ref="game" :src="$mspaURL('assets://archive/namcohigh/game/index2.html')" :width="`${gameWidth}px`" :height="`${gameHeight}px`" @load="initLocalStorage"/>
   </div>
   <div class="pageBody" v-else>
     <div class="header">
