@@ -77,8 +77,10 @@ function resolveAssetsProtocol(assets_url, asset_root) {
 
 const UrlFilterMixin = {
     methods: {
-        filterLinksAndImages(){
-            let el = this.$el.querySelector('.pageContent')
+        filterLinksAndImages(el){
+            // dynamic default
+            if (!el)
+                el = this.$el.querySelector('.pageContent')
 
             // Check if this is a comment
             if (el.nodeType === 8)
