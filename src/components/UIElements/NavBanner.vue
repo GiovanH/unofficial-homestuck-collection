@@ -1,29 +1,16 @@
 <template>
   <nav class="navBanner" :class="{customNavBanner: useCustomStyles, pixelated: $localData.settings.pixelScaling}">
     <div class="navList">
-      <ul class="nav1">
-        <li><a href="https://www.homestuck.com">{{this.navText[0]}}</a></li>
-      </ul>
+      <template v-for="(group, gi) in urls">
+        <ul :class="'nav' + (gi+1)">
+          <li v-for="href in group">
+            <a v-if="href == 'toggleJumpBox'" @click.prevent="toggleJumpBox()">{{getLabel(href)}}</a>
+            <a v-else-if="href == 'toggleBookmarks'" @click.prevent="toggleBookmarks()">{{getLabel(href)}}</a>
+            <a v-else :href="href">{{getLabel(href)}}</a>
+          </li>
+        </ul>
       <div class="candyCorn" />
-      <ul class="nav2">
-        <li><a href="/">{{navText[1]}}</a></li>
-        <li><a @click.prevent="toggleJumpBox()">{{navText[2]}}</a></li>
-      </ul>
-      <div class="candyCorn" />
-      <ul class="nav3">
-        <li><a href="/map">{{navText[3]}}</a></li>
-        <li><a href="/log">{{navText[4]}}</a></li>
-        <li><a href="/search">{{navText[5]}}</a></li>
-      </ul>
-      <div class="candyCorn" />
-      <ul class="nav4">
-        <li><a @click.prevent="toggleBookmarks()">{{navText[6]}}</a></li>
-      </ul>
-      <div class="candyCorn" />
-      <ul class="nav5">
-        <li><a href="/settings">{{navText[7]}}</a></li>
-        <li><a href="/credits">{{navText[8]}}</a></li>
-      </ul>
+      </template>
     </div>
   </nav>
 </template>
@@ -39,36 +26,51 @@ export default {
 	],
   data: function() {
     return {
-      defaultText: [
-        "HOMESTUCK.COM",
-        "HOME",
-        "JUMP",
-        "MAP",
-        "LOG",
-        "SEARCH",
-        "SAVE/LOAD",
-        "SETTINGS",
-        "CREDITS"
+      urls: [
+        [
+          "https://www.homestuck.com"
+        ],
+        [
+          "/",
+          "toggleJumpBox"
+        ],
+        [
+          "/map",
+          "/log",
+          "/search"
+        ],
+        [
+          "toggleBookmarks"
+        ],
+        [
+          "/settings",
+          "/credits"
+        ]
       ],
-      a6a6Text: [
-        "WORTHLESS GARBAGE.",
-        "STUPID.",
-        "WHO CARES?",
-        "WOW.",
-        "NO.",
-        "BORING.",
-        "DUMB NOISE.",
-        "BULLSHIT.",
-        "WHATEVER."
-      ]
-    }
-  },
-  computed: {
-    navText() {
-      return this.$root.theme === 'A6A6' ? this.a6a6Text : this.defaultText
-    },
-    tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      labels: {
+        "": {
+          "https://www.homestuck.com": "HOMESTUCK.COM",
+          "/": "HOME",
+          "toggleJumpBox": "JUMP",
+          "/map": "MAP",
+          "/log": "LOG",
+          "/search": "SEARCH",
+          "toggleBookmarks": "SAVE/LOAD",
+          "/settings": "SETTINGS",
+          "/credits": "CREDITS"
+        },
+        A6A6: {
+          "https://www.homestuck.com": "WORTHLESS GARBAGE.",
+          "/": "STUPID.",
+          "toggleJumpBox": "WHO CARES?",
+          "/map": "WOW.",
+          "/log": "NO.",
+          "/search": "BORING.",
+          "toggleBookmarks": "DUMB NOISE.",
+          "/settings": "BULLSHIT.",
+          "/credits": "WHATEVER."
+        }
+      }
     }
   },
   methods:{
@@ -77,6 +79,14 @@ export default {
     },
     toggleJumpBox(){
       this.$root.$children[0].openJumpbox()
+    },
+    getLabel(href){
+      return (this.labels[this.$root.theme] || this.labels[''])[href] || href
+    }
+  },
+  computed: {
+    tabComponent() {
+      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
     }
   },
 }
@@ -93,6 +103,9 @@ export default {
     .navList {
       .candyCorn {
         content: var(--nav-candyCornContent);
+        &:last-child {
+          display: none;
+        }
       }
       ul li:not(:last-child):after {
         color: var(--nav-divider);
