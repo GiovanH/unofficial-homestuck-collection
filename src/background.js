@@ -7,6 +7,7 @@ import fs from 'fs'
 import FlexSearch from 'flexsearch'
 
 import Resources from "./resources.js"
+import Mods from "./mods.js"
 
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -34,7 +35,6 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-var modRoot = path.join(assetDir, "mods")
 
 var archive
 var modChoices
@@ -190,61 +190,11 @@ function loadArchiveData(){
   return data
 }
 
-function crawlFileTree(root, recursive=false){
-  const dir = fs.opendirSync(root);
-  let ret = {}
-  let dirent
-  while (dirent = dir.readSync()) {
-    if (dirent.isDirectory() && recursive) {
-      let subpath = path.join(root, dirent.name)
-      ret[dirent.name] = crawlFileTree(subpath, true)
-    } else {
-      ret[dirent.name] = true
-    }
-  }
-  dir.close()
-  return ret
-}
-
-function getModJs(mod_dir){
-  try {
-      let modjs_path = path.join(modRoot, mod_dir, "mod.js")
-      var mod = __non_webpack_require__(modjs_path)
-      return mod
-  } catch (e1) {
-    try {
-        // Look for a single-file mod
-        let modjs_path = path.join(modRoot, mod_dir)
-        var mod = __non_webpack_require__(modjs_path)
-        return mod
-    } catch (e2) {
-        console.error(e2)
-        throw e2
-    }
-  }
-}
-
-
-function loadModChoices(){
-  // TODO mod stuff
-
-  var mod_folders = Object.keys(crawlFileTree(modRoot, false))
-  var items = mod_folders.map((dir) => {
-    let js = getModJs(dir)
-    return {
-      label: js.title,
-      desc: js.desc,
-      key: dir
-    }
-  })
-
-  console.log(items)
-  return items
-}
-
 try {
   archive = loadArchiveData()
-  modChoices = loadModChoices()
+  modChoices = Mods.loadModChoices()
+  
+  console.log(modChoices)
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin

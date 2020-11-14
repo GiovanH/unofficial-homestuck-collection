@@ -5,6 +5,8 @@ import localData from './store/localData'
 import fs from 'fs'
 import path from 'path'
 
+import Mods from "./mods.js"
+
 const Store = require('electron-store')
 const store = new Store()
 
@@ -24,10 +26,10 @@ Vue.use(localData, {
 
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
+
 var modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
 
 const Resources = require("@/resources.js")
-
 Resources.init({
   assets_root: `http://127.0.0.1:${port}/`
 })
