@@ -27,14 +27,13 @@ Vue.use(localData, {
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 
-var modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
-
 const Resources = require("@/resources.js")
 Resources.init({
   assets_root: `http://127.0.0.1:${port}/`
 })
 
-Mods.getMixins().map((m) => Vue.mixin(m))
+// Mixin mod mixins
+Mods.getMixins().forEach((m) => Vue.mixin(m))
 
 Vue.mixin({
   data(){
@@ -49,7 +48,7 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => modChoices
+    $modChoices: () => Mods.modChoices
   },
   methods: {
     $resolvePath(to){

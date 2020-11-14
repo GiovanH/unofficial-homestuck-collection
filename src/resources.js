@@ -1,7 +1,10 @@
 //Rules for transforming intercepted URLS
 const path = require('path')
+const Mods = require('@/mods.js').default
 
-const VERBOSE = false
+console.log(Mods)
+
+const VERBOSE = true
 
 var assets_root
 
@@ -108,24 +111,19 @@ function getResourceURL(request_url){
     return resource_url
 }
 
-function resolveAssetsProtocol(assets_url, asset_root) {
-    // Finally, redirect mspa:// to local mspa    
-    // let resource_url = mspa_url.replace("mspa://", "")
+function resolveAssetsProtocol(asset_url, assets_root) {
+    console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
-    // let routes = getModRoutes()
-    // if (routes[resource_url]) {
-    //     print("Mod resolved", mspa_url, "to", routes[resource_url])
-    //     return routes[resource_url]
-    // }
+    let mod_route = Mods.getAssetRoute(asset_url)
+    if (mod_route) {
+        print("[resolvA]", asset_url, "mod to", mod_route)
+        return mod_route
+    }
 
-    // resource_url = mspaData + resource_url
+    let resource_url = asset_url.replace("assets://", assets_root)
 
-    // print("Resolved", mspa_url, "to", resource_url)
-    // return resource_url
-    let resource_url = assets_url.replace("assets://", assets_root)
-
-    if (assets_url != resource_url) {
-        print("[resolvA]", assets_url, "to", resource_url)
+    if (asset_url != resource_url) {
+        print("[resolvA]", asset_url, "to", resource_url)
     } else {
         print("[resolvA]", "no change for", resource_url)
     }

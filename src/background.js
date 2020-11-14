@@ -37,7 +37,6 @@ protocol.registerSchemesAsPrivileged([
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 
 var archive
-var modChoices
 var port
 
 //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
@@ -178,6 +177,10 @@ function loadArchiveData(){
   // Mod applications go here
   Mods.editArchive(data)
   
+  // This isn't strictly part of loading the archive data,
+  // but we should do this only when we reload the archive
+  Mods.bakeRoutes()
+
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   let gankraSearchPage = data.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
@@ -193,7 +196,6 @@ function loadArchiveData(){
 
 try {
   archive = loadArchiveData()
-  modChoices = Mods.loadModChoices()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -296,10 +298,6 @@ finally {
 //The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_REQUEST', (event) => {
   event.returnValue = { port, archive }
-})
-
-ipcMain.on('GET_AVAILABLE_MODS', (event) => {
-  event.returnValue = modChoices
 })
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
