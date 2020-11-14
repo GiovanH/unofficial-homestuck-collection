@@ -73,6 +73,8 @@ import PXS from '@/components/Comics/pxs.vue'
 import TSO from '@/components/Comics/tso.vue'
 import SNAPS from '@/components/Comics/Snaps.vue'
 
+import TESTS from '@/components/Extras/tests.vue'
+
 export default {
 	name: 'TabFrame',
 	props: [
@@ -125,7 +127,9 @@ export default {
 		SBAHJ,
 		PXS,
 		TSO,
-		SNAPS
+		SNAPS,
+
+		TESTS
 	},
 	data() {
 		return {
