@@ -176,6 +176,7 @@ function loadArchiveData(){
   }
 
   // Mod applications go here
+  Mods.editArchive(data)
   
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   let gankraSearchPage = data.search.find(x => x.key == '002745')
@@ -301,9 +302,14 @@ ipcMain.on('GET_AVAILABLE_MODS', (event) => {
   event.returnValue = modChoices
 })
 
+ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+  archive = loadArchiveData()
+})
+
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()
 })
+
 ipcMain.handle('win-maximize', async (event) => {
   if (win.isFullScreen()){
     win.setFullScreen(false)

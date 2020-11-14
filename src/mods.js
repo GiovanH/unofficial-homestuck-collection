@@ -79,6 +79,15 @@ function loadModChoices(){
   return items
 }
 
+function editArchive(archive){
+  getEnabledModsJs().forEach((js) => {
+    const editfn = js.edit
+    if (editfn) {
+      archive = editfn(archive)
+    }
+  })
+}
+
 function getMixins(){
   const nop = ()=>undefined;
   return getEnabledModsJs().map((js) => {
@@ -121,5 +130,6 @@ function getMixins(){
 export default {
   loadModChoices,
   getModJs,
-  getMixins
+  getMixins,
+  editArchive
 }
