@@ -1,7 +1,13 @@
 //Rules for transforming intercepted URLS
 const path = require('path')
 
+const VERBOSE = false
+
 var assets_root
+
+function print(){
+    if (VERBOSE) return console.log("[Resources]", ...arguments)
+}
 
 function fileIsAsset(url){
     // Given a url, *without considering the domain*, determine if this should
@@ -26,10 +32,10 @@ function resolveURL(url) {
     let resource_url = getResourceURL(url)
 
     if (resource_url.startsWith("assets://")) {
-        // console.log("[Resource]", "[convAll]", url, "to", resource_url)
+        // print("[convAll]", url, "to", resource_url)
         resource_url = resolveAssetsProtocol(resource_url, assets_root) 
     } else {
-        // console.log("[Resource]", "[convAll]", "no change for", resource_url)
+        // print("[convAll]", "no change for", resource_url)
     }
 
     return resource_url
@@ -41,9 +47,9 @@ function resolvePath(url, root_dir) {
 
     if (resource_path.startsWith("assets://")) {
         resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
-        console.log("[Resource]", "[resPath]", url, "to", resource_path)
+        print("[resPath]", url, "to", resource_path)
     } else {
-        console.log("[Resource]", "[resPath]", "no change for", resource_path)
+        print("[resPath]", "no change for", resource_path)
     }
 
     return resource_path
@@ -95,9 +101,9 @@ function getResourceURL(request_url){
     }
 
     if (resource_url != request_url) {
-        console.log("[Resource]", "[getResU]", request_url, "to", resource_url)
+        print("[getResU]", request_url, "to", resource_url)
     } else {
-        console.log("[Resource]", "[getResU]", "no change for", request_url)
+        print("[getResU]", "no change for", request_url)
     }
     return resource_url
 }
@@ -108,20 +114,20 @@ function resolveAssetsProtocol(assets_url, asset_root) {
 
     // let routes = getModRoutes()
     // if (routes[resource_url]) {
-    //     console.log("[Resource]", "Mod resolved", mspa_url, "to", routes[resource_url])
+    //     print("Mod resolved", mspa_url, "to", routes[resource_url])
     //     return routes[resource_url]
     // }
 
     // resource_url = mspaData + resource_url
 
-    // console.log("[Resource]", "Resolved", mspa_url, "to", resource_url)
+    // print("Resolved", mspa_url, "to", resource_url)
     // return resource_url
     let resource_url = assets_url.replace("assets://", assets_root)
 
     if (assets_url != resource_url) {
-        console.log("[Resource]", "[resolvA]", assets_url, "to", resource_url)
+        print("[resolvA]", assets_url, "to", resource_url)
     } else {
-        console.log("[Resource]", "[resolvA]", "no change for", resource_url)
+        print("[resolvA]", "no change for", resource_url)
     }
     return resource_url
 }
@@ -140,7 +146,7 @@ const UrlFilterMixin = {
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    console.log("[Resource]", "[filterL]", "looking up", link.href)
+                    print("[filterL]", "looking up", link.href)
                     link.href = getResourceURL(link.href)
                 }
             })

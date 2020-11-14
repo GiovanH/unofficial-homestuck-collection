@@ -6,6 +6,11 @@ const store = new Store()
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 var mod_root = path.join(assetDir, "mods")
+const VERBOSE = true
+
+function print(){
+    if (VERBOSE) return console.log("[Mods]", ...arguments)
+}
 
 function crawlFileTree(root, recursive=false){
   const dir = fs.opendirSync(root);
@@ -53,7 +58,8 @@ function loadModChoices(){
       key: dir
     }
   })
-
+  print("Mod choices loaded")
+  print(items)
   return items
 }
 

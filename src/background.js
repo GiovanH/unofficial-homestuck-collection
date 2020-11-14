@@ -194,8 +194,6 @@ try {
   archive = loadArchiveData()
   modChoices = Mods.loadModChoices()
   
-  console.log(modChoices)
-  
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
@@ -239,7 +237,6 @@ try {
     port = server.address().port
   
     // Initialize Resources
-    console.log(Resources)
     Resources.init({
       assets_root: `http://127.0.0.1:${port}/`
     })
@@ -563,7 +560,7 @@ async function createWindow () {
     ]
   }, (details, callback) => {
     let destination_url = Resources.resolveURL(details.url)
-    console.log(`onBeforeRequest: ${details.url} ===> ${destination_url}`)
+    // console.log(`onBeforeRequest: ${details.url} ===> ${destination_url}`)
     if (details.resourceType =="subFrame")
       win.webContents.send('TABS_PUSH_URL', destination_url)
 		else callback({
