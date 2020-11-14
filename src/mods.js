@@ -21,6 +21,10 @@ function getEnabledMods(){
   return list
 }
 
+function getEnabledModsJs(){
+  return getEnabledMods().map((dir) => getModJs(dir))
+}
+
 function crawlFileTree(root, recursive=false){
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
@@ -77,17 +81,18 @@ function loadModChoices(){
 
 function getMixins(){
   const nop = ()=>undefined;
-  return getEnabledMods().map((dir) => {
-    let js = getModJs(dir)
+  return getEnabledModsJs().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
+          // Shorthand
           if (hook.matchName) {
             hook.match = (c)=>(c.$options.name == hook.matchName)
           }
+
           if (hook.match(this)) {
             for (const cname in (hook.computed || {})) {
               // Precomputed super function
