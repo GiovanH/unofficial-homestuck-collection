@@ -314,7 +314,6 @@ export default {
       ipcRenderer.invoke('factory-reset')
     },
     onUpdateSortable: function(event){
-      console.log(event);
       let el_active = event.target;
       let setting_key = el_active.attributes['data-setting'] || "modListEnabled"
 
@@ -326,8 +325,8 @@ export default {
       let list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
-      console.log(list_active)
       this.$localData.settings[setting_key] = list_active
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
     }
   },
   watch: {
