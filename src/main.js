@@ -34,6 +34,8 @@ Resources.init({
   assets_root: `http://127.0.0.1:${port}/`
 })
 
+Mods.getMixins().map((m) => Vue.mixin(m))
+
 Vue.mixin({
   data(){
     return {
