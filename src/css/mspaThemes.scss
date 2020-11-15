@@ -64,18 +64,26 @@
 
 	&.scratch {
 		--font-default: #ffffff;
-		--font-header: #ffffff;
-		--font-ctx: #ffffff;
 		--font-log: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
 
-		--header-bg: #082a00;
-		--header-tabSection: #0e4603;
-		--header-border: #082a00;
+		&.styledUI {
+			--font-header: #ffffff;
+			--header-bg: #082a00;
+			--header-tabSection: #0e4603;
+			--header-border: #082a00;
 
-		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+			--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			--header-buttonClickState: rgba(255, 255, 255, 0.15);
+
+			--ctx-bg: #0e4603;
+			--ctx-frame: #082a00;
+			--ctx-shadow: #000000;
+			--ctx-select: #072600;
+			--ctx-divider: #FFFFFF;
+			--font-ctx: #ffffff;
+		}
 
 		--nav-bg: #000000;
 		--nav-link: #FFFFFF;
@@ -91,11 +99,6 @@
 		--page-links: #2cff4b;
 		--page-links-visited: #2cff4b;
 
-		--ctx-bg: #0e4603;
-		--ctx-frame: #082a00;
-		--ctx-shadow: #000000;
-		--ctx-select: #072600;
-		--ctx-divider: #FFFFFF;
 
 		--saves-bg: #0e4603;
 		--saves-tab: #082a00;
@@ -108,9 +111,24 @@
 	&.sbahj {
 		--font-disabled: #00000060;
 
-		--header-bg: #FFFF00;
-		--header-tabSection: #F400EC;
-		--header-border: #14ff23;
+		&.styledUI {
+			--header-bg: #FFFF00;
+			--header-tabSection: #F400EC;
+			--header-border: #14ff23;
+
+			--ctx-bg: #f400ec;
+			--ctx-frame: #0707ec;
+			--ctx-select: #FFFF00;
+			--ctx-divider: #14ff23;
+
+			#titleBarText {
+				font-size: 12px;
+			}
+			#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, .customStyles * {
+				font-family: "Comic Sans MS", "Comic Sans", cursive;
+			}
+
+		}
 
 		--nav-bg: #000000;
 
@@ -119,10 +137,6 @@
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
 
-		--ctx-bg: #f400ec;
-		--ctx-frame: #0707ec;
-		--ctx-select: #FFFF00;
-		--ctx-divider: #14ff23;
 
 		--saves-bg: #FFFF00;
 		--saves-tab: #F400EC;
@@ -133,27 +147,32 @@
 
 		--find--highlight: pink;
 
-		#titleBarText {
-			font-size: 12px;
-		}
-		#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, .customStyles * {
+		.customStyles * {
 			font-family: "Comic Sans MS", "Comic Sans", cursive;
 		}
 	}
 
 	&.cascade {
 		--font-default: #ffffff;
-		--font-header: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
-		--font-ctx: #ffffff;
 
-		--header-bg: #262626;
-		--header-tabSection: #404040;
-		--header-border: #363636;
+		&.styledUI {
+			--font-header: #ffffff;
+			--font-ctx: #ffffff;
 
-		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+			--header-bg: #262626;
+			--header-tabSection: #404040;
+			--header-border: #363636;
+
+			--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			--header-buttonClickState: rgba(255, 255, 255, 0.15);
+		
+			--ctx-bg: #262626;
+			--ctx-frame: #000000;
+			--ctx-select: #0066ff;
+			--ctx-divider: #ffffff;
+		}
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #262626;
@@ -162,11 +181,6 @@
 		--page-nav-divider: #0066ff;
 		--page-nav-meta: #0066ff;
 		--page-links: #0066ff;
-		
-		--ctx-bg: #262626;
-		--ctx-frame: #000000;
-		--ctx-select: #0066ff;
-		--ctx-divider: #ffffff;
 
 		--saves-bg: #454545;
 		--saves-tab: #262626;
@@ -178,17 +192,25 @@
 
 	&.collide {
 		--font-default: #ffffff;
-		--font-header: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
-		--font-ctx: #ffffff;
 
-		--header-bg: #262626;
-		--header-tabSection: #454545;
-		--header-border: #363636;
+		&.styledUI {
+			--font-header: #ffffff;
+			--font-ctx: #ffffff;
 
-		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+			--header-bg: #262626;
+			--header-tabSection: #454545;
+			--header-border: #363636;
+
+			--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			--header-buttonClickState: rgba(255, 255, 255, 0.15);
+
+			--ctx-bg: #262626;
+			--ctx-frame: #000000;
+			--ctx-select: red;
+			--ctx-divider: #ffffff;
+		}
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #454545;
@@ -197,11 +219,6 @@
 		--page-nav-meta: red;
 		--page-links: red;
 		
-		--ctx-bg: #262626;
-		--ctx-frame: #000000;
-		--ctx-select: red;
-		--ctx-divider: #ffffff;
-
 		--saves-bg: #454545;
 		--saves-tab: #262626;
 		--saves-tabHover: #3c3c3c;
@@ -212,20 +229,27 @@
 
 	&.tso {
 		--font-default: #ffffff;
-		--font-header: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
-		--font-ctx: #ffffff;
 
-		--header-bg: #111111;
-		--header-tabSection: #2f2f2f;
-		--header-border: #222222;
+		&.styledUI {
+			--font-header: #ffffff;
+			--font-ctx: #ffffff;
+
+			--header-bg: #111111;
+			--header-tabSection: #2f2f2f;
+			--header-border: #222222;
+
+			--ctx-bg: #2f2f2f;
+			--ctx-frame: #000000;
+			--ctx-select: #111111;
+			--ctx-divider: #ffffff;
+
+			--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			--header-buttonClickState: rgba(255, 255, 255, 0.15);
+		}
 
 		--nav-bg: #000000;
-
-		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		--header-buttonClickState: rgba(255, 255, 255, 0.15);
-
 		--page-pageBody: #000000;
 		--page-pageFrame: #2f2f2f;
 		--page-pageContent: #111111;
@@ -233,10 +257,6 @@
 		--page-nav-meta: #A1EE26;
 		--page-links: #A1EE26;
 		
-		--ctx-bg: #2f2f2f;
-		--ctx-frame: #000000;
-		--ctx-select: #111111;
-		--ctx-divider: #ffffff;
 
 		--saves-bg: #2f2f2f;
 		--saves-tab: #111111;
@@ -248,18 +268,25 @@
 
 	&.trickster {
 		--font-default: #f9fd6b;
-		--font-header: #f9fd6b;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
-		--font-ctx: #f9fd6b;
 
-		--header-bg: #ff73fd;
-		--header-tabSection: #00117e;
-		--header-border: #d361d1;
+		&.styledUI {
+			--font-header: #f9fd6b;
+			--font-ctx: #f9fd6b;
 
-		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+			--header-bg: #ff73fd;
+			--header-tabSection: #00117e;
+			--header-border: #d361d1;
 
+			--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			--header-buttonClickState: rgba(255, 255, 255, 0.15);
+
+			--ctx-bg: #ff73fd;
+			--ctx-frame: #00117e;
+			--ctx-select: #fb060b;
+			--ctx-divider: #0019b8;
+		}
 		--nav-bg: #000000;
 
 		--page-pageBody: url(assets://images/trickster_sitegraphics/Z2.gif);
@@ -272,10 +299,6 @@
 		--page-links: #fb060b;
 		--page-links-visited: #f9fd6b;
 
-		--ctx-bg: #ff73fd;
-		--ctx-frame: #00117e;
-		--ctx-select: #fb060b;
-		--ctx-divider: #0019b8;
 
 		--saves-bg: #f9fd6b;
 		--saves-tab: #ff73fd;
@@ -300,19 +323,27 @@
 
 	&.A6A6 {
 		--font-default: #2ed73a;
-		--font-header: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
-		--font-ctx: #ffffff;
 
-		--header-bg: #073c00;
-		--header-tabSection: #168500;
-		--header-border: #031600;
+		&.styledUI {
+			--font-ctx: #ffffff;
+			--font-header: #ffffff;
 
-		// --header-buttonHoverState: rgba(255, 255, 255, 0.1);
-		// --header-buttonClickState: rgba(255, 255, 255, 0.15);
-		--header-buttonHoverState: rgba(0, 0, 0, 0.2);
-		--header-buttonClickState: rgba(0, 0, 0, 0.25);
+			--header-bg: #073c00;
+			--header-tabSection: #168500;
+			--header-border: #031600;
+
+			// --header-buttonHoverState: rgba(255, 255, 255, 0.1);
+			// --header-buttonClickState: rgba(255, 255, 255, 0.15);
+			--header-buttonHoverState: rgba(0, 0, 0, 0.2);
+			--header-buttonClickState: rgba(0, 0, 0, 0.25);
+
+			--ctx-bg: #073c00;
+			--ctx-frame: #042300;
+			--ctx-select: #168500;
+			--ctx-divider: #2ed73a;
+		}
 
 		--nav-bg: #042300;
 		--nav-link: #2ed73a;
@@ -326,11 +357,6 @@
 		--page-nav-divider: #000000;
 		--page-nav-meta: #2ed73a;
 		--page-links: #2ed73a;
-
-		--ctx-bg: #073c00;
-		--ctx-frame: #042300;
-		--ctx-select: #168500;
-		--ctx-divider: #2ed73a;
 
 		--saves-bg: #168500;
 		--saves-tab: #073c00;
@@ -346,17 +372,26 @@
 
 	&.pxs {
 		--font-default: #ffffff;
-		--font-header: #ffffff;
-		--font-ctx: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: #a9a9a933;
 	
-		--header-bg: #095486;
-		--header-tabSection: #003b64;
-		--header-border: #095486;
-	
-		--header-buttonHoverState: #ffffff1a;
-		--header-buttonClickState: #ffffff26;
+		&.styledUI {
+			--font-header: #ffffff;
+			--font-ctx: #ffffff;
+
+			--header-bg: #095486;
+			--header-tabSection: #003b64;
+			--header-border: #095486;
+		
+			--header-buttonHoverState: #ffffff1a;
+			--header-buttonClickState: #ffffff26;
+				
+			--ctx-bg: #003b64;
+			--ctx-frame: #095486;
+			--ctx-shadow: #000000;
+			--ctx-select: #000000;
+			--ctx-divider: #ffffff;
+		}
 	
 		--nav-bg: #003b64;
 		--nav-link: #72abd2;
@@ -373,11 +408,6 @@
 		--page-links: #72abd2;
 		--page-links-visited: #ffffff;
 	
-		--ctx-bg: #003b64;
-		--ctx-frame: #095486;
-		--ctx-shadow: #000000;
-		--ctx-select: #000000;
-		--ctx-divider: #ffffff;
 
 		--saves-bg: #003b64;
 		--saves-tab: #095486;
