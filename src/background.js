@@ -271,12 +271,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: zoomIn()
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: zoomOut()
+          click: zoomOut
         },
       ]
     }
