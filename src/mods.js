@@ -55,6 +55,7 @@ function onModLoadFail(enabled_mods, e){
 function bakeRoutes(){
     let enabled_mods = getEnabledMods()
     let all_mod_routes = {}
+    // Start with least-priority so they're overwritten
     getEnabledModsJs().reverse().forEach(js => {
         try {
             let mod_root = path.join(modsDir, js._id, '')
@@ -169,6 +170,7 @@ function editArchive(archive){
 function getMixins(){
   const nop = ()=>undefined;
 
+  // TODO: How do mixin collisions work? Priorities
   return getEnabledModsJs().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
