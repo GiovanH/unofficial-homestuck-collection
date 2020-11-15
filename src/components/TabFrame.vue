@@ -176,7 +176,7 @@ export default {
 				'faqs': 'ExtrasPage',
 				'oilretcon': 'ExtrasPage'
 			}
-      
+	
 			let component = (this.routeParams.base in mapRoute ? mapRoute[this.routeParams.base] : this.routeParams.base).toUpperCase()
 			if (!this.routeParams.base) component = 'Homepage'
 			switch (component) {
@@ -367,9 +367,9 @@ export default {
 		reload() {
 			const u = this.tab.url
 			this.tab.url = "blank"
-  	        this.$nextTick(function () {
-	            this.tab.url = u
-	        })
+			this.$nextTick(function () {
+				this.tab.url = u
+			})
 		},
 		leftKeyPress(e) {
 			if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('left', e)
