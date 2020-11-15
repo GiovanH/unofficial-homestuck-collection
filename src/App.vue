@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="[$root.theme, $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive">
+  <div id="app" :class="[$localData.settings.themeStyleChrome ? $root.theme : 'default', $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive">
     <AppHeader />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications ref="notifications" />

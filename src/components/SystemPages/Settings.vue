@@ -58,7 +58,11 @@
               </option>
             </select>
             <br><br>
-            <label v-if="$localData.settings.themeOverride"><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
+            <label><input type="checkbox" name="themeStyleChrome" v-model="$localData.settings['themeStyleChrome']" @click="toggleSetting('themeStyleChrome')"> Allow themes to style application window</label>
+            <span v-if="$localData.settings.themeOverride">
+              <br><br>
+              <label ><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
+            </span>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
 

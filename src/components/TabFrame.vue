@@ -14,7 +14,13 @@
 		@keyup.f5="reload"
 		ref="tabFrame"
 	>
-		<component :is="resolveComponent" :tab="tab" :routeParams="routeParams" ref="page"/>
+		<component
+			:class="[$root.theme]"
+			:is="resolveComponent" 
+			:tab="tab" 
+			:routeParams="routeParams" 
+			ref="page"
+		/>
 		
 		<Bookmarks 	:tab="tab" ref="bookmarks" />
 		<MediaModal :tab="tab" ref="modal" />
