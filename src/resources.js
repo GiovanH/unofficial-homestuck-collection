@@ -4,7 +4,7 @@ const Mods = require('@/mods.js').default
 
 console.log(Mods)
 
-const VERBOSE = true
+const VERBOSE = false
 
 var assets_root
 
@@ -33,12 +33,13 @@ function fileIsAsset(url){
 function resolveURL(url) {
     // TODO URL handling
     let resource_url = getResourceURL(url)
+    print("Got resource URL", resource_url)
 
     if (resource_url.startsWith("assets://")) {
-        // print("[convAll]", url, "to", resource_url)
+        print("[resvUrl]", url, "to", resource_url)
         resource_url = resolveAssetsProtocol(resource_url, assets_root) 
     } else {
-        // print("[convAll]", "no change for", resource_url)
+        print("[resvUrl]", "no change for", resource_url)
     }
 
     return resource_url
@@ -50,9 +51,9 @@ function resolvePath(url, root_dir) {
 
     if (resource_path.startsWith("assets://")) {
         resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
-        print("[resPath]", url, "to", resource_path)
+        // print("[resPath]", url, "to", resource_path)
     } else {
-        print("[resPath]", "no change for", resource_path)
+        // print("[resPath]", "no change for", resource_path)
     }
 
     return resource_path
@@ -111,13 +112,19 @@ function getResourceURL(request_url){
     return resource_url
 }
 
-function resolveAssetsProtocol(asset_url, assets_root) {
+function resolveAssetsProtocol(asset_url, assets_root, loopcheck=[]) {
     console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
     let mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
         print("[resolvA]", asset_url, "mod to", mod_route)
-        return mod_route
+        if (loopcheck.includes(mod_route)) {
+            loopcheck.push(mod_route)
+            throw "Circular asset path!" + loopcheck
+        } else {
+            loopcheck.push(mod_route)
+            return resolveAssetsProtocol(mod_route, assets_root, loopcheck)
+        }
     }
 
     let resource_url = asset_url.replace("assets://", assets_root)

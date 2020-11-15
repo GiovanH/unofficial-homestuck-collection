@@ -157,7 +157,7 @@
         <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
-            <draggable tag="ul" group="sortable-mods" data-setting="modListEnabled">
+            <draggable tag="ul" group="sortable-mods">
               <li
                 v-for="option in modsDisabled"
                 :data-value="option.key"
@@ -168,7 +168,7 @@
           </div>
 
           <div class='col' title="Drag and drop!"><h2>Active</h2>
-            <draggable tag="ol" group="sortable-mods" @sort="onUpdateSortable">
+            <draggable tag="ol" group="sortable-mods" @sort="onUpdateSortable" data-setting="modListEnabled">
               <li
                 v-for="option in modsEnabled"
                 :data-value="option.key"
@@ -248,12 +248,13 @@ export default {
   },
   computed: {
     modsEnabled() {
-      return this.$modChoices.filter((key) => 
-        this.$localData.settings.modListEnabled.includes(key))
+
+      return this.$localData.settings.modListEnabled.map((key) => 
+        this.$modChoices[key])
     },
     modsDisabled() {
-      return this.$modChoices.filter((key) => 
-        !this.modsEnabled.includes(key))
+      return Object.values(this.$modChoices).filter((choice) => 
+        !this.modsEnabled.includes(choice))
     }
   },
   methods:{
@@ -315,7 +316,7 @@ export default {
     },
     onUpdateSortable: function(event){
       let el_active = event.target;
-      let setting_key = el_active.attributes['data-setting'] || "modListEnabled"
+      let setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
 
       // let list_active = []
       // for (var i = 0; i < el_active.children.length; i++) {

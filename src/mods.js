@@ -22,11 +22,11 @@ function getAssetRoute(url){
   // returns the path of the mod file. 
   // Otherwise, returns undefined.
 
+  // Lazily bake routes as needed instead of a init hook
   if (routes == undefined) bakeRoutes()
 
   console.assert(url.startsWith("assets://"), "mods", url)
 
-  // TEMP
   const file_route = routes[url]
   if (file_route) print(url, "to", file_route)
   return file_route
@@ -45,6 +45,11 @@ function getTreeRoutes(tree, parent=""){
         }
     }
     return routes
+}
+
+function onModLoadFail(enabled_mods, e){
+  console.error(e)
+  clearEnabledMods()
 }
 
 function bakeRoutes(){
@@ -76,14 +81,31 @@ function bakeRoutes(){
         }
     })
     routes = all_mod_routes
+
+    // Test routes
+    try {
+      const Resources = require("@/resources.js")
+      Object.keys(all_mod_routes).forEach(url => {
+        Resources.resolveURL(url)
+      })
+    } catch (e) {
+      onModLoadFail(enabled_mods, e)
+    }
+
     console.log(routes)
 }
 
+const store_modlist_key = 'localData.settings.modListEnabled'
+
 function getEnabledMods(){
   // Get modListEnabled from settings, even if vue is not loaded yet.
-  const key = 'localData.settings.modListEnabled'
-  const list = store.has(key) ? store.get(key) : []
+  const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
+  print("Enabled:", list)
   return list
+}
+
+function clearEnabledMods(){
+  store.set(store_modlist_key, [])
 }
 
 function getEnabledModsJs(){
@@ -119,7 +141,7 @@ function getModJs(mod_dir){
     if (e1.code && e1.code == "MODULE_NOT_FOUND") {
       try {
           // Look for a single-file mod
-          let modjs_path = path.join(modsDir, mod_dir) + ".js"
+          let modjs_path = path.join(modsDir, mod_dir)
           var mod = __non_webpack_require__(modjs_path)
           mod._id = mod_dir
           mod._singlefile = true
@@ -186,14 +208,15 @@ if (ipcMain) {
     function loadModChoices(){
       // Get the list of mods players can choose to enable/disable
       var mod_folders = Object.keys(crawlFileTree(modsDir, false))
-      var items = mod_folders.map((dir) => {
+      var items = mod_folders.reduce((acc, dir) => {
         let js = getModJs(dir)
-        return {
+        acc[dir] = {
           label: js.title,
           desc: js.desc,
           key: dir
         }
-      })
+        return acc
+      }, {})
       print("Mod choices loaded")
       print(items)
       return items
