@@ -43,6 +43,9 @@
           <dt><label><input type="checkbox" name="bandcampEmbed" v-model="$localData.settings['bandcampEmbed']" @click="toggleSetting('bandcampEmbed')">Enable online bandcamp player</label></dt>
           <dd class="settingDesc">Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.</dd>
 
+          <dt><label><input type="checkbox" name="styledUI" v-model="$localData.settings['styledUI']" @click="toggleSetting('styledUI')">Enable Styled UI</label></dt>
+          <dd class="settingDesc">Allow themes to affect the style of UI elements, like the tab bar and right-click menu.</dd>
+
           <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
           <dd class="settingDesc">It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu.</dd>
         </dl>
