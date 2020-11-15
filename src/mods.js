@@ -101,7 +101,6 @@ const store_modlist_key = 'localData.settings.modListEnabled'
 function getEnabledMods(){
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
-  print("Enabled:", list)
   return list
 }
 
@@ -158,7 +157,7 @@ function getModJs(mod_dir){
 // Interface
 
 function editArchive(archive){
-  getEnabledModsJs().forEach((js) => {
+  getEnabledModsJs().reverse().forEach((js) => {
     const editfn = js.edit
     if (editfn) {
       archive = editfn(archive)
@@ -171,7 +170,7 @@ function getMixins(){
   const nop = ()=>undefined;
 
   // TODO: How do mixin collisions work? Priorities
-  return getEnabledModsJs().map((js) => {
+  return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
@@ -188,7 +187,8 @@ function getMixins(){
               // Precomputed super function
               const sup = (()=>this._computedWatchers[cname].getter.call(this) || nop);
               Object.defineProperty(this, cname, {
-                get: () => (hook.computed[cname](sup))
+                get: () => (hook.computed[cname](sup)),
+                configurable: true
               })
             }
             for (const dname in (hook.data || {})) {
