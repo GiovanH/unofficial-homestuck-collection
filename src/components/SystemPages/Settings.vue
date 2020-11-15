@@ -160,6 +160,7 @@
             <draggable tag="ul" group="sortable-mods">
               <li
                 v-for="option in modsDisabled"
+                :key="option.key"
                 :data-value="option.key"
               >
                 <b>{{option.label}}</b> - {{option.desc}}
@@ -171,6 +172,7 @@
             <draggable tag="ol" group="sortable-mods" @sort="onUpdateSortable" data-setting="modListEnabled">
               <li
                 v-for="option in modsEnabled"
+                :key="option.key"
                 :data-value="option.key"
               >
                 <b>{{option.label}}</b> - {{option.desc}}
@@ -243,12 +245,12 @@ export default {
         {text: "OpenDyslexic", value: "openDyslexic"},
       ],
       newReaderPage: '',
-      newReaderValidation: true
+      newReaderValidation: true,
+      debounce: false
     }
   },
   computed: {
     modsEnabled() {
-
       return this.$localData.settings.modListEnabled.map((key) => 
         this.$modChoices[key])
     },
@@ -318,16 +320,16 @@ export default {
       let el_active = event.target;
       let setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
 
-      // let list_active = []
-      // for (var i = 0; i < el_active.children.length; i++) {
-      //     let child = el_active.children[i]
-      //     list_active.push(child.attributes['data-value'].value)
-      // }
       let list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
-      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      
+      if(this.debounce) return
+      this.debounce = setTimeout(function() {
+          this.debounce = false 
+          ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      }.bind(this), 2000)
     }
   },
   watch: {
