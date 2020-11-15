@@ -11,6 +11,7 @@
 		v-if="isLoaded"
 		@keyup.left="leftKeyPress"
 		@keyup.right="rightKeyPress"
+		@keyup.f5="reload"
 		ref="tabFrame"
 	>
 		<component :is="resolveComponent" :tab="tab" :routeParams="routeParams" ref="page"/>
@@ -329,40 +330,47 @@ export default {
 			return result
 		},
 		getTheme() {
-				let theme = this.$localData.settings.themeOverride || 'default'
-				
-				if (!this.$localData.settings.themeOverride || !this.$localData.settings.forceThemeOverride) {
-					if (this.resolveComponent == 'PAGE'){
-						let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-						if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-					}
-					else if (this.resolveComponent == 'FULLSCREENFLASH') {
-						if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
-					}
-					else if (this.resolveComponent == 'ENDOFHS') {
-						let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-						if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-					}
-					else if (this.resolveComponent == 'SBAHJ'){
-						theme = 'sbahj'
-					}
-					else if (this.resolveComponent == 'PXS'){
-						theme = 'pxs'
-					}
-					else if (this.resolveComponent == 'TSO'){
-						theme = 'tso'
-					}
-					else if (this.resolveComponent == 'EXTRASPAGE') {
-						if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
-					}
-					else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+			let theme = this.$localData.settings.themeOverride || 'default'
+			
+			if (!this.$localData.settings.themeOverride || !this.$localData.settings.forceThemeOverride) {
+				if (this.resolveComponent == 'PAGE'){
+					let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+					if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
 				}
+				else if (this.resolveComponent == 'FULLSCREENFLASH') {
+					if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
+				}
+				else if (this.resolveComponent == 'ENDOFHS') {
+					let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+					if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
+				}
+				else if (this.resolveComponent == 'SBAHJ'){
+					theme = 'sbahj'
+				}
+				else if (this.resolveComponent == 'PXS'){
+					theme = 'pxs'
+				}
+				else if (this.resolveComponent == 'TSO'){
+					theme = 'tso'
+				}
+				else if (this.resolveComponent == 'EXTRASPAGE') {
+					if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
+				}
+				else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+			}
 
-				if (this.tabIsActive) this.$root.theme = theme
+			if (this.tabIsActive) this.$root.theme = theme
 			
 		}
 	},
 	methods: {
+		reload() {
+			const u = this.tab.url
+			this.tab.url = "blank"
+  	        this.$nextTick(function () {
+	            this.tab.url = u
+	        })
+		},
 		leftKeyPress(e) {
 			if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('left', e)
 		},
