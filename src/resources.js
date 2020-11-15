@@ -25,7 +25,7 @@ function fileIsAsset(url){
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
 
-    return has_file_ext // ||  /^archive\//i.test(url) // maybe not needed now?
+    return has_file_ext ||  /^archive\//i.test(url) // maybe not needed now?
 }
 
 function resolveURL(url) {
@@ -96,10 +96,13 @@ function getResourceURL(request_url){
             .replace(/^\\/, "assets://")
             .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:[0-9]+\//, "assets://")
             .replace(/^http(s{0,1}):\/\/localhost:[0-9]+\//, "assets://")  // if this accidently catches localhost:8080 we're boned
+            
 
-        if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))
-            // files like 'archive/xxx'
-            resource_url = "assets://" + resource_url
+        // if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))
+        //     // files like 'archive/xxx'
+        //     resource_url = "assets://" + resource_url
+        if (!resource_url.startsWith("assets://"))
+            resource_url = resource_url.replace(/^(?=\w)/, "assets://")
     }
 
     if (resource_url != request_url) {
