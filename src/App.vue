@@ -20,9 +20,12 @@
   import Notifications from '@/components/UIElements/Notifications.vue'
   
   import ContextMenu from '@/components/UIElements/ContextMenu.vue'
+  
+  import Mods from "./mods.js"
 
   export default {
     name: 'HomestuckCollection',
+    mixins: [ Mods.getMainMixin() ],
     components: {
       Setup, AppHeader, TabFrame, ContextMenu, Notifications
     },

@@ -58,7 +58,7 @@ function bakeRoutes(){
     // Start with least-priority so they're overwritten
     getEnabledModsJs().reverse().forEach(js => {
         try {
-            let mod_root = path.join(modsDir, js._id, '')
+            let mod_root = path.join(modsDir, js._id)
             let mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
 
             // Lower priority: Auto routes
@@ -165,12 +165,37 @@ function editArchive(archive){
   })
 }
 
+function getMainMixin(){
+
+  let styles = []
+  getEnabledModsJs().forEach(js => {
+    let mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
+    const modstyles = js.styles || []
+    modstyles.forEach(style_link => styles.push(new URL(style_link, mod_root_url).href))
+  })
+
+  return {
+    mounted() {
+      styles.forEach((style_link) => {
+        let link = document.createElement("link")
+        link.rel = "stylesheet"
+        link.type = "text/css"
+        link.href = style_link
+
+        this.$el.appendChild(link)
+        console.log(link)
+      })
+    }
+  }
+}
+
 // Black magic
 function getMixins(){
   const nop = ()=>undefined;
 
   // TODO: How do mixin collisions work? Priorities
   return getEnabledModsJs().reverse().map((js) => {
+
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
@@ -236,6 +261,7 @@ if (ipcMain) {
 export default {
   getEnabledModsJs,  // probably shouldn't use
   getMixins,
+  getMainMixin,
   editArchive,
   bakeRoutes,
   getAssetRoute,

@@ -2,9 +2,7 @@
 const path = require('path')
 const Mods = require('@/mods.js').default
 
-console.log(Mods)
-
-const VERBOSE = false
+const VERBOSE = true
 
 var assets_root
 

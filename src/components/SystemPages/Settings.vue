@@ -469,6 +469,8 @@ export default {
       }
     }
     .sortable {
+      font-weight: normal;
+      
       ul, ol {  
         text-align: left;
         border: solid #c6c6c6;
