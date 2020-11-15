@@ -10,7 +10,7 @@ const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
-const http = require ('http')
+const http = require('http')
 
 const Store = require('electron-store')
 const store = new Store()
@@ -30,6 +30,18 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
   { scheme: 'assets', privileges: { standard: true } }
 ])
+
+// zoom functions
+function zoomIn() {
+  if (win) {
+    win.webContents.send('ZOOM_IN');
+  }
+}
+function zoomOut() {
+  if (win) {
+    win.webContents.send('ZOOM_OUT');
+  }
+}
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 var archive
@@ -115,26 +127,26 @@ try {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
         {
           label: 'Zoom In',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numadd',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           visible: false,
           acceleratorWorksWhenHidden: true,
           accelerator: 'CommandOrControl+numsub',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
         {
           label: 'Reset Zoom',
@@ -259,12 +271,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
       ]
     }
@@ -527,7 +539,7 @@ async function createWindow () {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-		'minWidth': 1000,
+    'minWidth': 1000,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
@@ -539,6 +551,15 @@ async function createWindow () {
       plugins: true
     }
   })
+
+  win.webContents.on('zoom-changed', (e, zoomDirection) => {
+    if (zoomDirection === 'in') {
+      zoomIn()
+    }
+    if (zoomDirection === 'out') {
+      zoomOut()
+    }
+  });
 
   //Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
