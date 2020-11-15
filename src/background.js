@@ -302,6 +302,7 @@ ipcMain.on('STARTUP_REQUEST', (event) => {
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   archive = loadArchiveData()
+  win.webContents.send('ARCHIVE_UPDATE', archive)
 })
 
 ipcMain.handle('win-minimize', async (event) => {

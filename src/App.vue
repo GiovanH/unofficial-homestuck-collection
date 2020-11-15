@@ -113,7 +113,11 @@
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
       })      
-  
+      
+      electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
+        this.archive = archive
+      })
+
       document.addEventListener('dragover', event => event.preventDefault())
       document.addEventListener('drop', event => event.preventDefault())
 
