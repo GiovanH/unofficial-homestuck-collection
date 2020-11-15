@@ -104,12 +104,8 @@ export default {
     background: var(--nav-bg);
 
     .navList {
-      .candyCorn {
+      .candyCorn:not(:last-child) {
         content: var(--nav-candyCornContent);
-        &:last-child {
-          // The last candy corn is a rendering artifact and should be discarded
-          display: none;
-        }
       }
       ul li:not(:last-child):after {
         color: var(--nav-divider);
@@ -168,7 +164,7 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      .candyCorn {
+      .candyCorn:not(:last-child) {
         margin: 0 9px;
         content: url(assets://images/candycorn.gif);
       }
