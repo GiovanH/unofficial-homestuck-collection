@@ -13,9 +13,9 @@
             <li><a href="/mspa/004572">hummingbird</a></li>
             <li><a href="/mspa/004718">motherfuckinmiracles</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
-            <li><a href="page.html?s=1&p=000110">Multiple images</a></li>
-            <li><a href="page.html?s=2&p=000136">Multiple commands</a></li>
-            <li><a href="page.html?s=3">Blood Spade</a></li>
+            <li><a href="/mspa/000110">Multiple images</a></li>
+            <li><a href="/mspa/000136">Multiple commands</a></li>
+            <li><a href="http://mspaintadventures.com?s=3">Blood Spade</a></li>
             <li><a href="/mspa/002148">Exile links</a></li>
             <li><a href="/mspa/003503">Pesterlogs</a></li>
             <li><a href="/mspa/003840">Descend</a></li>
@@ -49,7 +49,7 @@
             <li><a href="/mspa/010019">Panel path routing</a>
             <li><a href="/mspa/010027">Act 7</a></li>
             <li><a href="/mspa/pony">pony</a></li>
-            <li><a href="page.html?s=ryanquest">Ryanquest & modal</a></li>
+            <li><a href="http://mspaintadventures.com?s=ryanquest">Ryanquest & modal</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
