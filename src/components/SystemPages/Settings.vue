@@ -405,6 +405,9 @@ export default {
             ::v-deep .text{
               text-align: center;
             }
+            &.bold {
+              font-weight: bold;
+            }
           }
         }
       }
