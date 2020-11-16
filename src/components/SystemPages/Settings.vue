@@ -229,11 +229,6 @@ export default {
   computed: {
   },
   methods:{
-    padInputNumber(e){
-      console.log(e)
-      e.target.value = Number(e.target.value).pad(6)
-      console.log(e.target.value)
-    },
     validateNewReader() {
       if (this.$localData.settings.mspaMode) {
         let pageId = (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage
