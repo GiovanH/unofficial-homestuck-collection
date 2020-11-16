@@ -108,8 +108,6 @@
           <dt><label><input type="checkbox" name="credits" v-model="$localData.settings['credits']" @click="toggleSetting('credits')">Show inline audio credits</label></dt>
           <dd class="settingDesc">Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database.</dd>
           
-          <dt v-if="this.$archive.mspa.footnotes"><label><input type="checkbox" name="footnotes" v-model="$localData.settings['openLogs']" @click="toggleSetting('footnotes')">Display footnotes</label></dt>
-          <dd v-if="this.$archive.mspa.footnotes" class="settingDesc">Display footnotes beneath MSPA pages.</dd>
         </dl>
       </div>
       <div class="settings retcons" v-if="!$isNewReader">

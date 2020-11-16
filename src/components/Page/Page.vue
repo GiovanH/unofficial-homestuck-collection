@@ -121,7 +121,7 @@ export default {
       return this.thisPage.flag.includes('FIREFLY')
     },
     footnote() {
-      return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+      return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
     },
     footerBanner() {            
       let num = parseInt(this.pageNum)
