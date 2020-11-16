@@ -5,7 +5,11 @@
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <a :href="reverseLink" class="switchOrder">Reverse order</a>
-        <div class="logItems" v-html="log" />
+        <div class="logItems" v-html="log">
+          <template v-for="page in log">
+            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
+          </template>
+        </div>
       </div>
     </div>
     <div class="pageFrame noLog" v-else >
@@ -30,6 +34,13 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
+const sort_methods = {
+    asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
+    desc: (a, b) => (a.page_num < b.page_num) ? 1 : -1,
+    alpha: (a, b) => (a.title > b.title) ? 1 : -1,
+    random: (a, b) => 0.5 - Math.random()
+}
+
 export default {
   name: 'log',
   props: [
@@ -46,20 +57,23 @@ export default {
   },
   computed: {
     log() {
+      // OuterHTML of log (yikes!)
       if (this.routeParams.mode) {
         this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
         let story = this.routeParams.mode.charAt(0)
+
+        return this.storyLog(story)
         
-        if (story in this.$archive.log[this.sort]){
-          let logData = this.$archive.log[this.sort][story]
-          if (this.$isNewReader) {
-            let regex = this.sort == 'log' ? new RegExp(`^(.*${this.$localData.settings.newReader.current}">".*?"<\/a><br>).*$`) : new RegExp(`^.*?(.{12}<a href="\/mspa\/${this.$localData.settings.newReader.current}.*)$`)
-            return logData.replace(regex, '$1')
-          }
-          else {
-            return logData
-          }
-        }
+        // if (story in this.$archive.log[this.sort]){
+        //   let logData = this.$archive.log[this.sort][story]
+        //   if (this.$isNewReader) {
+        //     let regex = this.sort == 'log' ? new RegExp(`^(.*${this.$localData.settings.newReader.current}">".*?"<\/a><br>).*$`) : new RegExp(`^.*?(.{12}<a href="\/mspa\/${this.$localData.settings.newReader.current}.*)$`)
+        //     return logData.replace(regex, '$1')
+        //   }
+        //   else {
+        //     return logData
+        //   }
+        // }
       }
       else return undefined
     },
@@ -68,6 +82,27 @@ export default {
     },
   },
   methods:{
+    getSorter(default_="asc"){
+      let sort_order = this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'asc' : 'desc'
+      let sort_fn = sort_methods[sort_order]
+      if (!sort_fn)
+          sort_fn = sort_methods[default_]
+      return sort_fn
+    },
+    storyLog(story_id) {
+      return this.$getAllPagesInStory(story_id).map((page_num) => 
+        this.getLogEntry(page_num)
+      ).sort(this.getSorter())
+    },
+    getLogEntry(page_num) {
+      let page = this.$archive.mspa.story[page_num]
+      return {
+        title: page.title,
+        page_num: page.pageId,
+        href: `/mspa/${page.pageId}`,
+        date: new Date(page.timestamp * 1000)
+      }
+    }
   }
 }
 </script>

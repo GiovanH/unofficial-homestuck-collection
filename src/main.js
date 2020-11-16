@@ -25,6 +25,15 @@ Vue.use(localData, {
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 
+
+Number.prototype.pad = function(size) {
+    if (isNaN(this))
+        return undefined
+    var s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+}
+
 Vue.mixin({
   data(){
     return {
@@ -139,7 +148,47 @@ Vue.mixin({
       }
 
       return undefined
-
+    },
+    $getAllPagesInStory(story_id, incl_secret=false) {
+      let page_nums = []
+      if (story_id == '1'){
+          for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
+          for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
+      }
+      else if (story_id == '2'){
+          page_nums.push(Number(136).pad(6))
+          for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
+      }
+      else if (story_id == '3'){
+          page_nums.push("MC0001")
+      }
+      else if (story_id == '4'){
+          for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
+          for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
+      }
+      else if (story_id == '5'){
+          for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
+      }
+      else if (story_id == '6'){
+          for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
+          for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
+          for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
+          for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
+          for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
+          if (incl_secret) {
+              page_nums.push("darkcage")
+              page_nums.push("darkcage2")
+              page_nums.push("pony")
+              page_nums.push("pony2")
+          }
+      }
+      else if (story_id == 'ryanquest'){
+          for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
+      }
+      if (story_id == 'snaps') {
+          for (let i = 1; i <= 64; i++) page_nums.push(String(i))
+      }
+      return page_nums
     },
     $vizToMspa(vizStory, vizPage) {
       let mspaPage
