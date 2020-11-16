@@ -21,7 +21,7 @@
           <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
           <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
           <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
-          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_hs.gif" /><br>Ryanquest</a></div>
+          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_rq.png" /><br>Ryanquest</a></div>
         </div>
       </div>
     </div>
