@@ -166,17 +166,18 @@
 
         <SpoilerBox kind="">
 
-          <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
+          <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
           <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
 
-          <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label></dt>
+          <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label><span class="cw severe">race</span></dt>
           <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
           
-          <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label></dt>
+          <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label><span class="cw severe">body horror</span></dt>
           <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.</a></dd>
           
-          <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label></dt>
-          <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed. <!-- TODO content warnings --></dd>
+          <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label><span class="cw severe">holocaust</span></dt> 
+          <!-- todo: something better than "holocaust" -->
+          <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
         </SpoilerBox>
       </div>
       <div class="settings system">
@@ -322,7 +323,7 @@ export default {
       } else {
         let args = {
           title: "Are you sure?",
-          message: "This option restores all the controversial material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
+          message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
         }
         ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
           if (answer === true) {
@@ -520,6 +521,24 @@ export default {
               font-weight: bold;
             }
           }
+        }
+        span.cw {
+            padding: 0 7px;
+            font-size: 12px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
+            font-weight: 500;
+            line-height: 18px;
+            border: 1px solid transparent;
+            border-radius: 2em;
+            margin-left: 1em;
+            &.minor {
+              background-color: #fbca04;
+              color: #000000;
+            }
+            &.severe{
+              background-color: #d93f0b;
+              color: #ffffff;
+            }
         }
       }
     }
