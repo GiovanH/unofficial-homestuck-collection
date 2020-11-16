@@ -154,6 +154,7 @@ Vue.mixin({
       if (story_id == '1'){
           for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
           for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
+            page_nums.push("jb2_000000")
       }
       else if (story_id == '2'){
           page_nums.push(Number(136).pad(6))
