@@ -327,6 +327,8 @@ export default {
         ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
           if (answer === true) {
             this.allControversial.forEach(key => this.$localData.settings[key] = true)
+          } else {
+            this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
           }
         })
       }
