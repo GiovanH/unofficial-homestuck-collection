@@ -5,7 +5,7 @@
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <a :href="reverseLink" class="switchOrder">Reverse order</a>
-        <div class="logItems" v-html="log">
+        <div class="logItems">
           <template v-for="page in log">
             {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
           </template>
@@ -21,6 +21,7 @@
           <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
           <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
           <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
+          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_hs.gif" /><br>Ryanquest</a></div>
         </div>
       </div>
     </div>
@@ -33,6 +34,8 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+
+const { DateTime } = require('luxon');
 
 const sort_methods = {
     asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
@@ -60,20 +63,13 @@ export default {
       // OuterHTML of log (yikes!)
       if (this.routeParams.mode) {
         this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
+
+        // TODO: no.
         let story = this.routeParams.mode.charAt(0)
+        if (story == "r")
+          story = "ryanquest"
 
         return this.storyLog(story)
-        
-        // if (story in this.$archive.log[this.sort]){
-        //   let logData = this.$archive.log[this.sort][story]
-        //   if (this.$isNewReader) {
-        //     let regex = this.sort == 'log' ? new RegExp(`^(.*${this.$localData.settings.newReader.current}">".*?"<\/a><br>).*$`) : new RegExp(`^.*?(.{12}<a href="\/mspa\/${this.$localData.settings.newReader.current}.*)$`)
-        //     return logData.replace(regex, '$1')
-        //   }
-        //   else {
-        //     return logData
-        //   }
-        // }
       }
       else return undefined
     },
@@ -90,17 +86,22 @@ export default {
       return sort_fn
     },
     storyLog(story_id) {
-      return this.$getAllPagesInStory(story_id).map((page_num) => 
-        this.getLogEntry(page_num)
+      // TODO: Spoiler checking
+      return this.$getAllPagesInStory(story_id).filter(page_num => 
+        !this.$pageIsSpoiler(page_num)
+      ).map(page_num => 
+        this.getLogEntry(story_id, page_num)
       ).sort(this.getSorter())
     },
-    getLogEntry(page_num) {
-      let page = this.$archive.mspa.story[page_num]
+    getLogEntry(story_id, page_num) {
+      let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
+      let page = story[page_num];
+      let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
       return {
         title: page.title,
         page_num: page.pageId,
-        href: `/mspa/${page.pageId}`,
-        date: new Date(page.timestamp * 1000)
+        href: `/${story_id}/${page.pageId}`,
+        date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).toFormat("MM/dd/yy") : "??/??/??")
       }
     }
   }
