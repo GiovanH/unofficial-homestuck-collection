@@ -143,25 +143,38 @@
           <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('009057')}}.</dd>
         </dl>
       </div>
-      <div class="settings controversial" v-if="!$isNewReader">
+      <div class="settings controversial" > <!-- v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
 
-        <dt><label><input type="checkbox" name="enableControversial" v-model="$localData.settings['enableControversial']" @click="toggleSetting('enableControversial')">Enable controversial content</label></dt>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore content that was removed for various reasons. The inclusion of this content is in no way an endorsement of its quality, and it absolutely should not be used to judge the original authors of the work.</dd>
+        <dt><label>
+          <input type="checkbox" name="enableControversial"
+            @click="toggleAllControversial()"
+            :checked.prop="controversialAll && !!controversialAny"
+            :indeterminate.prop="controversialAny && !controversialAll"
+          >Enable controversial content</label></dt>
+        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since removed for various reasons. The inclusion of this content is in no way an endorsement of its quality.
+        <br><br>
+        New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
 
-        <dl v-if="$localData.settings.enableControversial">
+      </div>
+      <div class="settings controversial" > <!-- v-else> -->
+        <h2>Controversial Content</h2>
+        <br>
+        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since removed for various reasons. The inclusion of this content is in no way an endorsement of its quality.</dd>
+        <!-- TODO spoiler start -->
+
           <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
           <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. After he left the team on less-than-favourable circumstances, the flashes he worked on were rescored.</dd>
 
           <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label></dt>
-          <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin-colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
+          <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
           
           <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label></dt>
-          <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page had a somewhat heavy focus on body horror</a>. The original version was completely unobscured, but it was hastily censored.</a></dd>
+          <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page had a somewhat heavy focus on body horror</a>. The original version was completely unobscured, but it was hastily censored with additional dialogue.</a></dd>
           
           <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label></dt>
-          <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
-        </dl>
+          <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed. <!-- TODO content warnings --></dd>
+        <!-- Spoiler end -->
       </div>
       <div class="settings system">
         <h2>System Settings</h2>
@@ -225,10 +238,24 @@ export default {
       ],
       newReaderPage: this.$localData.settings.newReader.current || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
-      newReaderValidation: true
+      newReaderValidation: true,
+      allControversial: [
+        'bolin',
+        'unpeachy',
+        'pxsTavros',
+        'cursedHistory'
+      ]
     }
   },
   computed: {
+    controversialAll(){
+      let values = this.allControversial.map(key => this.$localData.settings[key])
+      return values.every(Boolean)
+    },
+    controversialAny(){
+      let values = this.allControversial.map(key => this.$localData.settings[key])
+      return values.some(Boolean)
+    }
   },
   methods:{
     validateNewReader() {
@@ -265,10 +292,7 @@ export default {
 
         this.$localData.settings.themeOverride = ""
         this.$localData.settings['enableControversial'] = false
-        this.$localData.settings['bolin'] = false
-        this.$localData.settings['unpeachy'] = false
-        this.$localData.settings['pxsTavros'] = false
-        this.$localData.settings['cursedHistory'] = false
+        this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
         this.$updateNewReader(pageId, true)
       }
@@ -284,6 +308,24 @@ export default {
           this.$localData.root.NEW_READER_CLEAR()
         }
       })
+    },
+    toggleAllControversial() {
+      if (this.controversialAny) {
+        // Normally checking an indeterminate checkbox enables it,
+        // but we want to clear it instead.
+        this.allControversial.forEach(key => this.$localData.settings[key] = false)
+        this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
+      } else {
+        let args = {
+          title: "Are you sure?",
+          message: "This option restores all the controversial material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
+        }
+        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+          if (answer === true) {
+            this.allControversial.forEach(key => this.$localData.settings[key] = true)
+          }
+        })
+      }
     },
     toggleSetting(setting, parentObject){
       if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
