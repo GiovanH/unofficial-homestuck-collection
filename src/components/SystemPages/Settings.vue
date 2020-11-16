@@ -296,7 +296,6 @@ export default {
       if (this.newReaderValidation) {
 
         this.$localData.settings.themeOverride = ""
-        this.$localData.settings['enableControversial'] = false
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
         this.$updateNewReader(pageId, true)
@@ -336,13 +335,6 @@ export default {
       if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
       else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
-
-      if (setting == 'enableControversial' && !this.$localData.settings[setting]) {
-        this.$localData.settings['bolin'] = false
-        this.$localData.settings['unpeachy'] = false
-        this.$localData.settings['pxsTavros'] = false
-        this.$localData.settings['cursedHistory'] = false
-      }
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
