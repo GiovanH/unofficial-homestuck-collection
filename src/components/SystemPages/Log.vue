@@ -97,11 +97,12 @@ export default {
       let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
       let page = story[page_num];
       let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
+      let time_zone = "America/New_York"
       return {
         title: page.title,
         page_num: page.pageId,
         href: `/${page_type}/${page.pageId}`,
-        date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).toFormat("MM/dd/yy") : "??/??/??")
+        date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).setZone(time_zone).toFormat("MM/dd/yy") : "??/??/??")
       }
     }
   }
