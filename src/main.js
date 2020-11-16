@@ -25,6 +25,14 @@ Vue.use(localData, {
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 
+Number.prototype.pad = function(size) {
+    if (isNaN(this))
+        return undefined
+    var s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+}
+
 Vue.mixin({
   data(){
     return {

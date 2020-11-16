@@ -5,11 +5,14 @@
       <div class="settings newReader">
         <h2>New Reader Mode</h2>
         <div class="newReaderInput" v-if="$isNewReader">
-          <p>New reader mode enabled.<br>Currently up to page <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>.</p><br>
+          <p>New reader mode enabled.<br>Currently up to page 
+            <!-- <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>. -->
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()">
+          </p><br>
           <button @click="clearNewReader()">Switch off new reader mode</button>
         </div>
         <div class="newReaderInput" v-else>
-          <input size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
           <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
           <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number between 1901 and 10029.<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
@@ -218,13 +221,19 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"},
       ],
-      newReaderPage: '',
+      newReaderPage: this.$localData.settings.newReader.current || 
+        (this.$localData.settings.mspaMode ? '001901' : '1'),
       newReaderValidation: true
     }
   },
   computed: {
   },
   methods:{
+    padInputNumber(e){
+      console.log(e)
+      e.target.value = Number(e.target.value).pad(6)
+      console.log(e.target.value)
+    },
     validateNewReader() {
       if (this.$localData.settings.mspaMode) {
         let pageId = (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage
@@ -283,7 +292,9 @@ export default {
     }
   },
   watch: {
-    newReaderPage() {
+    newReaderPage(to, from) {
+      if (this.$localData.settings.mspaMode)
+        this.newReaderPage = Number(to).pad(6)
       this.validateNewReader()
     },
     '$localData.settings.mspaMode'() {
@@ -370,7 +381,7 @@ export default {
 
           input {
             border: 1px solid #777;
-            min-width: 70px;
+            width: 70px;
             font-size: 110%;
             border-radius: 2px;
             padding: 2px 3px;
