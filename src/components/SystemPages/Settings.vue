@@ -44,7 +44,12 @@
           <dd class="settingDesc">Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.</dd>
 
           <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
-          <dd class="settingDesc">It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu.</dd>
+          <dd class="settingDesc">
+          TODO: Expound on this description.
+          This is useful in other places, like style development and
+          nothing else yet
+
+          It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu.</dd>
         </dl>
       </div>
       <div class="settings enhancements">
