@@ -123,30 +123,32 @@
       </div>
       <div class="settings retcons" v-if="!$isNewReader">
         <h2>Retcons</h2>
+        <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
         <dl>
           <dt><label><input type="checkbox" name="retcon1" v-model="$localData.settings['retcon1']" @click="toggleSetting('retcon1')">#1 - John's arms</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('007999')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='007999'></StoryPageLink>.</dd>
 
           <dt><label><input type="checkbox" name="retcon2" v-model="$localData.settings['retcon2']" @click="toggleSetting('retcon2')">#2 - John's first Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008053')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008053'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon3" v-model="$localData.settings['retcon3']" @click="toggleSetting('retcon3')">#3 - John interrupting Dave and Jade</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008317')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008317'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon4" v-model="$localData.settings['retcon4']" @click="toggleSetting('retcon4')">#4 - The oil patches</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008991')}}. <a href="/oilretcon">/oilretcon</a></dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008991'></StoryPageLink>. <a href="/oilretcon">/oilretcon</a></dd>
           
           <dt><label><input type="checkbox" name="retcon5" v-model="$localData.settings['retcon5']" @click="toggleSetting('retcon5')">#5 - John's second Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('009026')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009026'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon6" v-model="$localData.settings['retcon6']" @click="toggleSetting('retcon6')">#6 - Terezi's password pages</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('009057')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009057'></StoryPageLink>.</dd>
         </dl>
       </div>
       <div class="settings controversial" > <!-- v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
 
         <dt><label>
+          <!-- All this with the indeterminate properties is so the button renders unambigiously if the setting is changed with a mod, or by accident. -->
           <input type="checkbox" name="enableControversial"
             @click="toggleAllControversial()"
             :checked.prop="controversialAll && !!controversialAny"
@@ -205,6 +207,7 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -213,7 +216,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText, SpoilerBox
+    NavBanner, PageText, SpoilerBox, StoryPageLink
   },
   data: function() {
     return {
@@ -439,6 +442,11 @@ export default {
         .settingDesc {
           color: var(--page-nav-meta);
           font-weight: normal;
+        }
+
+        > dd.settingDesc {
+          // Descriptions of whole sections
+          margin-top: 1em;
         }
         
         .system {
