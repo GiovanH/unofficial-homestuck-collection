@@ -1,5 +1,5 @@
 <template>
-  <a :href='href'>{{text}}</a>
+  <a :href='href' :title='title'>{{text}}</a>
 </template>
 
 <script>
@@ -7,15 +7,30 @@
 export default {
   name: 'StoryPageLink',
   props: [
-    'mspaId'
+    'mspaId',
+    'long'
   ],
   computed: {
+    page(){return this.$archive.mspa.story[this.mspaId]},
+    isLong(){return (this.long !== undefined)},
+    isSpoiler(){return this.$pageIsSpoiler(this.mspaId)},
+    href(){return `/mspa/${this.mspaId}`},
+
     text(){
-      return this.$mspaOrVizNumber(this.mspaId)
+      let num = this.$mspaOrVizNumber(this.mspaId)
+      if (this.isSpoiler)
+        return num
+      else if (this.isLong)
+        return `${num}: ${this.page.title}`
+      else
+        return num
     },
-    href(){
-      return `/mspa/${this.mspaId}`
-    }
+    title(){
+      if (this.isSpoiler)
+        return "???????????"
+      else
+        return this.page.title
+    },
   }
 }
 </script>

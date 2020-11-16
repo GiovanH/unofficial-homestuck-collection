@@ -144,27 +144,67 @@
           <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009057'></StoryPageLink>.</dd>
         </dl>
       </div>
-      <div class="settings controversial" > <!-- v-if="$isNewReader"> -->
+      <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-
-        <dt><label>
-          <!-- All this with the indeterminate properties is so the button renders unambigiously if the setting is changed with a mod, or by accident. -->
-          <input type="checkbox" name="enableControversial"
-            @click="toggleAllControversial()"
-            :checked.prop="controversialAll && !!controversialAny"
-            :indeterminate.prop="controversialAny && !controversialAll"
-          >Enable controversial content</label></dt>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since removed for various reasons. The inclusion of this content is in no way an endorsement of its quality.
-        <br><br>
-        New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
-
-      </div>
-      <div class="settings controversial" > <!-- v-else> -->
-        <h2>Controversial Content</h2>
-        <br>
         <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since removed for various reasons. The inclusion of this content is in no way an endorsement of its quality.</dd>
 
-        <SpoilerBox kind="">
+        <div v-if="$isNewReader">
+          
+          <!-- All this with the indeterminate properties is so the button renders unambigiously if the setting is changed with a mod, or by accident. -->
+          <dt><label><input type="checkbox" name="enableControversial"
+              @click="toggleAllControversial()"
+              :checked.prop="controversialAll && !!controversialAny"
+              :indeterminate.prop="controversialAny && !controversialAll"
+            >Enable controversial content</label></dt>
+          <dd class="settingDesc">
+          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
+
+        </div>
+
+        <dd class="settingDesc">
+        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</dd>
+          
+        <SpoilerBox kind="Affected Page Numbers" class="ccPageNos">
+          <div class="left col">
+            <h3>Homestuck</h3>
+            <!-- bolin -->
+            <ol>
+            <li><StoryPageLink long mspaId='002238'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002544'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002551'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002722'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002730'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002733'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002880'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002926'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002970'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='003620'></StoryPageLink></li>
+            <!-- peachy -->
+            <li><StoryPageLink long mspaId='007623'></StoryPageLink></li>
+            </ol>
+          </div>
+          <div class="right col">
+            <h3>Side content</h3>
+            <ol>
+            <li v-if="!$pageIsSpoiler('008753')"><a href="/pxs/summerteen-romance/31">Paradox Space - Summerteen Romance page 31</a></li>
+            <li v-else>Not yet unlocked (Jan 2019)</li>
+            <li v-if="!$isNewReader"><a href="/skaianet">Skaianet Systems</a></li>
+            <li v-else>Not yet unlocked (Apr 2014)</li>
+            </ol>
+          </div>
+          <!-- TODO -->
+        </SpoilerBox>
+
+        <div v-if="!$isNewReader" > <!-- TODO v-else> -->
+          <!-- <dt><label><input type="checkbox" name="enableControversial"
+              @click="toggleAllControversial()"
+              :checked.prop="controversialAll && !!controversialAny"
+              :indeterminate.prop="controversialAny && !controversialAll"
+            >Enable controversial content</label></dt> -->
+          <dd class="settingDesc">
+          Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
+
+        <SpoilerBox kind="Controversial Content">
 
           <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
           <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
@@ -180,6 +220,9 @@
           <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
         </SpoilerBox>
       </div>
+
+      </div>
+      
       <div class="settings system">
         <h2>System Settings</h2>
         <div class="system">
@@ -521,6 +564,18 @@ export default {
               font-weight: bold;
             }
           }
+        }
+        .ccPageNos {
+          font-weight: normal;
+          width: 600px;
+          margin: 1em auto;
+          h3 {
+            margin-top: .4em;
+          }
+          ol {
+            margin-inline-start: 2em;
+          }
+
         }
         span.cw {
             padding: 0 7px;
