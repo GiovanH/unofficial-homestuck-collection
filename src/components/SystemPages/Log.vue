@@ -100,7 +100,7 @@ export default {
       return {
         title: page.title,
         page_num: page.pageId,
-        href: `/${story_id}/${page.pageId}`,
+        href: `/${page_type}/${page.pageId}`,
         date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).toFormat("MM/dd/yy") : "??/??/??")
       }
     }
