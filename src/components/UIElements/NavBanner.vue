@@ -9,7 +9,7 @@
             <a v-else :href="href">{{getLabel(href)}}</a>
           </li>
         </ul>
-        <div v-if="gi+1 != urls.length" class="candyCorn" />
+        <div v-if="gi + 1 < urls.length" class="candyCorn" />
       </template>
     </div>
   </nav>
