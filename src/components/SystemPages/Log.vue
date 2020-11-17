@@ -34,6 +34,7 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import Memo from '@/memoization.js'
 
 const { DateTime } = require('luxon');
 
@@ -58,7 +59,9 @@ export default {
       sortNames: {
         asc: 'oldest to newest',
         desc: 'newest to oldest'
-      }
+      },
+      // have to bind `this` in data
+      storyLogRaw: Memo.memoized(this._storyLogRaw, "storyLogRaw", 10) 
     }
   },
   computed: {
@@ -109,8 +112,7 @@ export default {
     }
   },
   methods: {
-    storyLogRaw() {
-      let story_id = this.storyId
+    _storyLogRaw(story_id) {
       // The unsorted story log
       console.log("Recalculating story log :c")
 
