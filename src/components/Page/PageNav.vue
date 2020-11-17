@@ -29,6 +29,7 @@
 </template>
 
 <script>
+const { DateTime } = require('luxon');
 export default {
     name: 'pageNav',
     props: [
@@ -94,9 +95,16 @@ export default {
             }
         },
         getTimestamp() {
-            let date = new Date(parseInt(this.thisPage.timestamp) * 1000)
-            let options = {timeZone: "America/New_York", timeZoneName:"short", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit",}
-            let result = date.toLocaleDateString(undefined, options)
+            // let date = new Date(parseInt(this.thisPage.timestamp) * 1000)
+            // let options = {timeZone: "America/New_York", timeZoneName:"short", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit",}
+            // let result = date.toLocaleDateString(undefined, options)
+            if (!this.thisPage.timestamp) {
+                return undefined
+            } else {
+                return DateTime.fromSeconds(Number(this.thisPage.timestamp))
+                    .setZone("America/New_York")
+                    .toFormat("MM/dd/yyyy, ttt")
+            }
             return (result != "Invalid Date") ? result : undefined
         }
     }
