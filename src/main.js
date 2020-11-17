@@ -25,7 +25,6 @@ Vue.use(localData, {
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
 
-
 Number.prototype.pad = function(size) {
     if (isNaN(this))
         return undefined
