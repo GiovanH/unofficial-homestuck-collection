@@ -13,7 +13,7 @@ const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
-const http = require ('http')
+const http = require('http')
 
 const Store = require('electron-store')
 const store = new Store()
@@ -33,6 +33,18 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
   { scheme: 'assets', privileges: { standard: true } }
 ])
+
+// zoom functions
+function zoomIn() {
+  if (win) {
+    win.webContents.send('ZOOM_IN');
+  }
+}
+function zoomOut() {
+  if (win) {
+    win.webContents.send('ZOOM_OUT');
+  }
+}
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 
@@ -280,12 +292,12 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+          click: zoomOut
         },
       ]
     }
@@ -406,19 +418,8 @@ ipcMain.handle('restart', async (event) => {
   app.exit()
 })
 
-ipcMain.handle('factory-reset', async (event) => {
-  let confirmation = dialog.showMessageBoxSync(win, {
-    type: 'warning',
-    buttons: [
-      'OK',
-      'Cancel'
-    ],
-    cancelId: 1,
-    defaultId: 1,
-    title: 'Notice',
-    message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!'
-  })
-  if (confirmation == 0) {
+ipcMain.handle('factory-reset', async (event, confirmation) => {
+  if (confirmation === true) {
     store.delete('localData')
   
     app.relaunch()
@@ -426,18 +427,22 @@ ipcMain.handle('factory-reset', async (event) => {
   }
 })
 
-ipcMain.handle('disable-new-reader', async (event) => {
-  return dialog.showMessageBoxSync(win, {
+ipcMain.handle('prompt-okay-cancel', async (event, args) => {
+  let title = args.title || "Notice"
+  let ok_string = args.okay || "OK"
+  let cancel_string = args.cancel || "Cancel"
+  let answer = dialog.showMessageBoxSync(win, {
     type: 'warning',
     buttons: [
-      'OK',
-      'Cancel'
+      ok_string,
+      cancel_string
     ],
     cancelId: 1,
     defaultId: 1,
-    title: 'Notice',
-    message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
+    title,
+    message: args.message
   })
+  return (answer === 0)
 })
 
 ipcMain.handle('search', async (event, payload) => {
@@ -523,7 +528,7 @@ async function createWindow () {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-		'minWidth': 1000,
+    'minWidth': 1000,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
@@ -535,6 +540,15 @@ async function createWindow () {
       plugins: true
     }
   })
+
+  win.webContents.on('zoom-changed', (e, zoomDirection) => {
+    if (zoomDirection === 'in') {
+      zoomIn()
+    }
+    if (zoomDirection === 'out') {
+      zoomOut()
+    }
+  });
 
   //Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {

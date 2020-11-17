@@ -5,11 +5,16 @@
       <div class="settings newReader">
         <h2>New Reader Mode</h2>
         <div class="newReaderInput" v-if="$isNewReader">
-          <p>New reader mode enabled.<br>Currently up to page <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>.</p><br>
+          <p>New reader mode enabled.<br>Currently up to page 
+            <!-- <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>. -->
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $localData.settings.newReader.current}" v-model="newReaderPage">
+          </p><br>
+          <button v-if="newReaderValidation && (newReaderPage != $localData.settings.newReader.current)" @click="changeNewReader()">Set adjusted page</button>
+          <br />
           <button @click="clearNewReader()">Switch off new reader mode</button>
         </div>
         <div class="newReaderInput" v-else>
-          <input size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
           <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
           <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number between 1901 and 10029.<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
@@ -89,7 +94,16 @@
                 <br><br>
                 <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
               </div>
-              <PageText class="examplePrattle" content="|AUTHORLOG|<br/>A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
+              <div class="textpreviews">
+                <PageText class="examplePrattle" 
+                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
+                <PageText class="examplePrattle" 
+                content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
+                <!-- v-if="!this.$pageIsSpoiler('001926')" -->
+                <PageText class="examplePrattle" 
+                v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
+                content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
+              </div>
             </div>
           </dd>
 
@@ -247,7 +261,8 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"},
       ],
-      newReaderPage: '',
+      newReaderPage: this.$localData.settings.newReader.current || 
+        (this.$localData.settings.mspaMode ? '001901' : '1'),
       newReaderValidation: true,
       debounce: false
     }
@@ -272,6 +287,24 @@ export default {
         this.newReaderValidation = !!this.$vizToMspa('homestuck', this.newReaderPage).p && !/\D/.test(this.newReaderPage) && parseInt(this.newReaderPage) >= 1 && parseInt(this.newReaderPage) <= 8129
       }
     },
+    changeNewReader(){
+      this.validateNewReader() 
+      let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
+      if (this.newReaderValidation) {
+        let args = {
+          title: "Are you sure?",
+          message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
+        }
+        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+          if (answer === true)
+            this.$updateNewReader(pageId, true)
+          else
+            this.newReaderPage = this.$localData.settings.newReader.current
+        })
+        
+      }
+
+    },
     setNewReader() {
       this.validateNewReader() 
       let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
@@ -288,8 +321,12 @@ export default {
       }
     },
     clearNewReader() {
-      ipcRenderer.invoke('disable-new-reader').then( answer => {
-        if (answer == 0) {
+      let args = {
+        title: "Are you sure?",
+        message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
+      }
+      ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+        if (answer === true) {
           this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
           this.$localData.root.NEW_READER_CLEAR()
         }
@@ -316,8 +353,17 @@ export default {
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: true})
     },
-    factoryReset(){
-      ipcRenderer.invoke('factory-reset')
+    factoryReset(){      
+      let args = {
+        title: "FACTORY RESET",
+        message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!',
+        okay: "Yes, delete everything"
+      }
+      ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
+        if (answer === true) {
+          ipcRenderer.invoke('factory-reset', answer)
+        }
+      })
     },
     onUpdateSortable: function(event){
       let el_active = event.target;
@@ -336,7 +382,9 @@ export default {
     }
   },
   watch: {
-    newReaderPage() {
+    newReaderPage(to, from) {
+      if (this.$localData.settings.mspaMode)
+        this.newReaderPage = Number(to).pad(6)
       this.validateNewReader()
     },
     '$localData.settings.mspaMode'() {
@@ -421,9 +469,12 @@ export default {
           margin-top: 20px;
           text-align: center;
 
+          button {
+              margin-bottom: 1em;
+          }
           input {
             border: 1px solid #777;
-            min-width: 70px;
+            width: 70px;
             font-size: 110%;
             border-radius: 2px;
             padding: 2px 3px;
@@ -432,6 +483,10 @@ export default {
             &.invalid:not(:disabled):not(.empty) {
               background: pink;
               border-color: rgb(187, 0, 37);
+              box-shadow: 0 0 3px 1px red;
+            }
+            &.changed {
+              border-color: #ffaa00;
               box-shadow: 0 0 3px 1px red;
             }
           }
@@ -450,6 +505,13 @@ export default {
           margin-top: 16px;
           text-align: center;
 
+          .textpreviews {
+            border: 6px solid var(--page-pageFrame);
+            padding: 6px;
+            position: relative;
+            left: 0;
+          }
+
           .knobs {
             width: 75%;
             margin: 0 auto 16px;
@@ -461,11 +523,17 @@ export default {
               width: 100%;
             }
           }
+          div.examplePrattle, p.examplePrattle {
+            margin-bottom: 16px;
+          }
           .examplePrattle {
             margin: 0 auto;
 
             ::v-deep .text{
-              text-align: center;
+              // text-align: center;
+            }
+            &.bold {
+              font-weight: bold;
             }
           }
         }
