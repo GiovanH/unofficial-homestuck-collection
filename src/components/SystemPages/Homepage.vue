@@ -485,6 +485,18 @@ export default {
           top: -80px;
         }
       }
+      .logo {
+        // Correctly position cards under logos
+        &.hsLogo + .cardEntry {
+          padding-top: 120px;
+        }
+        &.mspaLogo + .cardEntry {
+          padding-top: 50px;
+        }
+        &.tsoLogo + .cardEntry {
+          padding-top: 80px;
+        }
+      }
       .cardContent {
         width: 100%;
         padding-bottom: 25px;
@@ -502,20 +514,11 @@ export default {
             margin-top: 20px;
           }
         }
-        &.hsCard {
-          padding-top: 120px;
-        }
-        &.jbCard {
-          padding-top: 50px;
-        }
-        &.bqCard, &.psCard {
+        &.cardEntry {
+          // Styles for big adventure cards
           padding-top: 25px;
           border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-        }
-        &.tsoCard {
-          padding-top: 80px;
-        }
-        &.cardEntry {
+
           display: flex;
           flex-flow: row nowrap;
           align-items: flex-start;
