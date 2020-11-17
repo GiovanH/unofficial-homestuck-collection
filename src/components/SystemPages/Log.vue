@@ -4,7 +4,7 @@
     <div class="pageFrame" v-if="log">
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
-        <a :href="reverseLink" class="switchOrder">Reverse order</a>
+        <a :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
         <div class="logItems">
           <template v-for="page in log">
             {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
@@ -55,45 +55,76 @@ export default {
   data: function() {
     return {
       sort: 'log',
-      reverseText: ['oldest', 'newest']
+      sortNames: {
+        asc: 'oldest to newest',
+        desc: 'newest to oldest'
+      }
     }
   },
   computed: {
-    log() {
-      // OuterHTML of log (yikes!)
-      if (this.routeParams.mode) {
-        this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
-
-        // TODO: no.
-        let story = this.routeParams.mode.charAt(0)
-        if (story == "r")
-          story = "ryanquest"
-
-        return this.storyLog(story)
+    storyId(){
+      if (!this.routeParams.mode) {
+        // We are on the root page
+        return undefined
       }
-      else return undefined
+
+      // TODO: this is horrible. why
+      let story = this.routeParams.mode.charAt(0)
+      if (story == "r")
+        story = "ryanquest"
+
+      return story
+    },
+    log() {
+      // A sorted list of log objects
+      if (!this.storyId) 
+        return undefined
+
+      return this.storyLogRaw(this.storyId).sort(this.sorter)
     },
     reverseLink(){
-      return /^\d_rev$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_rev`
+      return /^\d_asc$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_asc`
     },
+    reverseText(){
+      // Todo
+      return "View " + (this.sortNames[this.sortOrderNext] || "log")
+    },
+    sortOrderNext(){
+      let next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
+      return next
+    },
+    sortOrder(){
+      // The text key that defines the sort order
+      if (!this.routeParams.mode)
+        // Sort order w/o selected log???
+        return undefined
+
+      let sort_order = /^\d_asc$/.test(this.routeParams.mode) ? 'asc' : 'desc'
+      return sort_order
+    },
+    sorter(){
+      // The sorter function that .sort() keys
+      let default_="asc"
+      return sort_methods[this.sortOrder] || sort_methods[default_]
+    }
   },
-  methods:{
-    getSorter(default_="asc"){
-      let sort_order = this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'asc' : 'desc'
-      let sort_fn = sort_methods[sort_order]
-      if (!sort_fn)
-          sort_fn = sort_methods[default_]
-      return sort_fn
-    },
-    storyLog(story_id) {
-      // TODO: Spoiler checking
+  methods: {
+    storyLogRaw() {
+      let story_id = this.storyId
+      // The unsorted story log
+      console.log("Recalculating story log :c")
+
       return this.$getAllPagesInStory(story_id).filter(page_num => 
         !this.$pageIsSpoiler(page_num)
       ).map(page_num => 
         this.getLogEntry(story_id, page_num)
-      ).sort(this.getSorter())
+      )
     },
     getLogEntry(story_id, page_num) {
+      // Returns the actual entry object for a given page
+      // needs the story_id because ryanquest
+
+      // TODO: Memoize this?
       let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
       let page = story[page_num];
       let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
