@@ -413,15 +413,13 @@
           <div class="archiveCredits">
             <h2>Archive credits:</h2>
             <dl>
-              <dt>Bambosh:</dt><dd>Howdy! This archive is a project I've been itching to make since 2016, but was forced to gestate while I figured out exactly how I was going to go about it. I started work proper at the beginning of 2020, and you're finally looking at the end result! If you're an experienced developer who feels like having chuckle, check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection">source code.</a> It's all open source, so feel free to fork it off or suggest improvements! God knows it probably needs some.</dd>
-              <dt>Niklink:</dt><dd>Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages.</dd>
-              <dt><a href="https://hsmusic.github.io/">Florrie</a>:</dt><dd>For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.github.io/about/index.html">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.</dd>
-              <dt><a href="https://www.bgreco.net/hsflash.html">bgreco</a>:</dt><dd>For providing the original inspiration for the high quality flash audio in this archive. I didn't end up using their edits for the most-part, but the implementation here was very much adapted from their own.</dd>
-              <dt><a href="https://twitter.com/splitsuns">SplitSuns</a>:</dt><dd>For using their godlike audio magic powers to absolutely save my life during the process of editing the high quality flash audio.</dd>
-              <dt><a href="https://wheals.github.io">Wheals</a>:</dt><dd>For archiving all the old social media accounts, that I proceeded to cram into this thing.</dd>
-              <dt><a href="https://mrcheeze.github.io/andrewhussie/">MrCheeze</a>:</dt><dd>For archiving all the old Team Special Olympics comics, which again, I crammed right in here.</dd>
-              <dt><a href="https://homestuck.net/">Makin</a>:</dt><dd>Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>. Some of the backgrounds from their Snapchat archive made their way in too.</dd>
-              <dt><a href="http://readmspa.org">Anthony Bailey</a>:</dt><dd>For making the original offline Homestuck archive that sent me off down this rabbit hole to begin with!</dd>
+              <template v-for="credit in archiveCredits">
+                <dt>
+                  <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
+                  <span v-else>{{credit.name}}</span>
+                :</dt>
+                <dd v-html="credit.credit"></dd>
+              </template>
             </dl>
           </div>
         </div>
@@ -447,6 +445,51 @@ export default {
   },
   data: function() {
     return {
+      archiveCredits: [
+        {
+          name: "Bambosh",
+          credit: `Howdy! This archive is a project I've been itching to make since 2016, but was forced to gestate while I figured out exactly how I was going to go about it. I started work proper at the beginning of 2020, and you're finally looking at the end result! If you're an experienced developer who feels like having chuckle, check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection">source code.</a> It's all open source, so feel free to fork it off or suggest improvements! God knows it probably needs some.`
+        },
+        {
+          name: "Niklink",
+          credit: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages.`
+        },
+        {
+          name: "Florrie",
+          link: "https://hsmusic.github.io/",
+          credit: `For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.github.io/about/index.html">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.`
+        },
+        {
+          name: "bgreco",
+          link: "https://www.bgreco.net/hsflash.html",
+          credit: `For providing the original inspiration for the high quality flash audio in this archive. I didn't end up using their edits for the most-part, but the implementation here was very much adapted from their own.`
+        },
+        {
+          name: "SplitSuns",
+          link: "https://twitter.com/splitsuns",
+          credit: `For using their godlike audio magic powers to absolutely save my life during the process of editing the high quality flash audio.`
+        },
+        {
+          name: "Wheals",
+          link: "https://wheals.github.io",
+          credit: `For archiving all the old social media accounts, that I proceeded to cram into this thing.`
+        },
+        {
+          name: "MrCheeze",
+          link: "https://mrcheeze.github.io/andrewhussie/",
+          credit: `For archiving all the old Team Special Olympics comics, which again, I crammed right in here.`
+        },
+        {
+          name: "Makin",
+          link: "https://homestuck.net/",
+          credit: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>. Some of the backgrounds from their Snapchat archive made their way in too.`
+        },
+        {
+          name: "Anthony Bailey",
+          link: "http://readmspa.org",
+          credit: `For making the original offline Homestuck archive that sent me off down this rabbit hole to begin with!`
+        },
+      ]
     }
   },
   computed: {
