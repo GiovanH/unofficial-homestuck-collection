@@ -5,7 +5,11 @@
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <a :href="reverseLink" class="switchOrder">Reverse order</a>
-        <div class="logItems" v-html="log" />
+        <div class="logItems">
+          <template v-for="page in log">
+            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
+          </template>
+        </div>
       </div>
     </div>
     <div class="pageFrame noLog" v-else >
@@ -17,6 +21,7 @@
           <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
           <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
           <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
+          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_rq.png" /><br>Ryanquest</a></div>
         </div>
       </div>
     </div>
@@ -29,6 +34,15 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+
+const { DateTime } = require('luxon');
+
+const sort_methods = {
+    asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
+    desc: (a, b) => (a.page_num < b.page_num) ? 1 : -1,
+    alpha: (a, b) => (a.title > b.title) ? 1 : -1,
+    random: (a, b) => 0.5 - Math.random()
+}
 
 export default {
   name: 'log',
@@ -46,20 +60,16 @@ export default {
   },
   computed: {
     log() {
+      // OuterHTML of log (yikes!)
       if (this.routeParams.mode) {
         this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
+
+        // TODO: no.
         let story = this.routeParams.mode.charAt(0)
-        
-        if (story in this.$archive.log[this.sort]){
-          let logData = this.$archive.log[this.sort][story]
-          if (this.$isNewReader) {
-            let regex = this.sort == 'log' ? new RegExp(`^(.*${this.$localData.settings.newReader.current}">".*?"<\/a><br>).*$`) : new RegExp(`^.*?(.{12}<a href="\/mspa\/${this.$localData.settings.newReader.current}.*)$`)
-            return logData.replace(regex, '$1')
-          }
-          else {
-            return logData
-          }
-        }
+        if (story == "r")
+          story = "ryanquest"
+
+        return this.storyLog(story)
       }
       else return undefined
     },
@@ -68,6 +78,33 @@ export default {
     },
   },
   methods:{
+    getSorter(default_="asc"){
+      let sort_order = this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'asc' : 'desc'
+      let sort_fn = sort_methods[sort_order]
+      if (!sort_fn)
+          sort_fn = sort_methods[default_]
+      return sort_fn
+    },
+    storyLog(story_id) {
+      // TODO: Spoiler checking
+      return this.$getAllPagesInStory(story_id).filter(page_num => 
+        !this.$pageIsSpoiler(page_num)
+      ).map(page_num => 
+        this.getLogEntry(story_id, page_num)
+      ).sort(this.getSorter())
+    },
+    getLogEntry(story_id, page_num) {
+      let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
+      let page = story[page_num];
+      let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
+      let time_zone = "America/New_York"
+      return {
+        title: page.title,
+        page_num: page.pageId,
+        href: `/${page_type}/${page.pageId}`,
+        date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).setZone(time_zone).toFormat("MM/dd/yy") : "??/??/??")
+      }
+    }
   }
 }
 </script>
