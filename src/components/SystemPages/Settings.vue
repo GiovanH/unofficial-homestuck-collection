@@ -68,25 +68,27 @@
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
 
-          <dt>UI Theme Override</dt>
-          <dd v-if="!$isNewReader">
-            <select class="themeSelector" v-model="$localData.settings.themeOverrideUI" @change="$localData.root.saveLocalStorage()">
-              <option v-for="theme in themes" :value="theme.value">
-                {{ theme.text }}
-              </option>
-            </select>
-            <template v-if="$localData.settings.themeOverrideUI">
-              <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
-            </template>
-          </dd>
-          <dd v-else>
-            <dt><label>
+          <template v-if="!$isNewReader">
+            <dt>UI Theme Override</dt>
+            <dd >
+              <select class="themeSelector" v-model="$localData.settings.themeOverrideUI" @change="$localData.root.saveLocalStorage()">
+                <option v-for="theme in themes" :value="theme.value">
+                  {{ theme.text }}
+                </option>
+              </select>
+              <template v-if="$localData.settings.themeOverrideUI">
+                <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
+              </template>
+            </dd>
+          </template>
+          <dt v-else>
+            <label>
               <input type="checkbox" name="forceThemeOverrideUIMSPA"
               :checked.prop="forceThemeOverrideUIMSPAChecked === true"
               :indeterminate.prop="forceThemeOverrideUIMSPAChecked === undefined"
               @click="forceThemeOverrideUIMSPA()"> Never style UI
-            </label></dt>
-          </dd>
+            </label>
+          </dt>
 
 
           <dt>Text Override</dt>
