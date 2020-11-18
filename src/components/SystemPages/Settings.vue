@@ -544,6 +544,9 @@ export default {
         .themeSelector, .fontSelector {
           font-size: 16px;
         }
+        .themeSelector + dt {
+          display: inline;
+        }
         .textOverrideSettings {
           margin-top: 16px;
           text-align: center;

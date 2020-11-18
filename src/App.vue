@@ -49,9 +49,9 @@
 
         let page_theme;
 
+        // TODO: Sometimes the app loads before this.$refs is populated at all. 
         let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
         if (tab_components) {
-          // TODO: Sometimes the app loads before this.$refs is populated at all. 
           this.lastPageTheme = page_theme = tab_components[0].theme
         } else {
           console.error("No tabs! Using prev theme", this.lastPageTheme)
@@ -191,6 +191,8 @@
         let { target, button } = event
         if (button == 2) {
           event.preventDefault()
+          // TODO: Sometimes contextMenu is undefined?
+          console.assert(this.$refs.contextMenu, this.$refs)
           this.$refs.contextMenu.open(event, target)
           return
         }
