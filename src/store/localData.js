@@ -77,7 +77,6 @@ class LocalData {
       retcon5: true,
       retcon6: true,
 
-      enableControversial: false,
       bolin: false,
       unpeachy: false,
       pxsTavros: false,
