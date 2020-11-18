@@ -2,8 +2,9 @@
   <span>
     <span v-if="isSpoiler">{{this.displayNum}}</span>
     <template v-else>
-      <a v-if="innertext" :href='href' :title='title'>{{innertext}}</a>
-      <span v-if="outertext" v-html="outertext"></span>
+      <span v-if="preText" v-html="preText"></span>v
+      <a v-if="innerText" :href='href' :title='title'>{{innerText}}</a>
+      <span v-if="postText" v-html="postText"></span>
     </template>
   </span>
 </template>
@@ -25,12 +26,17 @@ export default {
     href(){return `/mspa/${this.mspaId}`},
     displayNum(){return this.$mspaOrVizNumber(this.mspaId)},
 
-    outertext(){
+    postText(){
       if (this.isCredit && !this.isSpoiler)
         return ` - <b>${this.page.title}</b>`
       return false
     },
-    innertext(){
+    preText(){
+      if (this.isCredit)
+        return `Page `
+      return false
+    },
+    innerText(){
       let num = this.displayNum
       if (this.isSpoiler)
         return num
