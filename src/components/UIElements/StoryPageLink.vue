@@ -2,7 +2,7 @@
   <span>
     <span v-if="isSpoiler">{{this.displayNum}}</span>
     <template v-else>
-      <span v-if="preText" v-html="preText"></span>v
+      <span v-if="preText" v-html="preText"></span>
       <a v-if="innerText" :href='href' :title='title'>{{innerText}}</a>
       <span v-if="postText" v-html="postText"></span>
     </template>
