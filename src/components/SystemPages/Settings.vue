@@ -79,7 +79,14 @@
               <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
             </template>
           </dd>
-          <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
+          <dd v-else>
+            <dt><label>
+              <input type="checkbox" name="forceThemeOverrideUIMSPA"
+              :checked.prop="forceThemeOverrideUIMSPAChecked === true"
+              :indeterminate.prop="forceThemeOverrideUIMSPAChecked === undefined"
+              @click="forceThemeOverrideUIMSPA()"> Never style UI
+            </label></dt>
+          </dd>
 
 
           <dt>Text Override</dt>
@@ -319,7 +326,16 @@ export default {
     controversialAny(){
       let values = this.allControversial.map(key => this.$localData.settings[key])
       return values.some(Boolean)
-    }
+    },
+    forceThemeOverrideUIMSPAChecked(){
+      if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == true) {
+        return true
+      } else if (this.$localData.settings.themeOverrideUI == "" && this.$localData.settings.forceThemeOverrideUI == false) {
+        return false
+      } else {
+        return undefined
+      }
+    },
   },
   methods:{
     validateNewReader() {
@@ -371,6 +387,16 @@ export default {
           this.$localData.root.NEW_READER_CLEAR()
         }
       })
+    },
+    forceThemeOverrideUIMSPA(){
+      if (this.forceThemeOverrideUIMSPAChecked) {
+        this.$localData.settings.themeOverrideUI = ""
+        this.$localData.settings.forceThemeOverrideUI = false
+      } else {
+        this.$localData.settings.themeOverrideUI = "default"
+        this.$localData.settings.forceThemeOverrideUI = true
+      }
+      this.$localData.root.saveLocalStorage()
     },
     toggleAllControversial() {
       if (this.controversialAny) {
