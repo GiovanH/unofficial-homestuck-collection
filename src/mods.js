@@ -192,8 +192,7 @@ function getMainMixin(){
 // Black magic
 function getMixins(){
   const nop = ()=>undefined;
-
-  // TODO: How do mixin collisions work? Priorities
+  
   return getEnabledModsJs().reverse().map((js) => {
 
     const vueHooks = js.vueHooks || []

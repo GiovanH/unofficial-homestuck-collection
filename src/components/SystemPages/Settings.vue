@@ -50,7 +50,7 @@
 
           <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
           <dd class="settingDesc">
-          TODO: Expound on this description.
+          // TODO: Expound on this description.
           This is useful in other places, like style development and
           nothing else yet
 
