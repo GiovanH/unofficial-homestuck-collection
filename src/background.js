@@ -561,26 +561,20 @@ async function createWindow () {
   })
   
   // Resolve asset URLs
-
-  protocol.registerHttpProtocol('assets', (details, callback) => {
-    let redirectURL = Resources.resolveAssetsProtocol(details.url)
-    callback({
-      url: redirectURL
-    })
-  })
-
+  
   // You can only have one of these, so all behavior has to go in here.
   // Yes, it's a pain.
   win.webContents.session.webRequest.onBeforeRequest({
     urls: [
-      'assets://*/*',  // yes, both
+      // 'assets://*/*',  // yes, both
 
       '*://*.mspaintadventures.com/*', 
+      "assets://*/*",  // yes, both
       "http://www.turner.com/planet/mp3/cp_close.mp3", 
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
       "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
-      "*://*.sweetcred.com/*",
+      "*://*.sweetcred.com/*"
     ]
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
