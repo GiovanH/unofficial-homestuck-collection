@@ -146,7 +146,7 @@
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since removed for various reasons. The inclusion of this content is in no way an endorsement of its quality.</dd>
+        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</dd>
 
         <div v-if="$isNewReader">
           
