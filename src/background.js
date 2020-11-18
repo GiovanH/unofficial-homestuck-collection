@@ -31,7 +31,12 @@ app.disableHardwareAcceleration()
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', privileges: { standard: true } }
+  { scheme: 'assets', privileges: { 
+    standard: true,
+    secure: true,
+    supportFetchAPI: true,
+    stream: true
+  }}
 ])
 
 // zoom functions
@@ -556,21 +561,21 @@ async function createWindow () {
   })
   
   // Resolve asset URLs
-  win.webContents.session.webRequest.onBeforeRequest({
-    urls: [
-      'assets://*/*',
-    ]
-  }, (details, callback) => {
+
+  protocol.registerHttpProtocol('assets', (details, callback) => {
+    let redirectURL = Resources.resolveAssetsProtocol(details.url)
     callback({
-      redirectURL: Resources.resolveAssetsProtocol(details.url)
+      url: redirectURL
     })
   })
 
-  //This should only ever trigger from flashes requesting resources or page redirects
+  // You can only have one of these, so all behavior has to go in here.
+  // Yes, it's a pain.
   win.webContents.session.webRequest.onBeforeRequest({
     urls: [
+      'assets://*/*',  // yes, both
+
       '*://*.mspaintadventures.com/*', 
-      'assets://*/*',
       "http://www.turner.com/planet/mp3/cp_close.mp3", 
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
@@ -578,13 +583,17 @@ async function createWindow () {
       "*://*.sweetcred.com/*",
     ]
   }, (details, callback) => {
-    let destination_url = Resources.resolveURL(details.url)
-    // console.log(`onBeforeRequest: ${details.url} ===> ${destination_url}`)
-    if (details.resourceType =="subFrame")
-      win.webContents.send('TABS_PUSH_URL', destination_url)
-		else callback({
-      redirectURL: destination_url
-    })
+    if (details.url.startsWith("assets://")) {
+      let redirectURL = Resources.resolveAssetsProtocol(details.url)
+      callback({redirectURL})
+    } else {
+      let destination_url = Resources.resolveURL(details.url)
+      if (details.resourceType =="subFrame")
+        win.webContents.send('TABS_PUSH_URL', destination_url)
+      else callback({
+        redirectURL: destination_url
+      })
+    }
 	})
 
   //It's important that only one window is ever active at a time

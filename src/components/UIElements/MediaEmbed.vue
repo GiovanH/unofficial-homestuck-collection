@@ -4,7 +4,7 @@
 	<iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
 	<!-- HTML iframes must not point to assets :c -->
 	<iframe v-else-if="getExt(url) === 'html'" 
-	:src='resolveFlashURL(url)' 
+	:src='$resolveURL(url)' 
 	width="650px" height="450px" class="sburb" seamless />
 	<div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
 	<audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$resolveURL(url)" type="audio/mpeg" />

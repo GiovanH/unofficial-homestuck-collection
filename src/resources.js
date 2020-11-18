@@ -22,7 +22,6 @@ function fileIsAsset(url){
     if (is_bundled) return false
 
     if (url.charAt(0) == "/") {
-        console.error(url)
         return true
         // i hate this a lot? this is not how it should work
     }
