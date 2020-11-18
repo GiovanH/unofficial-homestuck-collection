@@ -32,7 +32,7 @@
     data() {
       return {
         zoomLevel: 0,
-        lastTheme: 'default'
+        lastPageTheme: 'default'
       }
     },
     computed: {
@@ -40,15 +40,24 @@
         return this.$localData.tabData.tabList;
       },
       theme(){
-        let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
+        // you have to have these lines here or it won't work
+        // because vue is not great at this
+        this.$localData.tabData.activeTabKey; 
+        this.$localData.settings.themeOverrideUI;
+        this.$localData.settings.forceThemeOverrideUI;
+        // no, seriously
 
-        if (!tab_components) {
+        let page_theme;
+
+        let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
+        if (tab_components) {
           // TODO: Sometimes the app loads before this.$refs is populated at all. 
-          console.error("No tabs! Using prev theme", this.lastTheme)
-          return this.lastTheme
+          this.lastPageTheme = page_theme = tab_components[0].theme
+        } else {
+          console.error("No tabs! Using prev theme", this.lastPageTheme)
+          page_theme = this.lastPageTheme
         }
 
-        let page_theme = tab_components[0].theme
         let set_theme = this.$localData.settings.themeOverrideUI
         let theme = page_theme
 
@@ -63,9 +72,9 @@
             }
           } else {
             theme = set_theme
-          }
+          } 
         }
-        this.lastTheme = theme
+        this.lastPageTheme = theme
         return theme
       }
     },

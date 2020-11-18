@@ -420,7 +420,7 @@ export default {
 		          }
 		        }
 				this.$root.theme = theme
-			}			
+			}	
 		},
 		setTitle(component = this.resolveComponent){
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
@@ -578,6 +578,12 @@ export default {
 	},
 	watch: {
 		'isLoaded'(to, from){
+			this.setTheme()
+		},
+		'$localData.settings.themeOverride'(to, from){
+			this.setTheme()
+		},
+		'$localData.settings.forceThemeOverride'(to, from){
 			this.setTheme()
 		},
 		'tabIsActive'(to, from) {
