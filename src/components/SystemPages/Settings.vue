@@ -123,46 +123,106 @@
       </div>
       <div class="settings retcons" v-if="!$isNewReader">
         <h2>Retcons</h2>
+        <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
         <dl>
           <dt><label><input type="checkbox" name="retcon1" v-model="$localData.settings['retcon1']" @click="toggleSetting('retcon1')">#1 - John's arms</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('007999')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='007999'></StoryPageLink>.</dd>
 
           <dt><label><input type="checkbox" name="retcon2" v-model="$localData.settings['retcon2']" @click="toggleSetting('retcon2')">#2 - John's first Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008053')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008053'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon3" v-model="$localData.settings['retcon3']" @click="toggleSetting('retcon3')">#3 - John interrupting Dave and Jade</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008317')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008317'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon4" v-model="$localData.settings['retcon4']" @click="toggleSetting('retcon4')">#4 - The oil patches</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('008991')}}. <a href="/oilretcon">/oilretcon</a></dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008991'></StoryPageLink>. <a href="/oilretcon">/oilretcon</a></dd>
           
           <dt><label><input type="checkbox" name="retcon5" v-model="$localData.settings['retcon5']" @click="toggleSetting('retcon5')">#5 - John's second Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('009026')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009026'></StoryPageLink>.</dd>
           
           <dt><label><input type="checkbox" name="retcon6" v-model="$localData.settings['retcon6']" @click="toggleSetting('retcon6')">#6 - Terezi's password pages</label></dt>
-          <dd class="settingDesc">Originally enabled on page {{$mspaOrVizNumber('009057')}}.</dd>
+          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009057'></StoryPageLink>.</dd>
         </dl>
       </div>
-      <div class="settings controversial" v-if="!$isNewReader">
+      <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
+        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</dd>
 
-        <dt><label><input type="checkbox" name="enableControversial" v-model="$localData.settings['enableControversial']" @click="toggleSetting('enableControversial')">Enable controversial content</label></dt>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore content that was removed for various reasons. The inclusion of this content is in no way an endorsement of its quality, and it absolutely should not be used to judge the original authors of the work.</dd>
-
-        <dl v-if="$localData.settings.enableControversial">
-          <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
-          <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. After he left the team on less-than-favourable circumstances, the flashes he worked on were rescored.</dd>
-
-          <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label></dt>
-          <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin-colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
+        <div v-if="$isNewReader">
           
-          <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label></dt>
-          <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page had a somewhat heavy focus on body horror</a>. The original version was completely unobscured, but it was hastily censored.</a></dd>
+          <!-- All this with the indeterminate properties is so the button renders unambigiously if the setting is changed with a mod, or by accident. -->
+          <dt><label><input type="checkbox" name="enableControversial"
+              @click="toggleAllControversial()"
+              :checked.prop="controversialAll && !!controversialAny"
+              :indeterminate.prop="controversialAny && !controversialAll"
+            >Enable controversial content</label></dt>
+          <dd class="settingDesc">
+          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
+
+        </div>
+
+        <dd class="settingDesc">
+        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</dd>
           
-          <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label></dt>
+        <SpoilerBox kind="Affected Page Numbers" class="ccPageNos">
+          <div class="left col">
+            <h3>Homestuck</h3>
+            <!-- bolin -->
+            <ol>
+            <li><StoryPageLink long mspaId='002238'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002544'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002551'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002722'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002730'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002733'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002880'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002926'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='002970'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='003620'></StoryPageLink></li>
+            <!-- peachy -->
+            <li><StoryPageLink long mspaId='007623'></StoryPageLink></li>
+            </ol>
+          </div>
+          <div class="right col">
+            <h3>Side content</h3>
+            <ol>
+            <li v-if="!$pageIsSpoiler('008753')"><a href="/pxs/summerteen-romance/31">Paradox Space - Summerteen Romance page 31</a></li>
+            <li v-else>Not yet unlocked (Jan 2019)</li>
+            <li v-if="!$isNewReader"><a href="/skaianet">Skaianet Systems</a></li>
+            <li v-else>Not yet unlocked (Apr 2014)</li>
+            </ol>
+          </div>
+          <!-- TODO -->
+        </SpoilerBox>
+
+        <div v-if="!$isNewReader" > <!-- TODO v-else> -->
+          <!-- <dt><label><input type="checkbox" name="enableControversial"
+              @click="toggleAllControversial()"
+              :checked.prop="controversialAll && !!controversialAny"
+              :indeterminate.prop="controversialAny && !controversialAll"
+            >Enable controversial content</label></dt> -->
+          <dd class="settingDesc">
+          Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
+
+        <SpoilerBox kind="Controversial Content">
+
+          <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
+          <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
+
+          <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label><span class="cw severe">race</span></dt>
+          <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
+          
+          <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label><span class="cw severe">body horror</span></dt>
+          <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.</a></dd>
+          
+          <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label><span class="cw severe">holocaust</span></dt> 
+          <!-- todo: something better than "holocaust" -->
           <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
-        </dl>
+        </SpoilerBox>
       </div>
+
+      </div>
+      
       <div class="settings system">
         <h2>System Settings</h2>
         <div class="system">
@@ -190,6 +250,8 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
+import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -198,7 +260,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText
+    NavBanner, PageText, SpoilerBox, StoryPageLink
   },
   data: function() {
     return {
@@ -225,10 +287,24 @@ export default {
       ],
       newReaderPage: this.$localData.settings.newReader.current || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
-      newReaderValidation: true
+      newReaderValidation: true,
+      allControversial: [
+        'bolin',
+        'unpeachy',
+        'pxsTavros',
+        'cursedHistory'
+      ]
     }
   },
   computed: {
+    controversialAll(){
+      let values = this.allControversial.map(key => this.$localData.settings[key])
+      return values.every(Boolean)
+    },
+    controversialAny(){
+      let values = this.allControversial.map(key => this.$localData.settings[key])
+      return values.some(Boolean)
+    }
   },
   methods:{
     validateNewReader() {
@@ -264,11 +340,7 @@ export default {
       if (this.newReaderValidation) {
 
         this.$localData.settings.themeOverride = ""
-        this.$localData.settings['enableControversial'] = false
-        this.$localData.settings['bolin'] = false
-        this.$localData.settings['unpeachy'] = false
-        this.$localData.settings['pxsTavros'] = false
-        this.$localData.settings['cursedHistory'] = false
+        this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
         this.$updateNewReader(pageId, true)
       }
@@ -285,17 +357,30 @@ export default {
         }
       })
     },
+    toggleAllControversial() {
+      if (this.controversialAny) {
+        // Normally checking an indeterminate checkbox enables it,
+        // but we want to clear it instead.
+        this.allControversial.forEach(key => this.$localData.settings[key] = false)
+        this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
+      } else {
+        let args = {
+          title: "Are you sure?",
+          message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
+        }
+        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+          if (answer === true) {
+            this.allControversial.forEach(key => this.$localData.settings[key] = true)
+          } else {
+            this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
+          }
+        })
+      }
+    },
     toggleSetting(setting, parentObject){
       if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
       else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
-
-      if (setting == 'enableControversial' && !this.$localData.settings[setting]) {
-        this.$localData.settings['bolin'] = false
-        this.$localData.settings['unpeachy'] = false
-        this.$localData.settings['pxsTavros'] = false
-        this.$localData.settings['cursedHistory'] = false
-      }
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
@@ -396,6 +481,11 @@ export default {
           color: var(--page-nav-meta);
           font-weight: normal;
         }
+
+        > dd.settingDesc {
+          // Descriptions of whole sections
+          margin-top: 1em;
+        }
         
         .system {
           margin-top: 20px;
@@ -474,6 +564,36 @@ export default {
               font-weight: bold;
             }
           }
+        }
+        .ccPageNos {
+          font-weight: normal;
+          width: 600px;
+          margin: 1em auto;
+          h3 {
+            margin-top: .4em;
+          }
+          ol {
+            margin-inline-start: 2em;
+          }
+
+        }
+        span.cw {
+            padding: 0 7px;
+            font-size: 12px;
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
+            font-weight: 500;
+            line-height: 18px;
+            border: 1px solid transparent;
+            border-radius: 2em;
+            margin-left: 1em;
+            &.minor {
+              background-color: #fbca04;
+              color: #000000;
+            }
+            &.severe{
+              background-color: #d93f0b;
+              color: #ffffff;
+            }
         }
       }
     }
