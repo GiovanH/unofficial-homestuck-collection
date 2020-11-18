@@ -398,19 +398,8 @@ ipcMain.handle('restart', async (event) => {
   app.exit()
 })
 
-ipcMain.handle('factory-reset', async (event) => {
-  let confirmation = dialog.showMessageBoxSync(win, {
-    type: 'warning',
-    buttons: [
-      'OK',
-      'Cancel'
-    ],
-    cancelId: 1,
-    defaultId: 1,
-    title: 'Notice',
-    message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!'
-  })
-  if (confirmation == 0) {
+ipcMain.handle('factory-reset', async (event, confirmation) => {
+  if (confirmation === true) {
     store.delete('localData')
   
     app.relaunch()
@@ -418,18 +407,22 @@ ipcMain.handle('factory-reset', async (event) => {
   }
 })
 
-ipcMain.handle('disable-new-reader', async (event) => {
-  return dialog.showMessageBoxSync(win, {
+ipcMain.handle('prompt-okay-cancel', async (event, args) => {
+  let title = args.title || "Notice"
+  let ok_string = args.okay || "OK"
+  let cancel_string = args.cancel || "Cancel"
+  let answer = dialog.showMessageBoxSync(win, {
     type: 'warning',
     buttons: [
-      'OK',
-      'Cancel'
+      ok_string,
+      cancel_string
     ],
     cancelId: 1,
     defaultId: 1,
-    title: 'Notice',
-    message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
+    title,
+    message: args.message
   })
+  return (answer === 0)
 })
 
 ipcMain.handle('search', async (event, payload) => {
