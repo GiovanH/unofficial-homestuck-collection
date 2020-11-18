@@ -51,7 +51,14 @@ function memoized(fun, funkey, size = 1000){
     }
 }
 
+const mixin = {
+    methods: {
+       memoized
+    }
+}
+
 export default {
     memoized,
-    memoizedClearAll
+    memoizedClearAll,
+    mixin
 }

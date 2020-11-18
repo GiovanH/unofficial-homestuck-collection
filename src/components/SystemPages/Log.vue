@@ -34,7 +34,6 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
-import Memo from '@/memoization.js'
 
 const { DateTime } = require('luxon');
 
@@ -59,9 +58,7 @@ export default {
       sortNames: {
         asc: 'oldest to newest',
         desc: 'newest to oldest'
-      },
-      // have to bind `this` in data
-      storyLogRaw: Memo.memoized(this._storyLogRaw, "storyLogRaw", 10) 
+      }
     }
   },
   computed: {
@@ -109,19 +106,22 @@ export default {
       // The sorter function that .sort() keys
       let default_="asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
+    },
+    storyLogRaw() {
+      // The unsorted story log
+      return this.memoized(story_id => {
+        // aaaah this is such a hack
+        console.log("Recalculating story log :c")
+
+        return this.$getAllPagesInStory(story_id).filter(page_num => 
+          !this.$pageIsSpoiler(page_num)
+        ).map(page_num => 
+          this.getLogEntry(story_id, page_num)
+        )
+      }, "storyLogRaw", 10)
     }
   },
   methods: {
-    _storyLogRaw(story_id) {
-      // The unsorted story log
-      console.log("Recalculating story log :c")
-
-      return this.$getAllPagesInStory(story_id).filter(page_num => 
-        !this.$pageIsSpoiler(page_num)
-      ).map(page_num => 
-        this.getLogEntry(story_id, page_num)
-      )
-    },
     getLogEntry(story_id, page_num) {
       // Returns the actual entry object for a given page
       // needs the story_id because ryanquest

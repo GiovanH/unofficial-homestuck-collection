@@ -12,6 +12,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import Memoization from '@/memoization.js'
+
 library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -32,6 +34,8 @@ Number.prototype.pad = function(size) {
     while (s.length < (size || 2)) {s = "0" + s;}
     return s;
 }
+
+Vue.mixin(Memoization.mixin)
 
 Vue.mixin({
   data(){
