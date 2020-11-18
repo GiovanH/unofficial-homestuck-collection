@@ -2,7 +2,10 @@
 	<img    v-if="getExt(url) === 'img'" :src='$resolveURL(url)' @dragstart="drag($event)" alt />
 	<video  v-else-if="getExt(url) ==='vid'" :src='$resolveURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
 	<iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
-	<iframe v-else-if="getExt(url) === 'html'" :src='$resolveURL(url)' width="650px" height="450px" class="sburb" seamless />
+	<!-- HTML iframes must not point to assets :c -->
+	<iframe v-else-if="getExt(url) === 'html'" 
+	:src='resolveFlashURL(url)' 
+	width="650px" height="450px" class="sburb" seamless />
 	<div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
 	<audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$resolveURL(url)" type="audio/mpeg" />
 </template>
@@ -10,6 +13,7 @@
 <script>
 import fs from 'fs'
 import path from 'path'
+import Resources from "@/resources.js"
 
 export default {
 	props: ['url'],
@@ -273,6 +277,9 @@ export default {
 	methods: {
 		initIframe() {
 			this.$el.contentWindow.vm = this
+		},
+		resolveFlashURL(url){
+			return Resources.resolveURL(url)
 		},
 		invokeFromFlash(func) {
 			// getURL "about:srcdoc#link?url" ""

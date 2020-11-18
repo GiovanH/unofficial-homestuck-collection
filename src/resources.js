@@ -21,6 +21,12 @@ function fileIsAsset(url){
     let is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
     if (is_bundled) return false
 
+    if (url.charAt(0) == "/") {
+        console.error(url)
+        return true
+        // i hate this a lot? this is not how it should work
+    }
+
     let has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(url)
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
@@ -34,7 +40,7 @@ function resolveURL(url) {
 
     if (resource_url.startsWith("assets://")) {
         print("[resvUrl]", url, "to", resource_url)
-        resource_url = resolveAssetsProtocol(resource_url, assets_root) 
+        resource_url = resolveAssetsProtocol(resource_url) 
     } else {
         print("[resvUrl]", "no change for", resource_url)
     }
@@ -112,7 +118,7 @@ function getResourceURL(request_url){
     return resource_url
 }
 
-function resolveAssetsProtocol(asset_url, assets_root, loopcheck=[]) {
+function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
     let mod_route = Mods.getAssetRoute(asset_url)
@@ -123,7 +129,7 @@ function resolveAssetsProtocol(asset_url, assets_root, loopcheck=[]) {
             throw "Circular asset path!" + loopcheck
         } else {
             loopcheck.push(mod_route)
-            return resolveAssetsProtocol(mod_route, assets_root, loopcheck)
+            return resolveAssetsProtocol(mod_route, loopcheck)
         }
     }
 
