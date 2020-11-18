@@ -62,14 +62,25 @@
                 {{ theme.text }}
               </option>
             </select>
-            <br><br>
-            <label><input type="checkbox" name="themeStyleChrome" v-model="$localData.settings['themeStyleChrome']" @click="toggleSetting('themeStyleChrome')"> Allow themes to style application window</label>
-            <span v-if="$localData.settings.themeOverride">
-              <br><br>
-              <label ><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
-            </span>
+            <template v-if="$localData.settings.themeOverride">
+              <dt><label><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label></dt>
+            </template>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
+
+          <dt>UI Theme Override</dt>
+          <dd v-if="!$isNewReader">
+            <select class="themeSelector" v-model="$localData.settings.themeOverrideUI" @change="$localData.root.saveLocalStorage()">
+              <option v-for="theme in themes" :value="theme.value">
+                {{ theme.text }}
+              </option>
+            </select>
+            <template v-if="$localData.settings.themeOverrideUI">
+              <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
+            </template>
+          </dd>
+          <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
+
 
           <dt>Text Override</dt>
           <dd>

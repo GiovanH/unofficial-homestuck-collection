@@ -1,5 +1,8 @@
 <template>
-  <div id="app" :class="[$localData.settings.themeStyleChrome ? $root.theme : 'default', $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive">
+  <div id="app" :class="[
+    theme, 
+    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
+    ]" v-if="$archive">
     <AppHeader />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications ref="notifications" />
@@ -28,12 +31,42 @@
     },
     data() {
       return {
-        zoomLevel: 0
+        zoomLevel: 0,
+        lastTheme: 'default'
       }
     },
     computed: {
       tabList() {
         return this.$localData.tabData.tabList;
+      },
+      theme(){
+        let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
+
+        if (!tab_components) {
+          // TODO: Sometimes the app loads before this.$refs is populated at all. 
+          console.error("No tabs! Using prev theme", this.lastTheme)
+          return this.lastTheme
+        }
+
+        let page_theme = tab_components[0].theme
+        let set_theme = this.$localData.settings.themeOverrideUI
+        let theme = page_theme
+
+        if (set_theme) {
+          if (page_theme != 'default') {
+            // Page has a theme
+            if (this.$localData.settings.forceThemeOverrideUI) {
+              // If force is on, use the override theme
+              theme = set_theme
+            } else {
+              theme = page_theme
+            }
+          } else {
+            theme = set_theme
+          }
+        }
+        this.lastTheme = theme
+        return theme
       }
     },
     methods: {

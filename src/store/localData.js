@@ -56,8 +56,9 @@ class LocalData {
       devMode: false,
 
       themeOverride: "",
-      themeStyleChrome: true,
+      themeOverrideUI: "",
       forceThemeOverride: false,
+      forceThemeOverrideUI: false,
 
       textOverride: {
         fontFamily: "",

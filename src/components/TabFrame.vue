@@ -4,7 +4,6 @@
 		:class='{ 
 			hidden: !tabIsActive,
 			forceScrollBar: $localData.settings.forceScrollBar,
-			getTheme, 
 			forceLoad,  
 		}'
 		:tabindex="(tabIsActive) ? -1 : false" 
@@ -24,8 +23,8 @@
 		
 		<Bookmarks 	:tab="tab" ref="bookmarks" />
 		<MediaModal :tab="tab" ref="modal" />
-		<FindBox 		:tab="tab" ref="findbox"/>
-		<JumpBox 		:tab="tab" ref="jumpbox" />
+		<FindBox    :tab="tab" ref="findbox"/>
+		<JumpBox    :tab="tab" ref="jumpbox" />
 	</div>
 </template>
 
@@ -335,37 +334,34 @@ export default {
 			this.setTitle(result)
 			return result
 		},
-		getTheme() {
-			let theme = this.$localData.settings.themeOverride || 'default'
-			
-			if (!this.$localData.settings.themeOverride || !this.$localData.settings.forceThemeOverride) {
-				if (this.resolveComponent == 'PAGE'){
-					let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-					if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-				}
-				else if (this.resolveComponent == 'FULLSCREENFLASH') {
-					if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
-				}
-				else if (this.resolveComponent == 'ENDOFHS') {
-					let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-					if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-				}
-				else if (this.resolveComponent == 'SBAHJ'){
-					theme = 'sbahj'
-				}
-				else if (this.resolveComponent == 'PXS'){
-					theme = 'pxs'
-				}
-				else if (this.resolveComponent == 'TSO'){
-					theme = 'tso'
-				}
-				else if (this.resolveComponent == 'EXTRASPAGE') {
-					if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
-				}
-				else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+		theme() {
+			// Get the expected theme for this page.
+			let theme = 'default'
+			if (this.resolveComponent == 'PAGE'){
+				let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+				if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
 			}
-
-			if (this.tabIsActive) this.$root.theme = theme
+			else if (this.resolveComponent == 'FULLSCREENFLASH') {
+				if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
+			}
+			else if (this.resolveComponent == 'ENDOFHS') {
+				let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+				if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
+			}
+			else if (this.resolveComponent == 'SBAHJ'){
+				theme = 'sbahj'
+			}
+			else if (this.resolveComponent == 'PXS'){
+				theme = 'pxs'
+			}
+			else if (this.resolveComponent == 'TSO'){
+				theme = 'tso'
+			}
+			else if (this.resolveComponent == 'EXTRASPAGE') {
+				if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
+			}
+			else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+			return theme
 			
 		}
 	},
@@ -403,6 +399,28 @@ export default {
 		},
 		openModal(url) {
 			this.$refs.modal.open(url)
+		},
+		setTheme(){
+			if (this.isLoaded && this.tabIsActive) {
+		        let page_theme = this.theme || 'default'
+		        let set_theme = this.$localData.settings.themeOverride
+		        let theme = page_theme
+
+		        if (set_theme) {
+		          if (page_theme != 'default') {
+		            // Page has a theme
+		            if (this.$localData.settings.forceThemeOverride) {
+		              // If force is on, use the override theme
+		              theme = set_theme
+		            } else {
+		              theme = page_theme
+		            }
+		          } else {
+		            theme = set_theme
+		          }
+		        }
+				this.$root.theme = theme
+			}			
 		},
 		setTitle(component = this.resolveComponent){
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
@@ -559,7 +577,13 @@ export default {
 		}
 	},
 	watch: {
+		'isLoaded'(to, from){
+			this.setTheme()
+		},
 		'tabIsActive'(to, from) {
+			// Set app theme when we toggle to this tab
+			this.setTheme()
+
 			//Prevents tab from unloading if there's anything that might need to run in the background
 			if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
 			else if (this.forceLoad) {
@@ -583,6 +607,7 @@ export default {
 	},
 	mounted(){
 		this.setTitle()
+		this.setTheme()
 	},
 	destroyed() {
 		//Iframes sometimes decide to keep running in the background forever, so we manually clean them up
