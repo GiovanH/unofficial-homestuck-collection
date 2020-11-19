@@ -1,17 +1,25 @@
 name: "Todo Workflow"
-on: ["push"]
-jobs:
+ 
+on:
+  push:
+    branches: develop
+
   issues:
-    runs-on: "ubuntu-latest"
+    name: Create Issues from Todos
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@master"
-      - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@v2.2"
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+      - name: TODO to Issue
+        id: todo
+        uses: alstr/todo-to-issue-action@v2.0
         with:
           REPO: ${{ github.repository }}
           BEFORE: ${{ github.event.before }}
           SHA: ${{ github.sha }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LABEL: "// TODO"
+          LABEL: "// TODO:"
           COMMENT_MARKER: "//"
-        id: "todo"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
