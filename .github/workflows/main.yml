@@ -4,6 +4,7 @@ on:
   push:
     branches: develop
 
+jobs:
   issues:
     name: Create Issues from Todos
     runs-on: ubuntu-latest
