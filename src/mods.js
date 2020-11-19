@@ -4,18 +4,15 @@ import path from 'path'
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log');
+const logger = log.scope('Mods');
+
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 const modsDir = path.join(assetDir, "mods")
 const modsAssetsRoot = "assets://mods/"
 
-const VERBOSE = true
-
 var modChoices
 var routes = undefined
-
-function print(){
-    if (VERBOSE) return console.log("[Mods]", ...arguments)
-}
 
 function getAssetRoute(url){
   // If the asset url `url` should be replaced by a mod file,
@@ -28,7 +25,7 @@ function getAssetRoute(url){
   console.assert(url.startsWith("assets://"), "mods", url)
 
   const file_route = routes[url]
-  if (file_route) print(url, "to", file_route)
+  if (file_route) logger.debug(url, "to", file_route)
   return file_route
 }
 
@@ -48,16 +45,15 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function onModLoadFail(enabled_mods, e){
-  console.error("Mod load failure")
-  console.error(enabled_mods)
-  console.error(e)
+  logger.info("Mod load failure")
+  logger.debug(enabled_mods)
+  logger.debug(e)
   clearEnabledMods()
-  console.log(routes)
 }
 
 function bakeRoutes(){
     let enabled_mods = getEnabledMods()
-    print("Baking routes for", enabled_mods)
+    logger.info("Baking routes for", enabled_mods)
     let all_mod_routes = {}
     // Start with least-priority so they're overwritten
     getEnabledModsJs().reverse().forEach(js => {
@@ -90,7 +86,7 @@ function bakeRoutes(){
                 all_mod_routes[key] = local
             }
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
     })
     routes = all_mod_routes
@@ -156,6 +152,7 @@ function getModJs(mod_dir, singlefile=false){
         modjs_path = path.join(modsDir, mod_dir, "mod.js")
       }
       var mod = __non_webpack_require__(modjs_path)
+      // mod.logger = log.scope(mod_dir);
       mod._id = mod_dir
       mod._singlefile = singlefile
       return mod
@@ -168,7 +165,7 @@ function getModJs(mod_dir, singlefile=false){
         throw e1
       } else {
         // Singlefile found, other error
-        console.error("Singlefile found, other error 1")
+        logger.error("Singlefile found, other error 1")
         onModLoadFail([mod_dir], e1)
         throw e1
       }
@@ -181,11 +178,11 @@ function getModJs(mod_dir, singlefile=false){
         let e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
         if (e2_is_notfound) {
           // Singlefile not found either
-          console.error(mod_dir, "is missing required file 'mod.js'")
+          logger.error(mod_dir, "is missing required file 'mod.js'")
           onModLoadFail([mod_dir], e2)
         } else {
           // Singlefile found, other error
-          console.error("Singlefile found, other error 2")
+          logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
         } 
         // finally
@@ -222,6 +219,8 @@ function getMainMixin(){
 
   return {
     mounted() {
+      logger.info("Mounted main mixin")
+
       styles.forEach((style_link) => {
         let link = document.createElement("link")
         link.rel = "stylesheet"
@@ -229,7 +228,7 @@ function getMainMixin(){
         link.href = style_link
 
         this.$el.appendChild(link)
-        console.log(link)
+        logger.debug(link)
       })
     }
   }
@@ -289,8 +288,8 @@ if (ipcMain) {
         }
         return acc
       }, {})
-      print("Mod choices loaded")
-      print(items)
+      logger.info("Mod choices loaded")
+      logger.debug(items)
       return items
     }
 

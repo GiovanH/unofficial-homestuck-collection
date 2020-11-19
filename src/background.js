@@ -18,6 +18,8 @@ const http = require('http')
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log');
+const logger = log.scope('ElectronMain');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -191,12 +193,18 @@ function loadArchiveData(){
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
-  // Mod applications go here
-  Mods.editArchive(data)
-  
-  // This isn't strictly part of loading the archive data,
-  // but we should do this only when we reload the archive
-  Mods.bakeRoutes()
+  try {
+    Mods.editArchive(data)
+    // This isn't strictly part of loading the archive data,
+    // but we should do this only when we reload the archive
+    Mods.bakeRoutes()
+  } catch (e) {
+    // TODO: Errors should already log/handle themselves by now
+    // but we need to update the application state to react to it
+
+    // specifically $localdata can be in an invalid state
+    throw e
+  }
 
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   let gankraSearchPage = data.search.find(x => x.key == '002745')
@@ -263,7 +271,7 @@ try {
   })
 } 
 catch (error) {
-  console.log(error)
+  logger.error(error)
 
   //If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   //Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -381,7 +389,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw "Flash plugin not found"
     }
     catch(error) {
-      console.log(error)
+      logger.error(error)
       validated = false
     }
 
@@ -597,7 +605,7 @@ async function createWindow () {
     event.preventDefault()
 
     let parsedURL = Resources.resolveURL(url)
-    console.log(`new-window: ${url} ===> ${parsedURL}`)
+    logger.info(`new-window: ${url} ===> ${parsedURL}`)
 
     // If the given URL is still external, open a browser window.
     if (/http/.test(parsedURL))
@@ -651,7 +659,7 @@ else {
       try {
         await installExtension(VUEJS_DEVTOOLS)
       } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString())
+        logger.error('Vue Devtools failed to install:', e.toString())
       }
     }
     createWindow()

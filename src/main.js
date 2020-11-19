@@ -10,6 +10,10 @@ import Mods from "./mods.js"
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log');
+log.transports.console.format = '[{level}] {text}';
+const logger = log.scope('Vue');
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -91,6 +95,8 @@ Vue.mixin({
         return
       }
 
+      // TODO: Some of this could go in Resources?
+
       // Else, tests
       let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
@@ -108,7 +114,7 @@ Vue.mixin({
         shell.openExternal(Resources.resolveURL(to))
       }
       else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        console.log("UNCAUGHT ASSET?", to)
+        logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
       }
       else if (auxClick) {
@@ -375,7 +381,7 @@ Vue.mixin({
           }
         }
       }
-      else console.warn("Invalid page ID, not setting")
+      else logger.warn("Invalid page ID, not setting")
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)
@@ -434,7 +440,7 @@ Vue.mixin({
         else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp //After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        console.log(ref, this.$archive.mspa.story['006716'].timestamp)
+        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
       }
       else return false

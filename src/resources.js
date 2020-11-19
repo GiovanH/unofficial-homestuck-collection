@@ -2,13 +2,10 @@
 const path = require('path')
 const Mods = require('@/mods.js').default
 
-const VERBOSE = false
+const log = require('electron-log');
+const logger = log.scope('Resources');
 
 var assets_root = "uninitialized://"
-
-function print(){
-    if (VERBOSE) return console.log("[Resources]", ...arguments)
-}
 
 function fileIsAsset(url){
     // Given a url, *without considering the domain*, determine if this should
@@ -35,13 +32,13 @@ function fileIsAsset(url){
 
 function resolveURL(url) {
     let resource_url = getResourceURL(url)
-    print("Got resource URL", resource_url)
+    logger.info("Got resource URL", resource_url)
 
     if (resource_url.startsWith("assets://")) {
-        print("[resvUrl]", url, "to", resource_url)
+        logger.debug("[resvUrl]", url, "to", resource_url)
         resource_url = resolveAssetsProtocol(resource_url) 
     } else {
-        print("[resvUrl]", "no change for", resource_url)
+        logger.debug("[resvUrl]", "no change for", resource_url)
     }
 
     return resource_url
@@ -53,9 +50,9 @@ function resolvePath(url, root_dir) {
 
     if (resource_path.startsWith("assets://")) {
         resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
-        // print("[resPath]", url, "to", resource_path)
+        // logger.debug("[resPath]", url, "to", resource_path)
     } else {
-        // print("[resPath]", "no change for", resource_path)
+        // logger.debug("[resPath]", "no change for", resource_path)
     }
 
     return resource_path
@@ -110,9 +107,9 @@ function getResourceURL(request_url){
     }
 
     if (resource_url != request_url) {
-        print("[getResU]", request_url, "to", resource_url)
+        logger.debug("[getResU]", request_url, "to", resource_url)
     } else {
-        print("[getResU]", "no change for", request_url)
+        logger.debug("[getResU]", "no change for", request_url)
     }
     return resource_url
 }
@@ -122,7 +119,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 
     let mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
-        print("[resolvA]", asset_url, "mod to", mod_route)
+        logger.debug("[resolvA]", asset_url, "mod to", mod_route)
         if (loopcheck.includes(mod_route)) {
             loopcheck.push(mod_route)
             throw "Circular asset path!" + loopcheck
@@ -135,9 +132,9 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     let resource_url = asset_url.replace("assets://", assets_root)
 
     if (asset_url != resource_url) {
-        print("[resolvA]", asset_url, "to", resource_url)
+        logger.debug("[resolvA]", asset_url, "to", resource_url)
     } else {
-        print("[resolvA]", "no change for", resource_url)
+        logger.debug("[resolvA]", "no change for", resource_url)
     }
     return resource_url
 }
@@ -156,7 +153,7 @@ const UrlFilterMixin = {
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    print("[filterL]", "looking up", link.href)
+                    logger.debug("[filterL]", "looking up", link.href)
                     link.href = getResourceURL(link.href)
                 }
             })
