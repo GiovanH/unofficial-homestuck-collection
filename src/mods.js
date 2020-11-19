@@ -48,12 +48,16 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function onModLoadFail(enabled_mods, e){
+  console.error("Mod load failure")
+  console.error(enabled_mods)
   console.error(e)
   clearEnabledMods()
+  console.log(routes)
 }
 
 function bakeRoutes(){
     let enabled_mods = getEnabledMods()
+    print("Baking routes for", enabled_mods)
     let all_mod_routes = {}
     // Start with least-priority so they're overwritten
     getEnabledModsJs().reverse().forEach(js => {
@@ -62,14 +66,22 @@ function bakeRoutes(){
             let mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
 
             // Lower priority: Auto routes
-            if (js.treeroute) {
-              console.assert(!js._singlefile, "Single file mods cannot use treeroute!")
+            if (js.trees) {
+              console.assert(!js._singlefile, js.title, "Single file mods cannot use treeroute!")
               
-              let treeroutes = getTreeRoutes(crawlFileTree(path.join(mod_root, js.treeroute), true))
-              treeroutes.forEach((route) => {
-                  all_mod_routes["assets://" + route] =
-                    new URL(path.posix.join(js.treeroute, route), mod_root_url).href
-              })
+              for (let mod_tree in js.trees) {
+                let asset_tree = js.trees[mod_tree] 
+
+                console.assert(mod_tree.endsWith("/"), mod_tree, "Tree paths must be directories! (end with /)")
+                console.assert(asset_tree.endsWith("/"), asset_tree, "Tree paths must be directories! (end with /)")
+                console.assert(asset_tree.startsWith("assets://"), asset_tree, "Asset paths must be on the assets:// protocol!")
+
+                let treeroutes = getTreeRoutes(crawlFileTree(path.join(mod_root, mod_tree), true))
+                treeroutes.forEach(route => {
+                  all_mod_routes[asset_tree + route] =
+                    new URL(path.posix.join(mod_tree, route), mod_root_url).href
+                })
+              }
             }
             
             // Higher priority: manual routes
@@ -91,9 +103,8 @@ function bakeRoutes(){
       })
     } catch (e) {
       onModLoadFail(enabled_mods, e)
+      throw e
     }
-
-    console.log(routes)
 }
 
 const store_modlist_key = 'localData.settings.modListEnabled'
@@ -105,7 +116,10 @@ function getEnabledMods(){
 }
 
 function clearEnabledMods(){
+  // TODO: This doesn't trigger the settings.modListEnabled observer,
+  // which results in bad settings-screen side effects
   store.set(store_modlist_key, [])
+  bakeRoutes()
 }
 
 function getEnabledModsJs(){
@@ -130,27 +144,59 @@ function crawlFileTree(root, recursive=false){
   return ret
 }
 
-function getModJs(mod_dir){
+function getModJs(mod_dir, singlefile=false){
+  // Tries to load a mod from a directory
+  // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
+  // Errors passed to onModLoadFail and raised
   try {
-      let modjs_path = path.join(modsDir, mod_dir, "mod.js")
+      let modjs_path
+      if (singlefile) {
+        modjs_path = path.join(modsDir, mod_dir)
+      } else {
+        modjs_path = path.join(modsDir, mod_dir, "mod.js")
+      }
       var mod = __non_webpack_require__(modjs_path)
       mod._id = mod_dir
-      mod._singlefile = false
+      mod._singlefile = singlefile
       return mod
   } catch (e1) {
-    if (e1.code && e1.code == "MODULE_NOT_FOUND") {
-      try {
-          // Look for a single-file mod
-          let modjs_path = path.join(modsDir, mod_dir)
-          var mod = __non_webpack_require__(modjs_path)
-          mod._id = mod_dir
-          mod._singlefile = true
-          return mod
-      } catch (e2) {
-          console.error(e1)
-          throw e2
+    // elaborate error checking w/ afllback
+    let e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
+    if (singlefile) {
+      if (e1_is_notfound) {
+        // Tried singlefile, missing
+        throw e1
+      } else {
+        // Singlefile found, other error
+        console.error("Singlefile found, other error 1")
+        onModLoadFail([mod_dir], e1)
+        throw e1
       }
-    } else throw e1
+    } else if (e1_is_notfound) {
+      // Tried dir/mod.js, missing
+      try {
+        // Try to find singlefile
+        return getModJs(mod_dir, true)
+      } catch (e2) {
+        let e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
+        if (e2_is_notfound) {
+          // Singlefile not found either
+          console.error(mod_dir, "is missing required file 'mod.js'")
+          onModLoadFail([mod_dir], e2)
+        } else {
+          // Singlefile found, other error
+          console.error("Singlefile found, other error 2")
+          onModLoadFail([mod_dir], e2)
+        } 
+        // finally
+        throw e2
+
+      }
+    } else {
+      // dir/mod.js found, other error
+      onModLoadFail([mod_dir], e1)
+      throw e1
+    }
   }
 }
 
@@ -259,6 +305,7 @@ if (ipcMain) {
 
 export default {
   getEnabledModsJs,  // probably shouldn't use
+  getEnabledMods,
   getMixins,
   getMainMixin,
   editArchive,

@@ -2,9 +2,9 @@
 const path = require('path')
 const Mods = require('@/mods.js').default
 
-const VERBOSE = true
+const VERBOSE = false
 
-var assets_root
+var assets_root = "uninitialized://"
 
 function print(){
     if (VERBOSE) return console.log("[Resources]", ...arguments)
@@ -119,7 +119,6 @@ function getResourceURL(request_url){
 
 function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
-    console.assert(assets_root, "No asset root defined", asset_url)
 
     let mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {

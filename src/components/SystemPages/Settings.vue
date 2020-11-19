@@ -688,6 +688,7 @@ export default {
     .col {
         display: flex;
         flex-direction: column;
+        overflow: auto;
     }
 
     .row {
