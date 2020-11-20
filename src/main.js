@@ -455,5 +455,13 @@ window.vm = new Vue({
     }
   },
   router,
-  render: function (h) { return h(App) }
+  render: function (h) { return h(App) },
+  watch: {
+    '$localData.settings.devMode'(to, from){
+      let is_dev = to
+      log.transports.console.level = (is_dev ? "silly" : "info");
+      logger.silly("Dev-only")
+      logger.info("Everybody")
+    }
+  }
 }).$mount('#app')
