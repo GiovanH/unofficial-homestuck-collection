@@ -64,7 +64,7 @@ export default {
       if (this.routeParams.mode) {
         this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
 
-        // TODO: no.
+        // TODO: Replace this with actual argument parsing
         let story = this.routeParams.mode.charAt(0)
         if (story == "r")
           story = "ryanquest"
@@ -86,7 +86,6 @@ export default {
       return sort_fn
     },
     storyLog(story_id) {
-      // TODO: Spoiler checking
       return this.$getAllPagesInStory(story_id).filter(page_num => 
         !this.$pageIsSpoiler(page_num)
       ).map(page_num => 
