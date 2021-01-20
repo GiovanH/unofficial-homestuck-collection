@@ -49,12 +49,14 @@
 
         let page_theme;
 
-        // TODO: Sometimes the app loads before this.$refs is populated at all. 
+        // TODO: Sometimes the app loads before this.$refs is populated at all.
+        // Bam: This method tries to resolve before the new-tab event has propogated enough for the tab component to actually exist. Gotta re-examine
         let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
+
         if (tab_components) {
           this.lastPageTheme = page_theme = tab_components[0].theme
         } else {
-          console.error("No tabs! Using prev theme", this.lastPageTheme)
+          console.warn("No tabs! Using prev theme", this.lastPageTheme)
           page_theme = this.lastPageTheme
         }
 
