@@ -213,11 +213,7 @@ export default {
       newReaderValidation: true
     }
   },
-  computed: {
-    getSetting(value){
-      return $localData.settings[value];
-    }
-  },
+  computed: {},
   methods:{
     validateNewReader() {
       if (this.$localData.settings.mspaMode) {
