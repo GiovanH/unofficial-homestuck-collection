@@ -16,8 +16,12 @@
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
-          <div class="footnote" v-if="footnote">
-            <p v-html="footnote"/>
+          <div class="footnoteContainer" v-if="footnotesEnabled">
+            <div v-for="footnoteNamespace in footnoteList" v-bind:key="footnoteNamespace.name">
+              <div class="footnote" v-if="getFootnoteByNamespace(footnoteNamespace.name)" :class="footnoteNamespace.name" :style="footnoteNamespace.style">
+                <p v-html="getFootnoteByNamespace(footnoteNamespace.name)"/>
+              </div>
+            </div>
           </div>
       </div>
     </div>
@@ -120,8 +124,11 @@ export default {
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
     },
-    footnote() {
-      return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+    footnotesEnabled() {
+      return this.$archive.mspa.footnotes && this.$localData.settings.footnotes;
+    },
+    footnoteList(){
+      return this.footnotesEnabled ? this.$archive.mspa.footnotes : undefined;
     },
     footerBanner() {            
       let num = parseInt(this.pageNum)
@@ -167,7 +174,13 @@ export default {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
         else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
       }
-    }
+    },
+    getNamespace(name){
+      return this.footnoteList.find((el) => el.name === name);
+    },
+    getFootnoteByNamespace(name) {
+      return this.getNamespace(name) ? this.getNamespace(name)[this.thisPage.pageId] : undefined;
+    },
   },
   updated() {
     if (this.hscroll) this.$refs.media.scrollLeft = 0
