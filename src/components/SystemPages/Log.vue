@@ -64,7 +64,7 @@ export default {
       if (this.routeParams.mode) {
         this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
 
-        // TODO: Replace this with actual argument parsing
+        // TODO: Replace character splicing with something actually resembling parsing
         let story = this.routeParams.mode.charAt(0)
         if (story == "r")
           story = "ryanquest"

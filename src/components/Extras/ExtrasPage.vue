@@ -17,8 +17,11 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
+import Resources from '@/resources.js'
+
 export default {
   name: 'extras',
+  mixins: [ Resources.UrlFilterMixin ],
   props: [
     'tab', 'routeParams'
   ],
@@ -39,30 +42,6 @@ export default {
     thisPage() {
       return typeof this.pageData == 'string' ? this.pageData : this.pageData[this.routeParams.p].content
     },
-  },
-  methods:{
-    filterLinksAndImages(){
-      let el = this.$el.querySelector('.pageContent')
-
-      // Check if this is a comment
-      if (el.nodeType !== 8){
-        let links = el.getElementsByTagName('A')
-        for(let i = 0;i < links.length; i++) {
-          links[i].href = this.$filterURL(links[i].href)
-        }
-        
-        //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-        let images = el.getElementsByTagName('IMG')
-        for(let i = 0;i < images.length; i++) {
-          images[i].src = this.$mspaURL(images[i].src)
-          images[i].ondragstart = (e) => {
-            e.preventDefault()
-            e.dataTransfer.effectAllowed = 'copy'
-            require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-          }
-        }
-      }
-    }
   },
   updated() {
     this.filterLinksAndImages()

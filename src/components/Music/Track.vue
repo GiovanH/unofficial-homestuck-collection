@@ -178,21 +178,7 @@ export default {
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
-      let links = this.$refs.commentary.getElementsByTagName('A')
-      for(let i = 0;i < links.length; i++) {
-        links[i].href = this.$filterURL(links[i].href)
-      }
-      
-      //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-      let images = this.$refs.commentary.getElementsByTagName('IMG')
-      for(let i = 0;i < images.length; i++) {
-        images[i].src = this.$mspaURL(images[i].src)
-        images[i].ondragstart = (e) => {
-          e.preventDefault()
-          e.dataTransfer.effectAllowed = 'copy'
-          require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-        }
-      }
+      return filterLinksAndImages(this.$refs.commentary);
     }
   },
   mounted(){

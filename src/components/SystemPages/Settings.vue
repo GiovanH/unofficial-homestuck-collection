@@ -49,7 +49,8 @@
           <dd class="settingDesc">Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.</dd>
 
           <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
-          <dd class="settingDesc">It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu.</dd>
+          <dd class="settingDesc">
+          It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu, and shows a little more data for mod/style developers. Boring stuff, really.</dd>
         </dl>
       </div>
       <div class="settings enhancements">
@@ -117,8 +118,6 @@
           <dt><label><input type="checkbox" name="credits" v-model="$localData.settings['credits']" @click="toggleSetting('credits')">Show inline audio credits</label></dt>
           <dd class="settingDesc">Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database.</dd>
           
-          <dt v-if="this.$archive.mspa.footnotes"><label><input type="checkbox" name="footnotes" v-model="$localData.settings['openLogs']" @click="toggleSetting('footnotes')">Display footnotes</label></dt>
-          <dd v-if="this.$archive.mspa.footnotes" class="settingDesc">Display footnotes beneath MSPA pages.</dd>
         </dl>
       </div>
       <div class="settings retcons" v-if="!$isNewReader">
@@ -195,34 +194,60 @@
           <!-- TODO -->
         </SpoilerBox>
 
-        <div v-if="!$isNewReader" > <!-- TODO v-else> -->
-          <!-- <dt><label><input type="checkbox" name="enableControversial"
-              @click="toggleAllControversial()"
-              :checked.prop="controversialAll && !!controversialAny"
-              :indeterminate.prop="controversialAny && !controversialAll"
-            >Enable controversial content</label></dt> -->
+        <div v-if="!$isNewReader">
           <dd class="settingDesc">
           Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
 
-        <SpoilerBox kind="Controversial Content">
+          <SpoilerBox kind="Controversial Content">
 
-          <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
-          <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
+            <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
+            <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
 
-          <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label><span class="cw severe">race</span></dt>
-          <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
-          
-          <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label><span class="cw severe">body horror</span></dt>
-          <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.</a></dd>
-          
-          <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label><span class="cw severe">holocaust</span></dt> 
-          <!-- todo: something better than "holocaust" -->
-          <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
-        </SpoilerBox>
+            <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label><span class="cw severe">race</span></dt>
+            <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
+            
+            <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label><span class="cw severe">body horror</span></dt>
+            <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.</a></dd>
+            
+            <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label><span class="cw severe">holocaust</span></dt> 
+            <!-- todo: something better than "holocaust" -->
+            <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
+          </SpoilerBox>
+        </div>
+      </div> <!-- TODO: I am so angry about this. -->
+
+      <div class="settings mod">
+        <!-- TODO: IF YOU CHANGE THE MODS YOU NEED TO RELOAD -->
+        <h2>Mod Settings</h2>
+
+        <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
+        <section class="group sortable row">
+          <div class='col' title="Drag and drop!"><h2>Inactive</h2>
+            <draggable tag="ul" group="sortable-mods">
+              <li
+                v-for="option in modsDisabled"
+                :key="option.key"
+                :data-value="option.key"
+              >
+                <b>{{option.label}}</b> - {{option.desc}}
+              </li>
+            </draggable>
+          </div>
+
+          <div class='col' title="Drag and drop!"><h2>Active</h2>
+            <draggable tag="ol" group="sortable-mods" @sort="onUpdateSortable" data-setting="modListEnabled">
+              <li
+                v-for="option in modsEnabled"
+                :key="option.key"
+                :data-value="option.key"
+              >
+                <b>{{option.label}}</b> - {{option.desc}}
+              </li>
+            </draggable>
+          </div>
+        </section>
       </div>
 
-      </div>
-      
       <div class="settings system">
         <h2>System Settings</h2>
         <div class="system">
@@ -252,6 +277,8 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import draggable from "vuedraggable";
+
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -260,7 +287,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText, SpoilerBox, StoryPageLink
+    NavBanner, PageText, SpoilerBox, StoryPageLink, draggable
   },
   data: function() {
     return {
@@ -293,7 +320,8 @@ export default {
         'unpeachy',
         'pxsTavros',
         'cursedHistory'
-      ]
+      ],
+      debounce: false
     }
   },
   computed: {
@@ -304,6 +332,14 @@ export default {
     controversialAny(){
       let values = this.allControversial.map(key => this.$localData.settings[key])
       return values.some(Boolean)
+    },
+    modsEnabled() {
+      return this.$localData.settings.modListEnabled.map((key) => 
+        this.$modChoices[key])
+    },
+    modsDisabled() {
+      return Object.values(this.$modChoices).filter((choice) => 
+        !this.modsEnabled.includes(choice))
     }
   },
   methods:{
@@ -402,6 +438,21 @@ export default {
           ipcRenderer.invoke('factory-reset', answer)
         }
       })
+    },
+    onUpdateSortable: function(event){
+      let el_active = event.target;
+      let setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
+
+      let list_active = Array(...el_active.children).map((child) =>
+        child.attributes['data-value'].value
+      )
+      this.$localData.settings[setting_key] = list_active
+      
+      if(this.debounce) return
+      this.debounce = setTimeout(function() {
+          this.debounce = false 
+          ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      }.bind(this), 2000)
     }
   },
   watch: {
@@ -597,6 +648,50 @@ export default {
         }
       }
     }
+    .sortable {
+      font-weight: normal;
+      
+      ul, ol {  
+        text-align: left;
+        border: solid #c6c6c6;
+        border-width: 7px 7px 0 0;
+        padding-bottom: 6em;
+        height: 100%;
+      }
+
+      li {
+          /*list-style-position: inside;*/
+          background-color: #fff;
+          border: 1px solid rgba(0,0,0,.125);
+          margin-bottom: -1px;
+          padding: .2em;
+      }
+
+      ul li {
+          list-style: none;
+      }
+
+      ol li {
+        list-style: decimal;
+      }
+
+      .col {  
+          width: 100%;
+          margin: 0 20px;
+      }
+    }
+
+    .col {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    .row {
+      display: flex;
+
+    }
   }
+
 </style>
 

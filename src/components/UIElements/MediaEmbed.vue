@@ -1,15 +1,19 @@
 <template>
-	<img    v-if="getExt(url) === 'img'" :src='$mspaURL(url)' @dragstart="drag($event)" alt />
-	<video  v-else-if="getExt(url) ==='vid'" :src='$mspaURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
+	<img    v-if="getExt(url) === 'img'" :src='$resolveURL(url)' @dragstart="drag($event)" alt />
+	<video  v-else-if="getExt(url) ==='vid'" :src='$resolveURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
 	<iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
-	<iframe v-else-if="getExt(url) === 'html'" :src='$mspaURL(url)' width="650px" height="450px" class="sburb" seamless />
+	<!-- HTML iframes must not point to assets :c -->
+	<iframe v-else-if="getExt(url) === 'html'" 
+	:src='resolveFrameUrl(url)' 
+	width="650px" height="450px" class="sburb" seamless />
 	<div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
-	<audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$mspaURL(url)" type="audio/mpeg" />
+	<audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$resolveURL(url)" type="audio/mpeg" />
 </template>
 
 <script>
 import fs from 'fs'
 import path from 'path'
+import Resources from "@/resources.js"
 
 export default {
 	props: ['url'],
@@ -256,8 +260,8 @@ export default {
 				<\/script>
 				</head>
 				<body>
-				<object type="application/x-shockwave-flash" width="${this.flashProps.width}" height="${this.flashProps.height}" data="${this.$mspaURL(this.url)}">
-						<param name='movie' value="${this.$mspaURL(this.url)}"/>
+				<object type="application/x-shockwave-flash" width="${this.flashProps.width}" height="${this.flashProps.height}" data="${this.$resolveURL(this.url)}">
+						<param name='movie' value="${this.$resolveURL(this.url)}"/>
 						<param name='play' value="true"/>
 						<param name='loop' value="true"/>
 						<param name="quality" value="high" />
@@ -273,6 +277,9 @@ export default {
 	methods: {
 		initIframe() {
 			this.$el.contentWindow.vm = this
+		},
+		resolveFrameUrl(url){
+			return Resources.resolveURL(url)
 		},
 		invokeFromFlash(func) {
 			// getURL "about:srcdoc#link?url" ""
@@ -400,7 +407,7 @@ export default {
 			}
 		},
 		createAudioElement(id = this.flashProps.id) {
-			let audioElement = new Audio(this.$mspaURL(path.join(path.parse(this.url).dir, id + '.mp3')))
+			let audioElement = new Audio(this.$resolveURL(path.join(path.parse(this.url).dir, id + '.mp3')))
 
 			audioElement.preload = 'auto'
 
