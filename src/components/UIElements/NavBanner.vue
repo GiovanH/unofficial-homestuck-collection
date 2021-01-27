@@ -9,7 +9,7 @@
             <a v-else :href="href">{{getLabel(href)}}</a>
           </li>
         </ul>
-      <div class="candyCorn" />
+        <div v-if="gi + 1 < urls.length" class="candyCorn" />
       </template>
     </div>
   </nav>
@@ -104,7 +104,7 @@ export default {
     background: var(--nav-bg);
 
     .navList {
-      .candyCorn:not(:last-child) {
+      .candyCorn {
         content: var(--nav-candyCornContent);
       }
       ul li:not(:last-child):after {
@@ -164,7 +164,7 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      .candyCorn:not(:last-child) {
+      .candyCorn {
         margin: 0 9px;
         content: url(assets://images/candycorn.gif);
       }
