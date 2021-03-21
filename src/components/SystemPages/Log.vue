@@ -68,7 +68,7 @@ export default {
         return undefined
       }
 
-      // TODO: this is horrible. why
+      // TODO: Replace character splicing with something actually resembling parsing
       let story = this.routeParams.mode.charAt(0)
       if (story == "r")
         story = "ryanquest"
@@ -76,11 +76,15 @@ export default {
       return story
     },
     log() {
+      // depends on
+      // this.$localData.settings.newReader;
+      console.log("Recalculating story log")
+
       // A sorted list of log objects
       if (!this.storyId) 
         return undefined
 
-      return this.storyLogRaw(this.storyId).sort(this.sorter)
+      return this.storyLogRaw(this.storyId).filter(page_num => !this.$pageIsSpoiler(page_num)).sort(this.sorter)
     },
     reverseLink(){
       return /^\d_asc$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_asc`
@@ -106,18 +110,15 @@ export default {
       // The sorter function that .sort() keys
       let default_="asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
-    storyLog(story_id) {
-      return this.$getAllPagesInStory(story_id).filter(page_num => 
-        !this.$pageIsSpoiler(page_num)
-      ).map(page_num => 
-        this.getLogEntry(story_id, page_num)
-      ).sort(this.getSorter())
     },
     storyLogRaw() {
       // The unsorted story log
+
+      // Vue should really be able to keep track of this, but it just can't. 
+      // TODO: Reset this function when story data gets changed
+      
       return this.memoized(story_id => {
-        // aaaah this is such a hack
-        console.log("Recalculating story log :c")
+        console.log("Recalculating raw story log (BAD)")
 
         return this.$getAllPagesInStory(story_id).filter(page_num => 
           !this.$pageIsSpoiler(page_num)
