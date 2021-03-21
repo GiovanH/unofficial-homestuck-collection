@@ -106,6 +106,12 @@ export default {
       // The sorter function that .sort() keys
       let default_="asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
+    storyLog(story_id) {
+      return this.$getAllPagesInStory(story_id).filter(page_num => 
+        !this.$pageIsSpoiler(page_num)
+      ).map(page_num => 
+        this.getLogEntry(story_id, page_num)
+      ).sort(this.getSorter())
     },
     storyLogRaw() {
       // The unsorted story log

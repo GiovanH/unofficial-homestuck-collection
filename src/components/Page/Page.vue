@@ -78,7 +78,7 @@ export default {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
             let img = new Image()
-            img.src = this.$mspaURL(media)
+            img.src = this.$resolveURL(media)
             this.preload.push(img)
           }
         })
@@ -121,7 +121,7 @@ export default {
       return this.thisPage.flag.includes('FIREFLY')
     },
     footnote() {
-      return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+      return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
     },
     footerBanner() {            
       let num = parseInt(this.pageNum)

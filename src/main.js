@@ -5,8 +5,14 @@ import localData from './store/localData'
 import fs from 'fs'
 import path from 'path'
 
+import Mods from "./mods.js"
+
 const Store = require('electron-store')
 const store = new Store()
+
+const log = require('electron-log');
+log.transports.console.format = '[{level}] {text}';
+const logger = log.scope('Vue');
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -26,6 +32,14 @@ Vue.use(localData, {
 
 const {shell, ipcRenderer} = require('electron')
 let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
+
+const Resources = require("@/resources.js")
+Resources.init({
+  assets_root: `http://127.0.0.1:${port}/`
+})
+
+// Mixin mod mixins
+Mods.getMixins().forEach((m) => Vue.mixin(m))
 
 Number.prototype.pad = function(size) {
     if (isNaN(this))
@@ -49,10 +63,12 @@ Vue.mixin({
     $archive: () => archive,
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
-    }
+    },
+    $modChoices: () => Mods.modChoices
   },
   methods: {
     $resolvePath(to){
+      // Resolves a logical path within the vue router
       let route = this.$router.resolve(to.toLowerCase()).route
       let resolvedUrl = route.path
       let base = route.path.slice(1).split("/")[0]
@@ -72,23 +88,38 @@ Vue.mixin({
       }
       return resolvedUrl
     },
+    $openModal(to) {
+        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
+    },
     $openLink(url, auxClick = false) {
       let urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+
+      if (urlObject.protocol == "assets:") {
+        this.$openModal(Resources.resolveAssetsProtocol(url))
+        return
+      }
+
+      // TODO: Some of this could go in Resources?
+
+      // Else, tests
       let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
+        // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
         }
         else shell.openExternal(urlObject.href)
       }
       else if (/\.(html|pdf)$/i.test(to)){
-        shell.openExternal(this.$mspaURL(to))
+        // TODO: Not sure resolveURL is needed here? This should always be external?
+        shell.openExternal(Resources.resolveURL(to))
       }
       else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
+        logger.error("UNCAUGHT ASSET?", to)
+        this.$openModal(to)
       }
       else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
@@ -97,30 +128,16 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
+    // TODO: resolveURL is perhaps a bad name because this doesn't resolve assets:// urls yet?
+    // that's not handled until Resources.resolveAssetsProtocol or Resources.resolveURL() (which does both)
+    $resolveURL: Resources.getResourceURL,
+    $filterURL(u) {return this.$resolveURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       let url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
-    $filterURL(url){
-      return url
-        .replace(/^.+:\/\/(www\.|cdn\.)?mspaintadventures\.com\/?((scratch|trickster|ACT6ACT5ACT1x2CO|ACT6ACT6)\.php)?/, "")
-        .replace(/^(.+:\/\/127.0.0.1:\d*\/|.+:\/\/localhost:\d*\/|app:\/\/\.|)/, "")
-        .replace(/^extras\/(ps\d{6})\.html/, "/unlock\/$1")
-        // .replace(/\.html$/, "")
-        .replace(/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1")
-        .replace(/storyfiles\/hs2\/(waywardvagabond\/\w+\/)$/, "/$1")
-        .replace(/\?s=(\w*)&p=(\w*)/, "/mspa/$2")
-        .replace(/\?s=(\w*)/, "/mspa/$1")
-        .replace(/\/Sfiles/, "")
-        .replace(/%20/g, " ")
-    },
     $mspaFileStream(url) {
-      return path.join(this.$localData.assetDir, this.$filterURL(url))
-    },
-    $mspaURL(url) {
-      let resource = this.$filterURL(url)
-      if (resource.charAt(0) == '/') resource = resource.slice(1)
-      return this.$localhost + resource
+      return Resources.resolvePath(url, this.$localData.assetDir)
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber
@@ -368,7 +385,7 @@ Vue.mixin({
           }
         }
       }
-      else console.warn("Invalid page ID, not setting")
+      else logger.warn("Invalid page ID, not setting")
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)
@@ -427,7 +444,7 @@ Vue.mixin({
         else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp //After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        console.log(ref, this.$archive.mspa.story['006716'].timestamp)
+        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
       }
       else return false
@@ -442,5 +459,13 @@ window.vm = new Vue({
     }
   },
   router,
-  render: function (h) { return h(App) }
+  render: function (h) { return h(App) },
+  watch: {
+    '$localData.settings.devMode'(to, from){
+      let is_dev = to
+      log.transports.console.level = (is_dev ? "silly" : "info");
+      logger.silly("Dev-only")
+      logger.info("Everybody")
+    }
+  }
 }).$mount('#app')

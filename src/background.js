@@ -6,6 +6,9 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
 import FlexSearch from 'flexsearch'
 
+import Resources from "./resources.js"
+import Mods from "./mods.js"
+
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -15,6 +18,8 @@ const http = require('http')
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log');
+const logger = log.scope('ElectronMain');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -28,7 +33,12 @@ app.disableHardwareAcceleration()
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', privileges: { standard: true } }
+  { scheme: 'assets', privileges: { 
+    standard: true,
+    secure: true,
+    supportFetchAPI: true,
+    stream: true
+  }}
 ])
 
 // zoom functions
@@ -44,15 +54,136 @@ function zoomOut() {
 }
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+
 var archive
 var port
-var menuTemplate 
-// Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-try {
+
+//Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
+var menuTemplate = [
+  {
+    label: 'File',
+    submenu: [
+      { role: 'quit' }
+    ]
+  },
+  {
+    role: 'editMenu'
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      {
+        label: 'Zoom In',
+        accelerator: 'CmdOrCtrl+=',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        accelerator: 'CmdOrCtrl+-',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Zoom In',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numadd',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numsub',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Reset Zoom',
+        accelerator: 'CmdOrCtrl+0',
+        click: () => {if (win) win.webContents.send('ZOOM_RESET')}
+      },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  {
+    label: 'Tabs',
+    submenu: [
+      {
+        label: 'Go back one page',
+        accelerator: 'Alt+Left',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
+      },
+      {
+        label: 'Go forward one page',
+        accelerator: 'Alt+Right',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
+      },
+      { type: 'separator' },
+      {
+        label: 'New Tab',
+        accelerator: 'CmdOrCtrl+T',
+        click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+      },
+      {
+        label: 'Close Tab',
+        accelerator: 'CmdOrCtrl+W',
+        click: () => {if (win) win.webContents.send('TABS_CLOSE')}
+      },
+      { type: 'separator' },
+      {
+        label: 'Next Tab',
+        accelerator: 'CmdOrCtrl+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
+      },
+      {
+        label: 'Previous Tab',
+        accelerator: 'CmdOrCtrl+Shift+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
+      },
+      { type: 'separator' },
+      {
+        label: 'Duplicate Tab',
+        accelerator: 'CmdOrCtrl+Shift+D',
+        click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
+      },
+      {
+        label: 'Restore Closed Tab',
+        accelerator: 'CmdOrCtrl+Shift+T',
+        click: () => {if (win) win.webContents.send('TABS_RESTORE')}
+      }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      {
+        label: 'Open Jump Bar',
+        accelerator: 'CmdOrCtrl+L',
+        click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
+      },
+      {
+        label: 'Find in page',
+        accelerator: 'CmdOrCtrl+F',
+        click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
+      },
+      { role: 'minimize' },
+    ]
+  }
+]
+
+function loadArchiveData(){
+  // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
+  // This returns an `archive` object, and does not modify the global archive directly. 
   if (!assetDir) throw "No reference to asset directory"
 
   //Grab and parse all data jsons
-  archive = {
+  let data = {
     ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
     mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
     log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
@@ -62,18 +193,35 @@ try {
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
-  
+  try {
+    Mods.editArchive(data)
+    // This isn't strictly part of loading the archive data,
+    // but we should do this only when we reload the archive
+    Mods.bakeRoutes()
+  } catch (e) {
+    // TODO: Errors should already log/handle themselves by now
+    // but we need to update the application state to react to it
+
+    // specifically $localdata can be in an invalid state
+    throw e
+  }
+
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  let gankraSearchPage = archive.search.find(x => x.key == '002745')
+  let gankraSearchPage = data.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
-  archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+  data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
 
-  archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+  data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
 
-  archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+  data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
+  return data
+}
 
+try {
+  archive = loadArchiveData()
+  
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
@@ -105,125 +253,6 @@ try {
   })
   chapterIndex.add(archive.search)
   
-  //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
-  menuTemplate = [
-    {
-      label: 'File',
-      submenu: [
-        { role: 'quit' }
-      ]
-    },
-    {
-      role: 'editMenu'
-    },
-    // { role: 'viewMenu' }
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        {
-          label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+=',
-          click: zoomIn
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-',
-          click: zoomOut
-        },
-        {
-          label: 'Zoom In',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numadd',
-          click: zoomIn
-        },
-        {
-          label: 'Zoom Out',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numsub',
-          click: zoomOut
-        },
-        {
-          label: 'Reset Zoom',
-          accelerator: 'CmdOrCtrl+0',
-          click: () => {if (win) win.webContents.send('ZOOM_RESET')}
-        },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
-    {
-      label: 'Tabs',
-      submenu: [
-        {
-          label: 'Go back one page',
-          accelerator: 'Alt+Left',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
-        },
-        {
-          label: 'Go forward one page',
-          accelerator: 'Alt+Right',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
-        },
-        { type: 'separator' },
-        {
-          label: 'New Tab',
-          accelerator: 'CmdOrCtrl+T',
-          click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
-        },
-        {
-          label: 'Close Tab',
-          accelerator: 'CmdOrCtrl+W',
-          click: () => {if (win) win.webContents.send('TABS_CLOSE')}
-        },
-        { type: 'separator' },
-        {
-          label: 'Next Tab',
-          accelerator: 'CmdOrCtrl+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
-        },
-        {
-          label: 'Previous Tab',
-          accelerator: 'CmdOrCtrl+Shift+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
-        },
-        { type: 'separator' },
-        {
-          label: 'Duplicate Tab',
-          accelerator: 'CmdOrCtrl+Shift+D',
-          click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
-        },
-        {
-          label: 'Restore Closed Tab',
-          accelerator: 'CmdOrCtrl+Shift+T',
-          click: () => {if (win) win.webContents.send('TABS_RESTORE')}
-        }
-      ]
-    },
-    // { role: 'windowMenu' }
-    {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Open Jump Bar',
-          accelerator: 'CmdOrCtrl+L',
-          click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
-        },
-        {
-          label: 'Find in page',
-          accelerator: 'CmdOrCtrl+F',
-          click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
-        },
-        { role: 'minimize' },
-      ]
-    }
-  ]
-  
   //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
     return handler(request, response, {
@@ -234,10 +263,15 @@ try {
   server.listen(0, '127.0.0.1', (error) => {
     if (error) throw error
     port = server.address().port
+  
+    // Initialize Resources
+    Resources.init({
+      assets_root: `http://127.0.0.1:${port}/`
+    })
   })
 } 
 catch (error) {
-  console.log(error)
+  logger.error(error)
 
   //If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   //Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -291,9 +325,15 @@ ipcMain.on('STARTUP_REQUEST', (event) => {
   event.returnValue = { port, archive }
 })
 
+ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+  archive = loadArchiveData()
+  win.webContents.send('ARCHIVE_UPDATE', archive)
+})
+
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()
 })
+
 ipcMain.handle('win-maximize', async (event) => {
   if (win.isFullScreen()){
     win.setFullScreen(false)
@@ -331,15 +371,8 @@ ipcMain.handle('locate-assets', async (event, payload) => {
   if (newPath) {
     let validated = true
     try {
-      let testAssets = {
-        ...JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/version.json'), 'utf8')),
-        mspa : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/mspa.json'), 'utf8')),
-        log : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/log.json'), 'utf8')),
-        social : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/social.json'), 'utf8')),
-        music : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/music.json'), 'utf8')),
-        comics : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/comics.json'), 'utf8')),
-        search: JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/search.json'), 'utf8'))
-      }
+      // If there's an issue with the archive data, this should fail.
+      loadArchiveData()
 
       let flashPlugin
       switch (process.platform) {
@@ -356,7 +389,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw "Flash plugin not found"
     }
     catch(error) {
-      console.log(error)
+      logger.error(error)
       validated = false
     }
 
@@ -502,30 +535,6 @@ ipcMain.on('ondragstart', (event, filePath) => {
 })
 
 //Define which URL schemes to be intercepted
-const filter = {
-  urls: [
-    '*://*.mspaintadventures.com/*', 
-    'assets://*/*',
-    "http://www.turner.com/planet/mp3/cp_close.mp3", 
-    "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
-    "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
-    "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
-    "*://*.sweetcred.com/*",
-  ]
-}
-//Rules for transforming intercepted URLS
-function filterURL(url) {
-  return url
-    .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") //Linked from a few flashes
-    .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") //Covers for 99% of flashes that link to other pages
-    .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") //Covers for story links without page numbers
-    .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") //Link from CD rack flash
-    .replace(/http:\/\/www\.sweetcred\.com/, `http://127.0.0.1:${port}/archive/sweetcred`)
-    .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `127.0.0.1:${port}/storyfiles/hs2/00338`) // phat beat machine
-    .replace(/www\.timelesschaos\.com\/transferFiles/, `127.0.0.1:${port}/storyfiles/hs2/03318` ) // return to core - 618heircut.mp3
-    .replace(/assets\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect resource requests to asset folder
-    .replace(/http\:\/\/((www|cdn)\.)?mspaintadventures\.com/, `http://127.0.0.1:${port}`) //Complete, should ideally never happen and probably won't work properly if it does
-}
 
 async function createWindow () {
   // Create the browser window.
@@ -559,11 +568,34 @@ async function createWindow () {
     event.preventDefault()
   })
   
-  //This should only ever trigger from flashes requesting resources or page redirects
-  win.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-    console.log(`onBeforeRequest: ${details.url} ===> ${filterURL(details.url)}`)
-    if (details.resourceType =="subFrame") win.webContents.send('TABS_PUSH_URL', filterURL(details.url))
-		else callback({redirectURL: filterURL(details.url)})
+  // Resolve asset URLs
+  
+  // You can only have one of these, so all behavior has to go in here.
+  // Yes, it's a pain.
+  win.webContents.session.webRequest.onBeforeRequest({
+    urls: [
+      // 'assets://*/*',  // yes, both
+
+      '*://*.mspaintadventures.com/*', 
+      "assets://*/*",  // yes, both
+      "http://www.turner.com/planet/mp3/cp_close.mp3", 
+      "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
+      "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
+      "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://*.sweetcred.com/*"
+    ]
+  }, (details, callback) => {
+    if (details.url.startsWith("assets://")) {
+      let redirectURL = Resources.resolveAssetsProtocol(details.url)
+      callback({redirectURL})
+    } else {
+      let destination_url = Resources.resolveURL(details.url)
+      if (details.resourceType =="subFrame")
+        win.webContents.send('TABS_PUSH_URL', destination_url)
+      else callback({
+        redirectURL: destination_url
+      })
+    }
 	})
 
   //It's important that only one window is ever active at a time
@@ -571,10 +603,15 @@ async function createWindow () {
   //Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
-    let parsedURL = filterURL(url)
-    console.log(`new-window: ${url} ===> ${parsedURL}`)
-    if (/http/.test(parsedURL)) shell.openExternal(url) //if filterURL didnt work, open in the browser just to be safe
-    else win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+
+    let parsedURL = Resources.resolveURL(url)
+    logger.info(`new-window: ${url} ===> ${parsedURL}`)
+
+    // If the given URL is still external, open a browser window.
+    if (/http/.test(parsedURL))
+      shell.openExternal(url) 
+    else
+      win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
   })
 
 
@@ -622,7 +659,7 @@ else {
       try {
         await installExtension(VUEJS_DEVTOOLS)
       } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString())
+        logger.error('Vue Devtools failed to install:', e.toString())
       }
     }
     createWindow()
