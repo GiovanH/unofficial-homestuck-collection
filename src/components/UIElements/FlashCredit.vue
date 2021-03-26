@@ -23,7 +23,8 @@ export default {
   },
   computed: {
     credit() {
-      //Manual exception to prevent appearance on A6A6 introduction
+      // Manual exception to prevent appearance on A6A6 introduction
+      // TODO: why does this get special treatment?
       if (this.pageId in this.$archive.music.flashes && this.pageId != '008143') {
         if (this.$localData.settings.bolin && 'bolin' in this.$archive.music.flashes[this.pageId]) return this.$archive.music.flashes[this.pageId].bolin
         else return this.$archive.music.flashes[this.pageId].tracks
@@ -100,6 +101,11 @@ export default {
   border: solid 2px #ff9000;
   transition: opacity 1s;
 }
+
+.modalContainer .creditWrapper {
+  margin: 1em;
+}
+
 .frame {
   display: flex;
   text-decoration: none;

@@ -525,7 +525,6 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   }
 })
 
-
 //Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {
   event.sender.startDrag({
@@ -533,8 +532,6 @@ ipcMain.on('ondragstart', (event, filePath) => {
     icon: `${__static}/img/dragSmall.png`
   })
 })
-
-//Define which URL schemes to be intercepted
 
 async function createWindow () {
   // Create the browser window.
@@ -614,7 +611,6 @@ async function createWindow () {
       win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
   })
 
-
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -642,10 +638,10 @@ app.on('activate', () => {
   }
 })
 
-
 if (!gotTheLock) {
   app.quit()
 } 
+
 else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
