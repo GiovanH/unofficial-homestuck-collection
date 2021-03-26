@@ -12,7 +12,7 @@ var assets_root = "uninitialized://"
 // Pure
 function fileIsAsset(url){
     // Given a url, *without considering the domain*, determine if this should
-    // route to an asset of some sort. 
+    // route to an asset of some sort. (bool)
 
     // If this function is false, url is either an internal vue link
     // or an external web page.
@@ -23,7 +23,7 @@ function fileIsAsset(url){
 
     // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
-    let has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(url)
+    let has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov)$/i.test(url)
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
 
@@ -32,29 +32,30 @@ function fileIsAsset(url){
 
 // NOT PURE
 function resolveURL(url) {
+    // The main logic
     let resource_url = getResourceURL(url)
-    // logger.debug("Got resource URL", resource_url)
+    logger.debug("Got resource URL", resource_url)
 
     if (resource_url.startsWith("assets://")) {
-        // logger.debug("[resvUrl]", url, "to", resource_url)
+        logger.debug("[resvUrl]", url, "to", resource_url, "to", resolveAssetsProtocol(resource_url))
         resource_url = resolveAssetsProtocol(resource_url) 
     } else {
-        // logger.debug("[resvUrl]", "no change for", resource_url)
+        logger.debug("[resvUrl]", "no change for", resource_url)
     }
 
     return resource_url
 }
 
-// Pure
+// Pure(?)
 function resolvePath(url, root_dir) {
-    // Like resolveURL, but returns an os-path and not a file
+    // Like resolveURL, but returns an os-path and not a file URL
     let resource_path = getResourceURL(url)
 
     if (resource_path.startsWith("assets://")) {
         resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
-        // // logger.debug("[resPath]", url, "to", resource_path)
+        // logger.debug("[resPath]", url, "to", resource_path)
     } else {
-        // // logger.debug("[resPath]", "no change for", resource_path)
+        // logger.debug("[resPath]", "no change for", resource_path)
     }
 
     return resource_path
@@ -73,8 +74,11 @@ function getResourceURL(request_url){
     // Things this should not get:
     // assets://
 
-    // coerce logical vue resources to app://
-    // // do not actually
+    // Examples
+    // /storyfiles/hs2/00008.gif to assets://storyfiles/hs2/00008.gif
+    // /images/mspalogo_mspa.png to assets://images/mspalogo_mspa.png
+
+
     let resource_url = request_url
     //     .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:8080\//, "app://") 
     //     .replace(/^http(s{0,1}):\/\/localhost:8080\//, "app://") 
@@ -112,20 +116,25 @@ function getResourceURL(request_url){
     }
 
     if (resource_url != request_url) {
-        // logger.debug("[getResU]", request_url, "to", resource_url)
+        logger.debug("[getResU]", request_url, "to", resource_url)
     } else {
-        // logger.debug("[getResU]", "no change for", request_url)
+        logger.debug("[getResU]", "no change for", request_url, fileIsAsset(resource_url))
     }
     return resource_url
 }
 
 // NOT PURE
 function resolveAssetsProtocol(asset_url, loopcheck=[]) {
+    // Resolves assets:// urls to real urls on the localhost:{port} server
+
+    // Examples
+    // assets://images/candycorn.gif to http://127.0.0.1:21780/images/candycorn.gif
+
     console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
     let mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
-        // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
+        logger.debug("[resolvA]", asset_url, "mod to", mod_route)
         if (loopcheck.includes(mod_route)) {
             loopcheck.push(mod_route)
             throw "Circular asset path!" + loopcheck
@@ -140,7 +149,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     if (asset_url != resource_url) {
         // logger.debug("[resolvA]", asset_url, "to", resource_url)
     } else {
-        // logger.debug("[resolvA]", "no change for", resource_url)
+        logger.debug("[resolvA]", "no change for", resource_url)
     }
     return resource_url
 }
@@ -153,23 +162,29 @@ const UrlFilterMixin = {
                 el = this.$el.querySelector('.pageContent')
 
             // Check if this is a comment
-            if (el.nodeType === 8)
-                return
+            if (el.nodeType === 8) return
             
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    // logger.debug("[filterL]", "looking up", link.href)
-                    link.href = getResourceURL(link.href)
+                    pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
+                    logger.debug("[filterL]", "looking up", pseudLinkHref)
+                    link.href = getResourceURL(pseudLinkHref)
                 }
             })
 
             // Normally, this process would be handled by the MediaEmbed component. 
             // Gotta get the behaviour into all them images somehow!
+
+            // Internal links in the renderer already have the localhost:8080 prefix, which is different
+            // than how the other resources are handled. 
             let media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
-            for (let i = 0;i < media.length; i++) {
-                media[i].src = resolveURL(media[i].src)
+            for (let i = 0; i < media.length; i++) {
+                pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
+                logger.debug("[fltrSrc]", "looking up", pseudMediaSrc)
+                media[i].src = resolveURL(pseudMediaSrc)
+
                 if (media[i].tagName == 'IMG') {  
                     media[i].ondragstart = (e) => {
                         e.preventDefault()
