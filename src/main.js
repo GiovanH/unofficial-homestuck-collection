@@ -31,7 +31,7 @@ Vue.use(localData, {
 })
 
 const {shell, ipcRenderer} = require('electron')
-let { port } = ipcRenderer.sendSync('STARTUP_REQUEST')
+const port = ipcRenderer.sendSync('STARTUP_GET_PORT')
 
 const Resources = require("@/resources.js")
 Resources.init({
@@ -64,7 +64,7 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => Mods.modChoices
+    $modChoices: () => Mods.modChoices // This is the list of installed mods, it's okay to bake this
   },
   methods: {
     $resolvePath(to){
@@ -473,4 +473,6 @@ window.vm = new Vue({
   }
 }).$mount('#app')
 
-ipcRenderer.send("RELOAD_ARCHIVE_DATA") // Root must exist
+// Ask for a fresh copy of the archive
+// Root must exist to receive it, so this comes after vm
+ipcRenderer.send("RELOAD_ARCHIVE_DATA") 

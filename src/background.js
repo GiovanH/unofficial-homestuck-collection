@@ -321,12 +321,20 @@ finally {
 }
 
 //The renderer process requests the chosen port on startup, which we're happy to oblige
-ipcMain.on('STARTUP_REQUEST', (event) => {
-  event.returnValue = { port }
+ipcMain.on('STARTUP_GET_PORT', (event) => {
+  event.returnValue = port
 })
 
+// Speed hack, try to preload the first copy of the archive
+var first_archive = loadArchiveData();
+
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
-  win.webContents.send('ARCHIVE_UPDATE', loadArchiveData())
+  let archive;
+  if (first_archive) {
+    archive = first_archive
+    first_archive = undefined;
+  } else archive = loadArchiveData()
+  win.webContents.send('ARCHIVE_UPDATE', archive)
 })
 
 ipcMain.handle('win-minimize', async (event) => {
