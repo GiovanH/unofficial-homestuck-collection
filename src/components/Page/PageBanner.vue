@@ -21,6 +21,7 @@ export default {
             tooltipActive: false,
         }
     },
+    // TODO: Banner properties should be set in data, not code
     computed: {
         banner() {
             let result = undefined
