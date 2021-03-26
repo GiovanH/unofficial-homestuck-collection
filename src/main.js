@@ -32,7 +32,6 @@ Vue.use(localData, {
 
 const {shell, ipcRenderer} = require('electron')
 let { port } = ipcRenderer.sendSync('STARTUP_REQUEST')
-ipcRenderer.send("RELOAD_ARCHIVE_DATA")
 
 const Resources = require("@/resources.js")
 Resources.init({
@@ -473,3 +472,5 @@ window.vm = new Vue({
     }
   }
 }).$mount('#app')
+
+ipcRenderer.send("RELOAD_ARCHIVE_DATA") // Root must exist
