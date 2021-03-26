@@ -15,6 +15,7 @@ import fs from 'fs'
 import path from 'path'
 import Resources from "@/resources.js"
 
+// TODO: All these flash properties and timings should be stored as data
 export default {
 	props: ['url'],
 	data() {
@@ -235,7 +236,6 @@ export default {
 				return {id: filename, width: size.x + "px", height: size.y + "px", bgcolor: bgcolor}
 		},
 		flashSrc() {
-			// TODO: address this
 			return `
 				<html>
 				<head>
