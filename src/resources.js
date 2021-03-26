@@ -21,17 +21,13 @@ function fileIsAsset(url){
     let is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
     if (is_bundled) return false
 
-    // This is definitely wrong; see /sbahj/ urls
-    // if (url.charAt(0) == "/") {
-    //     return true
-        // i hate this a lot? this is not how it should work
-    // }
+    // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
     let has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(url)
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
 
-    return has_file_ext ||  /^archive\//i.test(url) // maybe not needed now?
+    return has_file_ext || /^archive\//i.test(url) || /\/^archive\//i.test(url) // maybe not needed now?
 }
 
 // NOT PURE
