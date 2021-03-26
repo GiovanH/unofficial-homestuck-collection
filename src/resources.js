@@ -95,8 +95,9 @@ function getResourceURL(request_url){
         resource_url = resource_url
             .replace(/^\//, "assets://")
             .replace(/^\\/, "assets://")
+            .replace(/\/Sfiles/, "")
             .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:[0-9]+\//, "assets://")
-            .replace(/^http(s{0,1}):\/\/localhost:[0-9]+\//, "assets://")  // if this accidently catches localhost:8080 we're boned
+            .replace(/^http(s{0,1}):\/\/localhost:[0-9]+\//, "assets://")  // TODO if this accidently catches localhost:8080 we're boned
             
 
         // if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))

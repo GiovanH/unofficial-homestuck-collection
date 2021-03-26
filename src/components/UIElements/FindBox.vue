@@ -85,7 +85,7 @@ export default {
         "iframes": true,
 
         "exclude": [
-          ".findBox *"
+          ".findBox"
         ]
       }
       // Remove previous marked elements and mark

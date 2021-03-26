@@ -235,6 +235,7 @@ export default {
 				return {id: filename, width: size.x + "px", height: size.y + "px", bgcolor: bgcolor}
 		},
 		flashSrc() {
+			// TODO: address this
 			return `
 				<html>
 				<head>
@@ -264,7 +265,7 @@ export default {
 						<param name='movie' value="${this.$resolveURL(this.url)}"/>
 						<param name='play' value="true"/>
 						<param name='loop' value="true"/>
-						<param name="quality" value="high" />
+						<param name='quality' value="high" />
 						<param name='bgcolor' value="${this.flashProps.bgcolor}"/>
 						<param name='devicefont' value="false"/>
 						<param name="allowScriptAccess" value="always" />
