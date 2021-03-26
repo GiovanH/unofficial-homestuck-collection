@@ -451,6 +451,7 @@ export default {
       if(this.debounce) return
       this.debounce = setTimeout(function() {
           this.debounce = false 
+          this.memoizedClearAll();
           ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       }.bind(this), 2000)
     }

@@ -115,7 +115,7 @@
       })      
       
       electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
-        this.archive = archive
+        this.$root.archive = archive
       })
 
       document.addEventListener('dragover', event => event.preventDefault())

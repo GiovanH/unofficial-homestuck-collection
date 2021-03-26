@@ -31,7 +31,8 @@ Vue.use(localData, {
 })
 
 const {shell, ipcRenderer} = require('electron')
-let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
+let { port } = ipcRenderer.sendSync('STARTUP_REQUEST')
+ipcRenderer.send("RELOAD_ARCHIVE_DATA")
 
 const Resources = require("@/resources.js")
 Resources.init({
@@ -60,7 +61,7 @@ Vue.mixin({
   },
   computed: {
     $localhost: () => `http://127.0.0.1:${port}/`,
-    $archive: () => archive,
+    $archive() {return this.$root.archive},
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
@@ -457,7 +458,8 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default'
+      theme: 'default',
+      archive: undefined
     }
   },
   router,

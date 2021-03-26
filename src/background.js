@@ -55,8 +55,8 @@ function zoomOut() {
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 
-var archive
 var port
+var chapterIndex;
 
 //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
 var menuTemplate = [
@@ -216,11 +216,21 @@ function loadArchiveData(){
 
   data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
+  //Set up search index
+  chapterIndex = new FlexSearch({
+    doc: {
+      id: 'key',
+      field: 'content',
+      tag: 'chapter'
+    }
+  })
+  chapterIndex.add(data.search)
+
   return data
 }
 
+
 try {
-  archive = loadArchiveData()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -242,16 +252,6 @@ try {
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
   else throw `Flash plugin not located at ${flashPath}`
-
-  //Set up search index
-  var chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: 'content',
-      tag: 'chapter'
-    }
-  })
-  chapterIndex.add(archive.search)
   
   //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
@@ -322,12 +322,11 @@ finally {
 
 //The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_REQUEST', (event) => {
-  event.returnValue = { port, archive }
+  event.returnValue = { port }
 })
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
-  archive = loadArchiveData()
-  win.webContents.send('ARCHIVE_UPDATE', archive)
+  win.webContents.send('ARCHIVE_UPDATE', loadArchiveData())
 })
 
 ipcMain.handle('win-minimize', async (event) => {
@@ -516,6 +515,8 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
+  // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
+  // If we must do this we should check for a steam installation, eat least
   const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
 
   if (app.getApplicationNameForProtocol(steamUrl)) {
