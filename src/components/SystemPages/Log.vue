@@ -114,12 +114,14 @@ export default {
     },
     storyLogRaw() {
       // The unsorted story log
+      this.$archive;
 
+      // console.log("Recalculating raw story log memo")
       // Vue should really be able to keep track of this, but it just can't. 
       // TODO: Reset this function when story data gets changed
       
       return this.memoized(story_id => {
-        console.log("Recalculating raw story log (BAD)")
+        // console.log("Recalculating raw story log (BAD)")
 
         return this.$getAllPagesInStory(story_id).map(page_num => 
           this.getLogEntry(story_id, page_num)
