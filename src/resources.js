@@ -5,8 +5,11 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
+// const Memoization = require('@/memoization.js').default
+
 var assets_root = "uninitialized://"
 
+// Pure
 function fileIsAsset(url){
     // Given a url, *without considering the domain*, determine if this should
     // route to an asset of some sort. 
@@ -31,34 +34,37 @@ function fileIsAsset(url){
     return has_file_ext ||  /^archive\//i.test(url) // maybe not needed now?
 }
 
+// NOT PURE
 function resolveURL(url) {
     let resource_url = getResourceURL(url)
-    logger.info("Got resource URL", resource_url)
+    // logger.debug("Got resource URL", resource_url)
 
     if (resource_url.startsWith("assets://")) {
-        logger.debug("[resvUrl]", url, "to", resource_url)
+        // logger.debug("[resvUrl]", url, "to", resource_url)
         resource_url = resolveAssetsProtocol(resource_url) 
     } else {
-        logger.debug("[resvUrl]", "no change for", resource_url)
+        // logger.debug("[resvUrl]", "no change for", resource_url)
     }
 
     return resource_url
 }
 
+// Pure
 function resolvePath(url, root_dir) {
     // Like resolveURL, but returns an os-path and not a file
     let resource_path = getResourceURL(url)
 
     if (resource_path.startsWith("assets://")) {
         resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
-        // logger.debug("[resPath]", url, "to", resource_path)
+        // // logger.debug("[resPath]", url, "to", resource_path)
     } else {
-        // logger.debug("[resPath]", "no change for", resource_path)
+        // // logger.debug("[resPath]", "no change for", resource_path)
     }
 
     return resource_path
 }
 
+// Pure
 function getResourceURL(request_url){
     // Transforms URLS into logical resource paths, usually assets://
     //
@@ -110,19 +116,20 @@ function getResourceURL(request_url){
     }
 
     if (resource_url != request_url) {
-        logger.debug("[getResU]", request_url, "to", resource_url)
+        // logger.debug("[getResU]", request_url, "to", resource_url)
     } else {
-        logger.debug("[getResU]", "no change for", request_url)
+        // logger.debug("[getResU]", "no change for", request_url)
     }
     return resource_url
 }
 
+// NOT PURE
 function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
     let mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
-        logger.debug("[resolvA]", asset_url, "mod to", mod_route)
+        // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
         if (loopcheck.includes(mod_route)) {
             loopcheck.push(mod_route)
             throw "Circular asset path!" + loopcheck
@@ -135,9 +142,9 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
     let resource_url = asset_url.replace("assets://", assets_root)
 
     if (asset_url != resource_url) {
-        logger.debug("[resolvA]", asset_url, "to", resource_url)
+        // logger.debug("[resolvA]", asset_url, "to", resource_url)
     } else {
-        logger.debug("[resolvA]", "no change for", resource_url)
+        // logger.debug("[resolvA]", "no change for", resource_url)
     }
     return resource_url
 }
@@ -156,7 +163,7 @@ const UrlFilterMixin = {
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    logger.debug("[filterL]", "looking up", link.href)
+                    // logger.debug("[filterL]", "looking up", link.href)
                     link.href = getResourceURL(link.href)
                 }
             })

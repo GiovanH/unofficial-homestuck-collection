@@ -280,8 +280,7 @@ if (ipcMain) {
       // Get the list of mods players can choose to enable/disable
       var mod_folders;
       try {
-        let tree = crawlFileTree(modsDir, false)
-        mod_folders = Object.keys(tree)
+        mod_folders = Object.keys(crawlFileTree(modsDir, false))
       } catch (e) {
         logger.error(e)
         // No mod folder at all. That's okay.
