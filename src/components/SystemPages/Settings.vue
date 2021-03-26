@@ -50,7 +50,7 @@
 
           <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
           <dd class="settingDesc">
-          It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu, and shows a little more data for mod/style developers. Boring stuff, really.</dd>
+          It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance.</dd>
         </dl>
       </div>
       <div class="settings enhancements">

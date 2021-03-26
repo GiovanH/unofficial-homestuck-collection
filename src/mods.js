@@ -278,7 +278,12 @@ if (ipcMain) {
     // We are in the main process.
     function loadModChoices(){
       // Get the list of mods players can choose to enable/disable
-      var mod_folders = Object.keys(crawlFileTree(modsDir, false))
+      try {
+        var mod_folders = Object.keys(crawlFileTree(modsDir, false))
+      } catch {
+        // No mod folder at all. That's okay.
+        return []
+      }
       var items = mod_folders.reduce((acc, dir) => {
         let js = getModJs(dir)
         acc[dir] = {
