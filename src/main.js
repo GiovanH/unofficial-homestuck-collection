@@ -109,6 +109,8 @@ Vue.mixin({
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
+          // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
+          // If we must do this we should check for a steam installation, eat least
           ipcRenderer.invoke('steam-open', urlObject.href)
         }
         else shell.openExternal(urlObject.href)

@@ -78,13 +78,14 @@ export default {
     log() {
       // depends on
       // this.$localData.settings.newReader;
-      console.log("Recalculating story log")
 
       // A sorted list of log objects
       if (!this.storyId) 
         return undefined
 
-      return this.storyLogRaw(this.storyId).filter(page_num => !this.$pageIsSpoiler(page_num)).sort(this.sorter)
+      return this.storyLogRaw(this.storyId).filter(page => 
+        !this.$pageIsSpoiler(page.page_num)
+      ).sort(this.sorter)
     },
     reverseLink(){
       return /^\d_asc$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_asc`
@@ -120,9 +121,7 @@ export default {
       return this.memoized(story_id => {
         console.log("Recalculating raw story log (BAD)")
 
-        return this.$getAllPagesInStory(story_id).filter(page_num => 
-          !this.$pageIsSpoiler(page_num)
-        ).map(page_num => 
+        return this.$getAllPagesInStory(story_id).map(page_num => 
           this.getLogEntry(story_id, page_num)
         )
       }, "storyLogRaw", 10)
