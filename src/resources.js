@@ -18,10 +18,11 @@ function fileIsAsset(url){
     let is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
     if (is_bundled) return false
 
-    if (url.charAt(0) == "/") {
-        return true
+    // This is definitely wrong; see /sbahj/ urls
+    // if (url.charAt(0) == "/") {
+    //     return true
         // i hate this a lot? this is not how it should work
-    }
+    // }
 
     let has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(url)
 
@@ -82,6 +83,7 @@ function getResourceURL(request_url){
         .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") //Covers for 99% of flashes that link to other pages
         .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") //Covers for story links without page numbers
         .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") //Link from CD rack flash
+        .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1") // TODO double-check this regex
         .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/, "assets://") //Complete, should ideally never happen and probably won't work properly if it does
     
         .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)

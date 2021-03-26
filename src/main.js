@@ -472,7 +472,3 @@ window.vm = new Vue({
     }
   }
 }).$mount('#app')
-
-// Ask for a fresh copy of the archive
-// Root must exist to receive it, so this comes after vm
-ipcRenderer.send("RELOAD_ARCHIVE_DATA") 

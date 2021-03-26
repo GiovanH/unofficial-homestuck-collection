@@ -182,15 +182,23 @@ function loadArchiveData(){
   // This returns an `archive` object, and does not modify the global archive directly. 
   if (!assetDir) throw "No reference to asset directory"
 
-  //Grab and parse all data jsons
-  let data = {
-    ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
-    mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
-    log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
-    social : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
-    music : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
-    comics : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
-    search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+  let data;
+
+  try {
+    //Grab and parse all data jsons
+    data = {
+      ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
+      mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
+      log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
+      social : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
+      music : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
+      comics : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
+      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+    }
+  } catch (e) {
+    // Error loading json. Probably a bad asset pack installation.
+    logger.error(e)
+    return undefined
   }
 
   try {
