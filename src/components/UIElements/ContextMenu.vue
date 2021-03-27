@@ -56,7 +56,6 @@
 
 <script>
 const {shell, clipboard, ipcRenderer} = require('electron')
-import fs from 'fs'
 
 export default {
   name: 'contextMenu',

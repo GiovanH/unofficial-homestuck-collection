@@ -78,7 +78,7 @@
 
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
-import { parse } from 'querystring'
+// import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
 
 export default {

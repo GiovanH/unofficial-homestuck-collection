@@ -21,6 +21,7 @@ export default {
             tooltipActive: false,
         }
     },
+    // TODO: Banner properties should be set in data, not code
     computed: {
         // TODO: These specific banner designations should be part of data, not code
         banner() {
