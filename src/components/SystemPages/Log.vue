@@ -118,7 +118,7 @@ export default {
 
       // console.log("Recalculating raw story log memo")
       // Vue should really be able to keep track of this, but it just can't. 
-      // TODO: Reset this function when story data gets changed
+      // TODO: story_id is user-input, needs to be error checked
       
       return this.memoized(story_id => {
         // console.log("Recalculating raw story log (BAD)")
