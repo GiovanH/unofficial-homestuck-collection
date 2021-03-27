@@ -183,7 +183,7 @@ Vue.mixin({
           for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
       }
       else if (story_id == '3'){
-          page_nums.push("MC0001")
+          page_nums.push("mc0001")
       }
       else if (story_id == '4'){
           for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
