@@ -24,7 +24,7 @@
                             <td bgcolor="#b9b8b9" >
                               <center style="padding:25px;">
                                 At the beginning of 2019, the <a href="http://skaianetsystems.com">Skaianet Systems</a> website launched, containing multiple hidden files within its source HTML. 
-                                Among <a href="/archive/skaianet/CRITICAL_ASSETS/index.html">other files</a>, there were 36 text documents outlining certain events that took place during Her Imperious Condescension's rise to power in universe B2.
+                                Among <a href="assets://archive/skaianet/CRITICAL_ASSETS/index.html">other files</a>, there were 36 text documents outlining certain events that took place during Her Imperious Condescension's rise to power in universe B2.
                                 <br><br>
                                 <strong>The following has been quoted directly from <a href="https://mspaintadventures.fandom.com/wiki/Skaianet_Systems_Incorporated#Criticism_and_apology">The MSPA Wiki</a>:</strong>
                                 <br><br>

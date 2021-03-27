@@ -66,7 +66,7 @@
               <h2><a href="/sbahj">Sweet Bro & Hella Jeff</a></h2>
               <p class="date">Mar 2009 - Nov 2017</p>
               <p class="comicsans">it keeps happening</p>
-              <p>> <a href="/archive/forum/SBaHJ Origins.html">The origin story.</a></p>
+              <p>> <a href="assets://archive/forum/SBaHJ Origins.html">The origin story.</a></p>
             </div>
           </div>
 
@@ -260,17 +260,17 @@
         </div>
         <div class="row">
           <div class="rowItem cheefulbear">
-            <a class="thumbnail kermit" href="/archive/forum/Cheerfulbear - PLAY ME.html"><Media url="/archive/collection/archive_cheerfulbear.png"/></a>
+            <a class="thumbnail kermit" href="assets://archive/forum/Cheerfulbear - PLAY ME.html"><Media url="/archive/collection/archive_cheerfulbear.png"/></a>
             <div class="description">
-              <h2><a href="/archive/forum/Cheerfulbear - PLAY ME.html">Cheerfulbear - PLAY ME</a></h2>
+              <h2><a href="assets://archive/forum/Cheerfulbear - PLAY ME.html">Cheerfulbear - PLAY ME</a></h2>
               <p class="date">Jan 2008</p>
               <p> HELLO CHEERFULBEAR I WOULD LIKE TO PLAY A GAME HELLO CHEERFULBEAR I WOULD</p>
             </div>
           </div>
           <div class="rowItem suckoff">
-            <a class="thumbnail" href="/archive/forum/Dear Andrew.html"><Media url="/archive/collection/archive_suckoff.png"/></a>
+            <a class="thumbnail" href="assets://archive/forum/Dear Andrew.html"><Media url="/archive/collection/archive_suckoff.png"/></a>
             <div class="description">
-              <h2><a href="/archive/forum/Dear Andrew.html">The Man-On-Man Suckoff Challenge</a></h2>
+              <h2><a href="assets://archive/forum/Dear Andrew.html">The Man-On-Man Suckoff Challenge</a></h2>
               <p class="date">Jun 2008 - May 2009</p>
               <p>Gaze deep into the uncanny valley.</p>
             </div>

@@ -104,6 +104,8 @@ Vue.mixin({
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
+          // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
+          // If we must do this we should check for a steam installation, eat least
           ipcRenderer.invoke('steam-open', urlObject.href)
         }
         else shell.openExternal(urlObject.href)
@@ -176,7 +178,7 @@ Vue.mixin({
           for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
       }
       else if (story_id == '3'){
-          page_nums.push("MC0001")
+          page_nums.push("mc0001")
       }
       else if (story_id == '4'){
           for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))

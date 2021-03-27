@@ -45,10 +45,11 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function onModLoadFail(enabled_mods, e){
-  logger.info("Mod load failure")
-  logger.debug(enabled_mods)
+  logger.info("Mod load failure with modlist", enabled_mods)
   logger.debug(e)
   clearEnabledMods()
+  logger.debug("Modlist cleared.")
+  throw e // TODO: Replace this with a good visual traceback so users can diagnose mod issues
 }
 
 function bakeRoutes(){
@@ -99,7 +100,6 @@ function bakeRoutes(){
       })
     } catch (e) {
       onModLoadFail(enabled_mods, e)
-      throw e
     }
 }
 
@@ -278,13 +278,24 @@ if (ipcMain) {
     // We are in the main process.
     function loadModChoices(){
       // Get the list of mods players can choose to enable/disable
-      var mod_folders = Object.keys(crawlFileTree(modsDir, false))
+      var mod_folders;
+      try {
+        mod_folders = Object.keys(crawlFileTree(modsDir, false))
+      } catch (e) {
+        logger.error(e)
+        // No mod folder at all. That's okay.
+        return []
+      }
       var items = mod_folders.reduce((acc, dir) => {
-        let js = getModJs(dir)
-        acc[dir] = {
-          label: js.title,
-          desc: js.desc,
-          key: dir
+        try {
+          let js = getModJs(dir)
+          acc[dir] = {
+            label: js.title,
+            desc: js.desc,
+            key: dir
+          }
+        } catch (e) {
+          logger.error(e)
         }
         return acc
       }, {})

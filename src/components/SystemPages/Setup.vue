@@ -1,3 +1,5 @@
+<!-- TODO: This file could also be used as a preloader? Or the preloader could be somewhere else -->
+
 <template>
 <div class="setup">
   <div class="header">

@@ -23,6 +23,7 @@ export default {
     },
     // TODO: Banner properties should be set in data, not code
     computed: {
+        // TODO: These specific banner designations should be part of data, not code
         banner() {
             let result = undefined
             let num = parseInt(this.page.pageId)
