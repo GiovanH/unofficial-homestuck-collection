@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     thisAlbum() {
-      let mode
+      // let mode // unused?
       let key = this.routeParams.id || undefined
       return (this.routeParams.mode == 'album' && key in this.$archive.music.albums) ? this.$archive.music.albums[key] : undefined
     },

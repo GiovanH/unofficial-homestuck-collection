@@ -34,7 +34,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
-import FlexSearch from 'flexsearch'
+// import FlexSearch from 'flexsearch'
 const { ipcRenderer } = require('electron')
 
 export default {

@@ -193,6 +193,8 @@ function loadArchiveData(){
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
+  if (!data) throw "Data empty after attempted load"
+
   try {
     Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
