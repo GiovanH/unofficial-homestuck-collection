@@ -518,7 +518,7 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
-  const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
+  const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
 
   if (app.getApplicationNameForProtocol(steamUrl)) {
     await shell.openExternal(steamUrl)

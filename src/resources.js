@@ -25,7 +25,7 @@ function fileIsAsset(url){
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
 
-    return has_file_ext || /^archive\//i.test(url) || /\/^archive\//i.test(url) // maybe not needed now?
+    return has_file_ext || /^archive\//i.test(url) || /^\/archive\//i.test(url) // maybe not needed now?
 }
 
 // NOT PURE
@@ -165,7 +165,7 @@ const UrlFilterMixin = {
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
+                    let pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
                     logger.debug("[filterL]", "looking up", pseudLinkHref)
                     link.href = getResourceURL(pseudLinkHref)
                 }
@@ -179,7 +179,7 @@ const UrlFilterMixin = {
             let media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
             for (let i = 0; i < media.length; i++) {
-                pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
+                let pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
                 logger.debug("[fltrSrc]", "looking up", pseudMediaSrc)
                 media[i].src = resolveURL(pseudMediaSrc)
 

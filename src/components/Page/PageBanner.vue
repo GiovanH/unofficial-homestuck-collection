@@ -115,7 +115,7 @@ export default {
             if (this.tooltipActive) {
                 let page = document.getElementById(this.tab.key)
                 let tooltip = page.getElementsByClassName('imgTooltip')[0]
-                let banner = page.getElementsByClassName('bannerImage')[0]
+                // let banner = page.getElementsByClassName('bannerImage')[0] // unused?
                 let offsetXY = [20, 30]
 
                 let tooltipX = e.clientX + offsetXY[0] //mouse X
