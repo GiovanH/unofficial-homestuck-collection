@@ -324,7 +324,7 @@ finally {
 
 //The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_REQUEST', (event) => {
-  if (!archive)
+  if (!archive) // this case is superceded by Datadriven, should be deleted on merge
     archive = loadArchiveData()
   event.returnValue = { port, archive }
 })
