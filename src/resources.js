@@ -5,7 +5,7 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
-var assets_root = "uninitialized://"
+var assets_root = undefined
 
 // Pure
 function fileIsAsset(url){
@@ -135,13 +135,17 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
         logger.debug("[resolvA]", asset_url, "mod to", mod_route)
         if (loopcheck.includes(mod_route)) {
             loopcheck.push(mod_route)
-            throw "Circular asset path!" + loopcheck
+            throw Error("Circular asset path!" + loopcheck)
         } else {
             loopcheck.push(mod_route)
             return resolveAssetsProtocol(mod_route, loopcheck)
         }
     }
 
+    if (assets_root == undefined) {
+        logger.error("Asked to resolve assets protocol before resources initialized!", asset_url)
+        throw Error("RESOURCES UNINITIALIZED")
+    }
     let resource_url = asset_url.replace("assets://", assets_root)
 
     if (asset_url != resource_url) {
