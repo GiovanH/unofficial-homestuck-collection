@@ -205,7 +205,7 @@ function loadArchiveData(){
     // but we need to update the application state to react to it
 
     // specifically $localdata can be in an invalid state
-    throw e
+    logger.error(e)
   }
 
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
@@ -324,6 +324,8 @@ finally {
 
 //The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_REQUEST', (event) => {
+  if (!archive)
+    archive = loadArchiveData()
   event.returnValue = { port, archive }
 })
 
