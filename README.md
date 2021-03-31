@@ -2,7 +2,7 @@
 
 Let me tell you a story about a webcomic called *Homestuck*. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2007 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.
 
-HJowever, with Flash finally being phased out at the end of 2020, *Homestuck* is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published *Homestuck* since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve *Homestuck's* one-of-a-kind presentation and flair, for both returning readers and those new to the story.
+However, with Flash finally being phased out at the end of 2020, *Homestuck* is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published *Homestuck* since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve *Homestuck's* one-of-a-kind presentation and flair, for both returning readers and those new to the story.
 
 This is the repository for a self-contained collection that contains Homestuck (with Flash elements fully intact), the other MS Paint Adventures, official Homestuck side-stories, and a variety of goodies for the enquiring reader, as well as a variety of unintrusive enhancements to the overall presentation, both for quality and convenience.
 
