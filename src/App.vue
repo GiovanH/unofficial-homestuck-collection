@@ -126,6 +126,8 @@
         if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })
 
+      // TODO: click and auxclick seem to share a lot of code here, consider rewrite
+
       window.addEventListener('click', event => {
         // ensure we use the link, in case the click has been received by a subelement
         let { target } = event
@@ -140,7 +142,7 @@
           // don't handle right clicks
           if (button !== undefined && button !== 0) return
           // don't handle if `target="_blank"`
-          let targetBlank = (target && target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false;
+          let targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
 
 
           if (event.preventDefault) {
@@ -176,7 +178,7 @@
           // don't handle when preventDefault called
           if (defaultPrevented) return
           // don't handle if `target="_blank"`
-          let targetBlank = (target && target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false;
+          let targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
           // don't handle right clicks
           if (button !== undefined && button !== 1) return
 

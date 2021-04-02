@@ -180,7 +180,7 @@ var menuTemplate = [
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   // This returns an `archive` object, and does not modify the global archive directly. 
-  if (!assetDir) throw "No reference to asset directory"
+  if (!assetDir) throw Error("No reference to asset directory")
 
   //Grab and parse all data jsons
   let data = {
@@ -193,7 +193,7 @@ function loadArchiveData(){
     search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
   }
 
-  if (!data) throw "Data empty after attempted load"
+  if (!data) throw Error("Data empty after attempted load")
 
   try {
     Mods.editArchive(data)
@@ -205,7 +205,7 @@ function loadArchiveData(){
     // but we need to update the application state to react to it
 
     // specifically $localdata can be in an invalid state
-    throw e
+    logger.error(e)
   }
 
   //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
@@ -228,7 +228,7 @@ try {
   let flashPlugin
   switch (process.platform) {
     case 'win32':
-      flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
+      flashPlugin = `archive/data/plugins/pepflashplayer${process.arch.replace('x', '')}.dll`
       break
     case 'darwin':
       flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
@@ -238,12 +238,19 @@ try {
       break
   }
   let flashPath = path.join(assetDir, flashPlugin)
+
+  if (process.platform == "win32" && !fs.existsSync(flashPath)) {
+    // On a windows install with the old asset pack and a unified DLL
+    flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
+    flashPath = path.join(assetDir, flashPlugin)
+  }
+
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
-  else throw `Flash plugin not located at ${flashPath}`
+  else throw Error(`Flash plugin not located at ${flashPath}`)
 
   //Set up search index
   var chapterIndex = new FlexSearch({
@@ -388,7 +395,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
           break
       }
-      if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw "Flash plugin not found"
+      if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw Error("Flash plugin not found")
     }
     catch(error) {
       logger.error(error)
@@ -518,7 +525,7 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
-  const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
+  const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
 
   if (app.getApplicationNameForProtocol(steamUrl)) {
     await shell.openExternal(steamUrl)
