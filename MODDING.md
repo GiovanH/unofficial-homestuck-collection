@@ -2,6 +2,8 @@
 
 This document is a draft and may or may not represent the final API **or** the current development implementation. See [issues](https://github.com/Bambosh/unofficial-homestuck-collection/issues/43) for discussion. 
 
+Implementation of the modding API can be found at or near [`/src/mods.js`](https://github.com/Bambosh/unofficial-homestuck-collection/blob/develop/src/mods.js)
+
 ## Basic Overview
 
 ### Writing mods
