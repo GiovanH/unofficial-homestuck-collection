@@ -71,7 +71,11 @@ This replaces the `content` of page `001901` with a new block of HTML (here, the
 
 ```js
 edit(archive) {
-    archive.mspa.story['001901'].content = archive.mspa.story['001901'].content.replace("the 13th of April, 2009, ", "the 13th of April, ")
+    archive.mspa.story['001901'].content = 
+        archive.mspa.story['001901'].content.replace(
+            "the 13th of April, 2009, ", 
+            "the 13th of April, "
+        )
 }
 ```
 
@@ -94,6 +98,8 @@ However, there isn't a good way to construct `/some/new/path/here`.
 Instead, you should use the **Routes** system. Instead of telling the collection to change `['001901'].media` image to `mynew.gif`, you can tell the collection to *route* `"/storyfiles/hs2/00001.gif"` to `mymod/mynew.gif`. 
 
 The syntax is a simple key/value mapping, where keys are asset paths (prefixed with the protocol "assets://" in place of your assets directory) and the values are local file paths. 
+
+`trees`: `Map<AssetPath(String), LocalPath(String)>`
 
 So, to write our first-panel replacement mod, we would simply need the following:
 
@@ -132,6 +138,8 @@ You might have a case where you want to patch a large number of files at once wi
 Treeroutes build a `routes` object for you using an entire folder tree. This has the effect of a traditional patch done with a simple folder merge. 
 
 `trees`, like routes, is a key/value mapping, but it maps *local folders* to logical folder routes.
+
+`trees`: `Map<LocalPath(String), AssetPathDirectory(String)>` (note that this is not parallel with `routes`)
 
 Example:
 
@@ -181,3 +189,80 @@ treeroute: "./[mytree]/"
 ```
 
 with the same effect.
+
+### `styles`
+
+Mods can inject custom CSS into the whole app. `styles` declares a list of local css files to be injected.
+
+`styles`: `List<LocalPath(String)>`
+
+```js
+styles: [
+    "./test.css"
+]
+```
+
+Specific page/context selectors should be included in the CSS file.
+
+### Vue Hooks
+
+Vue hooks are the most complicated and the most powerful method of modifying the collection, and modify the Vue.js pages directly using mixins. 
+
+`vueHooks`: `List<VueHook>`
+
+Each `VueHook` has the following properties:
+
+- `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state.
+- `matchName` (string, optional): Shorthand for `match(c) {return c.$options.name == "pageText"}`. Helpful for matching specific `.vue` files by name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
+- `computed` (optional): The `computed` object is a collection of functions that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions take a `$super` argument that contains the *previous* result of the computation. 
+- `data` (optional): The `data` object is a collection of objects and functions. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
+
+Examples of VueHooks:
+
+```js
+vueHooks: [{
+    match(c) {return c.$options.name == "pageText"},
+    computed: {
+        logButtonText($super) {
+            return "MOD " + $super()
+        }
+    }
+}
+```
+
+This hooks the `pageText` vue page, which contains the spoiler button logic. It adds the word "MOD" before any log button text, so pages will read "MOD Show Pesterlog" or "MOD Hide Pesterlog". This demonstrates user of the `$super` argument within `computed`.
+
+```js
+vueHooks: [{
+    matchName: "navBanner",
+    data: {
+        urls: [
+            [ "/"
+            ],
+            [ "https://www.homestuck.com",
+              "toggleJumpBox"
+            ],
+            [ "/map",
+              "/log",
+              "/search"
+            ],
+            [ "toggleBookmarks"
+            ],
+            [ "/settings",
+              "/credits"
+            ]
+        ],
+        labels($super){
+            let labels = $super
+            labels['']["https://www.homestuck.com"] = "VIZ"
+            labels['']["/"] = "HOMESTUCK"
+            return labels
+        }
+    },
+}]
+```
+
+This hook uses the `matchName` shorthand to match the `navBanner` page, which is the top navigation bar. 
+
+It replaces the underlying `url` object with a new one, discarding any data that was previously there. It also replaces the `labels`, but this time it only modifies the two labels relevant to the change, again using the `$super` syntax.
+
