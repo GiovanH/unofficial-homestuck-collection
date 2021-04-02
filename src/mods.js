@@ -130,9 +130,12 @@ function crawlFileTree(root, recursive=false){
   let ret = {}
   let dirent
   while (dirent = dir.readSync()) {
-    if (dirent.isDirectory() && recursive) {
-      let subpath = path.join(root, dirent.name)
-      ret[dirent.name] = crawlFileTree(subpath, true)
+    if (dirent.isDirectory()) {
+      if (recursive) {
+        let subpath = path.join(root, dirent.name)
+        ret[dirent.name] = crawlFileTree(subpath, true)
+      }
+      else return []
     } else {
       ret[dirent.name] = true
     }
@@ -220,7 +223,7 @@ function getMainMixin(){
 
   return {
     mounted() {
-      logger.info("Mounted main mixin")
+      logger.debug("Mounted main mixin")
 
       styles.forEach((style_link) => {
         let link = document.createElement("link")
@@ -281,10 +284,13 @@ if (ipcMain) {
       // Get the list of mods players can choose to enable/disable
       var mod_folders;
       try {
-        mod_folders = Object.keys(crawlFileTree(modsDir, false))
+        // TODO: Replace this with proper file globbing
+        let tree = crawlFileTree(modsDir, false)
+        // .js file or folder of some sort
+        mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] == [])
       } catch (e) {
-        logger.error(e)
         // No mod folder at all. That's okay.
+        logger.error(e)
         return []
       }
       var items = mod_folders.reduce((acc, dir) => {
@@ -300,8 +306,8 @@ if (ipcMain) {
         }
         return acc
       }, {})
-      logger.info("Mod choices loaded")
-      logger.debug(items)
+      // logger.info("Mod choices loaded")
+      // logger.debug(items)
       return items
     }
 

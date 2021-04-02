@@ -5,7 +5,7 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
-var assets_root = "uninitialized://"
+var assets_root = undefined
 
 // Pure
 function fileIsAsset(url){
@@ -25,7 +25,7 @@ function fileIsAsset(url){
 
     // if you reference an html file in `archive/` that should match too, as a failsafe
 
-    return has_file_ext || /^archive\//i.test(url) || /\/^archive\//i.test(url) // maybe not needed now?
+    return has_file_ext || /^archive\//i.test(url) || /^\/archive\//i.test(url) // maybe not needed now?
 }
 
 // NOT PURE
@@ -135,13 +135,17 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
         logger.debug("[resolvA]", asset_url, "mod to", mod_route)
         if (loopcheck.includes(mod_route)) {
             loopcheck.push(mod_route)
-            throw "Circular asset path!" + loopcheck
+            throw Error("Circular asset path!" + loopcheck)
         } else {
             loopcheck.push(mod_route)
             return resolveAssetsProtocol(mod_route, loopcheck)
         }
     }
 
+    if (assets_root == undefined) {
+        logger.error("Asked to resolve assets protocol before resources initialized!", asset_url)
+        throw Error("RESOURCES UNINITIALIZED")
+    }
     let resource_url = asset_url.replace("assets://", assets_root)
 
     if (asset_url != resource_url) {
@@ -165,7 +169,7 @@ const UrlFilterMixin = {
             // else
             document.querySelectorAll("A").forEach((link) => {
                 if (link.href) {
-                    pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
+                    let pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
                     logger.debug("[filterL]", "looking up", pseudLinkHref)
                     link.href = getResourceURL(pseudLinkHref)
                 }
@@ -179,7 +183,7 @@ const UrlFilterMixin = {
             let media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
             for (let i = 0; i < media.length; i++) {
-                pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
+                let pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
                 logger.debug("[fltrSrc]", "looking up", pseudMediaSrc)
                 media[i].src = resolveURL(pseudMediaSrc)
 
