@@ -35,9 +35,10 @@ function getTreeRoutes(tree, parent=""){
         let dirent = tree[name]
         let subpath = (parent ? parent + "/" + name : name)
         if (dirent == true) {
-            // File
+            // Path points to a file of some sort
             routes.push(subpath)
         } else {
+            // Recurse through subpaths
             routes = routes.concat(getTreeRoutes(dirent, subpath))
         }
     }
@@ -49,13 +50,15 @@ function onModLoadFail(enabled_mods, e){
   logger.debug(e)
   clearEnabledMods()
   logger.debug("Modlist cleared.")
-  throw e // TODO: Replace this with a good visual traceback so users can diagnose mod issues
+  // TODO: Replace this with a good visual traceback so users can diagnose mod issues
+  throw e 
 }
 
 function bakeRoutes(){
     let enabled_mods = getEnabledMods()
     logger.info("Baking routes for", enabled_mods)
     let all_mod_routes = {}
+
     // Start with least-priority so they're overwritten
     getEnabledModsJs().reverse().forEach(js => {
         try {
@@ -91,9 +94,11 @@ function bakeRoutes(){
             logger.error(e)
         }
     })
+    // Modify script-global `routes`
     routes = all_mod_routes
 
-    // Test routes
+    // Test routes.
+    // TODO: This is super wasteful and should only be done when developer mode is on.
     try {
       const Resources = require("@/resources.js")
       Object.keys(all_mod_routes).forEach(url => {
@@ -157,7 +162,6 @@ function getModJs(mod_dir, singlefile=false){
         modjs_path = path.join(modsDir, mod_dir, "mod.js")
       }
       var mod = __non_webpack_require__(modjs_path)
-      // mod.logger = log.scope(mod_dir);
       mod._id = mod_dir
       mod._singlefile = singlefile
       return mod
@@ -186,7 +190,6 @@ function getModJs(mod_dir, singlefile=false){
           logger.error(mod_dir, "is missing required file 'mod.js'")
           onModLoadFail([mod_dir], e2)
         } else {
-          // Singlefile found, other error
           logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
         } 
@@ -214,6 +217,8 @@ function editArchive(archive){
 }
 
 function getMainMixin(){
+  // A mixin that injects on the main vue process.
+  // Currently this just injects custom css
 
   let styles = []
   getEnabledModsJs().forEach(js => {
@@ -239,8 +244,8 @@ function getMainMixin(){
   }
 }
 
-// Black magic
 function getMixins(){
+  // This is absolutely black magic
   const nop = ()=>undefined;
   
   return getEnabledModsJs().reverse().map((js) => {
@@ -278,6 +283,7 @@ function getMixins(){
 }
 
 // Runtime
+// Grey magic. This file can be run from either process, but only the main process will do file handling.
 const {ipcMain, ipcRenderer} = require('electron');
 if (ipcMain) {
     // We are in the main process.
@@ -307,8 +313,6 @@ if (ipcMain) {
         }
         return acc
       }, {})
-      // logger.info("Mod choices loaded")
-      // logger.debug(items)
       return items
     }
 
