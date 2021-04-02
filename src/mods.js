@@ -134,9 +134,10 @@ function crawlFileTree(root, recursive=false){
       if (recursive) {
         let subpath = path.join(root, dirent.name)
         ret[dirent.name] = crawlFileTree(subpath, true)
+      } else { // Is directory, but not doing a recursive scan
+        ret[dirent.name] = []
       }
-      else return []
-    } else {
+    } else { // Not a directory
       ret[dirent.name] = true
     }
   }
@@ -287,7 +288,7 @@ if (ipcMain) {
         // TODO: Replace this with proper file globbing
         let tree = crawlFileTree(modsDir, false)
         // .js file or folder of some sort
-        mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] == [])
+        mod_folders = Object.keys(tree).filter(p => (typeof(tree[p]) == "object" || /\.js$/.test(p)))
       } catch (e) {
         // No mod folder at all. That's okay.
         logger.error(e)
