@@ -83,6 +83,7 @@ function bakeRoutes(){
             // Higher priority: manual routes
             for (let key in js.routes || {}) {
                 let local = new URL(js.routes[key], mod_root_url).href
+                console.assert(!(js._singlefile && local.includes(mod_root_url)), js.title, "Single file mods cannot use local route!")
                 all_mod_routes[key] = local
             }
         } catch (e) {
