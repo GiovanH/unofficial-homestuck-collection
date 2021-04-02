@@ -227,10 +227,6 @@ export default {
 								size.x = 30
 								size.y = 30
 								break
-						case "kidshome":
-								size.x = 800
-								size.y = 600
-								break
 				}
 
 				return {id: filename, width: size.x + "px", height: size.y + "px", bgcolor: bgcolor}

@@ -124,7 +124,7 @@ export default {
       return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
     },
     footerBanner() {            
-      let num = parseInt(this.pageNum)
+      // let num = parseInt(this.pageNum) // unused?
       switch (this.$root.theme) {
         case 'scratch':
           return 'customScratchFooter.png'

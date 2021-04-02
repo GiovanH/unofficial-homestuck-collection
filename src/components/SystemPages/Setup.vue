@@ -1,3 +1,5 @@
+<!-- TODO: This file could also be used as a preloader? Or the preloader could be somewhere else -->
+
 <template>
 <div class="setup">
   <div class="header">
@@ -76,7 +78,7 @@
 
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
-import { parse } from 'querystring'
+// import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
 
 export default {
