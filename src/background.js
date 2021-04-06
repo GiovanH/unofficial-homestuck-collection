@@ -267,7 +267,6 @@ try {
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
-
   else throw Error(`Flash plugin not located at ${flashPath}`)
   
   //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
@@ -543,7 +542,7 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
   // If we must do this we should check for a steam installation, eat least
   const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
-
+  
   if (app.getApplicationNameForProtocol(steamUrl)) {
     await shell.openExternal(steamUrl)
   } else {
