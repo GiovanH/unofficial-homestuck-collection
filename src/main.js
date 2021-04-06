@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import localData from './store/localData'
-import path from 'path'
+// import path from 'path'
 
 import Mods from "./mods.js"
 

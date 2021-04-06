@@ -116,6 +116,7 @@ export default {
     },
     linkAndJoinExternalMusic() {
       if (this.track.urls) {
+        // Todo: rewrite this with host sanitization (let host = urlLib.parse(url).host == bandcamp.com)
         let sources = this.track.urls.map(url =>`<a href="${url}">${
           url.includes('bandcamp.com') ? 'Bandcamp' :
           url.includes('youtu') ? 'YouTube' :
