@@ -17,6 +17,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import Memoization from '@/memoization.js'
+
 library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -28,7 +30,7 @@ Vue.use(localData, {
 })
 
 const {shell, ipcRenderer} = require('electron')
-let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
+const port = ipcRenderer.sendSync('STARTUP_GET_PORT')
 
 const Resources = require("@/resources.js")
 Resources.init({
@@ -46,6 +48,8 @@ Number.prototype.pad = function(size) {
     return s;
 }
 
+Vue.mixin(Memoization.mixin)
+
 Vue.mixin({
   data(){
     return {
@@ -55,11 +59,11 @@ Vue.mixin({
   },
   computed: {
     $localhost: () => `http://127.0.0.1:${port}/`,
-    $archive: () => archive,
+    $archive() {return this.$root.archive},
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => Mods.modChoices
+    $modChoices: () => Mods.modChoices // This is the list of installed mods, it's okay to bake this
   },
   methods: {
     $resolvePath(to){
@@ -452,7 +456,8 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default'
+      theme: 'default',
+      archive: undefined
     }
   },
   router,

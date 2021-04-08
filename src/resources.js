@@ -5,6 +5,8 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
+// const Memoization = require('@/memoization.js').default
+
 var assets_root = undefined
 
 // Pure

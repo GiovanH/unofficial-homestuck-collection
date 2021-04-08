@@ -73,6 +73,10 @@
 
       electron.webFrame.setZoomFactor(1)
 
+      // Ask for a fresh copy of the archive
+      // Root must exist to receive it, so this calls from inside the app
+      electron.ipcRenderer.send("RELOAD_ARCHIVE_DATA") 
+
       //Sets up listener for the main process
       electron.ipcRenderer.on('TABS_NEW', (event, payload) => {
         this.$localData.root.TABS_NEW(payload.url, payload.adjacent)
@@ -115,7 +119,7 @@
       })      
       
       electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
-        this.archive = archive
+        this.$root.archive = archive
       })
 
       document.addEventListener('dragover', event => event.preventDefault())

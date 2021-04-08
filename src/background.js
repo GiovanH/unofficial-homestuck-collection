@@ -55,8 +55,8 @@ function zoomOut() {
 
 var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 
-var archive
 var port
+var chapterIndex;
 
 //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
 var menuTemplate = [
@@ -182,15 +182,22 @@ function loadArchiveData(){
   // This returns an `archive` object, and does not modify the global archive directly. 
   if (!assetDir) throw Error("No reference to asset directory")
 
-  //Grab and parse all data jsons
-  let data = {
-    ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
-    mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
-    log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
-    social : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
-    music : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
-    comics : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
-    search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+  let data;
+
+  try {
+    //Grab and parse all data jsons
+    data = {
+      ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
+      mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
+      social : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
+      music : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
+      comics : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
+      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+    }
+  } catch (e) {
+    // Error loading json. Probably a bad asset pack installation.
+    logger.error(e)
+    return undefined
   }
 
   if (!data) throw Error("Data empty after attempted load")
@@ -218,11 +225,21 @@ function loadArchiveData(){
 
   data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
+  //Set up search index
+  chapterIndex = new FlexSearch({
+    doc: {
+      id: 'key',
+      field: 'content',
+      tag: 'chapter'
+    }
+  })
+  chapterIndex.add(data.search)
+
   return data
 }
 
+
 try {
-  archive = loadArchiveData()
   
   //Pick the appropriate flash plugin for the user's platform
   let flashPlugin
@@ -251,16 +268,6 @@ try {
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   }
   else throw Error(`Flash plugin not located at ${flashPath}`)
-
-  //Set up search index
-  var chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: 'content',
-      tag: 'chapter'
-    }
-  })
-  chapterIndex.add(archive.search)
   
   //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
@@ -284,8 +291,8 @@ catch (error) {
 
   //If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   //Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
+  // TODO: The above logic doesn't work with the new async loading system
   port = undefined
-  archive = undefined
   
   //Throw together a neutered menu for setup mode
   menuTemplate = [
@@ -330,12 +337,19 @@ finally {
 }
 
 //The renderer process requests the chosen port on startup, which we're happy to oblige
-ipcMain.on('STARTUP_REQUEST', (event) => {
-  event.returnValue = { port, archive }
+ipcMain.on('STARTUP_GET_PORT', (event) => {
+  event.returnValue = port
 })
 
+// Speed hack, try to preload the first copy of the archive
+var first_archive = loadArchiveData();
+
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
-  archive = loadArchiveData()
+  let archive;
+  if (first_archive) {
+    archive = first_archive
+    first_archive = undefined;
+  } else archive = loadArchiveData()
   win.webContents.send('ARCHIVE_UPDATE', archive)
 })
 
@@ -525,8 +539,10 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
+  // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
+  // If we must do this we should check for a steam installation, eat least
   const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
-
+  
   if (app.getApplicationNameForProtocol(steamUrl)) {
     await shell.openExternal(steamUrl)
   } else {
