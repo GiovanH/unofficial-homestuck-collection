@@ -121,7 +121,7 @@ routes: {
 
 Note that `./` here means a local path relative to your mod folder. 
 
-With this enabled, any time any story page references that file, your file is substituted in place.
+With this enabled, any time any story page references that file, your file is substituted in place. You can think of this as something akin to Docker volume mapping, but much simpler.
 
 In the above example, we replace a panel already in the collection with one we provide. But what if we want to redirect it to a file already in the collection? This is easy:
 
