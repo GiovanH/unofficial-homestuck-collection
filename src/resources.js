@@ -10,7 +10,7 @@ const logger = log.scope('Resources');
 var assets_root = undefined
 
 // Pure
-function fileIsAsset(url){
+function fileIsAsset(url) {
   // Given a url, *without considering the domain*, determine if this should
   // route to an asset of some sort. (bool)
 

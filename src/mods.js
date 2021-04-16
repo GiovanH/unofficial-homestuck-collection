@@ -29,7 +29,7 @@ function getAssetRoute(url) {
   return file_route
 }
 
-function getTreeRoutes(tree, parent=""){
+function getTreeRoutes(tree, parent="") {
   let routes = []
   for (const name in tree) {
     const dirent = tree[name]
@@ -44,7 +44,7 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
-function onModLoadFail(enabled_mods, e){
+function onModLoadFail(enabled_mods, e) {
   logger.info("Mod load failure with modlist", enabled_mods)
   logger.debug(e)
   clearEnabledMods()
@@ -52,7 +52,7 @@ function onModLoadFail(enabled_mods, e){
   throw e // TODO: Replace this with a good visual traceback so users can diagnose mod issues
 }
 
-function bakeRoutes(){
+function bakeRoutes() {
   const enabled_mods = getEnabledMods()
   logger.info("Baking routes for", enabled_mods)
   let all_mod_routes = {}
@@ -105,24 +105,24 @@ function bakeRoutes(){
 
 const store_modlist_key = 'localData.settings.modListEnabled'
 
-function getEnabledMods(){
+function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
   return list
 }
 
-function clearEnabledMods(){
+function clearEnabledMods() {
   // TODO: This doesn't trigger the settings.modListEnabled observer,
   // which results in bad settings-screen side effects
   store.set(store_modlist_key, [])
   bakeRoutes()
 }
 
-function getEnabledModsJs(){
+function getEnabledModsJs() {
   return getEnabledMods().map((dir) => getModJs(dir))
 }
 
-function crawlFileTree(root, recursive=false){
+function crawlFileTree(root, recursive=false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
   const dir = fs.opendirSync(root);
@@ -142,7 +142,7 @@ function crawlFileTree(root, recursive=false){
   return ret
 }
 
-function getModJs(mod_dir, singlefile=false){
+function getModJs(mod_dir, singlefile=false) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
@@ -200,7 +200,7 @@ function getModJs(mod_dir, singlefile=false){
 
 // Interface
 
-function editArchive(archive){
+function editArchive(archive) {
   getEnabledModsJs().reverse().forEach((js) => {
     const editfn = js.edit
     if (editfn) {
@@ -209,7 +209,7 @@ function editArchive(archive){
   })
 }
 
-function getMainMixin(){
+function getMainMixin() {
   let styles = []
   getEnabledModsJs().forEach(js => {
     const mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
@@ -235,7 +235,7 @@ function getMainMixin(){
 }
 
 // Black magic
-function getMixins(){
+function getMixins() {
   const nop = ()=>undefined;
 
   return getEnabledModsJs().reverse().map((js) => {
