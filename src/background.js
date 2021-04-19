@@ -539,8 +539,6 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
-  // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
-  // If we must do this we should check for a steam installation, eat least
   const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
   
   if (app.getApplicationNameForProtocol(steamUrl)) {
