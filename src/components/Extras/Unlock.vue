@@ -7,6 +7,7 @@
           <h1>UNLOCKABLE CONTENT</h1>
           <MediaEmbed url="images/unlock_gamecode.gif" />
           <div class="text">
+            <!-- TODO: This page needs to be made data-driven AND then made spoiler-friendly using datetimes. -->
             <p>CONGRATULATIONS!!!<br><br>You have entered a valid GAME CODE and unlocked some exciting <strong>FAN-REQUESTED GAME COMMANDS!</strong> These were drawn and posted for fans who made <strong>DONATIONS!</strong></p>
             <br />
             <a href="/unlock/ps000001">FAD+ZAD+AD: Throw down your hats in disgust.</a><br>

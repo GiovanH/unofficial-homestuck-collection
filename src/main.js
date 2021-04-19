@@ -399,7 +399,18 @@ Vue.mixin({
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
-      return timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+
+      const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+
+      if (timestamp > latestTimestamp) {
+        logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        
+        // const { DateTime } = require('luxon');
+        // let time_zone = "America/New_York"
+        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        
+        return true
+      } else return false
     },
     $pageIsSpoiler(page, useLimit = false) {
       // The new-reader setting is split into two values: "current", and "limit"
