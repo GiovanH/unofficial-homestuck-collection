@@ -53,11 +53,12 @@ export default {
     },
     filteredYears(){
       let newsposts = Object.keys(this.$archive.social.news).sort().map(year => ({year, posts: this.$archive.social.news[year]}))
-      if (!this.$isNewReader) return newsposts
+      if (!this.$isNewReader)
+        return newsposts
       else {
         this.cutoff = true
         return newsposts.filter(year => {
-          year.posts = year.posts.filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp)
+          year.posts = year.posts.filter(post => this.$timestampIsSpoiler(post.timestamp))
           return year.posts.length > 1 
         })
       }
