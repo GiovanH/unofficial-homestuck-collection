@@ -26,5 +26,5 @@ rules:
   space-before-blocks: ["off"]
   space-before-function-paren: ["off"]
   space-infix-ops: ["warn"]
-  indent: ["error", 2, { "SwitchCase": 1 }]
+  indent: ["warn", 2, { "SwitchCase": 1 }]
   yoda: ["off", "never", { "exceptRange": true }]
