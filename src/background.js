@@ -18,27 +18,29 @@ const http = require('http')
 const Store = require('electron-store')
 const store = new Store()
 
-const log = require('electron-log');
-const logger = log.scope('ElectronMain');
+const log = require('electron-log')
+const logger = log.scope('ElectronMain')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
 const gotTheLock = app.requestSingleInstanceLock()
 
-//Improve overall performance by disabling GPU acceleration
-//We're not running crysis or anything its all gifs
+// Improve overall performance by disabling GPU acceleration
+// We're not running crysis or anything its all gifs
 app.disableHardwareAcceleration()
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', privileges: { 
-    standard: true,
-    secure: true,
-    supportFetchAPI: true,
-    stream: true
-  }}
+  { scheme: 'assets', 
+    privileges: { 
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true
+    }
+  }
 ])
 
 // zoom functions
@@ -58,7 +60,7 @@ var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir')
 var port
 var chapterIndex;
 
-//Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
+// Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
 var menuTemplate = [
   {
     label: 'File',
@@ -172,7 +174,7 @@ var menuTemplate = [
         accelerator: 'CmdOrCtrl+F',
         click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
       },
-      { role: 'minimize' },
+      { role: 'minimize' }
     ]
   }
 ]
@@ -182,10 +184,10 @@ function loadArchiveData(){
   // This returns an `archive` object, and does not modify the global archive directly. 
   if (!assetDir) throw Error("No reference to asset directory")
 
-  let data;
+  let data
 
   try {
-    //Grab and parse all data jsons
+    // Grab and parse all data jsons
     data = {
       ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
       mspa: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
@@ -217,8 +219,8 @@ function loadArchiveData(){
     logger.error(e)
   }
 
-  //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  let gankraSearchPage = data.search.find(x => x.key == '002745')
+  // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
+  const gankraSearchPage = data.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
   data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
@@ -227,7 +229,7 @@ function loadArchiveData(){
 
   data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
 
-  //Set up search index
+  // Set up search index
   chapterIndex = new FlexSearch({
     doc: {
       id: 'key',
@@ -240,10 +242,8 @@ function loadArchiveData(){
   return data
 }
 
-
 try {
-  
-  //Pick the appropriate flash plugin for the user's platform
+  // Pick the appropriate flash plugin for the user's platform
   let flashPlugin
   switch (process.platform) {
     case 'win32':
@@ -268,13 +268,12 @@ try {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
-  }
-  else throw Error(`Flash plugin not located at ${flashPath}`)
+  } else throw Error(`Flash plugin not located at ${flashPath}`)
   
-  //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
+  // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
     return handler(request, response, {
-        public: assetDir
+      public: assetDir
     })
   })
 
@@ -287,16 +286,15 @@ try {
       assets_root: `http://127.0.0.1:${port}/`
     })
   })
-} 
-catch (error) {
+} catch (error) {
   logger.error(error)
 
-  //If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
-  //Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
+  // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
+  // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
   // TODO: The above logic doesn't work with the new async loading system
   port = undefined
   
-  //Throw together a neutered menu for setup mode
+  // Throw together a neutered menu for setup mode
   menuTemplate = [
     {
       role: 'fileMenu'
@@ -329,16 +327,15 @@ catch (error) {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
           click: zoomOut
-        },
+        }
       ]
     }
   ]
-}
-finally {
+} finally {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
 
-//The renderer process requests the chosen port on startup, which we're happy to oblige
+// The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_PORT', (event) => {
   event.returnValue = port
 })
@@ -362,11 +359,9 @@ ipcMain.handle('win-minimize', async (event) => {
 ipcMain.handle('win-maximize', async (event) => {
   if (win.isFullScreen()){
     win.setFullScreen(false)
-  }
-  else if(win.isMaximized()){
+  } else if (win.isMaximized()){
     win.unmaximize()
-  }
-  else{
+  } else {
     win.maximize()
   }
 })
@@ -375,7 +370,7 @@ ipcMain.handle('win-close', async (event) => {
 })
 
 ipcMain.handle('save-file', async (event, payload) => {
-  let newPath = dialog.showSaveDialogSync(win, {
+  const newPath = dialog.showSaveDialogSync(win, {
     defaultPath: path.basename(payload.url)
   })
   if (newPath) fs.createReadStream(payload.url).pipe(fs.createWriteStream(newPath))
@@ -386,8 +381,8 @@ ipcMain.handle('inspect-element', async (event, payload) => {
 })
 
 ipcMain.handle('locate-assets', async (event, payload) => {
-  let defaultPath = assetDir || undefined
-  let newPath = dialog.showOpenDialogSync(win, {
+  const defaultPath = assetDir || undefined
+  const newPath = dialog.showOpenDialogSync(win, {
     defaultPath,
     properties: [
       'openDirectory'
@@ -412,15 +407,14 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           break
       }
       if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw Error("Flash plugin not found")
-    }
-    catch(error) {
+    } catch (error) {
       logger.error(error)
       validated = false
     }
 
     if (validated) {
       if (payload.restart) {
-        let confirmation = dialog.showMessageBoxSync(win, {
+        const confirmation = dialog.showMessageBoxSync(win, {
           type: 'warning',
           buttons: [
             'OK',
@@ -437,10 +431,8 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           app.relaunch()
           app.exit()
         }
-      }
-      else return newPath[0]
-    }
-    else {
+      } else return newPath[0]
+    } else {
       dialog.showMessageBoxSync(win, {
         type: 'warning',
         title: 'Assets not found',
@@ -466,10 +458,10 @@ ipcMain.handle('factory-reset', async (event, confirmation) => {
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {
-  let title = args.title || "Notice"
-  let ok_string = args.okay || "OK"
-  let cancel_string = args.cancel || "Cancel"
-  let answer = dialog.showMessageBoxSync(win, {
+  const title = args.title || "Notice"
+  const ok_string = args.okay || "OK"
+  const cancel_string = args.cancel || "Cancel"
+  const answer = dialog.showMessageBoxSync(win, {
     type: 'warning',
     buttons: [
       ok_string,
@@ -484,7 +476,7 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
 })
 
 ipcMain.handle('search', async (event, payload) => {
-  let keyAlias = {
+  const keyAlias = {
     "mc0001": 1892.5,
     "jb2_000000": 135.5,
     "pony": 2838.5,
@@ -494,9 +486,9 @@ ipcMain.handle('search', async (event, payload) => {
   }
   
   let limit = 1000
-  let sort = (a, b) => {
-    let aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
-    let bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
+  const sort = (a, b) => {
+    const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
+    const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
     return (payload.sort == 'desc') 
       ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0 
       : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
@@ -504,29 +496,28 @@ ipcMain.handle('search', async (event, payload) => {
 
   let filteredIndex
   if (payload.filter[0]) {
-    let items = chapterIndex.where(function(item) {
+    const items = chapterIndex.where(function(item) {
       return payload.filter.includes(item.chapter)
     })
     limit = items.length < 1000 ? items.length : 1000
     filteredIndex = new FlexSearch({doc: {id: 'key', field: 'content'}}).add(items)
-  }
-  else {
+  } else {
     filteredIndex = chapterIndex
   }
 
-  let results = (payload.sort == 'asc' || payload.sort == 'desc') 
+  const results = (payload.sort == 'asc' || payload.sort == 'desc') 
     ? filteredIndex.search(payload.input, {limit, sort})
     : filteredIndex.search(payload.input, {limit})
 
-  let foundText = []
+  const foundText = []
   for (const page of results) {
-    let flex = new FlexSearch()
-    let lines = page.content.split('###')
+    const flex = new FlexSearch()
+    const lines = page.content.split('###')
     for (let i = 0; i < lines.length; i++) {
       flex.add(i, lines[i])
     }
-    let indexes = flex.search(payload.input)
-    let output = []
+    const indexes = flex.search(payload.input)
+    const output = []
     for (let i = 0; i < indexes.length; i++) {
       output.push(lines[indexes[i]])
     }
@@ -550,7 +541,7 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   }
 })
 
-//Hook onto image drag events to allow images to be dragged into other programs
+// Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {
   event.sender.startDrag({
     file: filePath,
@@ -585,7 +576,7 @@ async function createWindow () {
     }
   });
 
-  //Catch-all to prevent navigating away from application page
+  // Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
@@ -608,25 +599,25 @@ async function createWindow () {
     ]
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
-      let redirectURL = Resources.resolveAssetsProtocol(details.url)
+      const redirectURL = Resources.resolveAssetsProtocol(details.url)
       callback({redirectURL})
     } else {
-      let destination_url = Resources.resolveURL(details.url)
-      if (details.resourceType =="subFrame")
+      const destination_url = Resources.resolveURL(details.url)
+      if (details.resourceType == "subFrame")
         win.webContents.send('TABS_PUSH_URL', destination_url)
       else callback({
         redirectURL: destination_url
       })
     }
-	})
+  })
 
-  //It's important that only one window is ever active at a time
-  //Target="_blank"/external links are generally handled through the frontend filter, so should hopefully only intercept flashes
-  //Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
+  // It's important that only one window is ever active at a time
+  // Target="_blank"/external links are generally handled through the frontend filter, so should hopefully only intercept flashes
+  // Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
 
-    let parsedURL = Resources.resolveURL(url)
+    const parsedURL = Resources.resolveURL(url)
     logger.info(`new-window: ${url} ===> ${parsedURL}`)
 
     // If the given URL is still external, open a browser window.
@@ -640,8 +631,7 @@ async function createWindow () {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } 
-  else {
+  } else {
     createProtocol('app')
     win.loadURL('app://./index.html')
   }
@@ -665,9 +655,7 @@ app.on('activate', () => {
 
 if (!gotTheLock) {
   app.quit()
-} 
-
-else {
+} else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (win) {

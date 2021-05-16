@@ -70,18 +70,20 @@ Vue.mixin({
   methods: {
     $resolvePath(to){
       // Resolves a logical path within the vue router
-      let route = this.$router.resolve(to.toLowerCase()).route
+      const route = this.$router.resolve(to.toLowerCase()).route
+      const base = route.path.slice(1).split("/")[0]
+      const vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
+
       let resolvedUrl = route.path
-      let base = route.path.slice(1).split("/")[0]
-      let vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
+
       if (!this.$localData.settings.mspaMode && base == 'mspa') {
-        let vizNums = this.$mspaToViz(route.params.p)
+        const vizNums = this.$mspaToViz(route.params.p)
         if (vizNums) resolvedUrl = `/${vizNums.s}/${vizNums.p}`
       } else if (this.$localData.settings.mspaMode ) {
         if (base == 'mspa') {
           if (route.params.p.padStart(6, '0') in this.$archive.mspa.story) resolvedUrl =  `/mspa/${route.params.p.padStart(6, '0')}` 
         } else if (vizBases.includes(base)) {
-          let mspaNums = this.$vizToMspa(base, route.params.p)
+          const mspaNums = this.$vizToMspa(base, route.params.p)
           if (mspaNums.p) resolvedUrl = `/mspa/${mspaNums.p}`
         }
       }
@@ -91,7 +93,7 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
-      let urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+      const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
 
       if (urlObject.protocol == "assets:") {
         this.$openModal(Resources.resolveAssetsProtocol(url))
@@ -129,7 +131,7 @@ Vue.mixin({
     $resolveURL: Resources.getResourceURL,
     $filterURL(u) {return this.$resolveURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
-      let url = this.$resolvePath(to)
+      const url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
@@ -167,27 +169,22 @@ Vue.mixin({
     },
     $getAllPagesInStory(story_id, incl_secret=false) {
       // TODO: Datadriven this
-      let page_nums = []
+      const page_nums = []
       if (story_id == '1'){
         for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
         for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
-          page_nums.push("jb2_000000")
-      }
-      else if (story_id == '2'){
+        page_nums.push("jb2_000000")
+      } else if (story_id == '2'){
         page_nums.push(Number(136).pad(6))
         for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '3'){
+      } else if (story_id == '3'){
         page_nums.push("mc0001")
-      }
-      else if (story_id == '4'){
+      } else if (story_id == '4'){
         for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
         for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '5'){
+      } else if (story_id == '5'){
         for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '6'){
+      } else if (story_id == '6'){
         for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
         for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
         for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
@@ -199,10 +196,10 @@ Vue.mixin({
           page_nums.push("pony")
           page_nums.push("pony2")
         }
-      }
-      else if (story_id == 'ryanquest'){
+      } else if (story_id == 'ryanquest'){
         for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
       }
+
       if (story_id == 'snaps') {
         for (let i = 1; i <= 64; i++) page_nums.push(String(i))
       }
@@ -210,7 +207,7 @@ Vue.mixin({
     },
     $vizToMspa(vizStory, vizPage) {
       let mspaPage
-      let vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
+      const vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
 
       switch (vizStory) {
         case 'jailbreak':
@@ -245,8 +242,8 @@ Vue.mixin({
       return {s: vizStory == 'ryanquest' ? 'ryanquest' : this.$getStory(mspaPage), p: mspaPage}
     },
     $mspaToViz(mspaInput, isRyanquest = false){
-      let mspaPage = (mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
-      let mspaStory = this.$getStory(mspaPage)
+      const mspaPage = (mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
+      const mspaStory = this.$getStory(mspaPage)
       let vizStory, vizPage
 
       if (isRyanquest) {
@@ -302,7 +299,7 @@ Vue.mixin({
     },
     $updateNewReader(thisPageId, forceOverride = false) {
       // TODO: Rewrite $updateNewReader for datadriven
-      let isSetupMode = !this.$archive
+      const isSetupMode = !this.$archive
       if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
@@ -321,9 +318,9 @@ Vue.mixin({
           // A6A5A1x2 COMBO
           else if ('007688' <= thisPageId && thisPageId <='007825') {
             // Sets the next page an extra step ahead to account for the x2 shittery
-            let isLeftPage = !(thisPageId % 2)
-            let page = this.$archive.mspa.story[thisPageId]
-            let nextPageOver = this.$archive.mspa.story[page.next[0]].next[0]
+            const isLeftPage = !(thisPageId % 2)
+            const page = this.$archive.mspa.story[thisPageId]
+            const nextPageOver = this.$archive.mspa.story[page.next[0]].next[0]
             let nextPageId 
             if (isLeftPage) {
               nextPageId = this.$archive.mspa.story[nextPageOver].next[0]
@@ -370,8 +367,8 @@ Vue.mixin({
         if (thisPageId == '010030') {
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
-          let resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
-          let resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
+          const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
+          const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
           // slap some retcons in there as well cause it's not like this function was long enough already
           if (resultCurrent) {
@@ -414,8 +411,9 @@ Vue.mixin({
       // The new-reader setting is split into two values: "current", and "limit"
       // "current" is the highest page the reader has actually visited. By setting "useLimit" to false, you can use this function to only display content up to a point the reader has seen.
       // "limit" is the highest page the reader is *allowed* to visit. This is generally set one page ahead of the current page, but in some circumstances like character select screens, it can go much further.
-      let parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
-      let parsedPage = parseInt(page)
+      // TODO: Better document this "friendsim" and "pesterquest" behavior
+      const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
+      const parsedPage = parseInt(page)
       return this.$isNewReader && (
         (page in this.$archive.mspa.story && (
           (!!parsedPage && parsedLimit < parsedPage) ||
@@ -428,7 +426,7 @@ Vue.mixin({
     },
     $trackIsSpoiler(ref) {
       if (this.$isNewReader && ref in this.$archive.music.tracks) {
-        let track = this.$archive.music.tracks[ref]
+        const track = this.$archive.music.tracks[ref]
         // Try to find a single linked page or album that isn't a spoiler. If we can't, block it.
         // if it's referenced by an unreleased track, that's not good enough. it has to be reference that unreleased track *itself* 
         // From the unreleased track's perspective: if it's referenced by a known track, it's ok. Whether or not it references a known track shouldn't affect it.
@@ -438,8 +436,7 @@ Vue.mixin({
           (track.album && track.album.find(album => {
             if (album == 'unreleased-tracks' && track.referencedBy) {
               return track.referencedBy.find(track => !this.$trackIsSpoiler(track))
-            }
-            else return !this.$albumIsSpoiler(album)
+            } else return !this.$albumIsSpoiler(album)
           }))
         )
       } else return false
@@ -449,15 +446,15 @@ Vue.mixin({
         // It's a spoiler if it belongs to an album with a more recent timestamp than the current page
         let date
 
-        if (ref == 'homestuck-vol-1') date = this.$archive.mspa.story['002340'].timestamp //During third Rose GameFAQs, after Nanna expodump
-        else if (ref == 'homestuck-vol-5') date = this.$archive.mspa.story['003841'].timestamp //Curtains after [S] Descend
-        else if (ref == 'homestuck-vol-6') date = this.$archive.mspa.story['005127'].timestamp //During LE/Recap 3 Huss interruption
-        else if (ref == 'song-of-skaia') date = this.$archive.mspa.story['006291'].timestamp //Immediately after EOA6I1
-        else if (ref == 'colours-and-mayhem-universe-b') date = this.$archive.mspa.story['006716'].timestamp //Immediately after DOTA, before EOY3 shown
-        else if (ref == 'homestuck-vol-9') date = this.$archive.mspa.story['006928'].timestamp //After Terry: FF to Liv, before cherub chess
-        else if (ref == 'symphony-impossible-to-play') date = this.$archive.mspa.story['007162'].timestamp //Just after Caliborn: Enter, before openbound 1
-        else if (ref == 'one-year-older') date = this.$archive.mspa.story['007162'].timestamp //Just after Caliborn: Enter, before openbound 1
-        else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp //After Interfishin, right when Caliborn/Calliope expodump begins
+        if (ref == 'homestuck-vol-1') date = this.$archive.mspa.story['002340'].timestamp // During third Rose GameFAQs, after Nanna expodump
+        else if (ref == 'homestuck-vol-5') date = this.$archive.mspa.story['003841'].timestamp // Curtains after [S] Descend
+        else if (ref == 'homestuck-vol-6') date = this.$archive.mspa.story['005127'].timestamp // During LE/Recap 3 Huss interruption
+        else if (ref == 'song-of-skaia') date = this.$archive.mspa.story['006291'].timestamp // Immediately after EOA6I1
+        else if (ref == 'colours-and-mayhem-universe-b') date = this.$archive.mspa.story['006716'].timestamp // Immediately after DOTA, before EOY3 shown
+        else if (ref == 'homestuck-vol-9') date = this.$archive.mspa.story['006928'].timestamp // After Terry: FF to Liv, before cherub chess
+        else if (ref == 'symphony-impossible-to-play') date = this.$archive.mspa.story['007162'].timestamp // Just after Caliborn: Enter, before openbound 1
+        else if (ref == 'one-year-older') date = this.$archive.mspa.story['007162'].timestamp // Just after Caliborn: Enter, before openbound 1
+        else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp // After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
         logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
@@ -478,7 +475,7 @@ window.vm = new Vue({
   render: function (h) { return h(App) },
   watch: {
     '$localData.settings.devMode'(to, from){
-      let is_dev = to
+      const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
       logger.silly("Dev-only")
       logger.info("Everybody")
