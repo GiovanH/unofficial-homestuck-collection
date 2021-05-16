@@ -6,17 +6,18 @@
 
       <a href="/news"><Media class="logo" :url="newsLogo" /></a>
       
-      <div class="newsYear" v-for="year in filteredYears" :key="year.year">
-        <h2 class="yearTitle" :class="[year.year]" v-text="'20'+year.year" @click="toggleYear(year.year)" />
-        <ul v-if="activeYear == year.year">
-          <li v-for="post in year.posts" class="post" v-html="post.html" :key="post.id" />
-          <li v-if="year.posts.length < $archive.social.news[year.year].length" class="post notice">
-            {{$archive.social.news[year.year].length - year.posts.length}} posts remain in 20{{year.year}}.
+      <div class="newsYear" v-for="newsYear in filteredSortedPosts" :key="newsYear.yearNo">
+        <h2 class="yearTitle" :class="[newsYear.yearNo]" v-text="'20'+newsYear.yearNo" @click="toggleYear(newsYear.yearNo)" />
+        <ul v-if="activeYear == newsYear.yearNo">
+          <li v-for="post in newsYear.posts" class="post" v-html="post.html" :key="post.id" />
+
+          <li v-if="newsYear.posts.length < newsposts[newsYear.yearNo].length" class="post notice">
+            {{$archive.social.news[newsYear.yearNo].length - newsYear.posts.length}} posts remain in 20{{newsYear.yearNo}}.
           </li>
         </ul>
       </div>
       
-      <p v-if="cutoff" class="cutoff">Keep reading Homestuck to unlock more posts!</p>
+      <p v-if="isCutoff" class="cutoff">Keep reading Homestuck to unlock more posts!</p>
 
     </div>
   </div>
@@ -43,39 +44,59 @@ export default {
   },
   data() {
     return {
-      activeYear: undefined,
-      cutoff: false
+      activeYear: undefined
     }
   },
   computed: {
     newsLogo() {
       return this.$root.theme === 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
     },
-    filteredYears(){
-      let newsposts = Object.keys(this.$archive.social.news).sort().map(year => ({year, posts: this.$archive.social.news[year]}))
+    newsposts(){
+      return this.$archive.social.news
+    },
+    filteredPosts(){
+      // Returns {yearNo: postList} for all years with visible news.
       if (!this.$isNewReader)
-        return newsposts
-      else {
-        this.cutoff = true
-        return newsposts.filter(year => {
-          year.posts = year.posts.filter(post => this.$timestampIsSpoiler(post.timestamp))
-          return year.posts.length > 1 
+        return this.newsposts
+
+      const timestampIsSpoiler = this.$timestampIsSpoiler
+      const newsposts = this.newsposts
+
+      return Object.keys(this.newsposts).reduce(function (result, yearNo) {
+        const newPosts = newsposts[yearNo].filter(function(post) {
+          return !timestampIsSpoiler(post.timestamp)
         })
-      }
+        if (newPosts.length > 0) {
+          result[yearNo] = (result[yearNo] || []).concat(newPosts)
+        }
+        return result
+      }, {})
+    },
+    filteredSortedPosts(){
+      // Vue won't let us sort by keys in the filter, so we have to make this intermediate.
+      // Returns [{yearNo: yearNo, posts: postList}] with the years sorted in order.
+      // Also, this sorts the postslist by timestamp, just in case.
+
+      const timestampSort = (a, b) => (a.timestamp > b.timestamp) ? 1 : -1
+      return Object.keys(this.filteredPosts).sort().map(yearNo => (
+        {yearNo, posts: this.filteredPosts[yearNo].sort(timestampSort)}
+      ))
+    },
+    isCutoff(){
+      return this.$isNewReader
     }
   },
-  methods:{
+  methods: {
     toggleYear(year) {
       this.activeYear = this.activeYear != year ? year : undefined
       if (this.activeYear) this.$nextTick(() => {this.jumpToClass(year)})
     },
     jumpToClass(id){
-      let className = id || ""
-      let el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
+      const className = id || ""
+      const el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
       if (el) {
         el.scrollIntoView(true)
-      }
-      else {
+      } else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
     }
@@ -83,11 +104,11 @@ export default {
   watch: {
     'tab.history': function (to, from) {
       if (this.routeParams.id) {
-        let year = this.routeParams.id.slice(5, 7)
+        const year = this.routeParams.id.slice(5, 7)
         if (year in this.$archive.social.news) this.activeYear = year
       }
-      //$nextTick doesn't work for some reason, so we're hacking the shit out of it
-      //the timeout basically just hangs until the dom is ready
+      // $nextTick doesn't work for some reason, so we're hacking the shit out of it
+      // the timeout basically just hangs until the dom is ready
       setTimeout(() => {this.jumpToClass(this.routeParams.id)}, 0)
     }
   },
@@ -95,8 +116,9 @@ export default {
     this.filterLinksAndImages()
   },
   mounted(){
+    // Try to jump to a specific point if the URL contains that info. TODO document this better
     if (this.routeParams.id) {
-      let year = this.routeParams.id.slice(5, 7)
+      const year = this.routeParams.id.slice(5, 7)
       if (year in this.$archive.social.news) this.activeYear = year
     }
     setTimeout(() => {this.jumpToClass(this.routeParams.id)}, 0)
