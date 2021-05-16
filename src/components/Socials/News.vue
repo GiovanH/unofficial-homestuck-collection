@@ -58,13 +58,10 @@ export default {
       // Returns {yearNo: postList} for all years with visible news.
       if (!this.$isNewReader)
         return this.newsposts
-
-      const timestampIsSpoiler = this.$timestampIsSpoiler
-      const newsposts = this.newsposts
-
-      return Object.keys(this.newsposts).reduce(function (result, yearNo) {
-        const newPosts = newsposts[yearNo].filter(function(post) {
-          return !timestampIsSpoiler(post.timestamp)
+      
+      return Object.keys(this.newsposts).reduce((result, yearNo) => {
+        const newPosts = this.newsposts[yearNo].filter(function(post) {
+          return !this.timestampIsSpoiler(post.timestamp)
         })
         if (newPosts.length > 0) {
           result[yearNo] = (result[yearNo] || []).concat(newPosts)
