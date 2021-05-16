@@ -12,7 +12,7 @@
           <li v-for="post in newsYear.posts" class="post" v-html="post.html" :key="post.id" />
 
           <li v-if="newsYear.posts.length < newsposts[newsYear.yearNo].length" class="post notice">
-            {{$archive.social.news[newsYear.yearNo].length - newsYear.posts.length}} posts remain in 20{{newsYear.yearNo}}.
+            {{newsposts[newsYear.yearNo].length - newsYear.posts.length}} posts remain in 20{{newsYear.yearNo}}.
           </li>
         </ul>
       </div>
@@ -52,7 +52,7 @@ export default {
       return this.$root.theme === 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
     },
     newsposts(){
-      return this.$archive.social.news
+      return this.$archive.news
     },
     filteredPosts(){
       // Returns {yearNo: postList} for all years with visible news.
@@ -105,7 +105,7 @@ export default {
     'tab.history': function (to, from) {
       if (this.routeParams.id) {
         const year = this.routeParams.id.slice(5, 7)
-        if (year in this.$archive.social.news) this.activeYear = year
+        if (year in this.newsposts) this.activeYear = year
       }
       // $nextTick doesn't work for some reason, so we're hacking the shit out of it
       // the timeout basically just hangs until the dom is ready
@@ -119,7 +119,7 @@ export default {
     // Try to jump to a specific point if the URL contains that info. TODO document this better
     if (this.routeParams.id) {
       const year = this.routeParams.id.slice(5, 7)
-      if (year in this.$archive.social.news) this.activeYear = year
+      if (year in this.newsposts) this.activeYear = year
     }
     setTimeout(() => {this.jumpToClass(this.routeParams.id)}, 0)
     this.filterLinksAndImages()
