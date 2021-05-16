@@ -60,9 +60,7 @@ export default {
         return this.newsposts
       
       return Object.keys(this.newsposts).reduce((result, yearNo) => {
-        const newPosts = this.newsposts[yearNo].filter(function(post) {
-          return !this.timestampIsSpoiler(post.timestamp)
-        })
+        const newPosts = this.newsposts[yearNo].filter((post) => !this.$timestampIsSpoiler(post.timestamp))
         if (newPosts.length > 0) {
           result[yearNo] = (result[yearNo] || []).concat(newPosts)
         }
