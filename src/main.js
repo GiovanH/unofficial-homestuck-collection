@@ -291,9 +291,19 @@ Vue.mixin({
     $mspaOrVizNumber(mspaId){
       return !(mspaId in this.$archive.mspa.story) || this.$localData.settings.mspaMode ? mspaId : this.$mspaToViz(mspaId).p
     },
+    $parseMspaOrViz(userInput, story = 'homestuck') {
+      // Takes a user-formatted string and returns a MSPA page number.
+      // The output page number may not be real!
+      if (this.$localData.settings.mspaMode) {
+        return userInput.padStart(6, '0')
+      } else {
+        return this.$vizToMspa(story, userInput).p
+      }
+    },
     $updateNewReader(thisPageId, forceOverride = false) {
+      // TODO: Rewrite $updateNewReader for datadriven
       let isSetupMode = !this.$archive
-      if (!/\D/.test(thisPageId) && '001901' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
@@ -359,8 +369,7 @@ Vue.mixin({
 
         if (thisPageId == '010030') {
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
-        }
-        else {
+        } else {
           let resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
           let resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
@@ -386,6 +395,20 @@ Vue.mixin({
     },
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
+    },
+    $timestampIsSpoiler(timestamp){
+      if (!this.$isNewReader) return false
+
+      const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+
+      if (timestamp > latestTimestamp) {
+        // logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        // const { DateTime } = require('luxon');
+        // let time_zone = "America/New_York"
+        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        
+        return true
+      } else return false
     },
     $pageIsSpoiler(page, useLimit = false) {
       // The new-reader setting is split into two values: "current", and "limit"

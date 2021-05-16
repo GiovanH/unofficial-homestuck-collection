@@ -160,7 +160,11 @@ const UrlFilterMixin = {
   methods: {
     filterLinksAndImages(el){
       // dynamic default
-      if (!el) { el = this.$el.querySelector('.pageContent') }
+      // this.$el can be a comment because fuck me of course it can
+      if (!el) { 
+        if (this.$el.nodeType === 8) return
+        else el = this.$el.querySelector('.pageContent')
+      }
 
       // Check if this is a comment
       if (el.nodeType === 8) return
