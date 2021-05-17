@@ -28,7 +28,7 @@
         <h2>Application Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
-            <dt :key="boolSetting.model"><label>
+            <dt><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]" 
@@ -90,7 +90,7 @@
           </dd>
           
           <template v-for="boolSetting in enhancementListBoolean">
-            <dt :key="boolSetting.model"><label>
+            <dt><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]" 
@@ -107,7 +107,7 @@
         <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
         <dl>
           <template v-for="retcon in retconList">
-            <dt :key="retcon.model"><label>
+            <dt><label>
               <input type="checkbox" 
                 :name="retcon.model" 
                 v-model="$localData.settings[retcon.model]" 
@@ -365,7 +365,7 @@ export default {
         {text: "Homosuck", value: "A6A6"},
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
-        {text: "Paradox Space", value: "pxs"},
+        {text: "Paradox Space", value: "pxs"}
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -373,7 +373,7 @@ export default {
         {text: "Verdana / Arial", value: "verdana"},
         {text: "Times New Roman", value: "times"},
         {text: "Comic Sans", value: "comicSans"},
-        {text: "OpenDyslexic", value: "openDyslexic"},
+        {text: "OpenDyslexic", value: "openDyslexic"}
       ],
       newReaderPage: this.$localData.settings.newReader.current || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
@@ -389,11 +389,11 @@ export default {
   },
   computed: {
     controversialAll(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.every(Boolean)
     },
     controversialAny(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.some(Boolean)
     },
     modsEnabled() {
@@ -428,7 +428,7 @@ export default {
     },
     setNewReader() {
       this.validateNewReader() 
-      let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
+      const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
         this.$localData.settings.themeOverride = ""
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
@@ -437,7 +437,7 @@ export default {
       }
     },
     clearNewReader() {
-      let args = {
+      const args = {
         title: "Are you sure?",
         message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
       }
@@ -455,7 +455,7 @@ export default {
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
         this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
       } else {
-        let args = {
+        const args = {
           title: "Are you sure?",
           message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
         }
@@ -483,7 +483,7 @@ export default {
       ipcRenderer.invoke('locate-assets', {restart: true})
     },
     factoryReset(){      
-      let args = {
+      const args = {
         title: "FACTORY RESET",
         message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!',
         okay: "Yes, delete everything"
@@ -495,19 +495,19 @@ export default {
       })
     },
     onUpdateSortable: function(event){
-      let el_active = event.target;
-      let setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
+      const el_active = event.target;
+      const setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
 
-      let list_active = Array(...el_active.children).map((child) =>
+      const list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
       
-      if(this.debounce) return
+      if (this.debounce) return
       this.debounce = setTimeout(function() {
-          this.debounce = false 
-          this.memoizedClearAll();
-          ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+        this.debounce = false 
+        this.memoizedClearAll();
+        ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       }.bind(this), 2000)
     }
   },
