@@ -298,6 +298,7 @@ export default {
           line-height: 20px;
           width: 100%;
           border: none;
+          font-family: var(--font-family-ui);
           background: var(--header-tabSection);
           color: var(--font-header);
         }

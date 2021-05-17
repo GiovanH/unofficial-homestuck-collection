@@ -215,11 +215,11 @@
             </div>
             <div class="center">
               > <a href="/log/4" >Adventure Log</a><br>
-              > <a href="/map/4" >Adventure Map</a>
+              > <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
             </div>
             <div class="right">
               > <a href="/unlock" >Unlockable Content</a><br>
-              > <a href="/faqs/science" >Science FAQ</a>
+              > <a href="/faqs/science" v-if="!$timestampIsSpoiler(1236384000)">Science FAQ</a><a disabled v-else>??????</a>
             </div>
           </div>
         </div>
@@ -441,7 +441,7 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
-    a {
+    a:not([disabled]) {
       color: var(--page-links);
     }
 

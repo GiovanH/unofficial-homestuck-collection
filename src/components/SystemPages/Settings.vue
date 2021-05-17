@@ -16,7 +16,7 @@
         <div class="newReaderInput" v-else>
           <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
           <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number between 1901 and 10029.<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
+          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 10029. Problem Sleuth starts at 000219.</p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
         </div>
         <dl>
@@ -343,39 +343,31 @@ export default {
         !this.modsEnabled.includes(choice))
     }
   },
-  methods:{
+  methods: {
     validateNewReader() {
-      if (this.$localData.settings.mspaMode) {
-        let pageId = (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage
-        this.newReaderValidation = pageId in this.$archive.mspa.story && pageId >= '001901' && pageId <= '010029' && !/\D/.test(pageId)
-      }
-      else {
-        this.newReaderValidation = !!this.$vizToMspa('homestuck', this.newReaderPage).p && !/\D/.test(this.newReaderPage) && parseInt(this.newReaderPage) >= 1 && parseInt(this.newReaderPage) <= 8129
-      }
+      const pageId = this.$parseMspaOrViz(this.newReaderPage)
+      this.newReaderValidation = pageId in this.$archive.mspa.story && pageId >= '000219' && pageId <= '010029' && !/\D/.test(pageId)
     },
     changeNewReader(){
       this.validateNewReader() 
-      let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
+      const pageId = this.$parseMspaOrViz(this.newReaderPage)
       if (this.newReaderValidation) {
-        let args = {
+        const args = {
           title: "Are you sure?",
           message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
         }
-        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+        ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
           if (answer === true)
             this.$updateNewReader(pageId, true)
           else
             this.newReaderPage = this.$localData.settings.newReader.current
         })
-        
       }
-
     },
     setNewReader() {
       this.validateNewReader() 
       let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
-
         this.$localData.settings.themeOverride = ""
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
@@ -452,6 +444,7 @@ export default {
       if(this.debounce) return
       this.debounce = setTimeout(function() {
           this.debounce = false 
+          this.memoizedClearAll();
           ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       }.bind(this), 2000)
     }

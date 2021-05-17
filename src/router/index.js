@@ -3,13 +3,13 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-//Generally speaking, routes aren't necessary to get a page working in this application.
-//If it doesn't have any subsequent routes, then you don't have to add it here at all! As long as it's defined in TabFrame.vue, you can run it just fine.
-//The router here is basically just used as a quick and dirty way to implement parameters and redirects.
-//If your page needs to use a url parameter, define it below. You'll be able to access it from your component through the 'routeParams' prop.
-//This is also the best place to set up URL redirects, since the router can do the ol' switcheroo before the program itself does anything with it.
+// Generally speaking, routes aren't necessary to get a page working in this application.
+// If it doesn't have any subsequent routes, then you don't have to add it here at all! As long as it's defined in TabFrame.vue, you can run it just fine.
+// The router here is basically just used as a quick and dirty way to implement parameters and redirects.
+// If your page needs to use a url parameter, define it below. You'll be able to access it from your component through the 'routeParams' prop.
+// This is also the best place to set up URL redirects, since the router can do the ol' switcheroo before the program itself does anything with it.
 
-//Keep in mind that 'base' is used as a reserved property that always refers to the first section of the url. Don't use it in your routing, or you'll overwrite it!
+// Keep in mind that 'base' is used as a reserved property that always refers to the first section of the url. Don't use it in your routing, or you'll overwrite it!
 
 const routes = [
   {

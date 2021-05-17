@@ -102,6 +102,7 @@ export default {
       input {
         padding: 2px 0;
         font-size: 22px;
+        font-family: var(--font-family-ui);
         height: 30px;
         width: 500px;
         border: none;
