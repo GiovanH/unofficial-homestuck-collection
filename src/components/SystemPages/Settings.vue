@@ -27,30 +27,16 @@
       <div class="settings application">
         <h2>Application Settings</h2>
         <dl>
-          <dt><label><input type="checkbox" name="showAddressBar" v-model="$localData.settings['showAddressBar']" @click="toggleSetting('showAddressBar')">Always show jump box</label></dt>
-          <dd class="settingDesc">Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L).</dd>
-
-          <dt><label><input type="checkbox" name="switchToNewTabs" v-model="$localData.settings['switchToNewTabs']" @click="toggleSetting('switchToNewTabs')">Auto-switch to new tabs</label></dt>
-          <dd class="settingDesc">Opening any link in a new tab will automatically switch you to that tab.</dd>
-
-          <dt><label><input type="checkbox" name="forceScrollBar" v-model="$localData.settings['forceScrollBar']" @click="toggleSetting('forceScrollBar')">Always display scroll bar</label></dt>
-          <dd class="settingDesc">Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this.</dd>
-          
-          <dt><label><input type="checkbox" name="smoothScrolling" v-model="$localData.settings['smoothScrolling']" @click="toggleSetting('smoothScrolling')">Enable smooth scrolling</label></dt>
-          <dd class="settingDesc">Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong></dd>
-          
-          <dt><label><input type="checkbox" name="pixelScaling" v-model="$localData.settings['pixelScaling']" @click="toggleSetting('pixelScaling')">Pixelated image scaling</label></dt>
-          <dd class="settingDesc">By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors.</dd>
-          
-          <dt><label><input type="checkbox" name="mspaMode" v-model="$localData.settings['mspaMode']" @click="toggleSetting('mspaMode')">Use MSPA page numbers</label></dt>
-          <dd class="settingDesc">Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck.</dd>
-          
-          <dt><label><input type="checkbox" name="bandcampEmbed" v-model="$localData.settings['bandcampEmbed']" @click="toggleSetting('bandcampEmbed')">Enable online bandcamp player</label></dt>
-          <dd class="settingDesc">Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.</dd>
-
-          <dt><label><input type="checkbox" name="devMode" v-model="$localData.settings['devMode']" @click="toggleSetting('devMode')">Enable Developer Mode</label></dt>
-          <dd class="settingDesc">
-          It's not all that exciting. It just adds an "Inspect Element" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance.</dd>
+          <template v-for="boolSetting in settingListBoolean">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]" 
+                @click="toggleSetting(boolSetting.model)"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass -->
+            <dd :key="boolSetting.model" class="settingDesc" v-html="boolSetting.desc"></dd>
+          </template>
         </dl>
       </div>
       <div class="settings enhancements">
@@ -102,45 +88,36 @@
               </div>
             </div>
           </dd>
-
-          <dt><label><input type="checkbox" name="arrowNav" v-model="$localData.settings['arrowNav']" @click="toggleSetting('arrowNav')">Enable arrow key navigation</label></dt>
-          <dd class="settingDesc">Allows you to navigate forward and backward between pages using the left and right arrow keys.</dd>
-
-          <dt><label><input type="checkbox" name="openLogs" v-model="$localData.settings['openLogs']" @click="toggleSetting('openLogs')">Automatically open logs</label></dt>
-          <dd class="settingDesc">Text logs begin open on each page, instead of requiring you to click them.</dd>
           
-          <dt><label><input type="checkbox" name="hqAudio" v-model="$localData.settings['hqAudio']" @click="toggleSetting('hqAudio')">Enable high quality Flash audio</label></dt>
-          <dd class="settingDesc">This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems.</dd>
-          
-          <dt><label><input type="checkbox" name="jsFlashes" v-model="$localData.settings['jsFlashes']" @click="toggleSetting('jsFlashes')">Enable enhanced Flash effects</label></dt>
-          <dd class="settingDesc">Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems.</dd>
+          <template v-for="boolSetting in enhancementListBoolean">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]" 
+                @click="toggleSetting(boolSetting.model)"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass still -->
+            <dd :key="boolSetting.model" class="settingDesc" v-html="boolSetting.desc"></dd>
+          </template>
 
-          <dt><label><input type="checkbox" name="credits" v-model="$localData.settings['credits']" @click="toggleSetting('credits')">Show inline audio credits</label></dt>
-          <dd class="settingDesc">Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database.</dd>
-          
         </dl>
       </div>
       <div class="settings retcons" v-if="!$isNewReader">
         <h2>Retcons</h2>
         <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
         <dl>
-          <dt><label><input type="checkbox" name="retcon1" v-model="$localData.settings['retcon1']" @click="toggleSetting('retcon1')">#1 - John's arms</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='007999'></StoryPageLink>.</dd>
+          <template v-for="retcon in retconList">
+            <dt :key="retcon.model"><label>
+              <input type="checkbox" 
+                :name="retcon.model" 
+                v-model="$localData.settings[retcon.model]" 
+                @click="toggleSetting(retcon.model)"
+              >{{retcon.label}}</label></dt>
+            <dd :key="retcon.model" class="settingDesc">
+              Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
+            </dd>
+          </template>
 
-          <dt><label><input type="checkbox" name="retcon2" v-model="$localData.settings['retcon2']" @click="toggleSetting('retcon2')">#2 - John's first Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008053'></StoryPageLink>.</dd>
-          
-          <dt><label><input type="checkbox" name="retcon3" v-model="$localData.settings['retcon3']" @click="toggleSetting('retcon3')">#3 - John interrupting Dave and Jade</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008317'></StoryPageLink>.</dd>
-          
-          <dt><label><input type="checkbox" name="retcon4" v-model="$localData.settings['retcon4']" @click="toggleSetting('retcon4')">#4 - The oil patches</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='008991'></StoryPageLink>. <a href="/oilretcon">/oilretcon</a></dd>
-          
-          <dt><label><input type="checkbox" name="retcon5" v-model="$localData.settings['retcon5']" @click="toggleSetting('retcon5')">#5 - John's second Zap-quest</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009026'></StoryPageLink>.</dd>
-          
-          <dt><label><input type="checkbox" name="retcon6" v-model="$localData.settings['retcon6']" @click="toggleSetting('retcon6')">#6 - Terezi's password pages</label></dt>
-          <dd class="settingDesc">Originally enabled on page <StoryPageLink mspaId='009057'></StoryPageLink>.</dd>
         </dl>
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
@@ -292,6 +269,91 @@ export default {
   },
   data: function() {
     return {
+      settingListBoolean: [
+        {
+          model: "showAddressBar",
+          label: "Always show jump box",
+          desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
+        }, {
+          model: "switchToNewTabs",
+          label: "Auto-switch to new tabs",
+          desc: "Opening any link in a new tab will automatically switch you to that tab."
+        }, {
+          model: "forceScrollBar",
+          label: "Always display scroll bar",
+          desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
+        }, {
+          model: "smoothScrolling",
+          label: "Enable smooth scrolling",
+          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
+        }, {
+          model: "pixelScaling",
+          label: "Pixelated image scaling</label></dt>",
+          desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
+        }, {
+          model: "mspaMode",
+          label: "Use MSPA page numbers",
+          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        }, {
+          model: "bandcampEmbed",
+          label: "Enable online bandcamp player",
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+        }, {
+          model: "devMode",
+          label: "Enable Developer Mode",
+          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+        }
+      ],
+      enhancementListBoolean: [
+        {
+          model: "arrowNav",
+          label: "Enable arrow key navigation",
+          desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys."
+        }, {
+          model: "openLogs",
+          label: "Automatically open logs",
+          desc: "Text logs begin open on each page, instead of requiring you to click them."
+        }, {
+          model: "hqAudio",
+          label: "Enable high quality Flash audio",
+          desc: "This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems."
+        }, {
+          model: "jsFlashes",
+          label: "Enable enhanced Flash effects",
+          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
+        }, {
+          model: "credits",
+          label: "Show inline audio credits",
+          desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
+        }
+      ],
+      retconList: [
+        {
+          model: "retcon1",
+          label: "John's arms",
+          origPage: "007999"
+        }, {
+          model: "retcon2",
+          label: "John's first Zap-quest",
+          origPage: "008053"
+        }, {
+          model: "retcon3",
+          label: "John interrupting Dave and Jade",
+          origPage: "008317"
+        }, {
+          model: "retcon4",
+          label: "The oil patches",
+          origPage: "008991"
+        }, {
+          model: "retcon5",
+          label: "John's second Zap-quest",
+          origPage: "009026"
+        }, {
+          model: "retcon6",
+          label: "Terezi's password pages",
+          origPage: "009057"
+        }
+      ],
       themes: [
         {text: "Auto", value: ""},
         {text: "MSPA", value: "default"},
