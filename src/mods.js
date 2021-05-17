@@ -31,7 +31,7 @@ function getAssetRoute(url) {
 
 function getTreeRoutes(tree, parent=""){
   let routes = []
-  for (let name in tree) {
+  for (const name in tree) {
     const dirent = tree[name]
     const subpath = (parent ? parent + "/" + name : name)
     if (dirent == true) {
@@ -94,7 +94,8 @@ function bakeRoutes() {
       logger.error(e)
     }
   })
-    // Modify script-global `routes`
+  
+  // Modify script-global `routes`
   routes = all_mod_routes
 
   // Test routes
@@ -131,7 +132,7 @@ function getEnabledModsJs() {
 function crawlFileTree(root, recursive=false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
-  const dir = fs.opendirSync(root);
+  const dir = fs.opendirSync(root)
   let ret = {}
   let dirent
   while (dirent = dir.readSync()) {
@@ -155,16 +156,16 @@ function getModJs(mod_dir, singlefile=false) {
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
   try {
-      let modjs_path
-      if (singlefile) {
-        modjs_path = path.join(modsDir, mod_dir)
-      } else {
-        modjs_path = path.join(modsDir, mod_dir, "mod.js")
-      }
-      var mod = __non_webpack_require__(modjs_path)
-      mod._id = mod_dir
-      mod._singlefile = singlefile
-      return mod
+    let modjs_path
+    if (singlefile) {
+      modjs_path = path.join(modsDir, mod_dir)
+    } else {
+      modjs_path = path.join(modsDir, mod_dir, "mod.js")
+    }
+    var mod = __non_webpack_require__(modjs_path)
+    mod._id = mod_dir
+    mod._singlefile = singlefile
+    return mod
   } catch (e1) {
     // elaborate error checking w/ afllback
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
@@ -245,7 +246,7 @@ function getMainMixin(){
 
 function getMixins(){
   // This is absolutely black magic
-  const nop = ()=>undefined;
+  const nop = () => undefined
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
@@ -256,14 +257,14 @@ function getMixins(){
         vueHooks.forEach((hook) => {
           // Shorthand
           if (hook.matchName) {
-            hook.match = (c)=>(c.$options.name == hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
           }
 
           if (hook.match(this)) {
             for (const cname in (hook.computed || {})) {
               // Precomputed super function
               // eslint-disable-next-line no-extra-parens
-              const sup = (()=>this._computedWatchers[cname].getter.call(this) || nop);
+              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop);
               Object.defineProperty(this, cname, {
                 get: () => (hook.computed[cname](sup)),
                 configurable: true
@@ -283,12 +284,12 @@ function getMixins(){
 
 // Runtime
 // Grey magic. This file can be run from either process, but only the main process will do file handling.
-const {ipcMain, ipcRenderer} = require('electron');
+const {ipcMain, ipcRenderer} = require('electron')
 if (ipcMain) {
   // We are in the main process.
   function loadModChoices(){
     // Get the list of mods players can choose to enable/disable
-    var mod_folders;
+    var mod_folders
     try {
       // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
