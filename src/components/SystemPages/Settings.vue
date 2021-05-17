@@ -177,18 +177,22 @@
 
           <SpoilerBox kind="Controversial Content">
 
-            <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label><span class="cw minor">ip</span></dt>
+            <template v-for="cc in controversialList">
+              <dt><label>
+                <input type="checkbox" 
+                  :name="cc.model" 
+                  v-model="$localData.settings[cc.model]" 
+                  @click="toggleSetting(cc.model)"
+                >{{cc.label}}</label>
+                <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
+                <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
+              </dt>
+              <dd :key="cc.model" class="settingDesc" v-html="cc.desc"></dd>
+            </template>
+
+            <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
             <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
 
-            <dt><label><input type="checkbox" name="unpeachy" v-model="$localData.settings['unpeachy']" @click="toggleSetting('unpeachy')">Homestuck - CAUCASIAN!</label><span class="cw severe">race</span></dt>
-            <dd class="settingDesc">During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a></dd>
-            
-            <dt><label><input type="checkbox" name="pxsTavros" v-model="$localData.settings['pxsTavros']" @click="toggleSetting('pxsTavros')">Paradox Space - Tavros Banana</label><span class="cw severe">body horror</span></dt>
-            <dd class="settingDesc">During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.</a></dd>
-            
-            <dt><label><input type="checkbox" name="cursedHistory" v-model="$localData.settings['cursedHistory']" @click="toggleSetting('cursedHistory')">Skaianet Systems - CURSED_HISTORY</label><span class="cw severe">holocaust</span></dt> 
-            <!-- todo: something better than "holocaust" -->
-            <dd class="settingDesc">At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.</dd>
           </SpoilerBox>
         </div>
       </div> <!-- TODO: I am so angry about this. -->
@@ -352,6 +356,37 @@ export default {
           model: "retcon6",
           label: "Terezi's password pages",
           origPage: "009057"
+        }
+      ],
+      controversialList: [
+        {
+          model: "bolin",
+          cws: {
+            minor: ["ip"], severe: []
+          },
+          label: "Homestuck - Bill Bolin music",
+          desc: "A decent number of Flash animations in the first year of Homestuck had music provided by <a href=\"/music/artist/bill-bolin\" target=\"_blank\">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored."
+        }, {
+          model: "unpeachy",
+          cws: {
+            minor: [], severe: ["race"]
+          },
+          label: "Homestuck - CAUCASIAN!",
+          desc: `During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a>`
+        }, {
+          model: "pxsTavros",
+          cws: {
+            minor: [], severe: ["body horror"]
+          },
+          label: "Paradox Space - Tavros Banana",
+          desc: `During the original run of Paradox Space's Summerteen Romance story, <a href="/pxs/summerteen-romance/31" target="_blank">one page included a scene with graphic body horror</a>. The original version was completely unobscured, but it was later censored with additional dialogue.`
+        }, {
+          model: "cursedHistory",
+          cws: {
+            minor: [], severe: ["holocaust"]
+          },
+          label: "Skaianet Systems - CURSED_HISTORY",
+          desc: `At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.`
         }
       ],
       themes: [
