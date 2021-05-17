@@ -52,6 +52,8 @@
 </template>
 
 <script>
+// TODO: We could probably optimize here by using draggable, since we already import it
+
 
 export default {
   name: 'bookmarks',
