@@ -83,7 +83,9 @@ class LocalData {
       bolin: false,
       unpeachy: false,
       pxsTavros: false,
-      cursedHistory: false
+      cursedHistory: false,
+
+      modListEnabled: []  // name hardcoded in mods.js, be careful
     }
 
     //Data will only contain settings if the app has already been used.

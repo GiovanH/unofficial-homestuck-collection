@@ -34,7 +34,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
-import FlexSearch from 'flexsearch'
+// import FlexSearch from 'flexsearch'
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -187,6 +187,7 @@ export default {
         .replace(new RegExp(`(${queries})`, 'gi'), `<span class="match">$1</span>`)
     },
     getChapter(key) {
+      // TODO: Rewrite chapter index as data driven
       let p = parseInt(key)
       if (!p) {
         switch (key) {
@@ -242,21 +243,19 @@ export default {
         else if (p >= 8375) c += "Act 6 Act 6 Act 2"
         else if (p >= 8178) c += "Act 6 Act 6 Intermission 1"
         else if (p >= 8143) c += "Act 6 Act 6 Act 1"
-        else if (p >= 8016) c += "Act 6 Intermission 5"
         else if (p >= 8092) c += "Act 6 Intermission 5 Intermission 6"
         else if (p >= 8012) c += "Act 6 Intermission 5"
         else if (p >= 8011) c += "Act 6 Intermission 5 Intermission 5"
-        else if (p >= 7866) c += "Act 6 Intermission 5"
         else if (p >= 7965) c += "Act 6 Intermission 5 Intermission 4"
-        else if (p >= 7823) c += "Act 6 Intermission 5"
         else if (p >= 7922) c += "Act 6 Intermission 5 Intermission 3"
         else if (p >= 7882) c += "Act 6 Intermission 5"
         else if (p >= 7881) c += "Act 6 Intermission 5 Interfishin"
+        else if (p >= 7866) c += "Act 6 Intermission 5"
         else if (p >= 7847) c += "Act 6 Intermission 5"
         else if (p >= 7846) c += "Act 6 Intermission 5 Intermission 2"
         else if (p >= 7840) c += "Act 6 Intermission 5"
         else if (p >= 7839) c += "Act 6 Intermission 5 Intermission 1"
-        else if (p >= 7827) c += "Act 6 Intermission 5"
+        else if (p >= 7823) c += "Act 6 Intermission 5"
         else if (p >= 7688) c += "Act 6 Act 5 Act 1 x2 Combo"
         else if (p >= 7678) c += "Act 6 Act 5 Act 1"
         else if (p >= 7614) c += "Act 6 Act 5 Act 2"

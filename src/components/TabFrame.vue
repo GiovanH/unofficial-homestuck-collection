@@ -29,7 +29,7 @@
 </template>
 
 <script>
-const electron = require('electron')
+// const electron = require('electron')
 import Bookmarks from '@/components/UIElements/Bookmarks.vue'
 import MediaModal from '@/components/UIElements/MediaModal.vue'
 import FindBox from '@/components/UIElements/FindBox.vue'

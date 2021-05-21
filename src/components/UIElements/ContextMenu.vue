@@ -1,21 +1,29 @@
 <template>
   <div tabindex="-1" class="contextMenu" id="contextMenu" @click="handleClick()" @blur="away">
-    <ul v-if="tags.length <= 0">
-      <li @mouseup="back()">Back</li>
-      <li @mouseup="forward()" class="border">Forward</li>
-      <li @mouseup="selectAll()">Select All</li>
-      <li @mouseup="saveGame()">Save/Load</li>
-    </ul>
+    <template v-if="tags.length <= 0">
+      <ul>
+        <li @mouseup="back()">Back</li>
+        <li @mouseup="forward()">Forward</li>
+      </ul>
+      <ul>
+        <li @mouseup="selectAll()">Select All</li>
+        <li @mouseup="saveGame()">Save/Load</li>
+      </ul>
+    </template>
     <ul v-if="tags.includes('History')">
       <li @mouseup="back()">Back</li>
-      <li @mouseup="forward()" class="border">Forward</li>
+      <li @mouseup="forward()">Forward</li>
     </ul>
-    <ul v-if="tags.includes('Tab')">
-      <li @mouseup="duplicateTab()">Duplicate Tab</li>
-      <li @mouseup="closeTab()" class="border">Close Tab</li>
-      <li @mouseup="closeTabsToRight()">Close Tabs to the Right</li>
-      <li @mouseup="closeAllOtherTabs()">Close Other Tabs</li>  
-    </ul>
+    <template v-if="tags.includes('Tab')">
+      <ul>
+        <li @mouseup="duplicateTab()">Duplicate Tab</li>
+        <li @mouseup="closeTab()">Close Tab</li>
+      </ul>
+      <ul>
+        <li @mouseup="closeTabsToRight()">Close Tabs to the Right</li>
+        <li @mouseup="closeAllOtherTabs()">Close Other Tabs</li>  
+      </ul>
+    </template>
     <ul v-if="tags.includes('TabSection')">
       <li @mouseup="newTab()">New Tab</li>
       <li @mouseup="reopenTab()">Reopen Closed Tab</li>
@@ -26,13 +34,17 @@
       <li @mouseup="selectAll()">Select All</li>  
       <li @mouseup="googleSearch()">Search with Google</li>  
     </ul>
-    <ul v-if="tags.includes('Input')">
-      <li @mouseup="cut()">Cut</li>
-      <li @mouseup="copy()">Copy</li>
-      <li @mouseup="paste()">Paste</li>
-      <li @mouseup="deleteText()" class="border">Delete</li>
-      <li @mouseup="selectAll()">Select All</li>
-    </ul>
+    <template v-if="tags.includes('Input')">
+      <ul>
+        <li @mouseup="cut()">Cut</li>
+        <li @mouseup="copy()">Copy</li>
+        <li @mouseup="paste()">Paste</li>  
+      </ul>
+      <ul>
+        <li @mouseup="deleteText()">Delete</li>
+        <li @mouseup="selectAll()">Select All</li>
+      </ul>
+    </template>
     <ul v-if="tags.includes('Link')">
       <li v-if="tags.includes('External')" @mouseup="openLinkInNewTab()">Open Link in Browser</li>
       <li v-else-if="tags.includes('MediaModal')" @mouseup="openLinkInNewTab()">Open Link in Popup</li>
@@ -56,7 +68,6 @@
 
 <script>
 const {shell, clipboard, ipcRenderer} = require('electron')
-import fs from 'fs'
 
 export default {
   name: 'contextMenu',
@@ -236,6 +247,9 @@ export default {
   box-shadow: 2px 2px 2px -2px var(--ctx-shadow);
   color: var(--font-ctx);
 
+  font-family: var(--font-family-ui);
+  font-weight: normal;
+
   z-index: 5;
   padding: 5px;
   outline: none;
@@ -253,8 +267,10 @@ export default {
       background: var(--ctx-select);
     }
   }
-  ul:not(:last-child),  li.border:not(:last-child){
+  ul:not(:last-child) {
     border-bottom: 1px solid var(--ctx-divider);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
   }
 }
 </style>

@@ -95,17 +95,21 @@ export default {
             }
         },
         getTimestamp() {
+            // Returns a formatted timestamp OR undefined
             // let date = new Date(parseInt(this.thisPage.timestamp) * 1000)
             // let options = {timeZone: "America/New_York", timeZoneName:"short", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit",}
             // let result = date.toLocaleDateString(undefined, options)
             if (!this.thisPage.timestamp) {
                 return undefined
             } else {
+                try {
                 return DateTime.fromSeconds(Number(this.thisPage.timestamp))
                     .setZone("America/New_York")
                     .toFormat("MM/dd/yyyy, ttt")
+                } catch {
+                    return "Invalid Date"
+                }
             }
-            return (result != "Invalid Date") ? result : undefined
         }
     }
 }

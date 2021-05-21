@@ -62,6 +62,7 @@ export default {
     }
   },
   methods:{
+    // TODO: Passwords should be stored as data
     submitPassword(){
       let url
       switch(this.inputText.toUpperCase()){

@@ -1,7 +1,8 @@
 <template>
     <div class="bannerDiv" v-if="!!banner"  @mouseover="mouseEnter" @mousemove="positionTooltip" @mouseleave="mouseLeave" >
         <Media :url="banner.url" :title="banner.title" class="bannerImage" />
-        <img v-if="imgTooltip" :src="$mspaURL(imgTooltip)" class="imgTooltip" />
+        <img v-if="imgTooltip" :src="$resolveURL(imgTooltip)" class="imgTooltip" />
+        <!-- TODO if imgTooltip is always an asset using asset:// would be cheaper -->
     </div>
 </template>
 
@@ -20,7 +21,9 @@ export default {
             tooltipActive: false,
         }
     },
+    // TODO: Banner properties should be set in data, not code
     computed: {
+        // TODO: These specific banner designations should be part of data, not code
         banner() {
             let result = undefined
             let num = parseInt(this.page.pageId)
@@ -112,7 +115,7 @@ export default {
             if (this.tooltipActive) {
                 let page = document.getElementById(this.tab.key)
                 let tooltip = page.getElementsByClassName('imgTooltip')[0]
-                let banner = page.getElementsByClassName('bannerImage')[0]
+                // let banner = page.getElementsByClassName('bannerImage')[0] // unused?
                 let offsetXY = [20, 30]
 
                 let tooltipX = e.clientX + offsetXY[0] //mouse X

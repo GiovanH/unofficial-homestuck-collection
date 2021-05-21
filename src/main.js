@@ -2,15 +2,22 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import localData from './store/localData'
-import fs from 'fs'
-import path from 'path'
+// import path from 'path'
+
+import Mods from "./mods.js"
 
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log');
+log.transports.console.format = '[{level}] {text}';
+const logger = log.scope('Vue');
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import Memoization from '@/memoization.js'
 
 library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
 
@@ -23,15 +30,27 @@ Vue.use(localData, {
 })
 
 const {shell, ipcRenderer} = require('electron')
-let { port, archive } = ipcRenderer.sendSync('STARTUP_REQUEST')
+const port = ipcRenderer.sendSync('STARTUP_GET_PORT')
 
+const Resources = require("@/resources.js")
+Resources.init({
+  assets_root: `http://127.0.0.1:${port}/`
+})
+
+// Mixin mod mixins
+Mods.getMixins().forEach((m) => Vue.mixin(m))
+
+// eslint-disable-next-line no-extend-native
 Number.prototype.pad = function(size) {
-    if (isNaN(this))
-        return undefined
-    var s = String(this);
-    while (s.length < (size || 2)) {s = "0" + s;}
-    return s;
+  if (isNaN(this))
+    return undefined
+  var s = String(this)
+  while (s.length < (size || 2)) 
+    s = "0" + s
+  return s
 }
+
+Vue.mixin(Memoization.mixin)
 
 Vue.mixin({
   data(){
@@ -42,106 +61,106 @@ Vue.mixin({
   },
   computed: {
     $localhost: () => `http://127.0.0.1:${port}/`,
-    $archive: () => archive,
+    $archive() {return this.$root.archive},
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
-    }
+    },
+    $modChoices: () => Mods.modChoices // This is the list of installed mods, it's okay to bake this
   },
   methods: {
     $resolvePath(to){
-      let route = this.$router.resolve(to.toLowerCase()).route
+      // Resolves a logical path within the vue router
+      const route = this.$router.resolve(to.toLowerCase()).route
+      const base = route.path.slice(1).split("/")[0]
+      const vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
+
       let resolvedUrl = route.path
-      let base = route.path.slice(1).split("/")[0]
-      let vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
+
       if (!this.$localData.settings.mspaMode && base == 'mspa') {
-        let vizNums = this.$mspaToViz(route.params.p)
+        const vizNums = this.$mspaToViz(route.params.p)
         if (vizNums) resolvedUrl = `/${vizNums.s}/${vizNums.p}`
-      }
-      else if (this.$localData.settings.mspaMode ) {
+      } else if (this.$localData.settings.mspaMode ) {
         if (base == 'mspa') {
           if (route.params.p.padStart(6, '0') in this.$archive.mspa.story) resolvedUrl =  `/mspa/${route.params.p.padStart(6, '0')}` 
-        }
-        else if (vizBases.includes(base)) {
-          let mspaNums = this.$vizToMspa(base, route.params.p)
+        } else if (vizBases.includes(base)) {
+          const mspaNums = this.$vizToMspa(base, route.params.p)
           if (mspaNums.p) resolvedUrl = `/mspa/${mspaNums.p}`
         }
       }
       return resolvedUrl
     },
+    $openModal(to) {
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
+    },
     $openLink(url, auxClick = false) {
-      let urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+      const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+
+      if (urlObject.protocol == "assets:") {
+        this.$openModal(Resources.resolveAssetsProtocol(url))
+        return
+      }
+
+      // TODO: Some of this could go in Resources?
+
+      // Else, tests
       let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
-            .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
+             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
+        // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
+          // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
+          // If we must do this we should check for a steam installation, eat least
           ipcRenderer.invoke('steam-open', urlObject.href)
-        }
-        else shell.openExternal(urlObject.href)
-      }
-      else if (/\.(html|pdf)$/i.test(to)){
-        shell.openExternal(this.$mspaURL(to))
-      }
-      else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
-      }
-      else if (auxClick) {
+        } else shell.openExternal(urlObject.href)
+      } else if (/\.(html|pdf)$/i.test(to)){
+        // TODO: Not sure resolveURL is needed here? This should always be external?
+        shell.openExternal(Resources.resolveURL(to))
+      } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
+        logger.error("UNCAUGHT ASSET?", to)
+        this.$openModal(to)
+      } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
-      }
-      else {
+      } else {
         this.$pushURL(to)
       }
     },
+    // TODO: resolveURL is perhaps a bad name because this doesn't resolve assets:// urls yet?
+    // that's not handled until Resources.resolveAssetsProtocol or Resources.resolveURL() (which does both)
+    $resolveURL: Resources.getResourceURL,
+    $filterURL(u) {return this.$resolveURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
-      let url = this.$resolvePath(to)
+      const url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
-    $filterURL(url){
-      return url
-        .replace(/^.+:\/\/(www\.|cdn\.)?mspaintadventures\.com\/?((scratch|trickster|ACT6ACT5ACT1x2CO|ACT6ACT6)\.php)?/, "")
-        .replace(/^(.+:\/\/127.0.0.1:\d*\/|.+:\/\/localhost:\d*\/|app:\/\/\.|)/, "")
-        .replace(/^extras\/(ps\d{6})\.html/, "/unlock\/$1")
-        // .replace(/\.html$/, "")
-        .replace(/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1")
-        .replace(/storyfiles\/hs2\/(waywardvagabond\/\w+\/)$/, "/$1")
-        .replace(/\?s=(\w*)&p=(\w*)/, "/mspa/$2")
-        .replace(/\?s=(\w*)/, "/mspa/$1")
-        .replace(/\/Sfiles/, "")
-        .replace(/%20/g, " ")
-    },
     $mspaFileStream(url) {
-      return path.join(this.$localData.assetDir, this.$filterURL(url))
-    },
-    $mspaURL(url) {
-      let resource = this.$filterURL(url)
-      if (resource.charAt(0) == '/') resource = resource.slice(1)
-      return this.$localhost + resource
+      return Resources.resolvePath(url, this.$localData.assetDir)
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber
 
-      //JAILBREAK
+      // JAILBREAK
       if (pageNumber <= 135 || pageNumber == "jb2_000000"){
         return 1
       }      
-      //BARD QUEST
+      // BARD QUEST
       else if (pageNumber >= 136 && pageNumber <= 216) {
         return 2
       }
-      //BLOOD SPADE
+      // BLOOD SPADE
       else if (pageNumber == "mc0001") {
         return 3
       }      
-      //PROBLEM SLEUTH
+      // PROBLEM SLEUTH
       else if (pageNumber >= 219 && pageNumber <= 1892){
         return 4
       }      
-      //HOMESTUCK BETA
+      // HOMESTUCK BETA
       else if (pageNumber >= 1893 && pageNumber <= 1900){
         return 5
       }      
-      //HOMESTUCK
+      // HOMESTUCK
       else if (pageNumber >= 1901 && pageNumber <= 10030 || (pageNumber == "pony" || pageNumber == "pony2" || pageNumber == "darkcage" || pageNumber == "darkcage2")){
         return 6
       }
@@ -149,52 +168,48 @@ Vue.mixin({
       return undefined
     },
     $getAllPagesInStory(story_id, incl_secret=false) {
-      let page_nums = []
+      // TODO: Datadriven this
+      const page_nums = []
       if (story_id == '1'){
-          for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
-          for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
-            page_nums.push("jb2_000000")
+        for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
+        for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
+        page_nums.push("jb2_000000")
+      } else if (story_id == '2'){
+        page_nums.push(Number(136).pad(6))
+        for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
+      } else if (story_id == '3'){
+        page_nums.push("mc0001")
+      } else if (story_id == '4'){
+        for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
+        for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
+      } else if (story_id == '5'){
+        for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
+      } else if (story_id == '6'){
+        for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
+        for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
+        for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
+        for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
+        for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
+        if (incl_secret) {
+          page_nums.push("darkcage")
+          page_nums.push("darkcage2")
+          page_nums.push("pony")
+          page_nums.push("pony2")
+        }
+      } else if (story_id == 'ryanquest'){
+        for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
       }
-      else if (story_id == '2'){
-          page_nums.push(Number(136).pad(6))
-          for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '3'){
-          page_nums.push("MC0001")
-      }
-      else if (story_id == '4'){
-          for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
-          for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '5'){
-          for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
-      }
-      else if (story_id == '6'){
-          for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
-          for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
-          for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
-          for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
-          for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
-          if (incl_secret) {
-              page_nums.push("darkcage")
-              page_nums.push("darkcage2")
-              page_nums.push("pony")
-              page_nums.push("pony2")
-          }
-      }
-      else if (story_id == 'ryanquest'){
-          for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
-      }
+
       if (story_id == 'snaps') {
-          for (let i = 1; i <= 64; i++) page_nums.push(String(i))
+        for (let i = 1; i <= 64; i++) page_nums.push(String(i))
       }
       return page_nums
     },
     $vizToMspa(vizStory, vizPage) {
       let mspaPage
-      let vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
+      const vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
 
-      switch(vizStory){
+      switch (vizStory) {
         case 'jailbreak':
           mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).toString().padStart(6, '0')
           if (1 > vizNum || vizNum > 135 || !(mspaPage in this.$archive.mspa.story)) return {s: undefined, p: undefined}
@@ -223,22 +238,21 @@ Vue.mixin({
           mspaPage = vizNum.toString().padStart(6, '0')
           if (1 > vizNum || vizNum > 15 || !(mspaPage in this.$archive.mspa.ryanquest)) return {s: undefined, p: undefined}
           break
-        
       }
       return {s: vizStory == 'ryanquest' ? 'ryanquest' : this.$getStory(mspaPage), p: mspaPage}
     },
     $mspaToViz(mspaInput, isRyanquest = false){
-      let mspaPage = (mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
-      let mspaStory = this.$getStory(mspaPage)
+      const mspaPage = (mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
+      const mspaStory = this.$getStory(mspaPage)
       let vizStory, vizPage
 
       if (isRyanquest) {
         if (!(mspaPage in this.$archive.mspa.ryanquest)) return undefined
         return {s: 'ryanquest', p: parseInt(mspaPage).toString() }
-      }
-      else if (!(mspaPage in this.$archive.mspa.story)) return undefined
-      else {
-        switch(mspaStory){
+      } else if (!(mspaPage in this.$archive.mspa.story)) {
+        return undefined
+      } else {
+        switch (mspaStory) {
           case 1:
             vizStory = "jailbreak"
             vizPage = (mspaPage == 'jb2_000000') ? '135' : (parseInt(mspaPage) - 1).toString()
@@ -274,53 +288,62 @@ Vue.mixin({
     $mspaOrVizNumber(mspaId){
       return !(mspaId in this.$archive.mspa.story) || this.$localData.settings.mspaMode ? mspaId : this.$mspaToViz(mspaId).p
     },
+    $parseMspaOrViz(userInput, story = 'homestuck') {
+      // Takes a user-formatted string and returns a MSPA page number.
+      // The output page number may not be real!
+      if (this.$localData.settings.mspaMode) {
+        return userInput.padStart(6, '0')
+      } else {
+        return this.$vizToMspa(story, userInput).p
+      }
+    },
     $updateNewReader(thisPageId, forceOverride = false) {
-      let isSetupMode = !this.$archive
-      if (!/\D/.test(thisPageId) && '001901' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      // TODO: Rewrite $updateNewReader for datadriven
+      const isSetupMode = !this.$archive
+      if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
-        //Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
-        //murder me for this horrible block of if-statements if you want, but stack overflow tells me its faster than the switch I was originall working with so shrug
+        // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
+        // murder me for this horrible block of if-statements if you want, but stack overflow tells me its faster than the switch I was originall working with so shrug
         if (!isSetupMode) {
-          //DISC TRANSITIONS + CASCADE SCRAPBOOK
+          // DISC TRANSITIONS + CASCADE SCRAPBOOK
           if (thisPageId == '005643') nextLimit = '005644'
           else if (thisPageId == '005984') nextLimit = '005985'
           else if (thisPageId == '006000') nextLimit = '006001'
 
-          //A6 CHARACTER SELECTS
+          // A6 CHARACTER SELECTS
           else if ('006021' <= thisPageId  && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
           else if ('006369' <= thisPageId  && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
 
-          //A6A5A1x2 COMBO
+          // A6A5A1x2 COMBO
           else if ('007688' <= thisPageId && thisPageId <='007825') {
-            //Sets the next page an extra step ahead to account for the x2 shittery
-            let isLeftPage = !(thisPageId % 2)
-            let page = this.$archive.mspa.story[thisPageId]
-            let nextPageOver = this.$archive.mspa.story[page.next[0]].next[0]
+            // Sets the next page an extra step ahead to account for the x2 shittery
+            const isLeftPage = !(thisPageId % 2)
+            const page = this.$archive.mspa.story[thisPageId]
+            const nextPageOver = this.$archive.mspa.story[page.next[0]].next[0]
             let nextPageId 
             if (isLeftPage) {
               nextPageId = this.$archive.mspa.story[nextPageOver].next[0]
-            }
-            else {
+            } else {
               nextPageId = nextPageOver
             }
             nextLimit = nextPageId
           }
 
-          //JOHN CURSOR
+          // JOHN CURSOR
           else if (thisPageId == '008105') nextLimit = '008106'
 
-          //HOMOSUCK PIANO
+          // HOMOSUCK PIANO
           else if (thisPageId == '008143') nextLimit = '008144'
 
-          //A6A6I1 GLITCHED CHARACTER SELECTS
+          // A6A6I1 GLITCHED CHARACTER SELECTS
           else if (thisPageId == '008282') nextLimit = '008283'
           else if (thisPageId == '008297') nextLimit = '008298'
           else if (thisPageId == '008301') nextLimit = '008302'
           else if (thisPageId == '008305') nextLimit = '008306'
           else if (thisPageId == '008316') nextLimit = '008317'
 
-          //TEREZI RETCON QUEST
+          // TEREZI RETCON QUEST
           else if (thisPageId == '009057') nextLimit = '009058'
           else if (thisPageId == '009108') nextLimit = '009109'
           else if (thisPageId == '009134') nextLimit = '009135'
@@ -330,25 +353,24 @@ Vue.mixin({
           else if (thisPageId == '009221') nextLimit = '009222'
           else if (thisPageId == '009262') nextLimit = '009263'
             
-          //CREDITS
+          // CREDITS
           else if (thisPageId == '010029') nextLimit = '010030'
           else if (thisPageId == '010030') this.$localData.root.NEW_READER_CLEAR()
 
-          //IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
-          //On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
+          // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
+          // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
           else nextLimit = [...this.$archive.mspa.story[thisPageId].next].sort()[0]
         }
-        //Safeguard to catch an unset nextLimit
+        // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
         if (thisPageId == '010030') {
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
-        }
-        else {
-          let resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
-          let resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
+        } else {
+          const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
+          const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
-          //slap some retcons in there as well cause it's not like this function was long enough already
+          // slap some retcons in there as well cause it's not like this function was long enough already
           if (resultCurrent) {
             this.$localData.settings.retcon1 = resultCurrent >= '007999'
             this.$localData.settings.retcon2 = resultCurrent >= '008053'
@@ -363,8 +385,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      }
-      else console.warn("Invalid page ID, not setting")
+      } else logger.warn("Invalid page ID, not setting")
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)
@@ -372,12 +393,27 @@ Vue.mixin({
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
+    $timestampIsSpoiler(timestamp){
+      if (!this.$isNewReader) return false
+
+      const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+
+      if (timestamp > latestTimestamp) {
+        // logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        // const { DateTime } = require('luxon');
+        // let time_zone = "America/New_York"
+        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        
+        return true
+      } else return false
+    },
     $pageIsSpoiler(page, useLimit = false) {
-      //The new-reader setting is split into two values: "current", and "limit"
-      //"current" is the highest page the reader has actually visited. By setting "useLimit" to false, you can use this function to only display content up to a point the reader has seen.
-      //"limit" is the highest page the reader is *allowed* to visit. This is generally set one page ahead of the current page, but in some circumstances like character select screens, it can go much further.
-      let parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
-      let parsedPage = parseInt(page)
+      // The new-reader setting is split into two values: "current", and "limit"
+      // "current" is the highest page the reader has actually visited. By setting "useLimit" to false, you can use this function to only display content up to a point the reader has seen.
+      // "limit" is the highest page the reader is *allowed* to visit. This is generally set one page ahead of the current page, but in some circumstances like character select screens, it can go much further.
+      // TODO: Better document this "friendsim" and "pesterquest" behavior
+      const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
+      const parsedPage = parseInt(page)
       return this.$isNewReader && (
         (page in this.$archive.mspa.story && (
           (!!parsedPage && parsedLimit < parsedPage) ||
@@ -390,43 +426,40 @@ Vue.mixin({
     },
     $trackIsSpoiler(ref) {
       if (this.$isNewReader && ref in this.$archive.music.tracks) {
-        let track = this.$archive.music.tracks[ref]
-        //Try to find a single linked page or album that isn't a spoiler. If we can't, block it.
-        //if it's referenced by an unreleased track, that's not good enough. it has to be reference that unreleased track *itself* 
-        //From the unreleased track's perspective: if it's referenced by a known track, it's ok. Whether or not it references a known track shouldn't affect it.
+        const track = this.$archive.music.tracks[ref]
+        // Try to find a single linked page or album that isn't a spoiler. If we can't, block it.
+        // if it's referenced by an unreleased track, that's not good enough. it has to be reference that unreleased track *itself* 
+        // From the unreleased track's perspective: if it's referenced by a known track, it's ok. Whether or not it references a known track shouldn't affect it.
         
         return !(
           (track.pages && track.pages.find(page => !this.$pageIsSpoiler(page))) ||
           (track.album && track.album.find(album => {
             if (album == 'unreleased-tracks' && track.referencedBy) {
               return track.referencedBy.find(track => !this.$trackIsSpoiler(track))
-            }
-            else return !this.$albumIsSpoiler(album)
+            } else return !this.$albumIsSpoiler(album)
           }))
         )
-      }
-      else return false
+      } else return false
     },
     $albumIsSpoiler(ref) {
       if (this.$isNewReader && ref in this.$archive.music.albums && this.$archive.music.albums[ref].date) {
-        //It's a spoiler if it belongs to an album with a more recent timestamp than the current page
+        // It's a spoiler if it belongs to an album with a more recent timestamp than the current page
         let date
 
-        if (ref == 'homestuck-vol-1') date = this.$archive.mspa.story['002340'].timestamp //During third Rose GameFAQs, after Nanna expodump
-        else if (ref == 'homestuck-vol-5') date = this.$archive.mspa.story['003841'].timestamp //Curtains after [S] Descend
-        else if (ref == 'homestuck-vol-6') date = this.$archive.mspa.story['005127'].timestamp //During LE/Recap 3 Huss interruption
-        else if (ref == 'song-of-skaia') date = this.$archive.mspa.story['006291'].timestamp //Immediately after EOA6I1
-        else if (ref == 'colours-and-mayhem-universe-b') date = this.$archive.mspa.story['006716'].timestamp //Immediately after DOTA, before EOY3 shown
-        else if (ref == 'homestuck-vol-9') date = this.$archive.mspa.story['006928'].timestamp //After Terry: FF to Liv, before cherub chess
-        else if (ref == 'symphony-impossible-to-play') date = this.$archive.mspa.story['007162'].timestamp //Just after Caliborn: Enter, before openbound 1
-        else if (ref == 'one-year-older') date = this.$archive.mspa.story['007162'].timestamp //Just after Caliborn: Enter, before openbound 1
-        else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp //After Interfishin, right when Caliborn/Calliope expodump begins
+        if (ref == 'homestuck-vol-1') date = this.$archive.mspa.story['002340'].timestamp // During third Rose GameFAQs, after Nanna expodump
+        else if (ref == 'homestuck-vol-5') date = this.$archive.mspa.story['003841'].timestamp // Curtains after [S] Descend
+        else if (ref == 'homestuck-vol-6') date = this.$archive.mspa.story['005127'].timestamp // During LE/Recap 3 Huss interruption
+        else if (ref == 'song-of-skaia') date = this.$archive.mspa.story['006291'].timestamp // Immediately after EOA6I1
+        else if (ref == 'colours-and-mayhem-universe-b') date = this.$archive.mspa.story['006716'].timestamp // Immediately after DOTA, before EOY3 shown
+        else if (ref == 'homestuck-vol-9') date = this.$archive.mspa.story['006928'].timestamp // After Terry: FF to Liv, before cherub chess
+        else if (ref == 'symphony-impossible-to-play') date = this.$archive.mspa.story['007162'].timestamp // Just after Caliborn: Enter, before openbound 1
+        else if (ref == 'one-year-older') date = this.$archive.mspa.story['007162'].timestamp // Just after Caliborn: Enter, before openbound 1
+        else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp // After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        console.log(ref, this.$archive.mspa.story['006716'].timestamp)
+        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
-      }
-      else return false
+      } else return false
     }
   } 
 })
@@ -434,9 +467,18 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default'
+      theme: 'default',
+      archive: undefined
     }
   },
   router,
-  render: function (h) { return h(App) }
+  render: function (h) { return h(App) },
+  watch: {
+    '$localData.settings.devMode'(to, from){
+      const is_dev = to
+      log.transports.console.level = (is_dev ? "silly" : "info");
+      logger.silly("Dev-only")
+      logger.info("Everybody")
+    }
+  }
 }).$mount('#app')

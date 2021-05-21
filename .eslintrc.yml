@@ -1,0 +1,32 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - 'plugin:vue/essential'
+  - standard
+parserOptions:
+  ecmaVersion: 12
+  sourceType: module
+plugins:
+  - vue
+rules:
+  arrow-spacing: ["warn"]
+  block-spacing: ["off"]
+  camelcase: ["off"]
+  curly: ["warn", "multi-or-nest", "consistent"]
+  dot-notation: ["warn"]
+  eqeqeq: ["warn", "smart"]
+  indent: ["warn", 2, { "SwitchCase": 1 }]
+  no-callback-literal: ["off"]
+  no-cond-assign: ["warn"]
+  no-multi-spaces: ["off"]
+  no-trailing-space: ["off"]
+  no-trailing-spaces: ["off"]
+  no-var: ["off"]
+  object-curly-spacing: ["off"]
+  quotes: ["off", "double", {"avoidEscape": true}]
+  semi: ["warn"]
+  space-before-blocks: ["off"]
+  space-before-function-paren: ["off"]
+  space-infix-ops: ["warn"]
+  yoda: ["off", "never", { "exceptRange": true }]

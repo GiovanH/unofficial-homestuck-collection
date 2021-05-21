@@ -66,7 +66,7 @@
               <h2><a href="/sbahj">Sweet Bro & Hella Jeff</a></h2>
               <p class="date">Mar 2009 - Nov 2017</p>
               <p class="comicsans">it keeps happening</p>
-              <p>> <a href="/archive/forum/SBaHJ Origins.html">The origin story.</a></p>
+              <p>> <a href="assets://archive/forum/SBaHJ Origins.html">The origin story.</a></p>
             </div>
           </div>
 
@@ -215,11 +215,11 @@
             </div>
             <div class="center">
               > <a href="/log/4" >Adventure Log</a><br>
-              > <a href="/map/4" >Adventure Map</a>
+              > <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
             </div>
             <div class="right">
               > <a href="/unlock" >Unlockable Content</a><br>
-              > <a href="/faqs/science" >Science FAQ</a>
+              > <a href="/faqs/science" v-if="!$timestampIsSpoiler(1236384000)">Science FAQ</a><a disabled v-else>??????</a>
             </div>
           </div>
         </div>
@@ -260,17 +260,17 @@
         </div>
         <div class="row">
           <div class="rowItem cheefulbear">
-            <a class="thumbnail kermit" href="/archive/forum/Cheerfulbear - PLAY ME.html"><Media url="/archive/collection/archive_cheerfulbear.png"/></a>
+            <a class="thumbnail kermit" href="assets://archive/forum/Cheerfulbear - PLAY ME.html"><Media url="/archive/collection/archive_cheerfulbear.png"/></a>
             <div class="description">
-              <h2><a href="/archive/forum/Cheerfulbear - PLAY ME.html">Cheerfulbear - PLAY ME</a></h2>
+              <h2><a href="assets://archive/forum/Cheerfulbear - PLAY ME.html">Cheerfulbear - PLAY ME</a></h2>
               <p class="date">Jan 2008</p>
               <p> HELLO CHEERFULBEAR I WOULD LIKE TO PLAY A GAME HELLO CHEERFULBEAR I WOULD</p>
             </div>
           </div>
           <div class="rowItem suckoff">
-            <a class="thumbnail" href="/archive/forum/Dear Andrew.html"><Media url="/archive/collection/archive_suckoff.png"/></a>
+            <a class="thumbnail" href="assets://archive/forum/Dear Andrew.html"><Media url="/archive/collection/archive_suckoff.png"/></a>
             <div class="description">
-              <h2><a href="/archive/forum/Dear Andrew.html">The Man-On-Man Suckoff Challenge</a></h2>
+              <h2><a href="assets://archive/forum/Dear Andrew.html">The Man-On-Man Suckoff Challenge</a></h2>
               <p class="date">Jun 2008 - May 2009</p>
               <p>Gaze deep into the uncanny valley.</p>
             </div>
@@ -441,7 +441,7 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
-    a {
+    a:not([disabled]) {
       color: var(--page-links);
     }
 
@@ -485,6 +485,18 @@ export default {
           top: -80px;
         }
       }
+      .logo {
+        // Correctly position cards under logos
+        &.hsLogo + .cardEntry {
+          padding-top: 120px;
+        }
+        &.mspaLogo + .cardEntry {
+          padding-top: 50px;
+        }
+        &.tsoLogo + .cardEntry {
+          padding-top: 80px;
+        }
+      }
       .cardContent {
         width: 100%;
         padding-bottom: 25px;
@@ -502,20 +514,11 @@ export default {
             margin-top: 20px;
           }
         }
-        &.hsCard {
-          padding-top: 120px;
-        }
-        &.jbCard {
-          padding-top: 50px;
-        }
-        &.bqCard, &.psCard {
+        &.cardEntry {
+          // Styles for big adventure cards
           padding-top: 25px;
           border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-        }
-        &.tsoCard {
-          padding-top: 80px;
-        }
-        &.cardEntry {
+
           display: flex;
           flex-flow: row nowrap;
           align-items: flex-start;

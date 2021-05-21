@@ -8,6 +8,8 @@
 				<div class="modalLinks">
 					<span v-text="splitPath[0]" @click.prevent="openItemInFolder()" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem()" />
 				</div>
+
+        		<FlashCredit :pageId="this.contentId"/>
 			</div>
 		</div>
 	</transition>
@@ -16,13 +18,14 @@
 
 <script>
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
+import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 const { shell } = require('electron')
 
 export default {
 	name: 'modal',
 	props: ['tab'],
 	components: {
-		MediaEmbed
+		MediaEmbed, FlashCredit
 	},
 	data() {
 		return{
@@ -34,6 +37,9 @@ export default {
 		splitPath() {
 			// Returns folder that the file is stored in, and the filename itself
 			return [this.url.slice(0, this.url.lastIndexOf('/')), this.url.slice(this.url.lastIndexOf('/')+1)]
+		},
+		contentId() {
+			return this.$resolveURL(this.url)
 		}
 	},
 	methods: { 

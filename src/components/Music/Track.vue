@@ -116,6 +116,7 @@ export default {
     },
     linkAndJoinExternalMusic() {
       if (this.track.urls) {
+        // Todo: rewrite this with host sanitization (let host = urlLib.parse(url).host == bandcamp.com)
         let sources = this.track.urls.map(url =>`<a href="${url}">${
           url.includes('bandcamp.com') ? 'Bandcamp' :
           url.includes('youtu') ? 'YouTube' :
@@ -178,21 +179,7 @@ export default {
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
-      let links = this.$refs.commentary.getElementsByTagName('A')
-      for(let i = 0;i < links.length; i++) {
-        links[i].href = this.$filterURL(links[i].href)
-      }
-      
-      //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-      let images = this.$refs.commentary.getElementsByTagName('IMG')
-      for(let i = 0;i < images.length; i++) {
-        images[i].src = this.$mspaURL(images[i].src)
-        images[i].ondragstart = (e) => {
-          e.preventDefault()
-          e.dataTransfer.effectAllowed = 'copy'
-          require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-        }
-      }
+      return filterLinksAndImages(this.$refs.commentary);
     }
   },
   mounted(){
