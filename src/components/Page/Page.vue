@@ -16,11 +16,11 @@
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
-          <div class="footnote" v-for="note in footnotes">
-            <div :class="note.class || ''">
-              <p v-html="note.content"/>
-              <span v-if="note.author" class="author" v-text="note.author" />
-            </div>
+          <div 
+            :class="note.class ? 'footnote ' + note.class : 'footnote'"
+            v-for="note in footnotes">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
           </div>
       </div>
     </div>

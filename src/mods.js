@@ -250,7 +250,7 @@ function mergeFootnotes(archive, footObj) {
   footObj.forEach(footnoteList => {
     logger.info(footnoteList)
     const default_author = footnoteList.author || "Undefined Author"
-    const default_class = footnoteList.class || "footnote-class"
+    const default_class = footnoteList.class || undefined
 
     logger.info(default_author, default_class)
 
