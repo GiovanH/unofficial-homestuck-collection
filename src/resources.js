@@ -206,6 +206,7 @@ const UrlFilterMixin = {
 module.exports = {
   init(settings){
     assets_root = settings.assets_root || assets_root
+    logger.info("Resources initialized to", assets_root)
   },
   UrlFilterMixin,
   resolveURL,

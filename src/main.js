@@ -4,8 +4,6 @@ import router from './router'
 import localData from './store/localData'
 // import path from 'path'
 
-import Mods from "./mods.js"
-
 const Store = require('electron-store')
 const store = new Store()
 
@@ -36,6 +34,9 @@ const Resources = require("@/resources.js")
 Resources.init({
   assets_root: `http://127.0.0.1:${port}/`
 })
+
+// Must init resources first.
+import Mods from "./mods.js"
 
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
