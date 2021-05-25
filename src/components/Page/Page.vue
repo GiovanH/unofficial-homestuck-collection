@@ -17,8 +17,9 @@
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
           <div class="footnote" v-for="note in footnotes">
-            <div :class="note.class">
+            <div :class="note.class || ''">
               <p v-html="note.content"/>
+              <span v-if="note.author" class="author" v-text="note.author" />
             </div>
           </div>
       </div>
@@ -293,18 +294,30 @@ export default {
         .footnote {
           width: 650px;
           border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 0;
+          padding: 30px 25px;
           p {
             text-align: center;
             margin: 0 auto;
             width: 600px;
           }
+
+          .author {
+            font-weight: 300;
+            font-size: 10px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+
+            display: flex;
+            justify-content: flex-end;
+
+            position: relative;
+            top: 12px;
+            margin-top: -12px;
+
+            color: var(--page-nav-meta);
+          }
+
         }
-      }	
+      }
     }
-
   }
-  
-
 </style>
-
