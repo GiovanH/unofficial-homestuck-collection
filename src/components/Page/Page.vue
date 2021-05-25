@@ -16,8 +16,10 @@
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
-          <div class="footnote" v-if="footnote">
-            <p v-html="footnote"/>
+          <div class="footnote" v-for="note in footnotes">
+            <div :class="note.class">
+              <p v-html="note.content"/>
+            </div>
           </div>
       </div>
     </div>
@@ -99,7 +101,7 @@ export default {
       console.log(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
-        //Removes [??????] password links if the retcon hasn't been triggered yet
+        // Removes [??????] password links if the retcon hasn't been triggered yet
         if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
         nextPages.push(this.pageData[nextID.trim()])
       })
@@ -120,8 +122,8 @@ export default {
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
     },
-    footnote() {
-      return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+    footnotes() {
+      return this.$archive.footnotes[this.pageNum] || []
     },
     footerBanner() {            
       // let num = parseInt(this.pageNum) // unused?

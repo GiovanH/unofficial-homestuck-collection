@@ -59,9 +59,6 @@ function bakeRoutes() {
   // Start with least-priority so they're overwritten
   getEnabledModsJs().reverse().forEach(js => {
     try {
-      const mod_root = path.join(modsDir, js._id)
-      const mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
-
       // Lower priority: Auto routes
       if (js.trees) {
         console.assert(!js._singlefile, js.title, "Single file mods cannot use treeroute!")
@@ -73,17 +70,17 @@ function bakeRoutes() {
           console.assert(asset_tree.endsWith("/"), asset_tree, "Tree paths must be directories! (end with /)")
           console.assert(asset_tree.startsWith("assets://"), asset_tree, "Asset paths must be on the assets:// protocol!")
 
-          const treeroutes = getTreeRoutes(crawlFileTree(path.join(mod_root, mod_tree), true))
+          const treeroutes = getTreeRoutes(crawlFileTree(path.join(js._mod_root_dir, mod_tree), true))
           treeroutes.forEach(route => {
             all_mod_routes[asset_tree + route] =
-              new URL(path.posix.join(mod_tree, route), mod_root_url).href
+              new URL(path.posix.join(mod_tree, route), js._mod_root_url).href
           })
         }
       }
       
       // Higher priority: manual routes
       for (const key in js.routes || {}) {
-        const local = new URL(js.routes[key], mod_root_url).href
+        const local = new URL(js.routes[key], js._mod_root_url).href
         all_mod_routes[key] = local
       }
     } catch (e) {
@@ -99,7 +96,8 @@ function bakeRoutes() {
       Resources.resolveURL(url)
     })
   } catch (e) {
-    onModLoadFail(enabled_mods, e)
+    // Might just be that resources are uninitialized.
+    logger.warn("Couldn't lookup", e, "Is resources uninitialized?")
   }
 }
 
@@ -133,7 +131,7 @@ function crawlFileTree(root, recursive=false) {
       if (recursive) {
         const subpath = path.join(root, dirent.name)
         ret[dirent.name] = crawlFileTree(subpath, true)
-      } else return []
+      } else ret[dirent.name] = undefined
     } else {
       ret[dirent.name] = true
     }
@@ -157,6 +155,12 @@ function getModJs(mod_dir, singlefile=false) {
     // mod.logger = log.scope(mod_dir);
     mod._id = mod_dir
     mod._singlefile = singlefile
+
+    if (!singlefile) {
+      mod._mod_root_dir = path.join(modsDir, mod._id)
+      mod._mod_root_url = new URL(mod._id, modsAssetsRoot).href + "/"
+    }
+
     return mod
   } catch (e1) {
     // elaborate error checking w/ afllback
@@ -201,10 +205,69 @@ function getModJs(mod_dir, singlefile=false) {
 // Interface
 
 function editArchive(archive) {
+  // edit(archive)
   getEnabledModsJs().reverse().forEach((js) => {
     const editfn = js.edit
     if (editfn) {
-      archive = editfn(archive)
+      editfn(archive)
+      console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+    }
+  })
+
+  archive.footnotes = {}
+
+  // Footnotes
+  getEnabledModsJs().reverse().forEach((js) => {
+    if (js.footnotes) {
+      if (typeof js.footnotes == "string") {
+        console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
+        
+        const json_path = path.join(
+          js._mod_root_dir, 
+          js.footnotes
+        )
+
+        logger.info(js.title, "Loading footnotes from file", json_path)
+        const footObj = JSON.parse(
+          fs.readFileSync(json_path, 'utf8')
+        )
+        mergeFootnotes(archive, footObj)
+      } else if (Array.isArray(js.footnotes)) {
+        logger.info(js.title, "Loading footnotes from object")
+        mergeFootnotes(archive, js.footnotes)
+      } else {
+        throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+      }
+      logger.info("updated obj", archive.footnotes)
+    }
+  })
+}
+
+function mergeFootnotes(archive, footObj) {
+  if (!Array.isArray(footObj)) {
+    throw new Error(`Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+  }
+
+  footObj.forEach(footnoteList => {
+    logger.info(footnoteList)
+    const default_author = footnoteList.author || "AUTHOR"
+    const default_class = footnoteList.class || "footnote-class"
+    
+    for (var page_num in footnoteList.footnotes) {
+      // TODO replace this with some good defaultdict juice
+      if (!archive.footnotes[page_num])
+        archive.footnotes[page_num] = []
+
+      footnoteList.footnotes[page_num].forEach(note => {
+        logger.info(page_num, note)
+        logger.info(note.content)
+
+        archive.footnotes[page_num].push({
+          author: (note.author || default_author),
+          class: (note.class || default_class),
+          content: note.content
+        })
+      })
     }
   })
 }
@@ -212,9 +275,8 @@ function editArchive(archive) {
 function getMainMixin() {
   let styles = []
   getEnabledModsJs().forEach(js => {
-    const mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
     const modstyles = js.styles || []
-    modstyles.forEach(style_link => styles.push(new URL(style_link, mod_root_url).href))
+    modstyles.forEach(style_link => styles.push(new URL(style_link, js._mod_root_url).href))
   })
 
   return {
@@ -273,22 +335,25 @@ function getMixins() {
 }
 
 // Runtime
-const {ipcMain, ipcRenderer} = require('electron');
+const {ipcMain, ipcRenderer} = require('electron')
 if (ipcMain) {
   // We are in the main process.
   function loadModChoices(){
     // Get the list of mods players can choose to enable/disable
-    var mod_folders;
+    var mod_folders
     try {
       // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] == [])
+      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p, tree[p]))
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
       return []
     }
+    // logger.info("Mod folders seen")
+    // logger.debug(mod_folders)
+
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir)
@@ -302,8 +367,9 @@ if (ipcMain) {
       }
       return acc
     }, {})
-    // logger.info("Mod choices loaded")
-    // logger.debug(items)
+
+    logger.info("Mod choices loaded")
+    logger.debug(Object.keys(items))
     return items
   }
 
@@ -312,6 +378,7 @@ if (ipcMain) {
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
 } else {
   // We are in the renderer process.
+  logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
 }
 
