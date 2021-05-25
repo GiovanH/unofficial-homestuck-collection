@@ -54,6 +54,8 @@ These are basic metadata attributes used in the settings screen for user selecti
 - `modVersion` (number): A javascript number specifying the version of the mod. This may be used for update checking, so this number should strictly increase with subsequent releases.
 - `locked` (string, optional): If your mod's name or description are spoilers, or if your mod unlocks spoiler content in some way, the mod will be hidden until the reader reaches this MSPA page number. For instance, use `"001901"` to unlock once the reader starts reading Homestuck.
 
+While are free to define your own names internally, you should not use names starting with an underscore (`_data`, for instance) as these may be overridden without warning.
+
 ### `edit()`
 
 The `edit()` function is the main way mods should edit data in the archive. When your mod is loaded, `yourmod.edit(archive)` is called with the entire archive passed by reference. `edit` can edit that object arbitrarily. The return value of `edit()` is ignored.
@@ -205,6 +207,65 @@ styles: [
 ```
 
 Specific page/context selectors should be included in the CSS file.
+
+### Footnotes
+
+Mods can add to the global library of footnotes (which is empty, by default) by defining their `footnotes` field. Each footnote has HTML content and an author name. Any given page can have any number of footnotes. 
+
+The `footnotes` object is constructed accordingly:
+
+`footnotes`: `List<FootnotesScope>`
+
+`FootnotesScope` is your main object to manipulate. It has fields
+
+- `author` (string): The author of the footnote. Note that this is not necessarily the author of the mod.
+- `class` (string, optional): A custom CSS class the footnote container will inherit. Use this if you want to do custom styling.
+- `footnotes`: `Map<PageNum, List<Note>>`
+
+Individual notes are as follows:
+
+- `content` (string): The actual content of the footnote. This can include HTML including formatting tags. Be sure to escape HTML if you're defining it in JSON.
+- `author` (string, optional): An explicitly defined author for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
+- `class` (string, optional): An explicitly defined class for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
+
+So, putting that all together, here is a valid footnotes object:
+
+```json
+[{
+  "author": "Default author",
+  "footnotes": {
+    "001901": [{
+      "content": "Footnote <i>html content</i>"
+    },{
+      "content": "Footnote <i>author</i>",
+      "author": "Author override"
+    },{
+      "content": "Footnote <i>class</i>",
+      "class": "css-override"
+    },{
+      "content": "Footnote <i>force clear author</i>",
+      "author": null
+    }],
+    "001902": [{
+      "content": "Footnote <b>a2</b>",
+      "author": "username_a2",
+      "class": "css_a2"
+    }],
+    "001903": [
+      {"content": "Footnote <b>a3a</b>"},
+      {"content": "Footnote <b>a3b</b>"}
+    ]
+  }
+}]
+```
+
+Optionally, your `footnotes` field can instead be set to a string, which will be treated as a local json path to a `footnotes` object, which will be loaded. E.g.
+
+```js
+    footnotes: "./footnotes.json"
+```
+
+Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 
 ### Vue Hooks
 
