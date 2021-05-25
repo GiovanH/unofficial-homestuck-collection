@@ -366,7 +366,7 @@ ipcMain.handle('win-maximize', async (event) => {
   }
 })
 ipcMain.handle('win-close', async (event) => {
-  logger.info("Got synchronous close event...")
+  logger.info("Got asynchronous close event")
   win.close()
 })
 ipcMain.on('win-close-sync', (e) => {
