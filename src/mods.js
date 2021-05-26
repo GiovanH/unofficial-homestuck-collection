@@ -383,6 +383,10 @@ if (ipcMain) {
   modChoices = loadModChoices()
 
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
+  ipcMain.on('MODS_FORCE_RELOAD', (e) => {
+    loadModChoices()
+    e.returnValue = true
+  })
 } else {
   // We are in the renderer process.
   logger.info("Requesting modlist from main")
