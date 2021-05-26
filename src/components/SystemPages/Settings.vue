@@ -16,7 +16,7 @@
         <div class="newReaderInput" v-else>
           <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
           <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 10029. Problem Sleuth starts at 000219.</p>
+          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
         </div>
         <dl>
