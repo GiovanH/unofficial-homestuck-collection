@@ -16,8 +16,11 @@
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
-          <div class="footnote" v-if="footnote">
-            <p v-html="footnote"/>
+          <div 
+            :class="note.class ? 'footnote ' + note.class : 'footnote'"
+            v-for="note in footnotes">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
           </div>
       </div>
     </div>
@@ -99,7 +102,7 @@ export default {
       console.log(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
-        //Removes [??????] password links if the retcon hasn't been triggered yet
+        // Removes [??????] password links if the retcon hasn't been triggered yet
         if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
         nextPages.push(this.pageData[nextID.trim()])
       })
@@ -120,8 +123,8 @@ export default {
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
     },
-    footnote() {
-      return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+    footnotes() {
+      return this.$archive.footnotes[this.pageNum] || []
     },
     footerBanner() {            
       // let num = parseInt(this.pageNum) // unused?
@@ -291,18 +294,30 @@ export default {
         .footnote {
           width: 650px;
           border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 0;
+          padding: 30px 25px;
           p {
             text-align: center;
             margin: 0 auto;
             width: 600px;
           }
+
+          .author {
+            font-weight: 300;
+            font-size: 10px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+
+            display: flex;
+            justify-content: flex-end;
+
+            position: relative;
+            top: 12px;
+            margin-top: -12px;
+
+            color: var(--page-nav-meta);
+          }
+
         }
-      }	
+      }
     }
-
   }
-  
-
 </style>
-
