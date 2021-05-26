@@ -19,6 +19,22 @@
           <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
         </div>
+
+        <h3>Reading Experience</h3>
+        <dl class="fastForwardSelection">
+          <dt>
+            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']">
+            <label for="fast_forward=false">Replay</label>
+          </dt>
+          <dd>Read as if you were reading it live. Stories will be presented approximately as they were at the time of publication.</dd>
+
+          <dt>
+            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']">
+            <label for="fast_forward=true">Archival</label>
+          </dt>
+          <dd>Read as an archival reader. Stories will be presented approximately as they were at the time they were finished/abandoned.</dd>
+        </dl>
+
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
@@ -667,6 +683,13 @@ export default {
             }
           }
         }
+
+        .fastForwardSelection {
+          dd {
+            font-weight: normal;
+          }
+        }
+
         button {
           font-size: 110%;
         }
