@@ -24,6 +24,9 @@
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import {notifData, notifPages} from '@/js/notifications.js'
+const log = require('electron-log')
+
+const logger = log.scope('Notif')
 
 export default {
   name: 'Notifications',
@@ -41,6 +44,14 @@ export default {
     }
   },
   computed: {
+    newspostsByTimestamp() {
+      return Object.values(this.$archive.news).reduce(function(acc, y){
+        return acc.concat(y)
+      }, []).reduce(function(acc, n){
+        acc[n.timestamp] = n
+        return acc
+      })
+    }    
   },
   methods:{
     //This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
@@ -55,8 +66,28 @@ export default {
           this.notifPages['010030'].forEach(notifId => this.queueNotif(notifId))
         } 
       }
-      else if (pageId in this.notifPages ) {
+      else if (pageId in this.notifPages) {
         this.notifPages[pageId].forEach(notifId => this.queueNotif(notifId))
+      }
+
+      // Timestamp-based notifications
+
+      const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
+      const prevTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].previous].timestamp
+      
+      if (this.$settings.subNotifications) {
+        try {
+          // TODO: Optimize this so we're not iterating this much
+          logger.info(prevTimestamp, latestTimestamp, latestTimestamp - prevTimestamp)
+          for (const newst in this.newspostsByTimestamp) {
+            if (newst > prevTimestamp && newst <= latestTimestamp) {
+              logger.info(prevTimestamp, newst, latestTimestamp)
+              this.queueNotif('notif_news')
+            }
+          }
+        } catch (e) {
+          logger.warn("Couldn't compute timestamp", e)
+        }
       }
     },
     queueNotif(notifId) {

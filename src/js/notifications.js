@@ -263,6 +263,13 @@ module.exports = {
       desc: 'Tomorrow\'s canon, today! Homestuck still has plenty in store for you.',
       url: '/skaianet',
       thumb: '/archive/collection/archive_skaianet.png'
+    },
+
+    notif_news: {
+      title: 'New news post',
+      desc: 'wowie!',
+      url: '/news',
+      thumb: '/archive/collection/archive_skaianet.png'
     }
   },
   
