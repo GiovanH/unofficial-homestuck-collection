@@ -35,7 +35,7 @@
                 @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-            <dd :key="boolSetting.model" class="settingDesc" v-html="boolSetting.desc"></dd>
+            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
           </template>
         </dl>
       </div>
@@ -97,7 +97,7 @@
                 @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass still -->
-            <dd :key="boolSetting.model" class="settingDesc" v-html="boolSetting.desc"></dd>
+            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
           </template>
 
         </dl>
@@ -113,7 +113,7 @@
                 v-model="$localData.settings[retcon.model]" 
                 @click="toggleSetting(retcon.model)"
               >{{retcon.label}}</label></dt>
-            <dd :key="retcon.model" class="settingDesc">
+            <dd class="settingDesc">
               Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
             </dd>
           </template>
@@ -183,11 +183,12 @@
                   :name="cc.model" 
                   v-model="$localData.settings[cc.model]" 
                   @click="toggleSetting(cc.model)"
+                  
                 >{{cc.label}}</label>
                 <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
                 <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
               </dt>
-              <dd :key="cc.model" class="settingDesc" v-html="cc.desc"></dd>
+              <dd class="settingDesc" v-html="cc.desc"></dd>
             </template>
 
             <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
