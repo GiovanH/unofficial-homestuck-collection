@@ -253,11 +253,8 @@ function mergeFootnotes(archive, footObj) {
   }
 
   footObj.forEach(footnoteList => {
-    logger.info(footnoteList)
     const default_author = footnoteList.author || "Undefined Author"
     const default_class = footnoteList.class || undefined
-
-    logger.info(default_author, default_class)
 
     for (var page_num in footnoteList.footnotes) {
       // TODO replace this with some good defaultdict juice
@@ -265,15 +262,11 @@ function mergeFootnotes(archive, footObj) {
         archive.footnotes[page_num] = []
 
       footnoteList.footnotes[page_num].forEach(note => {
-        logger.info(page_num, note)
-
         const new_note = {
           author: (note.author === null) ? null : (note.author || default_author),
           class: (note.class === null) ? null : (note.class || default_class),
           content: note.content
         }
-
-        logger.debug(new_note)
 
         archive.footnotes[page_num].push(new_note)
       })
