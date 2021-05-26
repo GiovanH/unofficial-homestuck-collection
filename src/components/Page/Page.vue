@@ -96,6 +96,7 @@ export default {
       return media
     },
     pageContent() {
+      // Todo: Handle peachy with a mod replacement
       return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
     },
     storyNum() {
@@ -311,12 +312,15 @@ export default {
           }
         }
         .preface {
+          width: 650px;
+          margin: 1em 0;
+
           border-style: dashed;
           border-width: 1px;
-          border-color: gray;
-          width: 650px;
-          background-color: #C6C6C6;
-          margin: 1em 0;
+
+          border-color: var(--page-log-border);
+          background-color: var(--page-pageFrame);
+          color: var(--page-nav-divider);
           p {
             text-align: center;
             margin: 0 auto;

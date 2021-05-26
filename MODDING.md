@@ -267,6 +267,8 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
     footnotes: "./footnotes.json"
 ```
 
+Footnotes are not supported on fullscreen flash pages like EndOfHS or Game Over.
+
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 
 ### Vue Hooks

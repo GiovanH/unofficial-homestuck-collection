@@ -8,6 +8,12 @@
     </div>
     <div class="pageFrame">
       <div class="pageContent leftPage">
+          <div 
+            :class="note.class ? 'preface ' + note.class : 'preface'"
+            v-for="note in prefaces[0]">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage[0].title" />
               <div class="media">
@@ -18,8 +24,20 @@
               <TextContent :key="thisPage[0].pageId" :content="thisPage[0].content"/>
               <PageNav :thisPage="thisPage[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
           </div>
+          <div 
+            :class="note.class ? 'footnote ' + note.class : 'footnote'"
+            v-for="note in footnotes[0]">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
       </div>
       <div class="pageContent rightPage">
+          <div 
+            :class="note.class ? 'preface ' + note.class : 'preface'"
+            v-for="note in prefaces[1]">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
           <div class="mediaContent">
               <h2 class="pageTitle" v-html="thisPage[1].title" />
               <div class="media">
@@ -29,6 +47,12 @@
           <div class="textContent">
               <TextContent :key="thisPage[1].pageId" :content="thisPage[1].content"/>
               <PageNav :thisPage="thisPage[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
+          </div>
+          <div 
+            :class="note.class ? 'footnote ' + note.class : 'footnote'"
+            v-for="note in footnotes[1]">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
           </div>
       </div>
     </div>
@@ -64,6 +88,18 @@ export default {
     },
     storyNum() {
       return this.$getStory(this.pageNum)
+    },
+    footnotes() {
+      return [
+        (this.$archive.footnotes[this.thisPage[0].pageId] || []).filter(n => !n.preface),
+        (this.$archive.footnotes[this.thisPage[1].pageId] || []).filter(n => !n.preface),
+      ]
+    },
+    prefaces() {
+      return [
+        (this.$archive.footnotes[this.thisPage[0].pageId] || []).filter(n => n.preface),
+        (this.$archive.footnotes[this.thisPage[1].pageId] || []).filter(n => n.preface),
+      ]
     },
     thisPage() {
       let thisPageId = this.pageNum
@@ -202,6 +238,49 @@ export default {
         display: flex;
         flex-direction: column;
       }
+        .footnote {
+          width: 650px;
+          border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
+          padding: 30px 25px;
+          p {
+            text-align: center;
+            margin: 0 auto;
+            width: 600px;
+          }
+        }
+        .preface {
+          width: 650px;
+          margin: 1em 0;
+
+          border-style: dashed;
+          border-width: 1px;
+
+          border-color: var(--page-log-border);
+          background-color: var(--page-pageFrame);
+          color: var(--page-nav-divider);
+          p {
+            text-align: center;
+            margin: 0 auto;
+            width: 600px;
+          }
+        }
+
+        .footnote, .preface {
+          .author {
+            font-weight: 300;
+            font-size: 10px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+
+            display: flex;
+            justify-content: flex-end;
+
+            position: relative;
+            top: 12px;
+            margin-top: -12px;
+
+            color: var(--page-nav-meta);
+          }
+        }
     }	
   }
 
