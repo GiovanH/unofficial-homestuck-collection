@@ -302,17 +302,33 @@ Vue.mixin({
       // TODO: Rewrite $updateNewReader for datadriven
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const isInRange = '000219' <= thisPageId && thisPageId <= '010030'
+      const isInRange = '000219' <= thisPageId && thisPageId <= '010030' // in the "keep track of spoilers" range
+
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
-        // murder me for this horrible block of if-statements if you want, but stack overflow tells me its faster than the switch I was originall working with so shrug
         if (!isSetupMode) {
-          // DISC TRANSITIONS + CASCADE SCRAPBOOK
-          if (thisPageId == '005643') nextLimit = '005644'
-          else if (thisPageId == '005984') nextLimit = '005985'
-          else if (thisPageId == '006000') nextLimit = '006001'
+          var offByOnePages = [
+            // DISC TRANSITIONS + CASCADE SCRAPBOOK
+            '005643', '005984', '006000',
+
+            '008105', // JOHN CURSOR          
+            '008143', // HOMOSUCK PIANO
+
+            // A6A6I1 GLITCHED CHARACTER SELECTS
+            '008282', '008297', '008301', '008305', '008316',
+
+            // TEREZI RETCON QUEST
+            '009057', '009108', '009134', '009149', 
+            '009187', '009203', '009221', '009262',
+            
+            '010029' // CREDITS
+          ]
+
+          if (offByOnePages.includes(thisPageId)) {
+            nextLimit = (parseInt(thisPageId) + 1).pad(6)
+          }
 
           // A6 CHARACTER SELECTS
           else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
@@ -332,31 +348,6 @@ Vue.mixin({
             }
             nextLimit = nextPageId
           }
-
-          // JOHN CURSOR
-          else if (thisPageId == '008105') nextLimit = '008106'
-
-          // HOMOSUCK PIANO
-          else if (thisPageId == '008143') nextLimit = '008144'
-
-          // A6A6I1 GLITCHED CHARACTER SELECTS
-          else if (thisPageId == '008282') nextLimit = '008283'
-          else if (thisPageId == '008297') nextLimit = '008298'
-          else if (thisPageId == '008301') nextLimit = '008302'
-          else if (thisPageId == '008305') nextLimit = '008306'
-          else if (thisPageId == '008316') nextLimit = '008317'
-
-          // TEREZI RETCON QUEST
-          else if (thisPageId == '009057') nextLimit = '009058'
-          else if (thisPageId == '009108') nextLimit = '009109'
-          else if (thisPageId == '009134') nextLimit = '009135'
-          else if (thisPageId == '009149') nextLimit = '009150'
-          else if (thisPageId == '009187') nextLimit = '009188'
-          else if (thisPageId == '009203') nextLimit = '009204'
-          else if (thisPageId == '009221') nextLimit = '009222'
-          else if (thisPageId == '009262') nextLimit = '009263'
-          else if (thisPageId == '010030') this.$localData.root.NEW_READER_CLEAR()
-
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
           else nextLimit = [...this.$archive.mspa.story[thisPageId].next].sort()[0]
