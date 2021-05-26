@@ -294,7 +294,7 @@ export default {
           desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
         }, {
           model: "pixelScaling",
-          label: "Pixelated image scaling</label></dt>",
+          label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
         }, {
           model: "mspaMode",
