@@ -309,6 +309,7 @@ Vue.mixin({
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
         if (!isSetupMode) {
+          // Calculate nextLimit
           var offByOnePages = [
             // DISC TRANSITIONS + CASCADE SCRAPBOOK
             '005643', '005984', '006000',
@@ -356,6 +357,7 @@ Vue.mixin({
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
         if (thisPageId == '010030') {
+          // Finished Homestuck.
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
