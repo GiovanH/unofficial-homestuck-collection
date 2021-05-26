@@ -220,6 +220,7 @@ The `footnotes` object is constructed accordingly:
 
 - `author` (string): The author of the footnote. Note that this is not necessarily the author of the mod.
 - `class` (string, optional): A custom CSS class the footnote container will inherit. Use this if you want to do custom styling.
+- `preface` (bool, optional): If set to `true`, notes will appear before pages instead of after them.
 - `footnotes`: `Map<PageNum, List<Note>>`
 
 Individual notes are as follows:
@@ -227,6 +228,7 @@ Individual notes are as follows:
 - `content` (string): The actual content of the footnote. This can include HTML including formatting tags. Be sure to escape HTML if you're defining it in JSON.
 - `author` (string, optional): An explicitly defined author for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
 - `class` (string, optional): An explicitly defined class for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
+- `preface` (bool, optional): An explicitly defined preface-state for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
 
 So, putting that all together, here is a valid footnotes object:
 

@@ -255,6 +255,7 @@ function mergeFootnotes(archive, footObj) {
   footObj.forEach(footnoteList => {
     const default_author = footnoteList.author || "Undefined Author"
     const default_class = footnoteList.class || undefined
+    const default_ispreface = footnoteList.preface
 
     for (var page_num in footnoteList.footnotes) {
       // TODO replace this with some good defaultdict juice
@@ -265,6 +266,7 @@ function mergeFootnotes(archive, footObj) {
         const new_note = {
           author: (note.author === null) ? null : (note.author || default_author),
           class: (note.class === null) ? null : (note.class || default_class),
+          preface: note.preface || default_ispreface,
           content: note.content
         }
 

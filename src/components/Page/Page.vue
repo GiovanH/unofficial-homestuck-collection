@@ -5,6 +5,12 @@
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
       <div class="pageContent">
+          <div 
+            :class="note.class ? 'preface ' + note.class : 'preface'"
+            v-for="note in prefaces">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -124,7 +130,10 @@ export default {
       return this.thisPage.flag.includes('FIREFLY')
     },
     footnotes() {
-      return this.$archive.footnotes[this.pageNum] || []
+      return (this.$archive.footnotes[this.pageNum] || []).filter(n => !n.preface)
+    },
+    prefaces() {
+      return (this.$archive.footnotes[this.pageNum] || []).filter(n => n.preface)
     },
     footerBanner() {            
       // let num = parseInt(this.pageNum) // unused?
@@ -300,7 +309,22 @@ export default {
             margin: 0 auto;
             width: 600px;
           }
+        }
+        .preface {
+          border-style: dashed;
+          border-width: 1px;
+          border-color: gray;
+          width: 650px;
+          background-color: #C6C6C6;
+          margin: 1em 0;
+          p {
+            text-align: center;
+            margin: 0 auto;
+            width: 600px;
+          }
+        }
 
+        .footnote, .preface {
           .author {
             font-weight: 300;
             font-size: 10px;
@@ -315,7 +339,6 @@ export default {
 
             color: var(--page-nav-meta);
           }
-
         }
       }
     }
