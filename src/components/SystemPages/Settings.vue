@@ -23,16 +23,16 @@
         <h3>Reading Experience</h3>
         <dl class="fastForwardSelection">
           <dt>
-            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']">
+            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live. Stories will be presented approximately as they were at the time of publication.</dd>
+          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page).</dd>
 
           <dt>
-            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']">
+            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=true">Archival</label>
           </dt>
-          <dd>Read as an archival reader. Stories will be presented approximately as they were at the time they were finished/abandoned.</dd>
+          <dd>Read as an archival reader.<br>Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
         </dl>
 
         <dl>
@@ -522,6 +522,8 @@ export default {
       }
     },
     toggleSetting(setting, parentObject){
+      // Call this when a setting changes, so we can update it on the parent object.
+      // Doesn't actually toggle settings.
       if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
       else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
