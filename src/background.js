@@ -341,7 +341,13 @@ ipcMain.on('STARTUP_GET_PORT', (event) => {
 })
 
 // Speed hack, try to preload the first copy of the archive
-var first_archive = loadArchiveData();
+var first_archive
+try {
+  first_archive = loadArchiveData()
+} catch (e) {
+  // Probably asked for a resource before init! Well, that's just a cache failure then.
+  logger.warn(e)
+}
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   let archive;
