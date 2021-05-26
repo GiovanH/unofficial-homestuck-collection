@@ -301,7 +301,9 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       // TODO: Rewrite $updateNewReader for datadriven
       const isSetupMode = !this.$archive
-      if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      const isNumericalPage = /\D/.test(thisPageId)
+      const isInRange = '000219' <= thisPageId && thisPageId <= '010030'
+      if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
@@ -313,8 +315,8 @@ Vue.mixin({
           else if (thisPageId == '006000') nextLimit = '006001'
 
           // A6 CHARACTER SELECTS
-          else if ('006021' <= thisPageId  && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
-          else if ('006369' <= thisPageId  && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
+          else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
+          else if ('006369' <= thisPageId && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
 
           // A6A5A1x2 COMBO
           else if ('007688' <= thisPageId && thisPageId <='007825') {
@@ -353,9 +355,6 @@ Vue.mixin({
           else if (thisPageId == '009203') nextLimit = '009204'
           else if (thisPageId == '009221') nextLimit = '009222'
           else if (thisPageId == '009262') nextLimit = '009263'
-            
-          // CREDITS
-          else if (thisPageId == '010029') nextLimit = '010030'
           else if (thisPageId == '010030') this.$localData.root.NEW_READER_CLEAR()
 
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
@@ -366,6 +365,7 @@ Vue.mixin({
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
         if (thisPageId == '010030') {
+          this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
           const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
