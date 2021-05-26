@@ -226,9 +226,10 @@
                 <b>{{option.label}}</b> - {{option.desc}}
               </li>
             </draggable>
-            <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
           </div>
         </section>
+        <button @click="forceReload">Force reload</button>
+        <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
       </div>
 
       <div class="settings system">
@@ -539,12 +540,16 @@ export default {
       )
       this.$localData.settings[setting_key] = list_active
       
-      if(this.debounce) return
+      if (this.debounce) return
       this.debounce = setTimeout(function() {
-          this.debounce = false 
-          this.memoizedClearAll();
-          ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+        this.debounce = false 
+        this.memoizedClearAll();
+        ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       }.bind(this), 2000)
+    },
+    forceReload: function() {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      ipcRenderer.send('RELOAD_ARCHIVE_DATA')
     }
   },
   watch: {
