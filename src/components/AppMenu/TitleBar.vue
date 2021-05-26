@@ -43,6 +43,10 @@ export default {
     },
     close() {
       ipcRenderer.invoke('win-close')
+      // Give the OS 2500 ms, then force close
+      setTimeout(function() {
+        ipcRenderer.sendSync('win-close-sync')
+      }, 2500)
     }
   },
   mounted() {

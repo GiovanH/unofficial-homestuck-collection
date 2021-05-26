@@ -366,8 +366,15 @@ ipcMain.handle('win-maximize', async (event) => {
   }
 })
 ipcMain.handle('win-close', async (event) => {
+  logger.info("Got asynchronous close event")
   win.close()
 })
+ipcMain.on('win-close-sync', (e) => {
+  logger.warn("Got synchronous close event!")
+  win.destroy()
+  e.returnValue = true;
+})
+
 
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {
