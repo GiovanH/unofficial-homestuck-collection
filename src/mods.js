@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
+const {ipcMain, ipcRenderer, dialog} = require('electron')
+
 const Store = require('electron-store')
 const store = new Store()
 
@@ -45,13 +47,30 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
-function onModLoadFail(enabled_mods, e) {
-  logger.info("Mod load failure with modlist", enabled_mods)
-  logger.debug(e)
-  clearEnabledMods()
-  logger.debug("Modlist cleared.")
-  // TODO: Replace this with a good visual traceback so users can diagnose mod issues
-  throw e 
+var onModLoadFail;
+
+if (ipcMain) {
+  onModLoadFail = function (enabled_mods, e) {
+    logger.info("Mod load failure with issues in", enabled_mods)
+    logger.error(e)
+    clearEnabledMods()
+    // TODO: Replace this with a good visual traceback so users can diagnose mod issues
+    
+    dialog.showMessageBoxSync({
+      type: 'error',
+      title: 'Mod load error',
+      message: "Something went wrong while loading mods! All mods have been disabled for safety.\nCheck the console log for details"
+    })
+  }
+} else {
+  // We are in the renderer process.
+  onModLoadFail = function (enabled_mods, e) {
+    logger.info("Mod load failure with modlist", enabled_mods)
+    logger.debug(e)
+    clearEnabledMods()
+    logger.error("Did not expect to be in the renderer process for this! Debug")
+    throw e 
+  }
 }
 
 function bakeRoutes() {
@@ -97,14 +116,17 @@ function bakeRoutes() {
 
   // Test routes
   // TODO: This is super wasteful and should only be done when developer mode is on.
-  try {
-    const Resources = require("@/resources.js")
+
+  const Resources = require("@/resources.js")
+  if (Resources.isReady()) {
     Object.keys(all_mod_routes).forEach(url => {
-      Resources.resolveURL(url)
+      try {
+        Resources.resolveURL(url)
+      } catch (e) {
+        logger.warn("Testing routes failed")
+        onModLoadFail([url], e)
+      }
     })
-  } catch (e) {
-    // Might just be that resources are uninitialized.
-    logger.warn("Couldn't lookup", e, "Is resources uninitialized?")
   }
 }
 
@@ -120,6 +142,7 @@ function clearEnabledMods() {
   // TODO: This doesn't trigger the settings.modListEnabled observer,
   // which results in bad settings-screen side effects
   store.set(store_modlist_key, [])
+  logger.debug("Modlist cleared.")
   bakeRoutes()
 }
 
@@ -351,7 +374,7 @@ function getMixins(){
 
 // Runtime
 // Grey magic. This file can be run from either process, but only the main process will do file handling.
-const {ipcMain, ipcRenderer} = require('electron')
+
 if (ipcMain) {
   // We are in the main process.
   function loadModChoices(){

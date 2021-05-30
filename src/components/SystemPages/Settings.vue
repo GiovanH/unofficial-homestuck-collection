@@ -16,7 +16,7 @@
         <div class="newReaderInput" v-else>
           <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
           <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 10029. Problem Sleuth starts at 000219.</p>
+          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
         </div>
         <dl>
@@ -294,7 +294,7 @@ export default {
           desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
         }, {
           model: "pixelScaling",
-          label: "Pixelated image scaling</label></dt>",
+          label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
         }, {
           model: "mspaMode",
