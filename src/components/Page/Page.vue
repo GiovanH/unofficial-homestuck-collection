@@ -131,10 +131,10 @@ export default {
       return this.thisPage.flag.includes('FIREFLY')
     },
     footnotes() {
-      return (this.$archive.footnotes[this.pageNum] || []).filter(n => !n.preface)
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
     },
     prefaces() {
-      return (this.$archive.footnotes[this.pageNum] || []).filter(n => n.preface)
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
     },
     footerBanner() {            
       // let num = parseInt(this.pageNum) // unused?

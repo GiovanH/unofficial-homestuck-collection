@@ -90,15 +90,17 @@ export default {
       return this.$getStory(this.pageNum)
     },
     footnotes() {
+      const notes = this.$archive.footnotes['story']
       return [
-        (this.$archive.footnotes[this.thisPage[0].pageId] || []).filter(n => !n.preface),
-        (this.$archive.footnotes[this.thisPage[1].pageId] || []).filter(n => !n.preface),
+        (notes[this.thisPage[0].pageId] || []).filter(n => !n.preface),
+        (notes[this.thisPage[1].pageId] || []).filter(n => !n.preface)
       ]
     },
     prefaces() {
+      const notes = this.$archive.footnotes['story']
       return [
-        (this.$archive.footnotes[this.thisPage[0].pageId] || []).filter(n => n.preface),
-        (this.$archive.footnotes[this.thisPage[1].pageId] || []).filter(n => n.preface),
+        (notes[this.thisPage[0].pageId] || []).filter(n => n.preface),
+        (notes[this.thisPage[1].pageId] || []).filter(n => n.preface)
       ]
     },
     thisPage() {

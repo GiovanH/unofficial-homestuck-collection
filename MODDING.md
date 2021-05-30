@@ -212,16 +212,14 @@ Specific page/context selectors should be included in the CSS file.
 
 Mods can add to the global library of footnotes (which is empty, by default) by defining their `footnotes` field. Each footnote has HTML content and an author name. Any given page can have any number of footnotes. 
 
-The `footnotes` object is constructed accordingly:
-
-`footnotes`: `List<FootnotesScope>`
+The `footnotes` object is a `List<FootnotesScope>`
 
 `FootnotesScope` is your main object to manipulate. It has fields
 
 - `author` (string): The author of the footnote. Note that this is not necessarily the author of the mod.
 - `class` (string, optional): A custom CSS class the footnote container will inherit. Use this if you want to do custom styling.
 - `preface` (bool, optional): If set to `true`, notes will appear before pages instead of after them.
-- `footnotes`: `Map<PageNum, List<Note>>`
+- `story`: `Map<PageNum, List<Note>>`, adds footnotes to MSPA story pages by PageNum.
 
 Individual notes are as follows:
 
@@ -235,7 +233,7 @@ So, putting that all together, here is a valid footnotes object:
 ```json
 [{
   "author": "Default author",
-  "footnotes": {
+  "story": {
     "001901": [{
       "content": "Footnote <i>html content</i>"
     },{
