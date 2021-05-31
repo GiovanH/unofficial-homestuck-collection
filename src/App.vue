@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="[$root.theme, $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive">
+  <div id="app" :class="[$root.theme, $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive && $root.loadState !== 'ERROR'">
     <AppHeader />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications ref="notifications" />
@@ -123,7 +123,7 @@
 
       electron.ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
         console.log("got SET_LOAD_STATE", state)
-        this.loadState = state
+        this.$root.loadState = state
       })
 
       document.addEventListener('dragover', event => event.preventDefault())

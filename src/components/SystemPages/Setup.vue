@@ -54,9 +54,10 @@
         </div>
       </div>
 
-      <div class="card" v-else-if="isLoading && !(archiveError || timeout)">
+      <div class="card" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
         <div class="cardContent card_intro">
           <div class="getStarted">
+            <!-- TODO: some sort of graphic loader here -->
             <p>Loading...</p>
           </div>
         </div>
@@ -129,11 +130,8 @@ export default {
     validatePage() {
       return this.newReaderValidation && this.assetDir
     },
-    archiveError(){
-      return this.loadState == "ERROR"
-    },
     isLoading() {
-      return this.loadState === undefined || this.loadState == "LOADING"
+      return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
     },
     isNewUser() {
       return this.$localData.assetDir === undefined
