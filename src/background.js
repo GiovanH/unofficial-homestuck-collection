@@ -220,6 +220,7 @@ function loadArchiveData(){
   }
 
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
+  // TODO: Detect Asset Pack verison here, only apply patch if applicable.
   const gankraSearchPage = data.search.find(x => x.key == '002745')
   if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
