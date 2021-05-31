@@ -121,6 +121,10 @@
         this.$root.archive = archive
       })
 
+      electron.ipcRenderer.on('ARCHIVE_ERROR', (event, archive) => {
+        this.$root.archiveError = true
+      })
+
       document.addEventListener('dragover', event => event.preventDefault())
       document.addEventListener('drop', event => event.preventDefault())
 

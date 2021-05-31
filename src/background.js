@@ -346,17 +346,21 @@ var first_archive
 try {
   first_archive = loadArchiveData()
 } catch (e) {
-  // Probably asked for a resource before init! Well, that's just a cache failure then.
   logger.warn(e)
 }
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   let archive;
-  if (first_archive) {
-    archive = first_archive
-    first_archive = undefined;
-  } else archive = loadArchiveData()
-  win.webContents.send('ARCHIVE_UPDATE', archive)
+  try {
+    if (first_archive) {
+      archive = first_archive
+      first_archive = undefined;
+    } else archive = loadArchiveData()
+    win.webContents.send('ARCHIVE_UPDATE', archive)
+  } catch (e) {
+    logger.error("Error reloading archive", e)
+    win.webContents.send('ARCHIVE_ERROR')
+  }
 })
 
 ipcMain.handle('win-minimize', async (event) => {

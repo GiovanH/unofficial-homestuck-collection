@@ -27,6 +27,13 @@
           </div>
         </div>
       </div>
+      <div class="card" v-else-if="!isLoaded">
+        <div class="cardContent card_intro">
+          <div class="getStarted">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
       <div class="card" v-else>
         <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
@@ -89,7 +96,6 @@ export default {
   },
   data: function() {
     return {
-      errorMode: false,
       newReaderToggle: true,
       newReaderPage: "1",
       newReaderValidation: true,
@@ -100,6 +106,12 @@ export default {
   computed: {
     validatePage() {
       return this.newReaderValidation && this.assetDir
+    },
+    isLoaded() {
+      return !this.$localData || !this.$localData.assetDir
+    }, 
+    errorMode() {
+      return this.$root.archiveError
     }
   },
   methods: {
@@ -120,9 +132,6 @@ export default {
       if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
       ipcRenderer.invoke('restart')
     }
-  },
-  mounted() {
-    this.errorMode = !!this.$localData && !!this.$localData.assetDir
   },
   watch: {
     newReaderPage(to, from) {
