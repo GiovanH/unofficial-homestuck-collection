@@ -7,7 +7,28 @@
   </div>
   <div class="tabFrame">
     <div class="pageBody">
-      <div class="card" v-if="!errorMode">
+      <div class="card" v-if="errorMode">
+        <div class="cardContent card_intro">
+          <div class="getStarted">
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
+            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
+            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
+            <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
+            <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
+            <div class="center">
+              <button @click="locateAssets()">Locate Assets</button><br>
+              <span class="hint">Directory: {{assetDir || $localData.assetDir || 'None selected'}}</span>
+            </div>
+            <br>
+            <div class="center">
+              <button @click="errorModeRestart()">All done. Let's roll!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" v-else>
+        <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
           <div class="intro">
             <img class="logo" src="@/assets/collection_logo.png"><br>
@@ -51,26 +72,6 @@
           </div>
         </div>
       </div>
-      <div class="card" v-else>
-        <div class="cardContent card_intro">
-          <div class="getStarted">
-            <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
-            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
-            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
-            <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
-            <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
-            <div class="center">
-              <button @click="locateAssets()">Locate Assets</button><br>
-              <span class="hint">Directory: {{assetDir || $localData.assetDir || 'None selected'}}</span>
-            </div>
-            <br>
-            <div class="center">
-              <button @click="errorModeRestart()">All done. Let's roll!</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -99,9 +100,9 @@ export default {
   computed: {
     validatePage() {
       return this.newReaderValidation && this.assetDir
-    },
+    }
   },
-  methods:{
+  methods: {
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: false}).then( result => {
         this.assetDir = result || this.assetDir
