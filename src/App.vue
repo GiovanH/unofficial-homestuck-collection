@@ -121,8 +121,9 @@
         this.$root.archive = archive
       })
 
-      electron.ipcRenderer.on('ARCHIVE_ERROR', (event, archive) => {
-        this.$root.archiveError = true
+      electron.ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
+        console.log("got SET_LOAD_STATE", state)
+        this.loadState = state
       })
 
       document.addEventListener('dragover', event => event.preventDefault())

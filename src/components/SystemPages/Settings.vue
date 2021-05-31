@@ -550,6 +550,7 @@ export default {
     forceReload: function() {
       ipcRenderer.sendSync('MODS_FORCE_RELOAD')
       ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      // ipcRenderer.invoke('restart')
     }
   },
   watch: {

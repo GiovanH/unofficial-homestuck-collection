@@ -204,19 +204,27 @@ function loadArchiveData(){
     return undefined
   }
 
-  if (!data) throw Error("Data empty after attempted load")
+  if (!data) throw new Error("Data empty after attempted load")
 
   try {
     Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
     // but we should do this only when we reload the archive
     Mods.bakeRoutes()
+
+    // Sanity checks
+    let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+    required_keys.forEach(key => {
+      if (!data[key]) throw new Error("Archive object missing required key", key)
+    })
+
   } catch (e) {
     // TODO: Errors should already log/handle themselves by now
     // but we need to update the application state to react to it
 
     // specifically $localdata can be in an invalid state
-    logger.error(e)
+    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+    throw e
   }
 
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
@@ -351,6 +359,7 @@ try {
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   let archive;
+  win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
     if (first_archive) {
       archive = first_archive
@@ -359,7 +368,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
-    win.webContents.send('ARCHIVE_ERROR')
+    win.webContents.send('SET_LOAD_STATE', "ERROR")
   }
 })
 

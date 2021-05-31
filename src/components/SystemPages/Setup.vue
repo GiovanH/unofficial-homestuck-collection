@@ -7,34 +7,8 @@
   </div>
   <div class="tabFrame">
     <div class="pageBody">
-      <div class="card" v-if="errorMode">
-        <div class="cardContent card_intro">
-          <div class="getStarted">
-            <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
-            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
-            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
-            <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
-            <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
-            <div class="center">
-              <button @click="locateAssets()">Locate Assets</button><br>
-              <span class="hint">Directory: {{assetDir || $localData.assetDir || 'None selected'}}</span>
-            </div>
-            <br>
-            <div class="center">
-              <button @click="errorModeRestart()">All done. Let's roll!</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card" v-else-if="!isLoaded">
-        <div class="cardContent card_intro">
-          <div class="getStarted">
-            <p>Loading...</p>
-          </div>
-        </div>
-      </div>
-      <div class="card" v-else>
+
+      <div class="card" v-if="isNewUser">
         <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
           <div class="intro">
@@ -79,6 +53,53 @@
           </div>
         </div>
       </div>
+
+      <div class="card" v-else-if="isLoading && !(archiveError || timeout)">
+        <div class="cardContent card_intro">
+          <div class="getStarted">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" v-else>
+        <!-- Something went wrong. -->
+        <div class="cardContent card_intro">
+          <div class="getStarted" v-if="modsEnabled">
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p>Sorry! Something went critically wrong loading the program.</p><br>
+            <p>You currently have mods enabled:</p><br>
+            <ol>
+              <li v-for="id in modsEnabled" v-text="id.label" :key="id.key"/>
+            </ol>
+            <br>
+            <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
+            <p>Please disable all mods and then restart.</p><br>
+            <div class="center">
+              <button @click="clearEnabledMods()">Disable all and reload</button><br>
+            </div>
+            <br>
+            <span class="hint">If this issue persists when you re-enable a mod, please contact the mod author!</span>
+          </div>
+          <div class="getStarted" v-else>
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
+            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
+            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
+            <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
+            <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
+            <div class="center">
+              <button @click="locateAssets()">Locate Assets</button><br>
+              <span class="hint">Directory: {{assetDir || $localData.assetDir || 'None selected'}}</span>
+            </div>
+            <br>
+            <div class="center">
+              <button @click="errorModeRestart()">All done. Let's roll!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>
@@ -97,6 +118,7 @@ export default {
   data: function() {
     return {
       newReaderToggle: true,
+      timeout: false,
       newReaderPage: "1",
       newReaderValidation: true,
       assetDir: undefined,
@@ -107,12 +129,24 @@ export default {
     validatePage() {
       return this.newReaderValidation && this.assetDir
     },
-    isLoaded() {
-      return !this.$localData || !this.$localData.assetDir
-    }, 
-    errorMode() {
-      return this.$root.archiveError
+    archiveError(){
+      return this.loadState == "ERROR"
+    },
+    isLoading() {
+      return this.loadState === undefined || this.loadState == "LOADING"
+    },
+    isNewUser() {
+      return this.$localData.assetDir === undefined
+    },
+    modsEnabled() {
+      return this.$localData.settings.modListEnabled.map((key) => 
+        this.$modChoices[key])
     }
+  },
+  mounted() {
+    setTimeout(function() {
+      this.timeout = true
+    }.bind(this), 8000)
   },
   methods: {
     locateAssets(){
@@ -120,17 +154,29 @@ export default {
         this.assetDir = result || this.assetDir
       })
     },
+    clearEnabledMods(){
+      this.$localData.settings["modListEnabled"] = []
+      this.$localData.VM.saveLocalStorage()
+
+      this.timeout = false
+
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+    },
     validateAndRestart(){
       if (this.newReaderToggle && this.newReaderValidation) {
         let mspaId = (parseInt(this.newReaderPage) + 1900).toString().padStart(6, '0') 
         this.$updateNewReader(mspaId)
       }
       this.$localData.root.SET_ASSET_DIR(this.assetDir)
-      ipcRenderer.invoke('restart')
+
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      // ipcRenderer.invoke('restart')
     },
     errorModeRestart() {
       if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
-      ipcRenderer.invoke('restart')
+
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      // ipcRenderer.invoke('restart')
     }
   },
   watch: {
