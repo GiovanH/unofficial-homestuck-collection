@@ -59,7 +59,7 @@ if (ipcMain) {
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
-      message: "Something went wrong while loading mods! All mods have been disabled for safety.\nCheck the console log for details"
+      message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
     })
   }
 } else {
