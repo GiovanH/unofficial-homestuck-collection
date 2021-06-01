@@ -207,9 +207,11 @@ function loadArchiveData(){
   if (!data) throw new Error("Data empty after attempted load")
 
   try {
+    logger.debug("Applying mod archive edits")
     Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
     // but we should do this only when we reload the archive
+    logger.debug("Baking mod routes")
     Mods.bakeRoutes()
 
     // Sanity checks
@@ -228,15 +230,17 @@ function loadArchiveData(){
   }
 
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  // TODO: Detect Asset Pack verison here, only apply patch if applicable.
-  const gankraSearchPage = data.search.find(x => x.key == '002745')
-  if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+  if (data.version == "1") {
+    logger.info("Applying asset pack v1 patches")
+    const gankraSearchPage = data.search.find(x => x.key == '002745')
+    if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
-  data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+    data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
 
-  data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+    data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
 
-  data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+    data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+  }
 
   // Set up search index
   chapterIndex = new FlexSearch({
