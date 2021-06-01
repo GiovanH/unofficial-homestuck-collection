@@ -16,6 +16,9 @@ const modsAssetsRoot = "assets://mods/"
 var modChoices
 var routes = undefined
 
+const store_modlist_key = 'localData.settings.modListEnabled'
+const store_devmode_key = 'localData.settings.devMode'
+
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
   // returns the path of the mod file. 
@@ -120,20 +123,24 @@ function bakeRoutes() {
   // Test routes
   // TODO: This is super wasteful and should only be done when developer mode is on.
 
-  const Resources = require("@/resources.js")
-  if (Resources.isReady()) {
-    Object.keys(all_mod_routes).forEach(url => {
-      try {
-        Resources.resolveURL(url)
-      } catch (e) {
-        logger.warn("Testing routes failed")
-        onModLoadFail([url], e)
-      }
-    })
-  }
-}
+  const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
 
-const store_modlist_key = 'localData.settings.modListEnabled'
+  if (do_full_check) {
+    logger.debug("Doing full resources check (devMode on)")
+    const Resources = require("@/resources.js")
+    if (Resources.isReady()) {
+      Object.keys(all_mod_routes).forEach(url => {
+        try {
+          Resources.resolveURL(url)
+        } catch (e) {
+          logger.warn("Testing routes failed")
+          onModLoadFail([url], e)
+        }
+      })
+    }
+  } else 
+    logger.debug("Skipping full resources check (devMode off)")
+}
 
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
