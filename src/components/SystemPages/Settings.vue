@@ -533,7 +533,7 @@ export default {
     },
     onUpdateSortable: function(event){
       let el_active = event.target;
-      let setting_key = el_active.attributes['data-setting'].value || "modListEnabled"
+      let setting_key = el_active.attributes['data-setting'].value
 
       let list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
