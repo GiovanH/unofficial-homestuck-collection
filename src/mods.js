@@ -16,13 +16,19 @@ const modsAssetsRoot = "assets://mods/"
 var modChoices
 var routes = undefined
 
+const store_modlist_key = 'localData.settings.modListEnabled'
+const store_devmode_key = 'localData.settings.devMode'
+
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
   // returns the path of the mod file. 
   // Otherwise, returns undefined.
 
   // Lazily bake routes as needed instead of a init hook
-  if (routes == undefined) bakeRoutes()
+  if (routes == undefined) {
+    logger.info("Baking routes lazily, triggered by", url)
+    bakeRoutes()
+  }
 
   console.assert(url.startsWith("assets://"), "mods", url)
 
@@ -53,9 +59,15 @@ if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
-    clearEnabledMods()
+
+    // Clear enabled mods
+    // TODO: This doesn't trigger the settings.modListEnabled observer,
+    // which results in bad settings-screen side effects
+    store.set(store_modlist_key, [])
+    logger.debug("Modlist cleared, clearing routes...")
+    bakeRoutes()
+
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
-    
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
@@ -67,7 +79,6 @@ if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
-    clearEnabledMods()
     logger.error("Did not expect to be in the renderer process for this! Debug")
     throw e 
   }
@@ -117,33 +128,29 @@ function bakeRoutes() {
   // Test routes
   // TODO: This is super wasteful and should only be done when developer mode is on.
 
-  const Resources = require("@/resources.js")
-  if (Resources.isReady()) {
-    Object.keys(all_mod_routes).forEach(url => {
-      try {
-        Resources.resolveURL(url)
-      } catch (e) {
-        logger.warn("Testing routes failed")
-        onModLoadFail([url], e)
-      }
-    })
-  }
-}
+  const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
 
-const store_modlist_key = 'localData.settings.modListEnabled'
+  if (do_full_check) {
+    logger.debug("Doing full resources check (devMode on)")
+    const Resources = require("@/resources.js")
+    if (Resources.isReady()) {
+      Object.keys(all_mod_routes).forEach(url => {
+        try {
+          Resources.resolveURL(url)
+        } catch (e) {
+          logger.warn("Testing routes failed")
+          onModLoadFail([url], e)
+        }
+      })
+    }
+  } else 
+    logger.debug("Skipping full resources check (devMode off)")
+}
 
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
   return list
-}
-
-function clearEnabledMods() {
-  // TODO: This doesn't trigger the settings.modListEnabled observer,
-  // which results in bad settings-screen side effects
-  store.set(store_modlist_key, [])
-  logger.debug("Modlist cleared.")
-  bakeRoutes()
 }
 
 function getEnabledModsJs() {
@@ -374,7 +381,7 @@ if (ipcMain) {
       // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p, tree[p]))
+      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
