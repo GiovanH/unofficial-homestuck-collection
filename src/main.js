@@ -478,8 +478,9 @@ window.vm = new Vue({
     '$localData.settings.devMode'(to, from){
       const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
-      logger.silly("Dev-only")
-      logger.info("Everybody")
+      logger.silly("Verbose log message for devs")
+      logger.info("Log message for everybody")
+      this.$localData.VM.saveLocalStorage()
     }
   }
 }).$mount('#app')

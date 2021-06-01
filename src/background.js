@@ -207,9 +207,11 @@ function loadArchiveData(){
   if (!data) throw Error("Data empty after attempted load")
 
   try {
+    logger.debug("Applying mod archive edits")
     Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
     // but we should do this only when we reload the archive
+    logger.debug("Baking mod routes")
     Mods.bakeRoutes()
   } catch (e) {
     // TODO: Errors should already log/handle themselves by now

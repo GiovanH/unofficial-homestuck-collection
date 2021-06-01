@@ -22,7 +22,10 @@ function getAssetRoute(url) {
   // Otherwise, returns undefined.
 
   // Lazily bake routes as needed instead of a init hook
-  if (routes == undefined) bakeRoutes()
+  if (routes == undefined) {
+    logger.info("Baking routes lazily, triggered by", url)
+    bakeRoutes()
+  }
 
   console.assert(url.startsWith("assets://"), "mods", url)
 
@@ -142,7 +145,7 @@ function clearEnabledMods() {
   // TODO: This doesn't trigger the settings.modListEnabled observer,
   // which results in bad settings-screen side effects
   store.set(store_modlist_key, [])
-  logger.debug("Modlist cleared.")
+  logger.debug("Modlist cleared, clearing routes...")
   bakeRoutes()
 }
 
@@ -374,7 +377,7 @@ if (ipcMain) {
       // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p, tree[p]))
+      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
