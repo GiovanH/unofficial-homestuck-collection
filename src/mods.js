@@ -59,9 +59,15 @@ if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
-    clearEnabledMods()
+
+    // Clear enabled mods
+    // TODO: This doesn't trigger the settings.modListEnabled observer,
+    // which results in bad settings-screen side effects
+    store.set(store_modlist_key, [])
+    logger.debug("Modlist cleared, clearing routes...")
+    bakeRoutes()
+
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
-    
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
@@ -73,7 +79,6 @@ if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
-    clearEnabledMods()
     logger.error("Did not expect to be in the renderer process for this! Debug")
     throw e 
   }
@@ -146,14 +151,6 @@ function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
   return list
-}
-
-function clearEnabledMods() {
-  // TODO: This doesn't trigger the settings.modListEnabled observer,
-  // which results in bad settings-screen side effects
-  store.set(store_modlist_key, [])
-  logger.debug("Modlist cleared, clearing routes...")
-  bakeRoutes()
 }
 
 function getEnabledModsJs() {
