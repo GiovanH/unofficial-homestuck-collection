@@ -182,6 +182,8 @@ var menuTemplate = [
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   // This returns an `archive` object, and does not modify the global archive directly. 
+  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+
   if (!assetDir) throw Error("No reference to asset directory")
 
   let data
@@ -206,6 +208,8 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  win.webContents.send('SET_LOAD_STAGE', "MODS")
+
   try {
     logger.debug("Applying mod archive edits")
     Mods.editArchive(data)
@@ -229,6 +233,7 @@ function loadArchiveData(){
     throw e
   }
 
+  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   if (data.version == "1") {
     logger.info("Applying asset pack v1 patches")

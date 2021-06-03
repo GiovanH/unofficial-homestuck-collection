@@ -126,6 +126,12 @@
         this.$root.loadState = state
       })
 
+      this.$root.loadStage = "MOUNTED"
+      electron.ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
+        console.log("got SET_LOAD_STAGE", stage)
+        this.$root.loadStage = stage
+      })
+
       document.addEventListener('dragover', event => event.preventDefault())
       document.addEventListener('drop', event => event.preventDefault())
 

@@ -7,7 +7,6 @@
   </div>
   <div class="tabFrame">
     <div class="pageBody">
-
       <div class="card" v-if="isNewUser">
         <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
@@ -54,19 +53,20 @@
         </div>
       </div>
 
-      <div class="card" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
-        <div class="cardContent card_intro">
-          <div class="getStarted">
-            <!-- TODO: some sort of graphic loader here -->
-            <p>Loading...</p>
-          </div>
+      <div class="loadcard" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
+        <div class="lds-spinner">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
         </div>
+        <p v-text="loadText"></p>
       </div>
+
 
       <div class="card" v-else>
         <!-- Something went wrong. -->
         <div class="cardContent card_intro">
-          <div class="getStarted" v-if="modsEnabled">
+          <div class="getStarted" v-if="modsEnabled.length">
             <img class="logo" src="@/assets/collection_logo.png"><br>
             <p>Sorry! Something went critically wrong loading the program.</p><br>
             <p>You currently have mods enabled:</p><br>
@@ -123,7 +123,14 @@ export default {
       newReaderPage: "1",
       newReaderValidation: true,
       assetDir: undefined,
-      invalidPages: ['2399', '3038', '3088', '6370', '7902', '7903', '7904']
+      invalidPages: ['2399', '3038', '3088', '6370', '7902', '7903', '7904'],
+      loadStages: {
+        "": "Awaiting reactivity",
+        "MOUNTED": "Entangling connections",
+        "ARCHIVE": "Raking filesystem",
+        "MODS": "Turbulating canon",
+        "PATCHES": "Applying spackle",
+      }
     }
   },
   computed: {
@@ -132,6 +139,12 @@ export default {
     },
     isLoading() {
       return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
+    },
+    loadText() {
+      if (this.$root.loadStage === undefined) {
+        return this.loadStages[""] || toString(this.$root.loadStage)
+      }
+      return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
     },
     isNewUser() {
       return this.$localData.assetDir === undefined
@@ -308,6 +321,103 @@ export default {
     }
   }
 } 
+
+.loadcard {
+  margin: auto;
+  p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: initial;
+    font-size: 16px;
+    color: white;
+  }
+
+  // adapted from https://loading.io/css/
+  .lds-spinner {
+    $size: 120px;
+    $halfsize: calc(#{$size} / 2);
+
+    color: official;
+    display: block;
+    position: relative;
+    width: $size;
+    height: $size;
+    margin: auto;
+
+    div {
+      transform-origin: $halfsize $halfsize;
+      animation: lds-spinner 1.2s linear infinite;
+
+      &:nth-child(1) {
+        transform: rotate(0deg);
+        animation-delay: -1.1s;
+      }
+      &:nth-child(2) {
+        transform: rotate(30deg);
+        animation-delay: -1s;
+      }
+      &:nth-child(3) {
+        transform: rotate(60deg);
+        animation-delay: -0.9s;
+      }
+      &:nth-child(4) {
+        transform: rotate(90deg);
+        animation-delay: -0.8s;
+      }
+      &:nth-child(5) {
+        transform: rotate(120deg);
+        animation-delay: -0.7s;
+      }
+      &:nth-child(6) {
+        transform: rotate(150deg);
+        animation-delay: -0.6s;
+      }
+      &:nth-child(7) {
+        transform: rotate(180deg);
+        animation-delay: -0.5s;
+      }
+      &:nth-child(8) {
+        transform: rotate(210deg);
+        animation-delay: -0.4s;
+      }
+      &:nth-child(9) {
+        transform: rotate(240deg);
+        animation-delay: -0.3s;
+      }
+      &:nth-child(10) {
+        transform: rotate(270deg);
+        animation-delay: -0.2s;
+      }
+      &:nth-child(11) {
+        transform: rotate(300deg);
+        animation-delay: -0.1s;
+      }
+      &:nth-child(12) {
+        transform: rotate(330deg);
+        animation-delay: 0s;
+      }
+    }
+    div:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 3px;
+      left: calc(#{$size} / 2 - 3px);
+      width: 6px;
+      height: calc(#{$size} / 4 - 2px);
+      border-radius: 20%;
+      background: #fff;
+    }
+  }
+  @keyframes lds-spinner {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
 
 </style>
 
