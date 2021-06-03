@@ -147,7 +147,7 @@ export default {
       return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
     },
     isNewUser() {
-      return this.$localData.assetDir === undefined
+      return !this.$localData.assetDir
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
@@ -171,7 +171,7 @@ export default {
 
       this.timeout = false
 
-      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      this.modSoftRestart()
     },
     validateAndRestart(){
       if (this.newReaderToggle && this.newReaderValidation) {
@@ -180,14 +180,17 @@ export default {
       }
       this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
-      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
-      // ipcRenderer.invoke('restart')
+      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      ipcRenderer.invoke('restart')
     },
     errorModeRestart() {
       if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
+      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      ipcRenderer.invoke('restart')
+    },
+    modSoftRestart() {
       ipcRenderer.send("RELOAD_ARCHIVE_DATA")
-      // ipcRenderer.invoke('restart')
     }
   },
   watch: {

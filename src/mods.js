@@ -10,7 +10,7 @@ const log = require('electron-log');
 const logger = log.scope('Mods');
 
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-const modsDir = path.join(assetDir, "mods")
+const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
 var modChoices
@@ -426,7 +426,11 @@ if (ipcMain) {
     return items
   }
 
-  modChoices = loadModChoices()
+  if (modsDir) {
+    modChoices = loadModChoices()
+  } else {
+    logger.warn("modsDir is not defined! First run?")
+  }
 
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
   ipcMain.on('MODS_FORCE_RELOAD', (e) => {

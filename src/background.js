@@ -260,8 +260,7 @@ function loadArchiveData(){
   return data
 }
 
-try {
-  // Pick the appropriate flash plugin for the user's platform
+function getFlashPath(){
   let flashPlugin
   switch (process.platform) {
     case 'win32':
@@ -273,6 +272,8 @@ try {
     case 'linux':
       flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
       break
+    default:
+      throw Error("Unknown platform", process.platform)
   }
   let flashPath = path.join(assetDir, flashPlugin)
 
@@ -281,6 +282,12 @@ try {
     flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
     flashPath = path.join(assetDir, flashPlugin)
   }
+  return flashPath
+}
+
+try {
+  // Pick the appropriate flash plugin for the user's platform
+  let flashPath = getFlashPath()
 
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
@@ -306,6 +313,7 @@ try {
   })
 } catch (error) {
   logger.error(error)
+  logger.info("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -428,21 +436,13 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     let validated = true
     try {
       // If there's an issue with the archive data, this should fail.
+      assetDir = newPath[0]
+      logger.info(assetDir)
       loadArchiveData()
 
-      let flashPlugin
-      switch (process.platform) {
-        case 'win32':
-          flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
-          break
-        case 'darwin':
-          flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
-          break
-        case 'linux':
-          flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
-          break
-      }
-      if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw Error("Flash plugin not found")
+      let flashPath = getFlashPath()
+      // logger.info(assetDir, flashPlugin, flashPath)
+      if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
       logger.error(error)
       validated = false
