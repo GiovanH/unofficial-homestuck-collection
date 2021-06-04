@@ -15,7 +15,6 @@ import fs from 'fs'
 import path from 'path'
 import Resources from "@/resources.js"
 
-// TODO: All these flash properties and timings should be stored as data
 export default {
   props: ['url'],
   data() {
@@ -46,7 +45,6 @@ export default {
         '01668': 2950,
         '01801': -100,
         '01931': -125,
-        11931: -125, // todo: oh god what's happening here
         '02577': 300,
         '02625': 2100,
         '02786': -200,
@@ -54,8 +52,8 @@ export default {
         '02926': 850,
         '03085': 8000,
         '03676': 60,
-        '03741': 6800,
         '03692': -100,
+        '03741': 6800,
         '04106_1': -50,
         '04106_2': 575,
         '04106_3': 1550,
@@ -66,7 +64,6 @@ export default {
         '04272': 3650,
         '04370_1': -100,
         '04370_2': 450,
-        'darkcage': 350,
         '04387': 600,
         '04483': 1860,
         '04569': 1300,
@@ -81,11 +78,13 @@ export default {
         '05258_replay': 0,
         '05435': 50,
         '05509': -100,
-        'A6A6I1': -100,
         '06898': 1300,
         '07095': -100,
-        17445: 1700, // todo: oh god what's happening here x2
-        '07445': 4530
+        '07445': 4530,
+        '11931': -125,
+        '17445': 1700,
+        'A6A6I1': -100,
+        'darkcage': 350,
       },
       audio: [],
       source: undefined,
@@ -118,6 +117,7 @@ export default {
       const size = {x: 650, y: 450}
       let bgcolor = '#fff'
       switch (filename){
+        // todo: no
         // CAPTCHA GENERATOR
         case "captchas": 
           size.x = 1100
@@ -215,7 +215,7 @@ export default {
           size.x = 950
           size.y = 1160
           break
-          
+
           // TRICKSTER BANNER
         case "menu":
           size.x = 950
@@ -230,17 +230,23 @@ export default {
 
       return {id: filename, width: size.x + "px", height: size.y + "px", bgcolor: bgcolor}
     },
+    rawStyle(){
+      // todo: no
+      if (this.flashProps.id == '07095')
+        return 'position:relative;top:-21px;'
+
+      if (this.flashProps.id == '07122')
+        return 'position:relative;top:-19px;'
+
+      return ''
+    },
     flashSrc() {
       return `
         <html>
         <head>
-        <!-- todo: oh christ -->
         <style>
           body{margin:0;overflow:hidden;background:${this.flashProps.bgcolor}}
-          object{
-          ${this.flashProps.id == '07095' ? 'position:relative;top:-21px;' : ''}
-          ${this.flashProps.id == '07122' ? 'position:relative;top:-19px;' : ''}
-          }
+          object{${this.flashProps.rawStyle}}
         </style>
         <script>
           //JS Enhancements: ${this.$localData.settings.jsFlashes}
