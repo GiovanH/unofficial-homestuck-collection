@@ -21,7 +21,7 @@
           <hr />
           <div class="newReader">
             <h2>New Readers</h2><br>
-            <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br>
+            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br> -->
             <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p><br>
             <p>For this reason, <em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode.</strong> It will automatically track your progress in the story, and strategically lock off such content until your dear, sweet, precious eyes are ready to handle it. Furthermore, <strong>New Reader Mode</strong> will also adjust <em>Homestuck</em> itself in minor ways that keep it somewhat in line with the state of the comic as it was written.</p><br>
             <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> <span class="tiny">(You can always switch it off later if it ends up being too much.)</span></p><br>
@@ -39,7 +39,7 @@
               <li>The application itself. (You’re running it now!)</li><br>
               <li>The asset pack, a 4gb folder you should have downloaded separately. This version of the application is tuned for <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack.</li>
             </ol><br>
-            <p>To gain access to the meat of this collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
+            <p>To finish setting up the collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
             <br>
             <div class="center">
               <button @click="locateAssets()">Locate Assets</button><br>
