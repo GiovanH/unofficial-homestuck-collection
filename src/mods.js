@@ -121,6 +121,8 @@ function bakeRoutes() {
       logger.error(e)
     }
   })
+
+  logger.debug(all_mod_routes)
   
   // Modify script-global `routes`
   routes = all_mod_routes
