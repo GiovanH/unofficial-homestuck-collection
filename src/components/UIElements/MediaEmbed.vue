@@ -27,7 +27,7 @@ export default {
       cropHeight: {
         '04106': '550px',
         '06240': '560px',
-        A6A6I1: '522px',
+        'A6A6I1': '522px',
         '07095': '521px',
         '07122': '631px',
         '07445': '522px',
@@ -46,7 +46,7 @@ export default {
         '01668': 2950,
         '01801': -100,
         '01931': -125,
-        11931: -125,
+        11931: -125, // todo: oh god what's happening here
         '02577': 300,
         '02625': 2100,
         '02786': -200,
@@ -66,7 +66,7 @@ export default {
         '04272': 3650,
         '04370_1': -100,
         '04370_2': 450,
-        darkcage: 350,
+        'darkcage': 350,
         '04387': 600,
         '04483': 1860,
         '04569': 1300,
@@ -81,10 +81,10 @@ export default {
         '05258_replay': 0,
         '05435': 50,
         '05509': -100,
-        A6A6I1: -100,
+        'A6A6I1': -100,
         '06898': 1300,
         '07095': -100,
-        17445: 1700,
+        17445: 1700, // todo: oh god what's happening here x2
         '07445': 4530
       },
       audio: [],
@@ -215,7 +215,7 @@ export default {
           size.x = 950
           size.y = 1160
           break
-						
+          
           // TRICKSTER BANNER
         case "menu":
           size.x = 950
@@ -234,6 +234,7 @@ export default {
       return `
         <html>
         <head>
+        <!-- todo: oh christ -->
         <style>
           body{margin:0;overflow:hidden;background:${this.flashProps.bgcolor}}
           object{
@@ -325,6 +326,7 @@ export default {
         case 'audioSeek': 
           console.log(`Seeking audio to ${param}`)
           this.audioSeek(param)
+          break
         case 'vol': 
           console.log(`Setting volume to ${param}`)
           this.audioVolume(param)
@@ -507,7 +509,7 @@ export default {
           transition = 'height 10s'
           break
       }
-			
+
       if (time) {
         this.startTimer(() => {
           if (Date.now() >= this.timer.start + this.timer.delay) {
@@ -547,21 +549,16 @@ export default {
       switch (ext) {
         case ".swf":
           return 'swf'
-          break
         case ".mp4":
         case ".webm":
           return 'vid'
-          break
         case ".txt":
           return 'txt'
-          break
         case ".html":
           return 'html'
-          break
         case ".mp3":
         case ".wav":
           return 'audio'
-          break
         default:
           return 'img'
       }
@@ -591,18 +588,18 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	.textEmbed {
-		overflow-y: scroll;
-		background-color:white;
-		white-space: pre-wrap;
-		width: 80vw;
-		height: 70vh;
-		max-width: 1155px;
-		max-height: 900px;
-		padding: 10px;
-	}
-	audio {
-		width: 100%;
-		min-width: 650px;
-	}
+  .textEmbed {
+    overflow-y: scroll;
+    background-color:white;
+    white-space: pre-wrap;
+    width: 80vw;
+    height: 70vh;
+    max-width: 1155px;
+    max-height: 900px;
+    padding: 10px;
+  }
+  audio {
+    width: 100%;
+    min-width: 650px;
+  }
 </style>
