@@ -16,10 +16,11 @@ import path from 'path'
 import Resources from "@/resources.js"
 
 export default {
+  // TODO: Additional override props for height, width, bgcolor
   props: ['url'],
   data() {
     return {
-      archiveFlashProps: {
+      indexedFlashProps: {
         // CAPTCHA GENERATOR
         "captchas": {width: 1100, height: 600},
         // SWEET CRED
@@ -72,8 +73,8 @@ export default {
           height: 650
         },
         // A6A6I4 FULLPAGERS
-        "07095": {width: 950, height: 650},
-        "07122": {width: 950, height: 650},
+        "07095": {width: 950, height: 650, rawStyle: 'position:relative;top:-21px;'},
+        "07122": {width: 950, height: 650, rawStyle: 'position:relative;top:-19px;'},
         // SHE'S 8ACK
         "07402": {width: 950, height: 650},          
         // A6A6I1 SELECTION SCREENS
@@ -234,25 +235,16 @@ export default {
         id: filename, 
         width: 650, 
         height: 450, 
-        bgcolor: '#fff'
+        bgcolor: '#fff',
+        rawStyle: ''
       }
 
-      let customProps = this.archiveFlashProps[filename] || {}
+      let customProps = this.indexedFlashProps[filename] || {}
 
       if (customProps)
         this.$logger.info("Custom props for flash", filename, customProps)
 
       return {...defaultProps, ...customProps}
-    },
-    rawStyle(){
-      // todo: no
-      if (this.flashProps.id == '07095')
-        return 'position:relative;top:-21px;'
-
-      if (this.flashProps.id == '07122')
-        return 'position:relative;top:-19px;'
-
-      return ''
     },
     flashSrc() {
       return `
@@ -277,7 +269,10 @@ export default {
         <\/script>
         </head>
         <body>
-        <object type="application/x-shockwave-flash" width="${this.flashProps.width}" height="${this.flashProps.height}" data="${this.$resolveURL(this.url)}">
+        <object type="application/x-shockwave-flash" 
+          width="${this.flashProps.width}" 
+          height="${this.flashProps.height}" 
+          data="${this.$resolveURL(this.url)}">
             <param name='movie' value="${this.$resolveURL(this.url)}"/>
             <param name='play' value="true"/>
             <param name='loop' value="true"/>
