@@ -30,6 +30,7 @@
               <label><input type="checkbox" v-model="newReaderToggle" />Enable New Reader Mode, starting from page </label><input type="text" :class="{invalid: !newReaderValidation}" v-model="newReaderPage" size="1" maxlength="4" :disabled="!newReaderToggle" /><br>
               <p class="hint" v-show="newReaderToggle">Enter a <em>Homestuck</em> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
             </div>
+            <p>If you enable New Reader Mode, you should probably also pop into Settings once the collection loads so you can configure your reading style and how the collection handles certain spoilers.</p>
           </div>
           <hr />
           <div class="getStarted">
