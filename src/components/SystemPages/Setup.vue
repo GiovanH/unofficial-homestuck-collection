@@ -126,7 +126,7 @@ export default {
   watch: {
     newReaderPage(to, from) {
       let parsedTo = parseInt(to)
-      console.log(to, parsedTo)
+      this.$logger.info(to, parsedTo)
       this.newReaderValidation = (!/\D/.test(to) && 1 <= parsedTo && parsedTo <= 8129 && !this.invalidPages.includes(to) )
     }
   }

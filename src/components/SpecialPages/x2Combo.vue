@@ -98,7 +98,7 @@ export default {
       return [this.thisPage[0].media, this.thisPage[1].media]
     },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage[1].title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage[1].title}`)
       let nextPages = [[], []]
       this.thisPage[0].next.forEach(nextID => {
         nextPages[0].push(this.$archive.mspa.story[nextID])

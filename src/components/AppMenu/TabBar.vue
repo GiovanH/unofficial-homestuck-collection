@@ -81,11 +81,11 @@ export default {
       this.$localData.root.TABS_HISTORY_FORWARD()
     },
     historyBackNewTab(e) {
-      console.log(e.button)
+      this.$logger.info(e.button)
       this.$localData.root.TABS_DUPLICATE(this.$localData.tabData.activeTabKey, true, 'back')
     },
     historyForwardNewTab(e) {
-      console.log(e.button)
+      this.$logger.info(e.button)
       this.$localData.root.TABS_DUPLICATE(this.$localData.tabData.activeTabKey, true, 'forward')
     },
     newTab() {
