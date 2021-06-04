@@ -56,8 +56,8 @@ Vue.mixin(Memoization.mixin)
 Vue.mixin({
   data(){
     return {
-      $appVersion: '1.1.0',
-      $expectedAssetVersion: '1'
+      $appVersion: '2.0.0',
+      $expectedAssetVersion: '2'
     }
   },
   computed: {
