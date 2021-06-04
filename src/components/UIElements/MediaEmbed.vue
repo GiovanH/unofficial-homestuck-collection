@@ -19,6 +19,121 @@ export default {
   props: ['url'],
   data() {
     return {
+      archiveFlashProps: {
+        // CAPTCHA GENERATOR
+        "captchas": {width: 1100, height: 600},
+        // SWEET CRED
+        "kidshome": {width: 800, height: 600},
+        // CLOCKS
+        "03848": {height: 1612},
+        "03857": {height: 1612},
+        "06649": {height: 1612},
+        // GENESIS FROG 
+        "04015": {height: 800},
+        // JOHN/JANE CURSOR
+        "05721": {height: 800},
+        "06202": {height: 800},
+        // SCRATCH ALTERNIA 
+        "04050": {height: 650},
+        // A6A6I1 SELECTION SCREEN
+        "06277": {height: 650},
+        // A6A6I5 SELECTION SCREENS
+        "07482": {height: 650},
+        "07668": {height: 650},
+        "07677": {height: 650},
+        "07682": {height: 650},
+        "07689": {height: 650},
+        "07692": {height: 650},
+        "07696": {height: 650},
+        "07709": {height: 650},
+        "07721": {height: 650},
+        "07729": {height: 650},
+        "07762": {height: 650},
+        "07800": {height: 650},
+        "07905": {height: 650},        
+        // TYPHEUS, YALDABOATH
+        "05994": {height: 1400},
+        "07083": {height: 1400},
+        // HOMOSUCK ANTHEM
+        "06240": {height: 576},
+        // CASCADE
+        "04106": {
+          bgcolor: '#262626',
+          width: 950, height: 650
+        },
+        "cascade": {
+          bgcolor: '#262626',
+          width: 950, height: 650
+        },
+        // DOTA
+        "04812": {
+          bgcolor: '#000',
+          width: 950,
+          height: 650
+        },
+        // A6A6I4 FULLPAGERS
+        "07095": {width: 950, height: 650},
+        "07122": {width: 950, height: 650},
+        // SHE'S 8ACK
+        "07402": {width: 950, height: 650},          
+        // A6A6I1 SELECTION SCREENS
+        "06379": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+        "06394": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+        "06398": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+        "06402": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+        "06413": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+        // VRISKAGRAM 
+        "07445": {
+          bgcolor: '#C6C6C6',
+          width: 950, height: 600
+        },
+
+        // REMEM8ER
+        "07953": {
+          bgcolor: '#C6C6C6',
+          width: 950,
+          height: 675
+        },
+        // HUGBUNP
+        "07921": {
+          width: 950,
+          height: 700
+        },
+        // GOLD PILOT
+        "A6A6I1": {
+          filename: "A6A6I1",
+          bgcolor: '#C6C6C6',
+          width: 950,
+          height: 750
+        },
+        // GAME OVER
+        "06898": {
+          bgcolor: '#042300',
+          width: 950, height: 786
+        },
+        // CROWBARS
+        "05492": {width: 950, height: 1160},
+        "05777": {width: 950, height: 1160},
+        // TRICKSTER BANNER
+        "menu": {width: 950, height: 20},
+        // TRICKSTER BANNER
+        "echidna": {width: 30, height: 30}
+      },
       gameOver: {
         count: 0,
         steps: [22433, 82300, 94800, 118566, 143930, 146973, 224876]
@@ -114,121 +229,20 @@ export default {
     flashProps() {
       let filename = path.parse(this.url).name
       if (/_hq/.test(filename)) filename = filename.substring(0, filename.length - 3)
-      const size = {x: 650, y: 450}
-      let bgcolor = '#fff'
-      switch (filename){
-        // todo: no
-        // CAPTCHA GENERATOR
-        case "captchas": 
-          size.x = 1100
-          size.y = 600
-          break
-        // SWEET CRED
-        case "kidshome": 
-          size.x = 800
-          size.y = 600
-          break
-        // CLOCKS
-        case "03848": case "03857": case "06649": 
-          size.y = 1612
-          break
-        // GENESIS FROG 
-        case "04015": 
-        // JOHN/JANE CURSOR
-        case "05721":
-        case "06202":                    
-          size.y = 800
-          break
-        // SCRATCH ALTERNIA 
-        case "04050": 
-        // A6A6I1 SELECTION SCREEN
-        case "06277":
-        // A6A6I5 SELECTION SCREENS
-        case "07482": case "07668": case "07677": case "07682": case "07689": case "07692": case "07696": case "07709": case "07721": case "07729": case "07762": case "07800": case "07905":
-          size.y = 650
-          break
-        // TYPHEUS, YALDABOATH
-        case "05994":  case "07083":
-          size.y = 1400
-          break
-        // HOMOSUCK ANTHEM
-        case "06240":
-          size.y = 576
-          break
-        // CASCADE
-        case "04106": case "cascade":
-          bgcolor = '#262626'
-          size.x = 950
-          size.y = 650
-          break
-        // DOTA
-        case "04812":  
-          bgcolor = '#000'
-          size.x = 950
-          size.y = 650
-          break
-          // A6A6I4 FULLPAGERS
-        case "07095": case "07122": 
-          // SHE'S 8ACK
-        case "07402": 
-          size.x = 950
-          size.y = 650
-          break
-          // A6A6I1 SELECTION SCREENS
-        case "06379": case "06394": case "06398": case "06402": case "06413":
-          // VRISKAGRAM 
-        case "07445":
-          bgcolor = '#C6C6C6'
-          size.x = 950
-          size.y = 600
-          break
 
-          // REMEM8ER
-        case "07953":
-          bgcolor = '#C6C6C6'
-          size.x = 950
-          size.y = 675
-          break
-
-          // HUGBUNP
-        case "07921":
-          size.x = 950
-          size.y = 700
-          break
-
-          // GOLD PILOT
-        case "A6A6I1":
-          filename = "A6A6I1"
-          bgcolor = '#C6C6C6'
-          size.x = 950
-          size.y = 750
-          break
-          // GAME OVER
-        case "06898":
-          bgcolor = '#042300'
-          size.x = 950
-          size.y = 786
-          break
-
-          // CROWBARS
-        case "05492": case "05777":
-          size.x = 950
-          size.y = 1160
-          break
-
-          // TRICKSTER BANNER
-        case "menu":
-          size.x = 950
-          size.y = 20
-          break
-          // TRICKSTER BANNER
-        case "echidna":
-          size.x = 30
-          size.y = 30
-          break
+      const defaultProps = {
+        id: filename, 
+        width: 650, 
+        height: 450, 
+        bgcolor: '#fff'
       }
 
-      return {id: filename, width: size.x + "px", height: size.y + "px", bgcolor: bgcolor}
+      let customProps = this.archiveFlashProps[filename] || {}
+
+      if (customProps)
+        this.$logger.info("Custom props for flash", filename, customProps)
+
+      return {...defaultProps, ...customProps}
     },
     rawStyle(){
       // todo: no
@@ -306,35 +320,35 @@ export default {
 
       // getURL "about:srcdoc#gameOver" "" <- Get ready for some bullshit
 
-      console.log(func)
+      this.$logger.info(func)
       const [funcName, param] = func.split('?')
       switch (funcName) {
         case 'audioInit':
-          console.log(`Creating audio`)
+          this.$logger.info(`Creating audio`)
           this.audioInit(param)
           break
         case 'audioStart':
-          console.log(`Playing audio (${param})`)
+          this.$logger.info(`Playing audio (${param})`)
           this.audioStart(param)
           break
         case 'audioPause':
-          console.log(`Pausing audio`)
+          this.$logger.info(`Pausing audio`)
           this.audioPause()
           break
         case 'audioResume':
-          console.log(`Resuming audio`)
+          this.$logger.info(`Resuming audio`)
           this.audioResume()
           break
         case 'audioReset':
-          console.log(`Resetting audio`)
+          this.$logger.info(`Resetting audio`)
           this.audioReset()
           break
         case 'audioSeek': 
-          console.log(`Seeking audio to ${param}`)
+          this.$logger.info(`Seeking audio to ${param}`)
           this.audioSeek(param)
           break
         case 'vol': 
-          console.log(`Setting volume to ${param}`)
+          this.$logger.info(`Setting volume to ${param}`)
           this.audioVolume(param)
           break
         case 'link':
@@ -342,19 +356,19 @@ export default {
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
-            console.log(`Starting height (${param})`)
+            this.$logger.info(`Starting height (${param})`)
             this.heightStart(param)
           }
           break
         case 'heightPause':
           if (this.$localData.settings.jsFlashes) {
-            console.log(`Pausing height (${param})`)
+            this.$logger.info(`Pausing height (${param})`)
             this.pauseTimer()
           }
           break
         case 'heightResume':
           if (this.$localData.settings.jsFlashes) {
-            console.log(`Resuming height (${param})`)
+            this.$logger.info(`Resuming height (${param})`)
             this.resumeTimer()
           }
           break
@@ -449,7 +463,7 @@ export default {
         delay = this.audioDelay[`${this.flashProps.id}_${n + 1}`]
       else if (this.flashProps.id in this.audioDelay)
         delay = this.audioDelay[this.flashProps.id]
-      console.log(`${this.flashProps.id}_${n + 1}: ${delay}ms delay`)
+      this.$logger.info(`${this.flashProps.id}_${n + 1}: ${delay}ms delay`)
       if (delay > 0) {setTimeout(() => {if (this.audio[n]) this.audio[n].play()}, delay)} else {
         if (delay < 0)
           this.audio[n].currentTime = -0.001 * delay

@@ -9,7 +9,6 @@ const store = new Store()
 
 const log = require('electron-log');
 log.transports.console.format = '[{level}] {text}';
-const logger = log.scope('Vue');
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -66,7 +65,8 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => Mods.modChoices // This is the list of installed mods, it's okay to bake this
+    $modChoices: () => Mods.modChoices, // This is the list of installed mods, it's okay to bake this
+    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
   },
   methods: {
     $resolvePath(to){
@@ -119,7 +119,7 @@ Vue.mixin({
         // TODO: Not sure resolveURL is needed here? This should always be external?
         shell.openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        logger.error("UNCAUGHT ASSET?", to)
+        this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
       } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
@@ -379,7 +379,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else logger.warn("Invalid page ID, not setting")
+      } else this.$logger.warn("Invalid page ID, not setting")
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)
@@ -393,10 +393,10 @@ Vue.mixin({
       const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
 
       if (timestamp > latestTimestamp) {
-        // logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"
-        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
         
         return true
       } else return false
@@ -451,7 +451,7 @@ Vue.mixin({
         else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp // After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
+        this.$logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
       } else return false
     }
@@ -471,8 +471,8 @@ window.vm = new Vue({
     '$localData.settings.devMode'(to, from){
       const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
-      logger.silly("Verbose log message for devs")
-      logger.info("Log message for everybody")
+      this.$logger.silly("Verbose log message for devs")
+      this.$logger.info("Log message for everybody")
       this.$localData.VM.saveLocalStorage()
     }
   }
