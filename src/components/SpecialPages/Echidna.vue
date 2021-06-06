@@ -35,7 +35,11 @@ export default {
   },
   computed: {
     thisPage() {
-      return this.$archive.mspa.story['009535']
+      return {
+        ...this.$archive.mspa.story['009535'],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     nextPagesArray() {
       console.log(`${this.tab.url} - ${this.thisPage.title}`)

@@ -55,7 +55,11 @@ export default {
       return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
     },
     thisPage() {
-      return this.$archive.mspa.story[this.pageNum]
+      return {
+        ...this.$archive.mspa.story[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     nextPagesArray() {
       return []
