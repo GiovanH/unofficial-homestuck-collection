@@ -90,7 +90,6 @@ Vue.mixin({
           if (mspaNums.p) resolvedUrl = `/mspa/${mspaNums.p}`
         }
       }
-      this.$logger.debug("$resolvePath'd", to, resolvedUrl)
       return resolvedUrl
     },
     $openModal(to) {

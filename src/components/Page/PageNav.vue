@@ -29,7 +29,6 @@
 </template>
 
 <script>
-const { DateTime } = require('luxon');
 export default {
   name: 'pageNav',
   props: [
@@ -38,7 +37,9 @@ export default {
   components: {
   },
   data() {
-    return {}
+    return {
+      DateTime: require('luxon').DateTime
+    }
   },
   computed: {
     mspaBase(){
@@ -81,7 +82,7 @@ export default {
         return undefined
       } else {
         try {
-          return DateTime.fromSeconds(Number(this.thisPage.timestamp))
+          return this.DateTime.fromSeconds(Number(this.thisPage.timestamp))
             .setZone("America/New_York")
             .toFormat("MM/dd/yyyy, ttt")
         } catch {
