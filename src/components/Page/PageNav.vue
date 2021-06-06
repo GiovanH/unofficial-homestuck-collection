@@ -33,7 +33,7 @@ const { DateTime } = require('luxon');
 export default {
   name: 'pageNav',
   props: [
-    'thisPage', 'nextPages', 'isRyanquest'
+    'thisPage', 'nextPages'
   ],
   components: {
   },
@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     mspaBase(){
-      return this.isRyanquest ? 'ryanquest' : 'mspa'
+      return this.thisPage.isRyanquest ? 'ryanquest' : 'mspa'
     },
     backUrl() {
       return this.$resolvePath(`${this.mspaBase}/${this.thisPage.previous}`)
@@ -56,7 +56,7 @@ export default {
     },
     pageIdText() {
       let id = this.thisPage.pageId
-      let story = (this.mspaBase == 'ryanquest') ?  'ryanquest' : this.$getStory(id)
+      let story = this.mspaBase // this.thisPage.storyId
       return this.$resolvePath(`${story}/${id}`)    
     },
     vizLink() {
