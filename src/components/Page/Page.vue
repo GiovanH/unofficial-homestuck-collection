@@ -50,7 +50,8 @@ export default {
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
     }
   },
   computed: {
@@ -83,6 +84,7 @@ export default {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
+      // TODO: Handle bolin with mod syntax
       if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
         let flashPath = media[0].substring(0, media[0].length-4)
         if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
@@ -105,6 +107,7 @@ export default {
       return media
     },
     pageContent() {
+      // TODO: Handle peachy with mod syntax
       return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
     },
     nextPagesArray() {
@@ -112,7 +115,7 @@ export default {
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
-        if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
+        if (!this.$localData.settings.retcon6 && this.retcon6passwordPages.includes(nextID)) return
         nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
