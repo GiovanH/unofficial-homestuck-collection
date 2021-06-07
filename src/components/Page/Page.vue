@@ -5,6 +5,12 @@
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
       <div class="pageContent">
+          <div 
+            :class="note.class ? 'preface ' + note.class : 'preface'"
+            v-for="note in prefaces">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -136,7 +142,10 @@ export default {
       return this.thisPage.flag.includes('FIREFLY')
     },
     footnotes() {
-      return this.$archive.footnotes[this.pageNum] || []
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
+    },
+    prefaces() {
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
     },
     footerBanner() {
       switch (this.$root.theme) {
@@ -303,7 +312,7 @@ export default {
           
         }
         .footnote {
-          width: 650px;
+          width: 600px;
           border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
           padding: 30px 25px;
           p {
@@ -311,7 +320,25 @@ export default {
             margin: 0 auto;
             width: 600px;
           }
+        }
+        .preface {
+          width: 600px;
+          margin: 1em 0;
 
+          border-style: dashed;
+          border-width: 1px;
+
+          border-color: var(--page-log-border);
+          background-color: var(--page-pageFrame);
+          color: var(--page-nav-divider);
+          p {
+            text-align: center;
+            margin: 0 auto;
+            width: 600px;
+          }
+        }
+
+        .footnote, .preface {
           .author {
             font-weight: 300;
             font-size: 10px;
@@ -326,7 +353,6 @@ export default {
 
             color: var(--page-nav-meta);
           }
-
         }
       }
     }
