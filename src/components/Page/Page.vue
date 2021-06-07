@@ -13,7 +13,7 @@
           </div>
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
               <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
           <div 
@@ -89,9 +89,6 @@ export default {
 
       return media
     },
-    pageContent() {
-      return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
-    },
     storyNum() {
       return this.$getStory(this.pageNum)
     },
@@ -158,9 +155,6 @@ export default {
             //   console.log(`DERETCONNING: ${this.thisPage.media[i]} ==> ${media[i]}`)
             // }
           }
-      }
-      else if (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) {
-        media[1] = media[1].replace('scraps/fruitone', '05720_2')
       }
       return media
     },

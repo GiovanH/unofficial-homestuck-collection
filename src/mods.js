@@ -19,6 +19,11 @@ var routes = undefined
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
+var imods = {
+  _peachy: require("./imods/_peachy.js")
+}
+
+
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
   // returns the path of the mod file. 
@@ -152,6 +157,10 @@ function bakeRoutes() {
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
+
+  if (store.get('localData.settings.unpeachy'))
+    list.push("_peachy")
+
   return list
 }
 
@@ -185,12 +194,18 @@ function getModJs(mod_dir, singlefile=false) {
   // Errors passed to onModLoadFail and raised
   try {
     let modjs_path
-    if (singlefile) {
-      modjs_path = path.join(modsDir, mod_dir)
+    var mod
+
+    if (mod_dir.startsWith("_")) {
+      mod = imods[mod_dir]
     } else {
-      modjs_path = path.join(modsDir, mod_dir, "mod.js")
+      if (singlefile) {
+        modjs_path = path.join(modsDir, mod_dir)
+      } else {
+        modjs_path = path.join(modsDir, mod_dir, "mod.js")
+      }
+      mod = __non_webpack_require__(modjs_path)
     }
-    var mod = __non_webpack_require__(modjs_path)
     mod._id = mod_dir
     mod._singlefile = singlefile
 
@@ -414,6 +429,9 @@ if (ipcMain) {
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir)
+        if (js.hidden === true)
+          return acc // continue
+
         acc[dir] = {
           label: js.title,
           desc: js.desc,
