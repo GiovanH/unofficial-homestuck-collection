@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
+const {ipcMain, ipcRenderer, dialog} = require('electron')
+
 const Store = require('electron-store')
 const store = new Store()
 
@@ -8,11 +10,14 @@ const log = require('electron-log');
 const logger = log.scope('Mods');
 
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-const modsDir = path.join(assetDir, "mods")
+const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
 var modChoices
 var routes = undefined
+
+const store_modlist_key = 'localData.settings.modListEnabled'
+const store_devmode_key = 'localData.settings.devMode'
 
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
@@ -20,7 +25,10 @@ function getAssetRoute(url) {
   // Otherwise, returns undefined.
 
   // Lazily bake routes as needed instead of a init hook
-  if (routes == undefined) bakeRoutes()
+  if (routes == undefined) {
+    logger.info("Baking routes lazily, triggered by", url)
+    bakeRoutes()
+  }
 
   console.assert(url.startsWith("assets://"), "mods", url)
 
@@ -29,27 +37,51 @@ function getAssetRoute(url) {
   return file_route
 }
 
-function getTreeRoutes(tree, parent="") {
+function getTreeRoutes(tree, parent=""){
   let routes = []
   for (const name in tree) {
     const dirent = tree[name]
     const subpath = (parent ? parent + "/" + name : name)
     if (dirent == true) {
-      // File
+      // Path points to a file of some sort
       routes.push(subpath)
     } else {
+      // Recurse through subpaths
       routes = routes.concat(getTreeRoutes(dirent, subpath))
     }
   }
   return routes
 }
 
-function onModLoadFail(enabled_mods, e) {
-  logger.info("Mod load failure with modlist", enabled_mods)
-  logger.debug(e)
-  clearEnabledMods()
-  logger.debug("Modlist cleared.")
-  throw e // TODO: Replace this with a good visual traceback so users can diagnose mod issues
+var onModLoadFail;
+
+if (ipcMain) {
+  onModLoadFail = function (enabled_mods, e) {
+    logger.info("Mod load failure with issues in", enabled_mods)
+    logger.error(e)
+
+    // Clear enabled mods
+    // TODO: This doesn't trigger the settings.modListEnabled observer,
+    // which results in bad settings-screen side effects
+    store.set(store_modlist_key, [])
+    logger.debug("Modlist cleared, clearing routes...")
+    bakeRoutes()
+
+    // TODO: Replace this with a good visual traceback so users can diagnose mod issues
+    dialog.showMessageBoxSync({
+      type: 'error',
+      title: 'Mod load error',
+      message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
+    })
+  }
+} else {
+  // We are in the renderer process.
+  onModLoadFail = function (enabled_mods, e) {
+    logger.info("Mod load failure with modlist", enabled_mods)
+    logger.debug(e)
+    logger.error("Did not expect to be in the renderer process for this! Debug")
+    throw e 
+  }
 }
 
 function bakeRoutes() {
@@ -59,9 +91,6 @@ function bakeRoutes() {
   // Start with least-priority so they're overwritten
   getEnabledModsJs().reverse().forEach(js => {
     try {
-      const mod_root = path.join(modsDir, js._id)
-      const mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
-
       // Lower priority: Auto routes
       if (js.trees) {
         console.assert(!js._singlefile, js.title, "Single file mods cannot use treeroute!")
@@ -73,49 +102,57 @@ function bakeRoutes() {
           console.assert(asset_tree.endsWith("/"), asset_tree, "Tree paths must be directories! (end with /)")
           console.assert(asset_tree.startsWith("assets://"), asset_tree, "Asset paths must be on the assets:// protocol!")
 
-          const treeroutes = getTreeRoutes(crawlFileTree(path.join(mod_root, mod_tree), true))
+          const treeroutes = getTreeRoutes(crawlFileTree(path.join(js._mod_root_dir, mod_tree), true))
           treeroutes.forEach(route => {
             all_mod_routes[asset_tree + route] =
-              new URL(path.posix.join(mod_tree, route), mod_root_url).href
+              new URL(path.posix.join(mod_tree, route), js._mod_root_url).href
           })
         }
       }
       
       // Higher priority: manual routes
       for (const key in js.routes || {}) {
-        const local = new URL(js.routes[key], mod_root_url).href
+        const local = new URL(js.routes[key], js._mod_root_url).href
+        console.assert(!(js._singlefile && local.includes(js._mod_root_url)), js.title, "Single file mods cannot use local route!")
+                
         all_mod_routes[key] = local
       }
     } catch (e) {
       logger.error(e)
     }
   })
+
+  logger.debug(all_mod_routes)
+  
+  // Modify script-global `routes`
   routes = all_mod_routes
 
   // Test routes
-  try {
-    const Resources = require("@/resources.js")
-    Object.keys(all_mod_routes).forEach(url => {
-      Resources.resolveURL(url)
-    })
-  } catch (e) {
-    onModLoadFail(enabled_mods, e)
-  }
-}
+  // TODO: This is super wasteful and should only be done when developer mode is on.
 
-const store_modlist_key = 'localData.settings.modListEnabled'
+  const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
+
+  if (do_full_check) {
+    logger.debug("Doing full resources check (devMode on)")
+    const Resources = require("@/resources.js")
+    if (Resources.isReady()) {
+      Object.keys(all_mod_routes).forEach(url => {
+        try {
+          Resources.resolveURL(url)
+        } catch (e) {
+          logger.warn("Testing routes failed")
+          onModLoadFail([url], e)
+        }
+      })
+    }
+  } else 
+    logger.debug("Skipping full resources check (devMode off)")
+}
 
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
   return list
-}
-
-function clearEnabledMods() {
-  // TODO: This doesn't trigger the settings.modListEnabled observer,
-  // which results in bad settings-screen side effects
-  store.set(store_modlist_key, [])
-  bakeRoutes()
 }
 
 function getEnabledModsJs() {
@@ -125,7 +162,7 @@ function getEnabledModsJs() {
 function crawlFileTree(root, recursive=false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
-  const dir = fs.opendirSync(root);
+  const dir = fs.opendirSync(root)
   let ret = {}
   let dirent
   while (dirent = dir.readSync()) {
@@ -133,7 +170,7 @@ function crawlFileTree(root, recursive=false) {
       if (recursive) {
         const subpath = path.join(root, dirent.name)
         ret[dirent.name] = crawlFileTree(subpath, true)
-      } else return []
+      } else ret[dirent.name] = undefined // Is directory, but not doing a recursive scan
     } else {
       ret[dirent.name] = true
     }
@@ -154,9 +191,14 @@ function getModJs(mod_dir, singlefile=false) {
       modjs_path = path.join(modsDir, mod_dir, "mod.js")
     }
     var mod = __non_webpack_require__(modjs_path)
-    // mod.logger = log.scope(mod_dir);
     mod._id = mod_dir
     mod._singlefile = singlefile
+
+    if (!singlefile) {
+      mod._mod_root_dir = path.join(modsDir, mod._id)
+      mod._mod_root_url = new URL(mod._id, modsAssetsRoot).href + "/"
+    }
+
     return mod
   } catch (e1) {
     // elaborate error checking w/ afllback
@@ -183,7 +225,6 @@ function getModJs(mod_dir, singlefile=false) {
           logger.error(mod_dir, "is missing required file 'mod.js'")
           onModLoadFail([mod_dir], e2)
         } else {
-          // Singlefile found, other error
           logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
         } 
@@ -198,23 +239,104 @@ function getModJs(mod_dir, singlefile=false) {
   }
 }
 
+const footnote_categories = ['story']
+
 // Interface
 
 function editArchive(archive) {
   getEnabledModsJs().reverse().forEach((js) => {
-    const editfn = js.edit
-    if (editfn) {
-      archive = editfn(archive)
+    try {
+      const editfn = js.edit
+      if (editfn) {
+        editfn(archive)
+        console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+      
+        // Sanity checks
+        // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+        // required_keys.forEach(key => {
+        //   if (!archive[key]) throw new Error("Archive object missing required key", key)
+        // })
+      }
+    } catch (e) {
+      onModLoadFail(js.key, "editing archive")
+    }
+  })
+
+  archive.footnotes = {}
+
+  footnote_categories.forEach(category => {
+    archive.footnotes[category] = []
+  })
+
+  // Footnotes
+  getEnabledModsJs().reverse().forEach((js) => {
+    try {
+      if (js.footnotes) {
+        if (typeof js.footnotes == "string") {
+          console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
+          
+          const json_path = path.join(
+            js._mod_root_dir, 
+            js.footnotes
+          )
+
+          logger.info(js.title, "Loading footnotes from file", json_path)
+          const footObj = JSON.parse(
+            fs.readFileSync(json_path, 'utf8')
+          )
+          mergeFootnotes(archive, footObj)
+        } else if (Array.isArray(js.footnotes)) {
+          logger.info(js.title, "Loading footnotes from object")
+          mergeFootnotes(archive, js.footnotes)
+        } else {
+          throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+        }
+      }
+    } catch (e) {
+      onModLoadFail(e, "adding footnotes")
     }
   })
 }
 
-function getMainMixin() {
+function mergeFootnotes(archive, footObj) {
+  if (!Array.isArray(footObj)) {
+    throw new Error(`Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+  }
+
+  footObj.forEach(footnoteList => {
+    const default_author = footnoteList.author || "Undefined Author"
+    const default_class = footnoteList.class || undefined
+    const default_ispreface = footnoteList.preface
+
+    footnote_categories.forEach(category => {
+      for (var page_num in footnoteList[category]) {
+        // TODO replace this with some good defaultdict juice
+        if (!archive.footnotes[category][page_num])
+          archive.footnotes[category][page_num] = []
+
+        footnoteList[category][page_num].forEach(note => {
+          const new_note = {
+            author: (note.author === null) ? null : (note.author || default_author),
+            class: (note.class === null) ? null : (note.class || default_class),
+            preface: note.preface || default_ispreface,
+            content: note.content
+          }
+
+          archive.footnotes[category][page_num].push(new_note)
+        })
+      }
+    })
+  })
+}
+
+function getMainMixin(){
+  // A mixin that injects on the main vue process.
+  // Currently this just injects custom css
+
   let styles = []
   getEnabledModsJs().forEach(js => {
-    const mod_root_url = new URL(js._id, modsAssetsRoot).href + "/"
     const modstyles = js.styles || []
-    modstyles.forEach(style_link => styles.push(new URL(style_link, mod_root_url).href))
+    modstyles.forEach(style_link => styles.push(new URL(style_link, js._mod_root_url).href))
   })
 
   return {
@@ -234,36 +356,55 @@ function getMainMixin() {
   }
 }
 
-// Black magic
-function getMixins() {
-  const nop = ()=>undefined;
+function getMixins(){
+  // This is absolutely black magic
+
+  const nop = () => undefined
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
+        const vueComponent = this
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
           // Shorthand
-          if (hook.matchName) {
-            hook.match = (c)=>(c.$options.name == hook.matchName)
-          }
-
+          if (hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
+          
           if (hook.match(this)) {
+            // Data w/ optional compute function
+            for (const dname in (hook.data || {})) {
+              const value = hook.data[dname]
+              this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+            }
+            // Computed
             for (const cname in (hook.computed || {})) {
               // Precomputed super function
-              // eslint-disable-next-line no-extra-parens
-              const sup = (()=>this._computedWatchers[cname].getter.call(this) || nop);
+              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
               Object.defineProperty(this, cname, {
-                get: () => (hook.computed[cname](sup)),
+                get: hook.computed[cname].bind(vueComponent, sup),
                 configurable: true
               })
             }
-            for (const dname in (hook.data || {})) {
-              const value = hook.data[dname]
-              this[dname] = (typeof value == "function" ? value(this[dname]) : value)
+            // Methods w/ optional super argument
+            for (const mname in (hook.methods || {})) {
+              const sup = this[mname] || nop
+              const bound = hook.methods[mname].bind(vueComponent)
+              this[mname] = function(){return bound(...arguments, sup)}
             }
+          }
+        })
+      },
+      updated() {
+        vueHooks.forEach((hook) => {
+          // Shorthand
+          if (hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
+
+          if (hook.updated && hook.match(this)) {
+            hook.updated.bind(this)()
           }
         })
       }
@@ -273,22 +414,26 @@ function getMixins() {
 }
 
 // Runtime
-const {ipcMain, ipcRenderer} = require('electron');
+// Grey magic. This file can be run from either process, but only the main process will do file handling.
+
 if (ipcMain) {
   // We are in the main process.
   function loadModChoices(){
     // Get the list of mods players can choose to enable/disable
-    var mod_folders;
+    var mod_folders
     try {
       // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] == [])
+      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
       return []
     }
+    // logger.info("Mod folders seen")
+    // logger.debug(mod_folders)
+
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir)
@@ -298,21 +443,33 @@ if (ipcMain) {
           key: dir
         }
       } catch (e) {
+        // Catch import-time mod-level errors
         logger.error(e)
       }
       return acc
     }, {})
-    // logger.info("Mod choices loaded")
-    // logger.debug(items)
+
+    logger.info("Mod choices loaded")
+    logger.debug(Object.keys(items))
     return items
   }
 
-  modChoices = loadModChoices()
+  if (modsDir) {
+    modChoices = loadModChoices()
+  } else {
+    logger.warn("modsDir is not defined! First run?")
+  }
 
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
+  ipcMain.on('MODS_FORCE_RELOAD', (e) => {
+    modChoices = loadModChoices()
+    e.returnValue = true
+  })
 } else {
   // We are in the renderer process.
+  logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+  // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
 export default {

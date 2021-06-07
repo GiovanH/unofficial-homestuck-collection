@@ -73,6 +73,8 @@ class LocalData {
       credits: true,
       footnotes: false,
 
+      fastForward: false,
+
       retcon1: true,
       retcon2: true,
       retcon3: true,

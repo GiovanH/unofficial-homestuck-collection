@@ -21,7 +21,7 @@
 			ref="page"
 		/>
 		
-		<Bookmarks 	:tab="tab" ref="bookmarks" />
+		<Bookmarks  :tab="tab" ref="bookmarks" />
 		<MediaModal :tab="tab" ref="modal" />
 		<FindBox    :tab="tab" ref="findbox"/>
 		<JumpBox    :tab="tab" ref="jumpbox" />

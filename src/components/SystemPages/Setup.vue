@@ -7,7 +7,8 @@
   </div>
   <div class="tabFrame">
     <div class="pageBody">
-      <div class="card" v-if="!errorMode">
+      <div class="card" v-if="isNewUser">
+        <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
           <div class="intro">
             <img class="logo" src="@/assets/collection_logo.png"><br>
@@ -20,7 +21,7 @@
           <hr />
           <div class="newReader">
             <h2>New Readers</h2><br>
-            <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br>
+            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br> -->
             <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p><br>
             <p>For this reason, <em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode.</strong> It will automatically track your progress in the story, and strategically lock off such content until your dear, sweet, precious eyes are ready to handle it. Furthermore, <strong>New Reader Mode</strong> will also adjust <em>Homestuck</em> itself in minor ways that keep it somewhat in line with the state of the comic as it was written.</p><br>
             <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> <span class="tiny">(You can always switch it off later if it ends up being too much.)</span></p><br>
@@ -29,6 +30,7 @@
               <label><input type="checkbox" v-model="newReaderToggle" />Enable New Reader Mode, starting from page </label><input type="text" :class="{invalid: !newReaderValidation}" v-model="newReaderPage" size="1" maxlength="4" :disabled="!newReaderToggle" /><br>
               <p class="hint" v-show="newReaderToggle">Enter a <em>Homestuck</em> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
             </div>
+            <p>If you enable New Reader Mode, you should probably also pop into Settings once the collection loads so you can configure your reading style and how the collection handles certain spoilers.</p>
           </div>
           <hr />
           <div class="getStarted">
@@ -38,7 +40,7 @@
               <li>The application itself. (You’re running it now!)</li><br>
               <li>The asset pack, a 4gb folder you should have downloaded separately. This version of the application is tuned for <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack.</li>
             </ol><br>
-            <p>To gain access to the meat of this collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
+            <p>To finish setting up the collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
             <br>
             <div class="center">
               <button @click="locateAssets()">Locate Assets</button><br>
@@ -51,9 +53,37 @@
           </div>
         </div>
       </div>
+
+      <div class="loadcard" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
+        <div class="lds-spinner">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <p v-text="loadText"></p>
+      </div>
+
+
       <div class="card" v-else>
+        <!-- Something went wrong. -->
         <div class="cardContent card_intro">
-          <div class="getStarted">
+          <div class="getStarted" v-if="modsEnabled.length">
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p>Sorry! Something went critically wrong loading the program.</p><br>
+            <p>You currently have mods enabled:</p><br>
+            <ol>
+              <li v-for="id in modsEnabled" v-text="id.label" :key="id.key"/>
+            </ol>
+            <br>
+            <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
+            <p>Please disable all mods and then restart.</p><br>
+            <div class="center">
+              <button @click="clearEnabledMods()">Disable all and reload</button><br>
+            </div>
+            <br>
+            <span class="hint">If this issue persists when you re-enable a mod, please contact the mod author!</span>
+          </div>
+          <div class="getStarted" v-else>
             <img class="logo" src="@/assets/collection_logo.png"><br>
             <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
             <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
@@ -71,6 +101,7 @@
           </div>
         </div>
       </div>
+      
     </div>
   </div>
 </div>
@@ -88,24 +119,60 @@ export default {
   },
   data: function() {
     return {
-      errorMode: false,
       newReaderToggle: true,
+      timeout: false,
       newReaderPage: "1",
       newReaderValidation: true,
       assetDir: undefined,
-      invalidPages: ['2399', '3038', '3088', '6370', '7902', '7903', '7904']
+      invalidPages: ['2399', '3038', '3088', '6370', '7902', '7903', '7904'],
+      loadStages: {
+        "": "Awaiting reactivity",
+        "MOUNTED": "Entangling connections",
+        "ARCHIVE": "Raking filesystem",
+        "MODS": "Turbulating canon",
+        "PATCHES": "Applying spackle",
+      }
     }
   },
   computed: {
     validatePage() {
       return this.newReaderValidation && this.assetDir
     },
+    isLoading() {
+      return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
+    },
+    loadText() {
+      if (this.$root.loadStage === undefined) {
+        return this.loadStages[""] || toString(this.$root.loadStage)
+      }
+      return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
+    },
+    isNewUser() {
+      return !this.$localData.assetDir
+    },
+    modsEnabled() {
+      return this.$localData.settings.modListEnabled.map((key) => 
+        this.$modChoices[key])
+    }
   },
-  methods:{
+  mounted() {
+    setTimeout(function() {
+      this.timeout = true
+    }.bind(this), 8000)
+  },
+  methods: {
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: false}).then( result => {
         this.assetDir = result || this.assetDir
       })
+    },
+    clearEnabledMods(){
+      this.$localData.settings["modListEnabled"] = []
+      this.$localData.VM.saveLocalStorage()
+
+      this.timeout = false
+
+      this.modSoftRestart()
     },
     validateAndRestart(){
       if (this.newReaderToggle && this.newReaderValidation) {
@@ -113,20 +180,24 @@ export default {
         this.$updateNewReader(mspaId)
       }
       this.$localData.root.SET_ASSET_DIR(this.assetDir)
+
+      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       ipcRenderer.invoke('restart')
     },
     errorModeRestart() {
       if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
+
+      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       ipcRenderer.invoke('restart')
+    },
+    modSoftRestart() {
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
     }
-  },
-  mounted() {
-    this.errorMode = !!this.$localData && !!this.$localData.assetDir
   },
   watch: {
     newReaderPage(to, from) {
       let parsedTo = parseInt(to)
-      console.log(to, parsedTo)
+      this.$logger.info(to, parsedTo)
       this.newReaderValidation = (!/\D/.test(to) && 1 <= parsedTo && parsedTo <= 8129 && !this.invalidPages.includes(to) )
     }
   }
@@ -254,6 +325,103 @@ export default {
     }
   }
 } 
+
+.loadcard {
+  margin: auto;
+  p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: initial;
+    font-size: 16px;
+    color: white;
+  }
+
+  // adapted from https://loading.io/css/
+  .lds-spinner {
+    $size: 120px;
+    $halfsize: calc(#{$size} / 2);
+
+    color: official;
+    display: block;
+    position: relative;
+    width: $size;
+    height: $size;
+    margin: auto;
+
+    div {
+      transform-origin: $halfsize $halfsize;
+      animation: lds-spinner 1.2s linear infinite;
+
+      &:nth-child(1) {
+        transform: rotate(0deg);
+        animation-delay: -1.1s;
+      }
+      &:nth-child(2) {
+        transform: rotate(30deg);
+        animation-delay: -1s;
+      }
+      &:nth-child(3) {
+        transform: rotate(60deg);
+        animation-delay: -0.9s;
+      }
+      &:nth-child(4) {
+        transform: rotate(90deg);
+        animation-delay: -0.8s;
+      }
+      &:nth-child(5) {
+        transform: rotate(120deg);
+        animation-delay: -0.7s;
+      }
+      &:nth-child(6) {
+        transform: rotate(150deg);
+        animation-delay: -0.6s;
+      }
+      &:nth-child(7) {
+        transform: rotate(180deg);
+        animation-delay: -0.5s;
+      }
+      &:nth-child(8) {
+        transform: rotate(210deg);
+        animation-delay: -0.4s;
+      }
+      &:nth-child(9) {
+        transform: rotate(240deg);
+        animation-delay: -0.3s;
+      }
+      &:nth-child(10) {
+        transform: rotate(270deg);
+        animation-delay: -0.2s;
+      }
+      &:nth-child(11) {
+        transform: rotate(300deg);
+        animation-delay: -0.1s;
+      }
+      &:nth-child(12) {
+        transform: rotate(330deg);
+        animation-delay: 0s;
+      }
+    }
+    div:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 3px;
+      left: calc(#{$size} / 2 - 3px);
+      width: 6px;
+      height: calc(#{$size} / 4 - 2px);
+      border-radius: 20%;
+      background: #fff;
+    }
+  }
+  @keyframes lds-spinner {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
 
 </style>
 

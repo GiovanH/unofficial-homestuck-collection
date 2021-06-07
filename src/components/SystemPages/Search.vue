@@ -15,7 +15,7 @@
             </div>
             <div v-for="(page, i) in results" :key="'page'+i" class="result">
               <h2>
-                <a :href="pageLink(page.key)" v-html="$archive.mspa.story[page.key].title" />
+                <a :href="$resolvePath(page.key)" v-html="$archive.mspa.story[page.key].title" />
               </h2>
               <div class="chapter" v-html="`${getChapter(page.key)} - ${$mspaOrVizNumber(page.key)}`" />
               <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="htmlEscape(line)" class="line" />
@@ -187,7 +187,6 @@ export default {
         .replace(new RegExp(`(${queries})`, 'gi'), `<span class="match">$1</span>`)
     },
     getChapter(key) {
-      // TODO: Rewrite chapter index as data driven
       let p = parseInt(key)
       if (!p) {
         switch (key) {
@@ -277,15 +276,6 @@ export default {
         else if (p >= 2149) c += "Act 2"
         else c += "Act 1"
         return c
-      }
-    },
-    pageLink(key) {
-      if (this.$localData.settings.mspaMode){ //mspa mode
-        return `/mspa/${key}`
-      }
-      else { //viz mode
-        let vizKey = this.$mspaToViz(key)
-        return `/${vizKey.s}/${vizKey.p}`
       }
     }
   }

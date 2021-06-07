@@ -182,6 +182,8 @@ var menuTemplate = [
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   // This returns an `archive` object, and does not modify the global archive directly. 
+  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+
   if (!assetDir) throw Error("No reference to asset directory")
 
   let data
@@ -204,30 +206,46 @@ function loadArchiveData(){
     return undefined
   }
 
-  if (!data) throw Error("Data empty after attempted load")
+  if (!data) throw new Error("Data empty after attempted load")
+
+  win.webContents.send('SET_LOAD_STAGE', "MODS")
 
   try {
+    logger.debug("Applying mod archive edits")
     Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
     // but we should do this only when we reload the archive
+    logger.debug("Baking mod routes")
     Mods.bakeRoutes()
+
+    // Sanity checks
+    let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+    required_keys.forEach(key => {
+      if (!data[key]) throw new Error("Archive object missing required key", key)
+    })
+
   } catch (e) {
     // TODO: Errors should already log/handle themselves by now
     // but we need to update the application state to react to it
 
     // specifically $localdata can be in an invalid state
-    logger.error(e)
+    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+    throw e
   }
 
+  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  const gankraSearchPage = data.search.find(x => x.key == '002745')
-  if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+  if (data.version == "1") {
+    logger.info("Applying asset pack v1 patches")
+    const gankraSearchPage = data.search.find(x => x.key == '002745')
+    if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
-  data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+    data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
 
-  data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+    data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
 
-  data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+    data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+  }
 
   // Set up search index
   chapterIndex = new FlexSearch({
@@ -242,8 +260,7 @@ function loadArchiveData(){
   return data
 }
 
-try {
-  // Pick the appropriate flash plugin for the user's platform
+function getFlashPath(){
   let flashPlugin
   switch (process.platform) {
     case 'win32':
@@ -255,6 +272,8 @@ try {
     case 'linux':
       flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
       break
+    default:
+      throw Error("Unknown platform", process.platform)
   }
   let flashPath = path.join(assetDir, flashPlugin)
 
@@ -263,6 +282,12 @@ try {
     flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
     flashPath = path.join(assetDir, flashPlugin)
   }
+  return flashPath
+}
+
+try {
+  // Pick the appropriate flash plugin for the user's platform
+  let flashPath = getFlashPath()
 
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
@@ -288,6 +313,7 @@ try {
   })
 } catch (error) {
   logger.error(error)
+  logger.info("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -341,15 +367,27 @@ ipcMain.on('STARTUP_GET_PORT', (event) => {
 })
 
 // Speed hack, try to preload the first copy of the archive
-var first_archive = loadArchiveData();
+var first_archive
+try {
+  first_archive = loadArchiveData()
+} catch (e) {
+  logger.warn(e)
+}
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   let archive;
-  if (first_archive) {
-    archive = first_archive
-    first_archive = undefined;
-  } else archive = loadArchiveData()
-  win.webContents.send('ARCHIVE_UPDATE', archive)
+  win.webContents.send('SET_LOAD_STATE', "LOADING")
+  try {
+    if (first_archive) {
+      archive = first_archive
+      first_archive = undefined;
+    } else archive = loadArchiveData()
+    win.webContents.send('ARCHIVE_UPDATE', archive)
+  } catch (e) {
+    logger.error("Error reloading archive", e)
+    win.webContents.send('SET_LOAD_STATE', "ERROR")
+  }
+  win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 ipcMain.handle('win-minimize', async (event) => {
@@ -366,7 +404,7 @@ ipcMain.handle('win-maximize', async (event) => {
   }
 })
 ipcMain.handle('win-close', async (event) => {
-  logger.info("Got synchronous close event...")
+  logger.info("Got asynchronous close event")
   win.close()
 })
 ipcMain.on('win-close-sync', (e) => {
@@ -399,21 +437,13 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     let validated = true
     try {
       // If there's an issue with the archive data, this should fail.
+      assetDir = newPath[0]
+      logger.info(assetDir)
       loadArchiveData()
 
-      let flashPlugin
-      switch (process.platform) {
-        case 'win32':
-          flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
-          break
-        case 'darwin':
-          flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
-          break
-        case 'linux':
-          flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
-          break
-      }
-      if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw Error("Flash plugin not found")
+      let flashPath = getFlashPath()
+      // logger.info(assetDir, flashPlugin, flashPath)
+      if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
       logger.error(error)
       validated = false

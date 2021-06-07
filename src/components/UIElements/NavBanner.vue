@@ -22,8 +22,8 @@ export default {
   components: {
   },
   props: [
-		'useCustomStyles'
-	],
+    'useCustomStyles'
+  ],
   data: function() {
     return {
       urls: [

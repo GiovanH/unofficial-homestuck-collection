@@ -5,6 +5,12 @@
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
       <div class="pageContent">
+          <div 
+            :class="note.class ? 'preface ' + note.class : 'preface'"
+            v-for="note in prefaces">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
+          </div>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -14,10 +20,13 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
-              <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
-          <div class="footnote" v-if="footnote">
-            <p v-html="footnote"/>
+          <div 
+            :class="note.class ? 'footnote ' + note.class : 'footnote'"
+            v-for="note in footnotes">
+            <p v-html="note.content"/>
+            <span v-if="note.author" class="author" v-text="note.author" />
           </div>
       </div>
     </div>
@@ -47,24 +56,41 @@ export default {
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
     }
   },
   computed: {
-    storyDataKey() {
-      if (this.routeParams.base === 'ryanquest') return 'ryanquest'
-      else return 'story'
+    isRyanquest(){
+      return (this.routeParams.base === 'ryanquest')
     },
     pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+      if (this.$isVizBase(this.routeParams.base)) {
+        return this.$vizToMspa(this.routeParams.base, this.routeParams.p).p
+      } else {
+        return this.routeParams.p
+      }
     },
-    pageData() {
-      return this.$archive.mspa[this.storyDataKey]
+    storyId() {
+      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+    },
+    pageCollection() {
+      const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
+      return this.$archive.mspa[storyDataKey]
+    },
+    thisPage() {
+      // Add useful information to archive object
+      return {
+        ...this.pageCollection[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     pageMedia() {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
+      // TODO: Handle bolin with mod syntax
       if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
         let flashPath = media[0].substring(0, media[0].length-4)
         if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
@@ -87,21 +113,16 @@ export default {
       return media
     },
     pageContent() {
+      // TODO: Handle peachy with mod syntax
       return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
     },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
-    thisPage() {
-      return this.pageData[this.pageNum]
-    },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
-        //Removes [??????] password links if the retcon hasn't been triggered yet
-        if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
-        nextPages.push(this.pageData[nextID.trim()])
+        // Removes [??????] password links if the retcon hasn't been triggered yet
+        if (!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
+        nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
     },
@@ -120,11 +141,13 @@ export default {
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
     },
-    footnote() {
-      return (this.$archive.mspa.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+    footnotes() {
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
     },
-    footerBanner() {            
-      // let num = parseInt(this.pageNum) // unused?
+    prefaces() {
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
+    },
+    footerBanner() {
       switch (this.$root.theme) {
         case 'scratch':
           return 'customScratchFooter.png'
@@ -141,12 +164,13 @@ export default {
   },
   methods:{
     deretcon(media) {
+      // TODO: Refactor retcon resource reservations
       if (
-      (this.thisPage.flag.includes('R1') && !this.$localData.settings.retcon1) ||
-      (this.thisPage.flag.includes('R2') && !this.$localData.settings.retcon2) ||
-      (this.thisPage.flag.includes('R3') && !this.$localData.settings.retcon3) ||
-      (this.thisPage.flag.includes('R4') && !this.$localData.settings.retcon4) ||
-      (this.thisPage.flag.includes('R5') && !this.$localData.settings.retcon5) ){
+      (this.thisPage.flag.includes('R1') && !this.$shouldRetcon('retcon1')) ||
+      (this.thisPage.flag.includes('R2') && !this.$shouldRetcon('retcon2')) ||
+      (this.thisPage.flag.includes('R3') && !this.$shouldRetcon('retcon3')) ||
+      (this.thisPage.flag.includes('R4') && !this.$shouldRetcon('retcon4')) ||
+      (this.thisPage.flag.includes('R5') && !this.$shouldRetcon('retcon5')) ){
           for (let i in media) {
             media[i] = media[i]
             .replace(/1([0-9]{4})\/1[0-9]{4}\.swf/g, "0$1/0$1.swf")
@@ -289,20 +313,49 @@ export default {
           
         }
         .footnote {
-          width: 650px;
+          width: 600px;
           border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 0;
+          padding: 30px 25px;
           p {
             text-align: center;
             margin: 0 auto;
             width: 600px;
           }
         }
-      }	
+        .preface {
+          width: 600px;
+          margin: 1em 0;
+
+          border-style: dashed;
+          border-width: 1px;
+
+          border-color: var(--page-log-border);
+          background-color: var(--page-pageFrame);
+          color: var(--page-nav-divider);
+          p {
+            text-align: center;
+            margin: 0 auto;
+            width: 600px;
+          }
+        }
+
+        .footnote, .preface {
+          .author {
+            font-weight: 300;
+            font-size: 10px;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+
+            display: flex;
+            justify-content: flex-end;
+
+            position: relative;
+            top: 12px;
+            margin-top: -12px;
+
+            color: var(--page-nav-meta);
+          }
+        }
+      }
     }
-
   }
-  
-
 </style>
-

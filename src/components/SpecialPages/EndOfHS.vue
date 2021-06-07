@@ -51,10 +51,14 @@ export default {
       return this.$getStory(this.pageNum)
     },
     thisPage() {
-      return this.$archive.mspa.story[this.pageNum]
+      return {
+        ...this.$archive.mspa.story[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         nextPages.push(this.$archive.mspa.story[nextID])
