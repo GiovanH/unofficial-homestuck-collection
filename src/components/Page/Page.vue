@@ -110,7 +110,7 @@ export default {
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
-        if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
+        if (!this.$shouldRetcon('retcon6') && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
         nextPages.push(this.pageData[nextID.trim()])
       })
       return nextPages
@@ -154,12 +154,13 @@ export default {
   },
   methods:{
     deretcon(media) {
+      // TODO: Refactor retcon resource reservations
       if (
-      (this.thisPage.flag.includes('R1') && !this.$localData.settings.retcon1) ||
-      (this.thisPage.flag.includes('R2') && !this.$localData.settings.retcon2) ||
-      (this.thisPage.flag.includes('R3') && !this.$localData.settings.retcon3) ||
-      (this.thisPage.flag.includes('R4') && !this.$localData.settings.retcon4) ||
-      (this.thisPage.flag.includes('R5') && !this.$localData.settings.retcon5) ){
+      (this.thisPage.flag.includes('R1') && !this.$shouldRetcon('retcon1')) ||
+      (this.thisPage.flag.includes('R2') && !this.$shouldRetcon('retcon2')) ||
+      (this.thisPage.flag.includes('R3') && !this.$shouldRetcon('retcon3')) ||
+      (this.thisPage.flag.includes('R4') && !this.$shouldRetcon('retcon4')) ||
+      (this.thisPage.flag.includes('R5') && !this.$shouldRetcon('retcon5')) ){
           for (let i in media) {
             media[i] = media[i]
             .replace(/1([0-9]{4})\/1[0-9]{4}\.swf/g, "0$1/0$1.swf")
