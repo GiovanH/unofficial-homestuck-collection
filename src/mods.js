@@ -121,6 +121,8 @@ function bakeRoutes() {
       logger.error(e)
     }
   })
+
+  logger.debug(all_mod_routes)
   
   // Modify script-global `routes`
   routes = all_mod_routes
@@ -343,34 +345,53 @@ function getMainMixin(){
 
 function getMixins(){
   // This is absolutely black magic
+
   const nop = () => undefined
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
+        const vueComponent = this
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
           // Shorthand
-          if (hook.matchName) {
+          if (hook.matchName)
             hook.match = (c) => (c.$options.name == hook.matchName)
-          }
-
+          
           if (hook.match(this)) {
+            // Data w/ optional compute function
+            for (const dname in (hook.data || {})) {
+              const value = hook.data[dname]
+              this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+            }
+            // Computed
             for (const cname in (hook.computed || {})) {
               // Precomputed super function
-              // eslint-disable-next-line no-extra-parens
-              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop);
+              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
               Object.defineProperty(this, cname, {
-                get: () => (hook.computed[cname](sup)),
+                get: hook.computed[cname].bind(vueComponent, sup),
                 configurable: true
               })
             }
-            for (const dname in (hook.data || {})) {
-              const value = hook.data[dname]
-              this[dname] = (typeof value == "function" ? value(this[dname]) : value)
+            // Methods w/ optional super argument
+            for (const mname in (hook.methods || {})) {
+              const sup = this[mname] || nop
+              const bound = hook.methods[mname].bind(vueComponent)
+              this[mname] = function(){return bound(...arguments, sup)}
             }
+          }
+        })
+      },
+      updated() {
+        vueHooks.forEach((hook) => {
+          // Shorthand
+          if (hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
+
+          if (hook.updated && hook.match(this)) {
+            hook.updated.bind(this)()
           }
         })
       }
