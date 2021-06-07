@@ -53,7 +53,11 @@ export default {
       return this.$getStory(this.pageNum)
     },
     thisPage() {
-      return this.$archive.mspa.story[this.pageNum]
+      return {
+        ...this.$archive.mspa.story[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)

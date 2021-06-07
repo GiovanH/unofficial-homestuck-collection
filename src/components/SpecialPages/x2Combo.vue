@@ -83,11 +83,22 @@ export default {
     }
   },
   computed: {
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+    isRyanquest(){
+      return (this.routeParams.base === 'ryanquest')
     },
-    storyNum() {
-      return this.$getStory(this.pageNum)
+    pageNum() {
+      // Page number of the left page
+      if (this.$isVizBase(this.routeParams.base))
+        return this.$vizToMspa(this.routeParams.base, this.routeParams.p).p
+      else
+        return this.routeParams.p
+    },
+    storyId() {
+      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+    },
+    pageCollection() {
+      const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
+      return this.$archive.mspa[storyDataKey]
     },
     footnotes() {
       const notes = this.$archive.footnotes['story']
@@ -115,8 +126,18 @@ export default {
         rightPageId = thisPageId
       }
 
-      let page = [this.$archive.mspa.story[leftPageId], this.$archive.mspa.story[rightPageId]]
-      return page
+      return [
+        {
+          ...this.$archive.mspa.story[leftPageId],
+          storyId: this.storyId,
+          isRyanquest: this.isRyanquest
+        },
+        {
+          ...this.$archive.mspa.story[rightPageId],
+          storyId: this.storyId,
+          isRyanquest: this.isRyanquest
+        }
+      ]
     },
     pageMedia() {
       this.preload = []

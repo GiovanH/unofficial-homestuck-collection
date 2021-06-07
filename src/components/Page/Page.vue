@@ -20,7 +20,7 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
-              <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
           </div>
           <div 
             :class="note.class ? 'footnote ' + note.class : 'footnote'"
@@ -56,24 +56,41 @@ export default {
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
     }
   },
   computed: {
-    storyDataKey() {
-      if (this.routeParams.base === 'ryanquest') return 'ryanquest'
-      else return 'story'
+    isRyanquest(){
+      return (this.routeParams.base === 'ryanquest')
     },
     pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+      if (this.$isVizBase(this.routeParams.base)) {
+        return this.$vizToMspa(this.routeParams.base, this.routeParams.p).p
+      } else {
+        return this.routeParams.p
+      }
     },
-    pageData() {
-      return this.$archive.mspa[this.storyDataKey]
+    storyId() {
+      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+    },
+    pageCollection() {
+      const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
+      return this.$archive.mspa[storyDataKey]
+    },
+    thisPage() {
+      // Add useful information to archive object
+      return {
+        ...this.pageCollection[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     pageMedia() {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
+      // TODO: Handle bolin with mod syntax
       if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
         let flashPath = media[0].substring(0, media[0].length-4)
         if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
@@ -96,22 +113,16 @@ export default {
       return media
     },
     pageContent() {
-      // Todo: Handle peachy with a mod replacement
+      // TODO: Handle peachy with mod syntax
       return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
-    thisPage() {
-      return this.pageData[this.pageNum]
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
-        if (!this.$shouldRetcon('retcon6') && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
-        nextPages.push(this.pageData[nextID.trim()])
+        if ((!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
+        nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
     },
@@ -136,8 +147,7 @@ export default {
     prefaces() {
       return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
     },
-    footerBanner() {            
-      // let num = parseInt(this.pageNum) // unused?
+    footerBanner() {
       switch (this.$root.theme) {
         case 'scratch':
           return 'customScratchFooter.png'

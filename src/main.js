@@ -71,19 +71,22 @@ Vue.mixin({
   methods: {
     $resolvePath(to){
       // Resolves a logical path within the vue router
+      // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to.toLowerCase()).route
       const base = route.path.slice(1).split("/")[0]
-      const vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
 
       let resolvedUrl = route.path
 
       if (!this.$localData.settings.mspaMode && base == 'mspa') {
+        // Route /mspa/# to /homestuck/#
         const vizNums = this.$mspaToViz(route.params.p)
         if (vizNums) resolvedUrl = `/${vizNums.s}/${vizNums.p}`
-      } else if (this.$localData.settings.mspaMode ) {
+      } else if (this.$localData.settings.mspaMode) {
         if (base == 'mspa') {
-          if (route.params.p.padStart(6, '0') in this.$archive.mspa.story) resolvedUrl =  `/mspa/${route.params.p.padStart(6, '0')}` 
-        } else if (vizBases.includes(base)) {
+          let p_padded = route.params.p.padStart(6, '0')
+          if (p_padded in this.$archive.mspa.story) resolvedUrl =  `/mspa/${p_padded}` 
+        } else if (this.$isVizBase(base)) {
+          // Route /homestuck/# to /mspa/#
           const mspaNums = this.$vizToMspa(base, route.params.p)
           if (mspaNums.p) resolvedUrl = `/mspa/${mspaNums.p}`
         }
