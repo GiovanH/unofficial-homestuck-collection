@@ -9,7 +9,6 @@ const store = new Store()
 
 const log = require('electron-log');
 log.transports.console.format = '[{level}] {text}';
-const logger = log.scope('Vue');
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -120,7 +119,7 @@ Vue.mixin({
         // TODO: Not sure resolveURL is needed here? This should always be external?
         shell.openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        logger.error("UNCAUGHT ASSET?", to)
+        this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
       } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
@@ -170,7 +169,6 @@ Vue.mixin({
       return undefined
     },
     $getAllPagesInStory(story_id, incl_secret=false) {
-      // TODO: Datadriven this
       const page_nums = []
       if (story_id == '1'){
         for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
@@ -302,20 +300,39 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       // TODO: Rewrite $updateNewReader for datadriven
       const isSetupMode = !this.$archive
-      if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      const isNumericalPage = /\D/.test(thisPageId)
+      const isInRange = '000219' <= thisPageId && thisPageId <= '010030' // in the "keep track of spoilers" range
+
+      if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
-        // murder me for this horrible block of if-statements if you want, but stack overflow tells me its faster than the switch I was originall working with so shrug
         if (!isSetupMode) {
-          // DISC TRANSITIONS + CASCADE SCRAPBOOK
-          if (thisPageId == '005643') nextLimit = '005644'
-          else if (thisPageId == '005984') nextLimit = '005985'
-          else if (thisPageId == '006000') nextLimit = '006001'
+          // Calculate nextLimit
+          var offByOnePages = [
+            // DISC TRANSITIONS + CASCADE SCRAPBOOK
+            '005643', '005984', '006000',
+
+            '008105', // JOHN CURSOR          
+            '008143', // HOMOSUCK PIANO
+
+            // A6A6I1 GLITCHED CHARACTER SELECTS
+            '008282', '008297', '008301', '008305', '008316',
+
+            // TEREZI RETCON QUEST
+            '009057', '009108', '009134', '009149', 
+            '009187', '009203', '009221', '009262',
+            
+            '010029' // CREDITS
+          ]
+
+          if (offByOnePages.includes(thisPageId)) {
+            nextLimit = (parseInt(thisPageId) + 1).pad(6)
+          }
 
           // A6 CHARACTER SELECTS
-          else if ('006021' <= thisPageId  && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
-          else if ('006369' <= thisPageId  && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
+          else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
+          else if ('006369' <= thisPageId && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
 
           // A6A5A1x2 COMBO
           else if ('007688' <= thisPageId && thisPageId <='007825') {
@@ -331,34 +348,6 @@ Vue.mixin({
             }
             nextLimit = nextPageId
           }
-
-          // JOHN CURSOR
-          else if (thisPageId == '008105') nextLimit = '008106'
-
-          // HOMOSUCK PIANO
-          else if (thisPageId == '008143') nextLimit = '008144'
-
-          // A6A6I1 GLITCHED CHARACTER SELECTS
-          else if (thisPageId == '008282') nextLimit = '008283'
-          else if (thisPageId == '008297') nextLimit = '008298'
-          else if (thisPageId == '008301') nextLimit = '008302'
-          else if (thisPageId == '008305') nextLimit = '008306'
-          else if (thisPageId == '008316') nextLimit = '008317'
-
-          // TEREZI RETCON QUEST
-          else if (thisPageId == '009057') nextLimit = '009058'
-          else if (thisPageId == '009108') nextLimit = '009109'
-          else if (thisPageId == '009134') nextLimit = '009135'
-          else if (thisPageId == '009149') nextLimit = '009150'
-          else if (thisPageId == '009187') nextLimit = '009188'
-          else if (thisPageId == '009203') nextLimit = '009204'
-          else if (thisPageId == '009221') nextLimit = '009222'
-          else if (thisPageId == '009262') nextLimit = '009263'
-            
-          // CREDITS
-          else if (thisPageId == '010029') nextLimit = '010030'
-          else if (thisPageId == '010030') this.$localData.root.NEW_READER_CLEAR()
-
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
           else nextLimit = [...this.$archive.mspa.story[thisPageId].next].sort()[0]
@@ -367,6 +356,8 @@ Vue.mixin({
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
         if (thisPageId == '010030') {
+          // Finished Homestuck.
+          this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
           const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
@@ -387,7 +378,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else logger.warn("Invalid page ID, not setting")
+      } else this.$logger.warn("Invalid page ID, not setting")
     },
     $shouldRetcon(retcon_id){
       console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
@@ -410,10 +401,10 @@ Vue.mixin({
       const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
 
       if (timestamp > latestTimestamp) {
-        // logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"
-        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
         
         return true
       } else return false
@@ -468,7 +459,7 @@ Vue.mixin({
         else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp // After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
+        this.$logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
       } else return false
     }
@@ -488,8 +479,8 @@ window.vm = new Vue({
     '$localData.settings.devMode'(to, from){
       const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
-      logger.silly("Verbose log message for devs")
-      logger.info("Log message for everybody")
+      this.$logger.silly("Verbose log message for devs")
+      this.$logger.info("Log message for everybody")
       this.$localData.VM.saveLocalStorage()
     }
   }

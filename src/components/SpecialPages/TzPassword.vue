@@ -47,7 +47,19 @@ export default {
   data: function() {
     return {
       inputText: '',
-      passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`
+      passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`,
+      failText: "&lt;- <b>WRONG!</b> GO B4CK!!!",
+      passwords: {
+        "TESTPASS": '/mspa/6',
+        "HOME": '/mspa/009059',
+        "R3UN1ON": '/mspa/009110',
+        "FR4M3D": '/mspa/009136',
+        "MOM3NT": '/mspa/009151',
+        "MURD3R": '/mspa/009189',
+        "JUST1C3": '/mspa/009205',
+        "HONK": '/mspa/009223',
+        "FL1P": '/mspa/009264'
+      }
     }
   },
   computed: {
@@ -61,48 +73,17 @@ export default {
       return []
     }
   },
-  methods:{
+  methods: {
     // TODO: Passwords should be stored as data
     submitPassword(){
-      let url
-      switch(this.inputText.toUpperCase()){
-        case "TESTPASS": 
-          url = '/mspa/6'
-        case "HOME":
-          url = '/mspa/009059'
-          break
-        case "R3UN1ON":
-          url = '/mspa/009110'
-          break
-        case "FR4M3D":
-          url = '/mspa/009136'
-          break
-        case "MOM3NT":
-          url = '/mspa/009151'
-          break
-        case "MURD3R":
-          url = '/mspa/009189'
-          break
-        case "JUST1C3":
-          url = '/mspa/009205'
-          break
-        case "HONK":
-          url = '/mspa/009223'
-          break
-        case "FL1P":
-          url = '/mspa/009264'
-          break
-      }
+      let url = this.passwords[this.inputText.toUpperCase()]
 
       if (url){
         this.$pushURL(url)
+      } else {
+        document.getElementById('passwordFailure').innerHTML = this.failText
       }
-      else{
-        document.getElementById('passwordFailure').innerHTML = "&lt;- <b>WRONG!</b> GO B4CK!!!"
-      }
-
     },
-    
     keyNavEvent(dir) {
       if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
     }

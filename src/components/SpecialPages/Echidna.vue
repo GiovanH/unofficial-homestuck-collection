@@ -38,7 +38,7 @@ export default {
       return this.$archive.mspa.story['009535']
     },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         nextPages.push(this.$archive.mspa.story[nextID])
