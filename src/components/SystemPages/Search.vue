@@ -187,7 +187,6 @@ export default {
         .replace(new RegExp(`(${queries})`, 'gi'), `<span class="match">$1</span>`)
     },
     getChapter(key) {
-      // TODO: Rewrite chapter index as data driven
       let p = parseInt(key)
       if (!p) {
         switch (key) {

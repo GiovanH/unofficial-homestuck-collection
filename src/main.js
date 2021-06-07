@@ -169,7 +169,6 @@ Vue.mixin({
       return undefined
     },
     $getAllPagesInStory(story_id, incl_secret=false) {
-      // TODO: Datadriven this
       const page_nums = []
       if (story_id == '1'){
         for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
