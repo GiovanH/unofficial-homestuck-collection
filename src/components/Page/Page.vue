@@ -121,7 +121,7 @@ export default {
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
-        if ((!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
+        if (!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
         nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
