@@ -284,8 +284,8 @@ Ways to hook Vue data, in order from most to least recommended:
 
 - `data` (optional): The `data` object is a collection of **values and functions**. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
 - `computed` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions are given a `$super` argument that contains the *previous* **result** of the computation. 
-- `methods` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
-- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated).
+- `methods` (optional): The `methods` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
+- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated). If you absolutely have to do arbitrary userjs-style DOM modifications, this is the place to do it.
 
 Examples of VueHooks:
 
