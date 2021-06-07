@@ -244,7 +244,7 @@
             </draggable>
           </div>
         </section>
-        <button @click="forceReload">Force reload</button>
+        <button v-if="$localData.settings.devMode" @click="forceReload">Force reload</button>
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
       </div>
 
@@ -562,12 +562,20 @@ export default {
       this.debounce = setTimeout(function() {
         this.debounce = false 
         this.memoizedClearAll();
-        ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+
+        this.$root.loadState = "LOADING"
+        this.$nextTick(function () {
+          ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+        })
       }.bind(this), 2000)
     },
     forceReload: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      this.$root.loadState = "LOADING"
+      this.$nextTick(function () {
+        ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      })
+      // ipcRenderer.invoke('restart')
     }
   },
   watch: {
