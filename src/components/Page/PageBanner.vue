@@ -21,63 +21,33 @@ export default {
     }
   },
   computed: {
-    // TODO: These specific banner designations should be part of data, not code
     banner() {
-      let result = undefined
       let num = parseInt(this.page.pageId)
       if (this.page.theme == 'scratch') {
-        let bannerNumber = ""
-        let hussTextIndex
-
-        if (num >= 5952){
-          bannerNumber = 117 - (5981 - num)
-          if (bannerNumber >= 92){
-            hussTextIndex = 19 - ( 111 - bannerNumber)
-          }
-        } else if (num >= 5937) {
-          bannerNumber = 87
-        } else if (num == 5936) {
-          bannerNumber = 86
-        } else if (num >= 5903) {
-          bannerNumber = 85
-        } else if (num == 5902) {
-          bannerNumber = 84
-        } else if (num == 5874) {
-          bannerNumber = 83
-        } else if (num == 5836) {
-          bannerNumber = 82
-        } else if (num == 5795) {
-          bannerNumber = 81
-        } else if (num >= 5775) {
-          bannerNumber = 80
-        } else if (num >= 5697) {
-          bannerNumber = (79 - (5774 - num)).toString().padStart(2, "0")
-        }
-        result = {
-          url: `/storyfiles/hs2/scratch/room${bannerNumber}.gif`, 
-          title: (hussTextIndex >= 0) ? this.$archive.mspa.scratchBanner[hussTextIndex] : undefined
+        return {
+          url: `/storyfiles/hs2/scratch/${this.page.scratchBanner}`, 
+          title: this.page.scratchTooltip ? this.page.scratchTooltip : undefined
         }
       }
       else if (this.page.theme == 'cascade')
-        result = {url: '/images/header_cascade.gif', title: undefined}
+        return {url: '/images/header_cascade.gif', title: undefined}
       else if (this.page.theme == 'trickster')
-        result = {url: '/images/trickster_sitegraphics/menu.swf', title: undefined}
+        return {url: '/images/trickster_sitegraphics/menu.swf', title: undefined}
       else if (this.page.flag.includes('X2COMBO'))
-        result = {url: '/images/act6act5act1x2combo.gif', title: undefined}
+        return {url: '/images/act6act5act1x2combo.gif', title: undefined}
       else if (num == 9987)
-        result = {url: '/images/collide_header.gif', title: undefined}
+        return {url: '/images/collide_header.gif', title: undefined}
       else if (num == 10027)
-        result = {url: '/images/act7_header.gif', title: undefined}
-
-      return result
+        return {url: '/images/act7_header.gif', title: undefined}
+      else 
+        return undefined
     },
     imgTooltip() {
       let num = parseInt(this.page.pageId)
       if (this.page.theme == 'scratch' && num >= 5976 && num <= 5981) {
         let LEnumber = num - 5975
         return `/storyfiles/hs2/scraps/LEtext${LEnumber}.gif`
-      }
-      else {
+      } else {
         this.tooltipActive = false
         return false
       }
@@ -92,7 +62,6 @@ export default {
         tooltip.style.display = 'block'
         this.tooltipActive = true
         this.positionTooltip(e)
-        
       }
     },
     mouseLeave(e) {

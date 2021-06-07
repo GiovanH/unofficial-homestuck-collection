@@ -16,10 +16,10 @@
 	>
 		<component :is="resolveComponent" :tab="tab" :routeParams="routeParams" ref="page"/>
 		
-		<Bookmarks 	:tab="tab" ref="bookmarks" />
+		<Bookmarks  :tab="tab" ref="bookmarks" />
 		<MediaModal :tab="tab" ref="modal" />
-		<FindBox 		:tab="tab" ref="findbox"/>
-		<JumpBox 		:tab="tab" ref="jumpbox" />
+		<FindBox    :tab="tab" ref="findbox"/>
+		<JumpBox    :tab="tab" ref="jumpbox" />
 	</div>
 </template>
 
