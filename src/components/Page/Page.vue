@@ -302,7 +302,7 @@ export default {
           
         }
         .footnote {
-          width: 650px;
+          width: 600px;
           border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
           padding: 30px 25px;
           p {
@@ -312,7 +312,7 @@ export default {
           }
         }
         .preface {
-          width: 650px;
+          width: 600px;
           margin: 1em 0;
 
           border-style: dashed;
