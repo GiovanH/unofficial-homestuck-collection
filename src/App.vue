@@ -1,5 +1,9 @@
 <template>
-  <div id="app" :class="[$root.theme, $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar']" v-if="$archive && $root.loadState !== 'ERROR'">
+  <div id="app" :class="[
+    $root.theme, 
+    // $root.loadState != 'DONE' ? 'busy' : '',
+    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
+    ]" v-if="$archive && $root.loadState !== 'ERROR'">
     <AppHeader />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications ref="notifications" />
@@ -122,13 +126,11 @@
       })
 
       electron.ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
-        console.log("got SET_LOAD_STATE", state)
         this.$root.loadState = state
       })
 
       this.$root.loadStage = "MOUNTED"
       electron.ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
-        console.log("got SET_LOAD_STAGE", stage)
         this.$root.loadStage = stage
       })
 
@@ -210,6 +212,10 @@
 @import "@/css/fa/scss/solid.scss";
 
 @import '@/css/mspaThemes.scss';
+
+  #app.busy {
+    cursor: progress;
+  }
 
   .addressBar {
     --headerHeight: 79px;

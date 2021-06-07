@@ -387,6 +387,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
   }
+  win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 ipcMain.handle('win-minimize', async (event) => {
