@@ -374,7 +374,7 @@ Vue.mixin({
           const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
           const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
-          // slap some retcons in there as well cause it's not like this function was long enough already
+          // If you've reached that page where a retcon happened, mark the flag.
           if (resultCurrent) {
             this.$localData.settings.retcon1 = resultCurrent >= '007999'
             this.$localData.settings.retcon2 = resultCurrent >= '008053'
@@ -390,6 +390,15 @@ Vue.mixin({
           }
         }
       } else logger.warn("Invalid page ID, not setting")
+    },
+    $shouldRetcon(retcon_id){
+      console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
+      // If fast-forward, always retcon.
+      if (this.$localData.settings.fastForward)
+        return true
+
+      // Else, only if the flag is set.
+      return this.$localData.settings[retcon_id]
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)

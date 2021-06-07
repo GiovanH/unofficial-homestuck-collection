@@ -279,8 +279,13 @@ Each `VueHook` has the following properties:
 
 - `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state.
 - `matchName` (string, optional): Shorthand for `match(c) {return c.$options.name == "pageText"}`. Helpful for matching specific `.vue` files by name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
-- `computed` (optional): The `computed` object is a collection of functions that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions take a `$super` argument that contains the *previous* result of the computation. 
-- `data` (optional): The `data` object is a collection of objects and functions. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
+
+Ways to hook Vue data, in order from most to least recommended:
+
+- `data` (optional): The `data` object is a collection of **values and functions**. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
+- `computed` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions are given a `$super` argument that contains the *previous* **result** of the computation. 
+- `methods` (optional): The `methods` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
+- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated). If you absolutely have to do arbitrary userjs-style DOM modifications, this is the place to do it.
 
 Examples of VueHooks:
 
@@ -331,3 +336,4 @@ This hook uses the `matchName` shorthand to match the `navBanner` page, which is
 
 It replaces the underlying `url` object with a new one, discarding any data that was previously there. It also replaces the `labels`, but this time it only modifies the two labels relevant to the change, again using the `$super` syntax.
 
+All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.

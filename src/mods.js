@@ -10,7 +10,7 @@ const log = require('electron-log');
 const logger = log.scope('Mods');
 
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-const modsDir = path.join(assetDir, "mods")
+const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
 var modChoices
@@ -71,7 +71,7 @@ if (ipcMain) {
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
-      message: "Something went wrong while loading mods! All mods have been disabled for safety.\nCheck the console log for details"
+      message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
     })
   }
 } else {
@@ -244,12 +244,21 @@ const footnote_categories = ['story']
 // Interface
 
 function editArchive(archive) {
-  // edit(archive)
   getEnabledModsJs().reverse().forEach((js) => {
-    const editfn = js.edit
-    if (editfn) {
-      editfn(archive)
-      console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+    try {
+      const editfn = js.edit
+      if (editfn) {
+        editfn(archive)
+        console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+      
+        // Sanity checks
+        // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+        // required_keys.forEach(key => {
+        //   if (!archive[key]) throw new Error("Archive object missing required key", key)
+        // })
+      }
+    } catch (e) {
+      onModLoadFail(js.key, "editing archive")
     }
   })
 
@@ -261,26 +270,30 @@ function editArchive(archive) {
 
   // Footnotes
   getEnabledModsJs().reverse().forEach((js) => {
-    if (js.footnotes) {
-      if (typeof js.footnotes == "string") {
-        console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
-        
-        const json_path = path.join(
-          js._mod_root_dir, 
-          js.footnotes
-        )
+    try {
+      if (js.footnotes) {
+        if (typeof js.footnotes == "string") {
+          console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
+          
+          const json_path = path.join(
+            js._mod_root_dir, 
+            js.footnotes
+          )
 
-        logger.info(js.title, "Loading footnotes from file", json_path)
-        const footObj = JSON.parse(
-          fs.readFileSync(json_path, 'utf8')
-        )
-        mergeFootnotes(archive, footObj)
-      } else if (Array.isArray(js.footnotes)) {
-        logger.info(js.title, "Loading footnotes from object")
-        mergeFootnotes(archive, js.footnotes)
-      } else {
-        throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+          logger.info(js.title, "Loading footnotes from file", json_path)
+          const footObj = JSON.parse(
+            fs.readFileSync(json_path, 'utf8')
+          )
+          mergeFootnotes(archive, footObj)
+        } else if (Array.isArray(js.footnotes)) {
+          logger.info(js.title, "Loading footnotes from object")
+          mergeFootnotes(archive, js.footnotes)
+        } else {
+          throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+        }
       }
+    } catch (e) {
+      onModLoadFail(e, "adding footnotes")
     }
   })
 }
@@ -345,34 +358,53 @@ function getMainMixin(){
 
 function getMixins(){
   // This is absolutely black magic
+
   const nop = () => undefined
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
     var mixin = {
       created() {
+        const vueComponent = this
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
           // Shorthand
-          if (hook.matchName) {
+          if (hook.matchName)
             hook.match = (c) => (c.$options.name == hook.matchName)
-          }
-
+          
           if (hook.match(this)) {
+            // Data w/ optional compute function
+            for (const dname in (hook.data || {})) {
+              const value = hook.data[dname]
+              this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+            }
+            // Computed
             for (const cname in (hook.computed || {})) {
               // Precomputed super function
-              // eslint-disable-next-line no-extra-parens
-              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop);
+              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
               Object.defineProperty(this, cname, {
-                get: () => (hook.computed[cname](sup)),
+                get: hook.computed[cname].bind(vueComponent, sup),
                 configurable: true
               })
             }
-            for (const dname in (hook.data || {})) {
-              const value = hook.data[dname]
-              this[dname] = (typeof value == "function" ? value(this[dname]) : value)
+            // Methods w/ optional super argument
+            for (const mname in (hook.methods || {})) {
+              const sup = this[mname] || nop
+              const bound = hook.methods[mname].bind(vueComponent)
+              this[mname] = function(){return bound(...arguments, sup)}
             }
+          }
+        })
+      },
+      updated() {
+        vueHooks.forEach((hook) => {
+          // Shorthand
+          if (hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
+
+          if (hook.updated && hook.match(this)) {
+            hook.updated.bind(this)()
           }
         })
       }
@@ -422,17 +454,22 @@ if (ipcMain) {
     return items
   }
 
-  modChoices = loadModChoices()
+  if (modsDir) {
+    modChoices = loadModChoices()
+  } else {
+    logger.warn("modsDir is not defined! First run?")
+  }
 
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
   ipcMain.on('MODS_FORCE_RELOAD', (e) => {
-    loadModChoices()
+    modChoices = loadModChoices()
     e.returnValue = true
   })
 } else {
   // We are in the renderer process.
   logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+  // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
 export default {
