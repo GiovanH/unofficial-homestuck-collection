@@ -239,6 +239,8 @@ function getModJs(mod_dir, singlefile=false) {
   }
 }
 
+const footnote_categories = ['story']
+
 // Interface
 
 function editArchive(archive) {
@@ -252,6 +254,10 @@ function editArchive(archive) {
   })
 
   archive.footnotes = {}
+
+  footnote_categories.forEach(category => {
+    archive.footnotes[category] = []
+  })
 
   // Footnotes
   getEnabledModsJs().reverse().forEach((js) => {
@@ -287,22 +293,26 @@ function mergeFootnotes(archive, footObj) {
   footObj.forEach(footnoteList => {
     const default_author = footnoteList.author || "Undefined Author"
     const default_class = footnoteList.class || undefined
+    const default_ispreface = footnoteList.preface
 
-    for (var page_num in footnoteList.footnotes) {
-      // TODO replace this with some good defaultdict juice
-      if (!archive.footnotes[page_num])
-        archive.footnotes[page_num] = []
+    footnote_categories.forEach(category => {
+      for (var page_num in footnoteList[category]) {
+        // TODO replace this with some good defaultdict juice
+        if (!archive.footnotes[category][page_num])
+          archive.footnotes[category][page_num] = []
 
-      footnoteList.footnotes[page_num].forEach(note => {
-        const new_note = {
-          author: (note.author === null) ? null : (note.author || default_author),
-          class: (note.class === null) ? null : (note.class || default_class),
-          content: note.content
-        }
+        footnoteList[category][page_num].forEach(note => {
+          const new_note = {
+            author: (note.author === null) ? null : (note.author || default_author),
+            class: (note.class === null) ? null : (note.class || default_class),
+            preface: note.preface || default_ispreface,
+            content: note.content
+          }
 
-        archive.footnotes[page_num].push(new_note)
-      })
-    }
+          archive.footnotes[category][page_num].push(new_note)
+        })
+      }
+    })
   })
 }
 
