@@ -347,12 +347,10 @@ function getMixins(){
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
           // Shorthand
-          if (hook.matchName) {
+          if (hook.matchName)
             hook.match = (c) => (c.$options.name == hook.matchName)
-          }
-
+          
           if (hook.match(this)) {
-            // logger.info("Mod", js.title, "has hooks for", this.$options.name)
             // Data w/ optional compute function
             for (const dname in (hook.data || {})) {
               const value = hook.data[dname]
@@ -373,6 +371,17 @@ function getMixins(){
               const bound = hook.methods[mname].bind(vueComponent)
               this[mname] = function(){return bound(...arguments, sup)}
             }
+          }
+        })
+      },
+      updated() {
+        vueHooks.forEach((hook) => {
+          // Shorthand
+          if (hook.matchName)
+            hook.match = (c) => (c.$options.name == hook.matchName)
+
+          if (hook.updated && hook.match(this)) {
+            hook.updated.bind(this)()
           }
         })
       }
