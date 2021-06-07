@@ -20,7 +20,8 @@ const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
 var imods = {
-  _peachy: require("./imods/_peachy.js")
+  _unpeachy: require("./imods/_unpeachy.js"),
+  _pxsTavros: require("./imods/_pxsTavros.js")
 }
 
 
@@ -159,7 +160,9 @@ function getEnabledMods() {
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
 
   if (store.get('localData.settings.unpeachy'))
-    list.push("_peachy")
+    list.push("_unpeachy")
+  if (store.get('localData.settings.pxsTavros'))
+    list.push("_pxsTavros")
 
   return list
 }

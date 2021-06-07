@@ -510,7 +510,7 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (setting == 'unpeachy') {
+      if (['unpeachy', 'pxsTavros'].includes(setting)) {
         ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       }
 
