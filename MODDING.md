@@ -212,28 +212,28 @@ Specific page/context selectors should be included in the CSS file.
 
 Mods can add to the global library of footnotes (which is empty, by default) by defining their `footnotes` field. Each footnote has HTML content and an author name. Any given page can have any number of footnotes. 
 
-The `footnotes` object is constructed accordingly:
-
-`footnotes`: `List<FootnotesScope>`
+The `footnotes` object is a `List<FootnotesScope>`
 
 `FootnotesScope` is your main object to manipulate. It has fields
 
 - `author` (string): The author of the footnote. Note that this is not necessarily the author of the mod.
 - `class` (string, optional): A custom CSS class the footnote container will inherit. Use this if you want to do custom styling.
-- `footnotes`: `Map<PageNum, List<Note>>`
+- `preface` (bool, optional): If set to `true`, notes will appear before pages instead of after them.
+- `story`: `Map<PageNum, List<Note>>`, adds footnotes to MSPA story pages by PageNum.
 
 Individual notes are as follows:
 
 - `content` (string): The actual content of the footnote. This can include HTML including formatting tags. Be sure to escape HTML if you're defining it in JSON.
 - `author` (string, optional): An explicitly defined author for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
 - `class` (string, optional): An explicitly defined class for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
+- `preface` (bool, optional): An explicitly defined preface-state for this particular note. This does not need to be set and will inherit from the `FootnotesScope` if note defined.
 
 So, putting that all together, here is a valid footnotes object:
 
 ```json
 [{
   "author": "Default author",
-  "footnotes": {
+  "story": {
     "001901": [{
       "content": "Footnote <i>html content</i>"
     },{
@@ -265,6 +265,8 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
     footnotes: "./footnotes.json"
 ```
 
+Footnotes are not supported on fullscreen flash pages like EndOfHS or Game Over.
+
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 
 ### Vue Hooks
@@ -282,8 +284,8 @@ Ways to hook Vue data, in order from most to least recommended:
 
 - `data` (optional): The `data` object is a collection of **values and functions**. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
 - `computed` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions are given a `$super` argument that contains the *previous* **result** of the computation. 
-- `methods` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
-- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated).
+- `methods` (optional): The `methods` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
+- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated). If you absolutely have to do arbitrary userjs-style DOM modifications, this is the place to do it.
 
 Examples of VueHooks:
 

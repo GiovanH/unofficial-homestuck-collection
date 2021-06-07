@@ -10,7 +10,7 @@ const log = require('electron-log');
 const logger = log.scope('Mods');
 
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-const modsDir = path.join(assetDir, "mods")
+const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
 var modChoices
@@ -77,7 +77,7 @@ if (ipcMain) {
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
-      message: "Something went wrong while loading mods! All mods have been disabled for safety.\nCheck the console log for details"
+      message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
     })
   }
 } else {
@@ -257,42 +257,61 @@ function getModJs(mod_dir, singlefile=false) {
   }
 }
 
+const footnote_categories = ['story']
+
 // Interface
 
 function editArchive(archive) {
-  // edit(archive)
   getEnabledModsJs().reverse().forEach((js) => {
-    const editfn = js.edit
-    if (editfn) {
-      editfn(archive)
-      console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+    try {
+      const editfn = js.edit
+      if (editfn) {
+        editfn(archive)
+        console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+      
+        // Sanity checks
+        // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+        // required_keys.forEach(key => {
+        //   if (!archive[key]) throw new Error("Archive object missing required key", key)
+        // })
+      }
+    } catch (e) {
+      onModLoadFail(js.key, "editing archive")
     }
   })
 
   archive.footnotes = {}
 
+  footnote_categories.forEach(category => {
+    archive.footnotes[category] = []
+  })
+
   // Footnotes
   getEnabledModsJs().reverse().forEach((js) => {
-    if (js.footnotes) {
-      if (typeof js.footnotes == "string") {
-        console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
-        
-        const json_path = path.join(
-          js._mod_root_dir, 
-          js.footnotes
-        )
+    try {
+      if (js.footnotes) {
+        if (typeof js.footnotes == "string") {
+          console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
+          
+          const json_path = path.join(
+            js._mod_root_dir, 
+            js.footnotes
+          )
 
-        logger.info(js.title, "Loading footnotes from file", json_path)
-        const footObj = JSON.parse(
-          fs.readFileSync(json_path, 'utf8')
-        )
-        mergeFootnotes(archive, footObj)
-      } else if (Array.isArray(js.footnotes)) {
-        logger.info(js.title, "Loading footnotes from object")
-        mergeFootnotes(archive, js.footnotes)
-      } else {
-        throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+          logger.info(js.title, "Loading footnotes from file", json_path)
+          const footObj = JSON.parse(
+            fs.readFileSync(json_path, 'utf8')
+          )
+          mergeFootnotes(archive, footObj)
+        } else if (Array.isArray(js.footnotes)) {
+          logger.info(js.title, "Loading footnotes from object")
+          mergeFootnotes(archive, js.footnotes)
+        } else {
+          throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+        }
       }
+    } catch (e) {
+      onModLoadFail(e, "adding footnotes")
     }
   })
 }
@@ -305,22 +324,26 @@ function mergeFootnotes(archive, footObj) {
   footObj.forEach(footnoteList => {
     const default_author = footnoteList.author || "Undefined Author"
     const default_class = footnoteList.class || undefined
+    const default_ispreface = footnoteList.preface
 
-    for (var page_num in footnoteList.footnotes) {
-      // TODO replace this with some good defaultdict juice
-      if (!archive.footnotes[page_num])
-        archive.footnotes[page_num] = []
+    footnote_categories.forEach(category => {
+      for (var page_num in footnoteList[category]) {
+        // TODO replace this with some good defaultdict juice
+        if (!archive.footnotes[category][page_num])
+          archive.footnotes[category][page_num] = []
 
-      footnoteList.footnotes[page_num].forEach(note => {
-        const new_note = {
-          author: (note.author === null) ? null : (note.author || default_author),
-          class: (note.class === null) ? null : (note.class || default_class),
-          content: note.content
-        }
+        footnoteList[category][page_num].forEach(note => {
+          const new_note = {
+            author: (note.author === null) ? null : (note.author || default_author),
+            class: (note.class === null) ? null : (note.class || default_class),
+            preface: note.preface || default_ispreface,
+            content: note.content
+          }
 
-        archive.footnotes[page_num].push(new_note)
-      })
-    }
+          archive.footnotes[category][page_num].push(new_note)
+        })
+      }
+    })
   })
 }
 
@@ -452,17 +475,22 @@ if (ipcMain) {
     return items
   }
 
-  modChoices = loadModChoices()
+  if (modsDir) {
+    modChoices = loadModChoices()
+  } else {
+    logger.warn("modsDir is not defined! First run?")
+  }
 
   ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
   ipcMain.on('MODS_FORCE_RELOAD', (e) => {
-    loadModChoices()
+    modChoices = loadModChoices()
     e.returnValue = true
   })
 } else {
   // We are in the renderer process.
   logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+  // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
 export default {

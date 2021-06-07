@@ -19,6 +19,22 @@
           <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
           <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
         </div>
+
+        <h3>Reading Experience</h3>
+        <dl class="fastForwardSelection">
+          <dt>
+            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
+            <label for="fast_forward=false">Replay</label>
+          </dt>
+          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page).</dd>
+
+          <dt>
+            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
+            <label for="fast_forward=true">Archival</label>
+          </dt>
+          <dd>Read as an archival reader.<br>Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
+        </dl>
+
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
@@ -225,7 +241,7 @@
             </draggable>
           </div>
         </section>
-        <button @click="forceReload">Force reload</button>
+        <button v-if="$localData.settings.devMode" @click="forceReload">Force reload</button>
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
       </div>
 
@@ -503,6 +519,8 @@ export default {
       }
     },
     toggleSetting(setting, parentObject){
+      // Call this when a setting changes, so we can update it on the parent object.
+      // Doesn't actually toggle settings.
       if (!(setting in this.$localData.settings) || (parentObject in this.$localData.settings && !(setting in this.$localData.settings[parentObject]))) this.$set(this.$localData.settings, setting, true)
       else if (parentObject && setting in this.$localData.settings[parentObject]) this.$localData.settings[parentObject][setting] = !this.$localData.settings[parentObject][setting]
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
@@ -544,12 +562,20 @@ export default {
       this.debounce = setTimeout(function() {
         this.debounce = false 
         this.memoizedClearAll();
-        ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+
+        this.$root.loadState = "LOADING"
+        this.$nextTick(function () {
+          ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+        })
       }.bind(this), 2000)
     },
     forceReload: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      this.$root.loadState = "LOADING"
+      this.$nextTick(function () {
+        ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      })
+      // ipcRenderer.invoke('restart')
     }
   },
   watch: {
@@ -667,6 +693,13 @@ export default {
             }
           }
         }
+
+        .fastForwardSelection {
+          dd {
+            font-weight: normal;
+          }
+        }
+
         button {
           font-size: 110%;
         }
