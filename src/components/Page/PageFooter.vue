@@ -69,7 +69,7 @@ export default {
 
         user-select: none;
     }
-    .scratch {
+    .scratch .footer {
         padding-left: 70px;
         padding-right: 70px;
         
