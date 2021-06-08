@@ -421,9 +421,6 @@ export default {
 		openModal(url) {
 			this.$refs.modal.open(url)
 		},
-		// setTheme(){
-		// 	this.$logger.info("setTheme")
-		// },
 		setTitle(component = this.resolveComponent){
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
 			let title, adventureTitle
@@ -579,19 +576,7 @@ export default {
 		}
 	},
 	watch: {
-		// 'isLoaded'(to, from){
-		// 	this.setTheme()
-		// },
-		// '$localData.settings.themeOverride'(to, from){
-		// 	this.setTheme()
-		// },
-		// '$localData.settings.forceThemeOverride'(to, from){
-		// 	this.setTheme()
-		// },
 		'tabIsActive'(to, from) {
-			// Set app theme when we toggle to this tab
-			// this.setTheme()
-
 			//Prevents tab from unloading if there's anything that might need to run in the background
 			if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
 			else if (this.forceLoad) {
@@ -615,7 +600,6 @@ export default {
 	},
 	mounted(){
 		this.setTitle()
-		// this.setTheme()
 	},
 	destroyed() {
 		//Iframes sometimes decide to keep running in the background forever, so we manually clean them up
