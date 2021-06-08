@@ -70,8 +70,8 @@ export default {
         user-select: none;
     }
     .scratch .footer {
-        padding-left: 70px;
-        padding-right: 70px;
+        padding-left: 40px;
+        padding-right: 40px;
         
         background-color: var(--page-pageContent);
     }
