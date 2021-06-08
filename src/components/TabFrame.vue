@@ -14,7 +14,7 @@
 		ref="tabFrame"
 	>
 		<component
-			:class="[$root.theme]"
+			:class="theme"
 			:is="resolveComponent" 
 			:tab="tab" 
 			:routeParams="routeParams" 
@@ -334,8 +334,8 @@ export default {
 			this.setTitle(result)
 			return result
 		},
-		theme() {
-			// Get the expected theme for this page.
+		contentTheme() {
+			// Get the expected theme for this page, based on the content
 			let theme = 'default'
 			if (this.resolveComponent == 'PAGE'){
 				let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
@@ -363,6 +363,27 @@ export default {
 			else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
 			return theme
 			
+		},
+		theme() {
+			// Get the actual displayed theme, factoring in settings.
+	        let page_theme = this.contentTheme || 'default'
+	        let set_theme = this.$localData.settings.themeOverride
+	        let theme = page_theme
+
+	        if (set_theme) {
+	          if (page_theme != 'default') {
+	            // Page has a theme
+	            if (this.$localData.settings.forceThemeOverride) {
+	              // If force is on, use the override theme
+	              theme = set_theme
+	            } else {
+	              theme = page_theme
+	            }
+	          } else {
+	            theme = set_theme
+	          }
+	        }
+			return theme
 		}
 	},
 	methods: {
@@ -400,28 +421,9 @@ export default {
 		openModal(url) {
 			this.$refs.modal.open(url)
 		},
-		setTheme(){
-			if (this.isLoaded && this.tabIsActive) {
-		        let page_theme = this.theme || 'default'
-		        let set_theme = this.$localData.settings.themeOverride
-		        let theme = page_theme
-
-		        if (set_theme) {
-		          if (page_theme != 'default') {
-		            // Page has a theme
-		            if (this.$localData.settings.forceThemeOverride) {
-		              // If force is on, use the override theme
-		              theme = set_theme
-		            } else {
-		              theme = page_theme
-		            }
-		          } else {
-		            theme = set_theme
-		          }
-		        }
-				this.$root.theme = theme
-			}	
-		},
+		// setTheme(){
+		// 	this.$logger.info("setTheme")
+		// },
 		setTitle(component = this.resolveComponent){
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
 			let title, adventureTitle
@@ -577,18 +579,18 @@ export default {
 		}
 	},
 	watch: {
-		'isLoaded'(to, from){
-			this.setTheme()
-		},
-		'$localData.settings.themeOverride'(to, from){
-			this.setTheme()
-		},
-		'$localData.settings.forceThemeOverride'(to, from){
-			this.setTheme()
-		},
+		// 'isLoaded'(to, from){
+		// 	this.setTheme()
+		// },
+		// '$localData.settings.themeOverride'(to, from){
+		// 	this.setTheme()
+		// },
+		// '$localData.settings.forceThemeOverride'(to, from){
+		// 	this.setTheme()
+		// },
 		'tabIsActive'(to, from) {
 			// Set app theme when we toggle to this tab
-			this.setTheme()
+			// this.setTheme()
 
 			//Prevents tab from unloading if there's anything that might need to run in the background
 			if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
@@ -613,7 +615,7 @@ export default {
 	},
 	mounted(){
 		this.setTitle()
-		this.setTheme()
+		// this.setTheme()
 	},
 	destroyed() {
 		//Iframes sometimes decide to keep running in the background forever, so we manually clean them up
