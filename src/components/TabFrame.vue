@@ -577,6 +577,8 @@ export default {
 	},
 	watch: {
 		'tabIsActive'(to, from) {
+			if (to)
+				this.$root.tabTheme = this.theme
 			//Prevents tab from unloading if there's anything that might need to run in the background
 			if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
 			else if (this.forceLoad) {
@@ -591,17 +593,20 @@ export default {
 		// When the tab changes or the tab changes theme,
 		// update the global variable right away
 		'isLoaded'(to, from){
-			this.$root.tabTheme = this.theme
+			if (this.tabIsActive)
+				this.$root.tabTheme = this.theme
 		},
 		'$localData.settings.themeOverride'(to, from){
-			this.$root.tabTheme = this.theme
+			if (this.tabIsActive)
+				this.$root.tabTheme = this.theme
 		},
 		'$localData.settings.forceThemeOverride'(to, from){
-			this.$root.tabTheme = this.theme
+			if (this.tabIsActive)
+				this.$root.tabTheme = this.theme
 		},
 		'theme'(to, from) {
-			this.$logger.info("updating tabTheme", this.$root.tabTheme, to)
-			this.$root.tabTheme = to
+			if (this.tabIsActive)
+				this.$root.tabTheme = to
 		},
 		'$localData.settings.hqAudio'() {
 			this.forceLoad = false
