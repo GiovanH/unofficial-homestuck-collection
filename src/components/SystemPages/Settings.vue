@@ -432,8 +432,8 @@ export default {
         }
       ],
       themes: [
-        {text: "Auto", value: ""},
-        {text: "MSPA", value: "default"},
+        {text: "Auto", value: "default"},
+        {text: "MSPA", value: "mspa"},
         {text: "Retro", value: "retro"},
         {text: "Scratch", value: "scratch"},
         {text: "SBaHJ", value: "sbahj"},
@@ -442,7 +442,7 @@ export default {
         {text: "Homosuck", value: "A6A6"},
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
-        {text: "Paradox Space", value: "pxs"},
+        {text: "Paradox Space", value: "pxs"}
       ],
       fonts: [
         {text: "Default", value: ""},

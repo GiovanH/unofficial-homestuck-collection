@@ -35,8 +35,7 @@
     },
     data() {
       return {
-        zoomLevel: 0,
-        lastPageTheme: 'default'
+        zoomLevel: 0
       }
     },
     computed: {
@@ -44,24 +43,18 @@
         return this.$localData.tabData.tabList
       },
       theme(){
-        // you have to have these lines here or it won't work
-        // because vue is not great at this
-        this.$localData.tabData.activeTabKey; 
-        this.$localData.settings.themeOverrideUI;
-        this.$localData.settings.forceThemeOverrideUI;
-        // no, seriously
-
-        let page_theme;
+        let page_theme
 
         // TODO: Sometimes the app loads before this.$refs is populated at all.
         // Bam: This method tries to resolve before the new-tab event has propogated enough for the tab component to actually exist. Gotta re-examine
-        let tab_components = this.$refs[this.$localData.tabData.activeTabKey]
+        const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
 
         if (tab_components) {
-          this.lastPageTheme = page_theme = tab_components[0].theme
+          // Get theme from inner tab
+          page_theme = tab_components[0].contentTheme
         } else {
-          console.warn("No tabs! Using prev theme", this.lastPageTheme)
-          page_theme = this.lastPageTheme
+          this.$logger.warn("No tabs! Using default")
+          page_theme = 'default'
         }
 
         let set_theme = this.$localData.settings.themeOverrideUI
@@ -80,8 +73,7 @@
             theme = set_theme
           } 
         }
-        this.lastPageTheme = theme
-        return theme
+        return (theme == 'default' ? 'mspa' : theme)
       }
     },
     methods: {

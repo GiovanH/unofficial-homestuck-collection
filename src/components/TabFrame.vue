@@ -383,7 +383,7 @@ export default {
 	            theme = set_theme
 	          }
 	        }
-			return theme
+        	return (theme == 'default' ? 'mspa' : theme)
 		}
 	},
 	methods: {
