@@ -148,7 +148,7 @@ export default {
       return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
     },
     footerBanner() {
-      switch (this.$root.theme) {
+      switch (this.$root.tabTheme) {
         case 'scratch':
           return 'customScratchFooter.png'
         case 'sbahj':

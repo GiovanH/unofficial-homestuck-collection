@@ -42,32 +42,33 @@
       tabList() {
         return this.$localData.tabData.tabList
       },
-      theme(){
+      tabTheme() {
         let page_theme
-
-        // TODO: Sometimes the app loads before this.$refs is populated at all.
-        // Bam: This method tries to resolve before the new-tab event has propogated enough for the tab component to actually exist. Gotta re-examine
         const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
 
         if (tab_components) {
           // Get theme from inner tab
           page_theme = tab_components[0].contentTheme
         } else {
+          // There are no tabs at all yet
           this.$logger.warn("No tabs! Using default")
           page_theme = 'default'
         }
+        return page_theme
+      },
+      theme() {
 
         let set_theme = this.$localData.settings.themeOverrideUI
-        let theme = page_theme
+        let theme = this.tabTheme
 
         if (set_theme) {
-          if (page_theme != 'default') {
+          if (this.tabTheme != 'default') {
             // Page has a theme
             if (this.$localData.settings.forceThemeOverrideUI) {
               // If force is on, use the override theme
               theme = set_theme
             } else {
-              theme = page_theme
+              theme = this.tabTheme
             }
           } else {
             theme = set_theme

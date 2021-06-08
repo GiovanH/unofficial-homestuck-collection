@@ -588,6 +588,21 @@ export default {
 				}, 10)
 			}
 		},
+		// When the tab changes or the tab changes theme,
+		// update the global variable right away
+		'isLoaded'(to, from){
+			this.$root.tabTheme = this.theme
+		},
+		'$localData.settings.themeOverride'(to, from){
+			this.$root.tabTheme = this.theme
+		},
+		'$localData.settings.forceThemeOverride'(to, from){
+			this.$root.tabTheme = this.theme
+		},
+		'theme'(to, from) {
+			this.$logger.info("updating tabTheme", this.$root.tabTheme, to)
+			this.$root.tabTheme = to
+		},
 		'$localData.settings.hqAudio'() {
 			this.forceLoad = false
 		},
