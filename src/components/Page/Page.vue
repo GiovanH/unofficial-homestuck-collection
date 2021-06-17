@@ -115,9 +115,6 @@ export default {
     storyNum() {
       return this.$getStory(this.pageNum)
     },
-    thisPage() {
-      return this.pageCollection[this.pageNum]
-    },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
