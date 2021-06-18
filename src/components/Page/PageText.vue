@@ -188,7 +188,7 @@ export default {
         text-align: center;
         margin: 0 0 30px 0;
         
-        /deep/ img.fullWidth {
+        ::v-deep img.fullWidth {
             position: relative;
             left: -25px;
         }

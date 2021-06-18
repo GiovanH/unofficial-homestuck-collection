@@ -198,15 +198,44 @@ with the same effect.
 
 Mods can inject custom CSS into the whole app. `styles` declares a list of local css files to be injected.
 
-`styles`: `List<LocalPath(String)>`
+`styles`: `List<CustomStyle>`
+
+A CustomStyle has fields
+
+`source`: A relative path to a stylesheet
 
 ```js
 styles: [
-    "./test.css"
-]
+    // Inject css file
+    {
+        source: "./test.css"
+    }
+],
 ```
 
 Specific page/context selectors should be included in the CSS file.
+
+### `themes`
+
+Instead of just blindly injecting CSS into the app, mods can also register themes that integrate with the collection's existing theme system.
+
+**Themes will be automatically scoped via SASS**, so the author does not need to handle any theme selection logic. 
+
+`themes`: `List<CustomTheme>`
+
+A CustomTheme has fields
+
+`label`: The name of the theme, displayed in the settings menu.
+`source`: A relative path to a stylesheet
+
+```js
+themes: [
+    {
+        label: "Super retro",
+        source: "./theme.scss"
+    }
+]
+```
 
 ### Footnotes
 

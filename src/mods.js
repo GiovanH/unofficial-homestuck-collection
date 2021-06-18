@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 const {ipcMain, ipcRenderer, dialog} = require('electron')
+const sass = require('sass');
 
 const Store = require('electron-store')
 const store = new Store()
@@ -333,24 +334,45 @@ function getMainMixin(){
   // A mixin that injects on the main vue process.
   // Currently this just injects custom css
 
-  let styles = []
-  getEnabledModsJs().forEach(js => {
-    const modstyles = js.styles || []
-    modstyles.forEach(style_link => styles.push(new URL(style_link, js._mod_root_url).href))
-  })
-
   return {
     mounted() {
-      logger.debug("Mounted main mixin")
+      getEnabledModsJs().forEach(js => {
+        const modstyles = js.styles || []
+        modstyles.forEach((customstyle, i) => {
+          const style_id = `style-${js._id}-${i}`
+          this.$logger.debug(style_id)
+          
+          const body = sass.renderSync({
+            file: path.resolve(js._mod_root_dir, customstyle.source),
+            sourceComments: true
+          }).css.toString()
 
-      styles.forEach((style_link) => {
-        const link = document.createElement("link")
-        link.rel = "stylesheet"
-        link.type = "text/css"
-        link.href = style_link
+          const style = document.createElement("style")
+          style.id = style_id
+          style.rel = "stylesheet"
+          style.innerHTML = body
+          this.$el.appendChild(style)
+          this.$logger.debug(style_id, style)
+        })
 
-        this.$el.appendChild(link)
-        logger.debug(link)
+        const modThemes = js.themes || []
+        modThemes.forEach((theme, i) => {
+          const theme_class = `theme-${js._id}-${i}`
+          this.$logger.debug(theme_class)
+
+          let body = fs.readFileSync(path.resolve(js._mod_root_dir, theme.source))
+          body = sass.renderSync({
+            data: `.${theme_class} {\n${body}\n}`,
+            sourceComments: true
+          }).css.toString()
+
+          const style = document.createElement("style")
+          style.id = theme_class
+          style.rel = "stylesheet"
+          style.innerHTML = body
+          this.$el.appendChild(style)
+          this.$logger.debug(theme_class, style)
+        })
       })
     }
   }
@@ -363,9 +385,29 @@ function getMixins(){
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
+    const modThemes = js.themes || []
+
+    // Keep this logic out here so it doesn't get repeated
+    // TODO: Make sure other forEachs aren't being duplicated down there
+
+
+    // Write theme hooks
+    // Try to minimize vue hooks (don't want a huge stack!)
+    if (modThemes.length) {
+      const newThemes = modThemes.map((theme, i) => 
+        ({text: theme.label, value: `theme-${js._id}-${i}`})
+      )
+      
+      vueHooks.push({
+        matchName: "settings",
+        data: {themes($super) {return $super.concat(newThemes)}}
+      })
+    }
+
     var mixin = {
       created() {
         const vueComponent = this
+
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
@@ -375,6 +417,8 @@ function getMixins(){
           
           if (hook.match(this)) {
             // Data w/ optional compute function
+            this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
+
             for (const dname in (hook.data || {})) {
               const value = hook.data[dname]
               this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)

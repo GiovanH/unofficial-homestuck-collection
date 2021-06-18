@@ -371,7 +371,8 @@ var first_archive
 try {
   first_archive = loadArchiveData()
 } catch (e) {
-  logger.warn(e)
+  // logger.warn(e)
+  // don't even warn, honestly
 }
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
