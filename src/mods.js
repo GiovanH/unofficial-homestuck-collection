@@ -13,6 +13,9 @@ const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir
 const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
+const imodsDir = (assetDir ? path.join(assetDir, "archive", "imods") : undefined)
+const imodsAssetsRoot = "assets://archive/imods/"
+
 var modChoices
 var routes = undefined
 
@@ -60,27 +63,28 @@ if (ipcMain) {
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
 
-    // Clear enabled mods
-    // TODO: This doesn't trigger the settings.modListEnabled observer,
-    // which results in bad settings-screen side effects
-    store.set(store_modlist_key, [])
-    logger.debug("Modlist cleared, clearing routes...")
-    bakeRoutes()
-
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
       message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
     })
+    // Clear enabled mods
+    // TODO: This doesn't trigger the settings.modListEnabled observer,
+    // which results in bad settings-screen side effects
+    store.set(store_modlist_key, [])
+    logger.debug("Modlist cleared, clearing routes...")
+    bakeRoutes()
   }
 } else {
   // We are in the renderer process.
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
+    document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
+    store.set(store_modlist_key, [])
     logger.error("Did not expect to be in the renderer process for this! Debug")
-    throw e 
+    ipcRenderer.invoke('restart')
   }
 }
 
@@ -152,6 +156,14 @@ function bakeRoutes() {
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
+
+  if (store.get('localData.settings.unpeachy'))
+    list.push("_unpeachy")
+  if (store.get('localData.settings.pxsTavros'))
+    list.push("_pxsTavros")
+  if (store.get('localData.settings.jsFlashes'))
+    list.push("_replaybound")
+
   return list
 }
 
@@ -185,18 +197,31 @@ function getModJs(mod_dir, singlefile=false) {
   // Errors passed to onModLoadFail and raised
   try {
     let modjs_path
+    var mod
+
+    // Global, but let us overwrite it for some cases
+    let thisModsDir = modsDir
+    let thisModsAssetRoot = modsAssetsRoot
+
+    if (mod_dir.startsWith("_")) {
+      thisModsDir = imodsDir
+      thisModsAssetRoot = imodsAssetsRoot
+    } 
+
     if (singlefile) {
-      modjs_path = path.join(modsDir, mod_dir)
+      modjs_path = path.join(thisModsDir, mod_dir)
     } else {
-      modjs_path = path.join(modsDir, mod_dir, "mod.js")
+      modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
-    var mod = __non_webpack_require__(modjs_path)
+    mod = __non_webpack_require__(modjs_path)
+
     mod._id = mod_dir
     mod._singlefile = singlefile
+    mod._internal = mod_dir.startsWith("_")
 
     if (!singlefile) {
-      mod._mod_root_dir = path.join(modsDir, mod._id)
-      mod._mod_root_url = new URL(mod._id, modsAssetsRoot).href + "/"
+      mod._mod_root_dir = path.join(thisModsDir, mod._id)
+      mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
 
     return mod
@@ -437,6 +462,9 @@ if (ipcMain) {
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir)
+        if (js.hidden === true)
+          return acc // continue
+
         acc[dir] = {
           label: js.title,
           desc: js.desc,
