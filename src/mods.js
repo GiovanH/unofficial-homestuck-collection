@@ -63,27 +63,28 @@ if (ipcMain) {
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
 
-    // Clear enabled mods
-    // TODO: This doesn't trigger the settings.modListEnabled observer,
-    // which results in bad settings-screen side effects
-    store.set(store_modlist_key, [])
-    logger.debug("Modlist cleared, clearing routes...")
-    bakeRoutes()
-
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
       message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
     })
+    // Clear enabled mods
+    // TODO: This doesn't trigger the settings.modListEnabled observer,
+    // which results in bad settings-screen side effects
+    store.set(store_modlist_key, [])
+    logger.debug("Modlist cleared, clearing routes...")
+    bakeRoutes()
   }
 } else {
   // We are in the renderer process.
   onModLoadFail = function (enabled_mods, e) {
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
+    document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
+    store.set(store_modlist_key, [])
     logger.error("Did not expect to be in the renderer process for this! Debug")
-    throw e 
+    ipcRenderer.invoke('restart')
   }
 }
 
