@@ -13,17 +13,14 @@ const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir
 const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
+const imodsDir = (assetDir ? path.join(assetDir, "archive", "imods") : undefined)
+const imodsAssetsRoot = "assets://archive/imods/"
+
 var modChoices
 var routes = undefined
 
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
-
-var imods = {
-  _unpeachy: require("./imods/_unpeachy.js"),
-  _pxsTavros: require("./imods/_pxsTavros.js")
-}
-
 
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
@@ -163,6 +160,8 @@ function getEnabledMods() {
     list.push("_unpeachy")
   if (store.get('localData.settings.pxsTavros'))
     list.push("_pxsTavros")
+  if (store.get('localData.settings.jsFlashes'))
+    list.push("_replaybound")
 
   return list
 }
@@ -199,22 +198,29 @@ function getModJs(mod_dir, singlefile=false) {
     let modjs_path
     var mod
 
+    // Global, but let us overwrite it for some cases
+    let thisModsDir = modsDir
+    let thisModsAssetRoot = modsAssetsRoot
+
     if (mod_dir.startsWith("_")) {
-      mod = imods[mod_dir]
+      thisModsDir = imodsDir
+      thisModsAssetRoot = imodsAssetsRoot
+    } 
+
+    if (singlefile) {
+      modjs_path = path.join(thisModsDir, mod_dir)
     } else {
-      if (singlefile) {
-        modjs_path = path.join(modsDir, mod_dir)
-      } else {
-        modjs_path = path.join(modsDir, mod_dir, "mod.js")
-      }
-      mod = __non_webpack_require__(modjs_path)
+      modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
+    mod = __non_webpack_require__(modjs_path)
+
     mod._id = mod_dir
     mod._singlefile = singlefile
+    mod._internal = mod_dir.startsWith("_")
 
     if (!singlefile) {
-      mod._mod_root_dir = path.join(modsDir, mod._id)
-      mod._mod_root_url = new URL(mod._id, modsAssetsRoot).href + "/"
+      mod._mod_root_dir = path.join(thisModsDir, mod._id)
+      mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
 
     return mod
