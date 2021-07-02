@@ -1,4 +1,4 @@
-body, .mspa {
+body, #app.mspa {
 	--font-default: #000000;
 	--font-header: #000000;
 	--font-ctx: #000000;
@@ -45,7 +45,7 @@ body, .mspa {
 	--find--highlight: lawngreen;
 }
 
-.retro {
+#app.retro {
 	--nav-bg: #000000;
 	--nav-link: #CCCCCC;
 
@@ -65,7 +65,7 @@ body, .mspa {
 	}
 }
 
-.scratch {
+#app.scratch {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-ctx: #ffffff;
@@ -108,7 +108,7 @@ body, .mspa {
 	--saves-scrollHover: #C0C0C0;
 }
 
-.sbahj {
+#app.sbahj {
 	--font-disabled: #00000060;
 	--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
 
@@ -145,7 +145,7 @@ body, .mspa {
 	}
 }
 
-.cascade {
+#app.cascade {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -180,7 +180,7 @@ body, .mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-.collide {
+#app.collide {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -214,7 +214,7 @@ body, .mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-.tso {
+#app.tso {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -250,7 +250,7 @@ body, .mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-.trickster {
+#app.trickster {
 	--font-default: #f9fd6b;
 	--font-header: #f9fd6b;
 	--font-highlight: #000000;
@@ -302,7 +302,7 @@ body, .mspa {
 	}
 }
 
-.A6A6 {
+#app.A6A6 {
 	--font-default: #2ed73a;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -348,7 +348,7 @@ body, .mspa {
 	}
 }
 
-.pxs {
+#app.pxs {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-ctx: #ffffff;
