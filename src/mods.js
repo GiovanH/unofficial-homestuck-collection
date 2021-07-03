@@ -129,8 +129,6 @@ function bakeRoutes() {
   routes = all_mod_routes
 
   // Test routes
-  // TODO: This is super wasteful and should only be done when developer mode is on.
-
   const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
 
   if (do_full_check) {

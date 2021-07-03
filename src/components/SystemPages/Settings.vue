@@ -268,7 +268,8 @@
             </draggable>
           </div>
         </section>
-        <button v-if="$localData.settings.devMode" @click="forceReload">Force reload</button>
+        <p>You may need to restart the application to apply some changes.</p>
+        <button v-if="$localData.settings.devMode" @click="forceReload">Soft reload</button>
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
       </div>
 
@@ -301,7 +302,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import draggable from "vuedraggable";
+import draggable from "vuedraggable"
 
 const { ipcRenderer } = require('electron')
 
@@ -450,7 +451,7 @@ export default {
         {text: "Verdana / Arial", value: "verdana"},
         {text: "Times New Roman", value: "times"},
         {text: "Comic Sans", value: "comicSans"},
-        {text: "OpenDyslexic", value: "openDyslexic"},
+        {text: "OpenDyslexic", value: "openDyslexic"}
       ],
       newReaderPage: this.$localData.settings.newReader.current || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
@@ -466,11 +467,11 @@ export default {
   },
   computed: {
     controversialAll(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.every(Boolean)
     },
     controversialAny(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.some(Boolean)
     },
     modsEnabled() {
@@ -489,7 +490,7 @@ export default {
       } else {
         return undefined
       }
-    },
+    }
   },
   methods: {
     validateNewReader() {
@@ -514,20 +515,21 @@ export default {
     },
     setNewReader() {
       this.validateNewReader() 
-      let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
+      const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
         this.$localData.settings.themeOverride = ""
+        // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
         this.$updateNewReader(pageId, true)
       }
     },
     clearNewReader() {
-      let args = {
+      const args = {
         title: "Are you sure?",
         message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
       }
-      ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+      ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
           this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
           this.$localData.root.NEW_READER_CLEAR()
@@ -548,15 +550,18 @@ export default {
       if (this.controversialAny) {
         // Normally checking an indeterminate checkbox enables it,
         // but we want to clear it instead.
+        
+        // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
         this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
       } else {
-        let args = {
+        const args = {
           title: "Are you sure?",
           message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
         }
-        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+        ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
           if (answer === true) {
+            // eslint-disable-next-line no-return-assign
             this.allControversial.forEach(key => this.$localData.settings[key] = true)
           } else {
             this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
@@ -593,10 +598,10 @@ export default {
       })
     },
     onUpdateSortable: function(event){
-      let el_active = event.target;
-      let setting_key = el_active.attributes['data-setting'].value
+      const el_active = event.target
+      const setting_key = el_active.attributes['data-setting'].value
 
-      let list_active = Array(...el_active.children).map((child) =>
+      const list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
@@ -604,7 +609,7 @@ export default {
       if (this.debounce) return
       this.debounce = setTimeout(function() {
         this.debounce = false 
-        this.memoizedClearAll();
+        this.memoizedClearAll()
 
         this.$root.loadState = "LOADING"
         this.$nextTick(function () {
