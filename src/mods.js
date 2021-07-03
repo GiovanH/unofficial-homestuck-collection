@@ -61,7 +61,6 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
-
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
@@ -84,7 +83,6 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (enabled_mods, e) {
-
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 

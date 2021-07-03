@@ -319,6 +319,10 @@ export default {
           label: "Always show jump box",
           desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
+          model: "mspaMode",
+          label: "Use MSPA page numbers",
+          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        }, {
           model: "switchToNewTabs",
           label: "Auto-switch to new tabs",
           desc: "Opening any link in a new tab will automatically switch you to that tab."
@@ -334,14 +338,6 @@ export default {
           model: "pixelScaling",
           label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
-        }, {
-          model: "mspaMode",
-          label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
-        }, {
-          model: "bandcampEmbed",
-          label: "Enable online bandcamp player",
-          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
         }, {
           model: "devMode",
           label: "Enable Developer Mode",
@@ -369,6 +365,10 @@ export default {
           model: "credits",
           label: "Show inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
+        }, {
+          model: "bandcampEmbed",
+          label: "Enable online bandcamp player",
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
         }
       ],
       retconList: [
