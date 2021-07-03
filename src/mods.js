@@ -61,6 +61,10 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
+
+    if (modsDir == undefined)
+      return // Pre-setup, we're probably fine ignoring this.
+
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
 
@@ -80,12 +84,16 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (enabled_mods, e) {
+
+    if (modsDir == undefined)
+      return // Pre-setup, we're probably fine ignoring this.
+
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
     document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
     store.set(store_modlist_key, [])
     logger.error("Did not expect to be in the renderer process for this! Debug")
-    ipcRenderer.invoke('restart')
+    ipcRenderer.invoke('reload')
   }
 }
 
@@ -167,7 +175,12 @@ function getEnabledMods() {
 }
 
 function getEnabledModsJs() {
-  return getEnabledMods().map((dir) => getModJs(dir))
+  try {
+    return getEnabledMods().map((dir) => getModJs(dir))
+  } catch {
+    logger.error("Couldn't load mod js'")
+    return []
+  }
 }
 
 function crawlFileTree(root, recursive=false) {
@@ -514,7 +527,7 @@ if (ipcMain) {
         }
       } catch (e) {
         // Catch import-time mod-level errors
-        logger.error(e)
+        logger.error("Couldn't load mod choice")
       }
       return acc
     }, {})
