@@ -231,9 +231,6 @@
               <dd class="settingDesc" v-html="cc.desc"></dd>
             </template>
 
-            <dt><label><input type="checkbox" name="bolin" v-model="$localData.settings['bolin']" @click="toggleSetting('bolin')">Homestuck - Bill Bolin music</label></dt>
-            <dd class="settingDesc">A decent number of Flash animations in the first year of Homestuck had music provided by <a href="/music/artist/bill-bolin" target="_blank">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored.</dd>
-
           </SpoilerBox>
         </div>
       </div> <!-- TODO: I am so angry about this. -->
@@ -578,6 +575,9 @@ export default {
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
+      }
+      if (['unpeachy', 'pxsTavros'].includes(setting)) {
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       }
 
       this.$localData.root.saveLocalStorage()
