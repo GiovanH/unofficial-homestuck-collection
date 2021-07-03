@@ -486,6 +486,11 @@ ipcMain.handle('restart', async (event) => {
   app.exit()
 })
 
+ipcMain.handle('reload', async (event) => {
+  win.reload()
+})
+
+
 ipcMain.handle('factory-reset', async (event, confirmation) => {
   if (confirmation === true) {
     store.delete('localData')

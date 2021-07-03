@@ -618,12 +618,13 @@ export default {
       }.bind(this), 2000)
     },
     forceReload: function() {
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
-      // ipcRenderer.invoke('restart')
+      ipcRenderer.invoke('reload')
+      // this.$root.loadState = "LOADING"
+      // this.$nextTick(function () {
+      //   ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      // })
+      // ipcRenderer.invoke('reload')
     }
   },
   watch: {
