@@ -265,9 +265,13 @@
             </draggable>
           </div>
         </section>
-        <p>You may need to restart the application to apply some changes.</p>
-        <button v-if="$localData.settings.devMode" @click="forceReload">Soft reload</button>
+
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
+
+        <div class="system">
+          <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
+          <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
+        </div>
       </div>
 
       <div class="settings system">
@@ -459,7 +463,8 @@ export default {
         'pxsTavros',
         'cursedHistory'
       ],
-      debounce: false
+      debounce: false,
+      needReload: false
     }
   },
   computed: {
@@ -601,10 +606,20 @@ export default {
       const el_active = event.target
       const setting_key = el_active.attributes['data-setting'].value
 
+      // Get lists of values
+      const old_list = this.$localData.settings[setting_key]
       const list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
+
+      // Calculte needReload
+      let diff = list_active.filter(x => !old_list.includes(x))
+      diff.concat(old_list.filter(x => !list_active.includes(x)))
+      if (diff.some(key => this.$modChoices[key].needsreload)) {
+        this.$logger.info("List change requires reload", diff)
+        this.needReload = true
+      }
       
       if (this.debounce) return
       this.debounce = setTimeout(function() {
@@ -615,7 +630,7 @@ export default {
         this.$nextTick(function () {
           ipcRenderer.send('RELOAD_ARCHIVE_DATA')
         })
-      }.bind(this), 2000)
+      }.bind(this), 4000)
     },
     forceReload: function() {
       ipcRenderer.invoke('reload')

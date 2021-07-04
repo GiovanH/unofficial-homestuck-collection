@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const {ipcMain, ipcRenderer, dialog} = require('electron')
+const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass');
 
 const Store = require('electron-store')
@@ -78,7 +78,9 @@ if (ipcMain) {
     // which results in bad settings-screen side effects
     store.set(store_modlist_key, [])
     logger.debug("Modlist cleared, clearing routes...")
-    bakeRoutes()
+
+    app.relaunch()
+    app.exit()
   }
 } else {
   // We are in the renderer process.
@@ -228,6 +230,7 @@ function getModJs(mod_dir, singlefile=false) {
     mod._id = mod_dir
     mod._singlefile = singlefile
     mod._internal = mod_dir.startsWith("_")
+    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
 
     if (!singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
@@ -521,6 +524,7 @@ if (ipcMain) {
         acc[dir] = {
           label: js.title,
           desc: js.desc,
+          needsreload: js._needsreload,
           key: dir
         }
       } catch (e) {
