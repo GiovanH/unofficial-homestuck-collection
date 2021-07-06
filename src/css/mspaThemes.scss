@@ -1,4 +1,4 @@
-body, #app.mspa {
+body, #app.mspa, .tabFrame>.mspa {
 	--font-default: #000000;
 	--font-header: #000000;
 	--font-ctx: #000000;
@@ -65,7 +65,7 @@ body, #app.mspa {
 	}
 }
 
-#app.scratch {
+#app.scratch, .tabFrame>.scratch {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-ctx: #ffffff;
@@ -108,7 +108,7 @@ body, #app.mspa {
 	--saves-scrollHover: #C0C0C0;
 }
 
-#app.sbahj {
+#app.sbahj, .tabFrame>.sbahj {
 	--font-disabled: #00000060;
 	--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
 
@@ -145,7 +145,7 @@ body, #app.mspa {
 	}
 }
 
-#app.cascade {
+#app.cascade, .tabFrame>.cascade {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -180,7 +180,7 @@ body, #app.mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-#app.collide {
+#app.collide, .tabFrame>.collide {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -214,7 +214,7 @@ body, #app.mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-#app.tso {
+#app.tso, .tabFrame>.tso {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -250,7 +250,7 @@ body, #app.mspa {
 	--saves-scrollHover: #6a6a6a;
 }
 
-#app.trickster {
+#app.trickster, .tabFrame>.trickster {
 	--font-default: #f9fd6b;
 	--font-header: #f9fd6b;
 	--font-highlight: #000000;
@@ -302,7 +302,7 @@ body, #app.mspa {
 	}
 }
 
-#app.A6A6 {
+#app.A6A6, .tabFrame>.A6A6 {
 	--font-default: #2ed73a;
 	--font-header: #ffffff;
 	--font-highlight: #000000;
@@ -348,7 +348,7 @@ body, #app.mspa {
 	}
 }
 
-#app.pxs {
+#app.pxs, .tabFrame>.pxs {
 	--font-default: #ffffff;
 	--font-header: #ffffff;
 	--font-ctx: #ffffff;
