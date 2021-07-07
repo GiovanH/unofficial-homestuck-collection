@@ -65,7 +65,7 @@
                 {{ theme.text }}
               </option>
             </select>
-            <template v-if="$localData.settings.themeOverride">
+            <template v-if="$localData.settings.themeOverride != 'default'">
               <dt><label><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label></dt>
             </template>
           </dd>
@@ -79,7 +79,7 @@
                   {{ theme.text }}
                 </option>
               </select>
-              <template v-if="$localData.settings.themeOverrideUI">
+              <template v-if="$localData.settings.themeOverrideUI != 'default'">
                 <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
               </template>
             </dd>

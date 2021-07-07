@@ -48,32 +48,46 @@
 
         if (tab_components) {
           // Get theme from inner tab
-          page_theme = tab_components[0].contentTheme
+          page_theme = {
+            defined: tab_components[0].contentTheme, 
+            rendered: tab_components[0].theme
+          }
         } else {
           // There are no tabs at all yet
           this.$logger.warn("No tabs! Using default")
-          page_theme = 'default'
+          page_theme = {defined: 'default', rendered: 'default'}
         }
+        this.$logger.warn("calculated tab theme", page_theme)
         return page_theme
       },
       theme() {
-
         let set_theme = this.$localData.settings.themeOverrideUI
-        let theme = this.tabTheme
+        // Default UI theme should be whatever the page is using
 
-        if (set_theme) {
-          if (this.tabTheme != 'default') {
+        // If there is a theme override and a UI theme override,
+        // the UI theme override should apply even if force is unset
+        let theme = this.tabTheme.rendered
+
+        this.$logger.warn("defaulting UI theme", theme)
+
+        if (set_theme != 'default') {
+          // User has a specified theme
+          if (this.tabTheme.defined != 'default') {
             // Page has a theme
             if (this.$localData.settings.forceThemeOverrideUI) {
               // If force is on, use the override theme
               theme = set_theme
+              this.$logger.warn("forcing UI theme", theme)
             } else {
-              theme = this.tabTheme
+              // Page takes priority over setting
+              theme = this.tabTheme.rendered
             }
           } else {
+            // User specified a theme, page did not
             theme = set_theme
           } 
         }
+        this.$logger.warn("calculated UI theme", theme)
         return (theme == 'default' ? 'mspa' : theme)
       }
     },
