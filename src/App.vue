@@ -57,7 +57,6 @@
           this.$logger.warn("No tabs! Using default")
           page_theme = {defined: 'default', rendered: 'default'}
         }
-        this.$logger.warn("calculated tab theme", page_theme)
         return page_theme
       },
       theme() {
@@ -68,8 +67,6 @@
         // the UI theme override should apply even if force is unset
         let theme = this.tabTheme.rendered
 
-        this.$logger.warn("defaulting UI theme", theme)
-
         if (set_theme != 'default') {
           // User has a specified theme
           if (this.tabTheme.defined != 'default') {
@@ -77,7 +74,6 @@
             if (this.$localData.settings.forceThemeOverrideUI) {
               // If force is on, use the override theme
               theme = set_theme
-              this.$logger.warn("forcing UI theme", theme)
             } else {
               // Page takes priority over setting
               theme = this.tabTheme.rendered
@@ -87,7 +83,6 @@
             theme = set_theme
           } 
         }
-        this.$logger.warn("calculated UI theme", theme)
         return (theme == 'default' ? 'mspa' : theme)
       }
     },
