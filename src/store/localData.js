@@ -55,8 +55,8 @@ class LocalData {
       bandcampEmbed: true,
       devMode: false,
 
-      themeOverride: "",
-      themeOverrideUI: "",
+      themeOverride: "default",
+      themeOverrideUI: "default",
       forceThemeOverride: false,
       forceThemeOverrideUI: false,
 
