@@ -427,7 +427,6 @@ function getMixins(){
     // Keep this logic out here so it doesn't get repeated
     // TODO: Make sure other forEachs aren't being duplicated down there
 
-
     // Write theme hooks
     // Try to minimize vue hooks (don't want a huge stack!)
     if (modThemes.length) {
@@ -439,6 +438,10 @@ function getMixins(){
         matchName: "settings",
         data: {themes($super) {return $super.concat(newThemes)}}
       })
+    }
+
+    if (vueHooks.length == 0) {
+      return null
     }
 
     var mixin = {
@@ -491,7 +494,7 @@ function getMixins(){
       }
     }
     return mixin
-  })
+  }).filter(Boolean)
 }
 
 // Runtime
