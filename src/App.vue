@@ -9,7 +9,7 @@
     <Notifications ref="notifications" />
     <ContextMenu ref="contextMenu" />
   </div>
-  <div id="app" class="default"  v-else>
+  <div id="app" class="mspa"  v-else>
     <Setup />
     <ContextMenu ref="contextMenu" />
   </div>
