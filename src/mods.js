@@ -225,6 +225,7 @@ function getModJs(mod_dir, singlefile=false) {
     } else {
       modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
+
     mod = __non_webpack_require__(modjs_path)
 
     mod._id = mod_dir
@@ -236,6 +237,22 @@ function getModJs(mod_dir, singlefile=false) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
+
+    if (mod.withLogger != undefined) {
+      mod.withLogger(log.scope(mod._id))
+    }
+
+    if (mod.withStore != undefined) {
+      const modKey = (k) => `mod.${mod._id}.${k}`
+      mod.withStore({
+        set: (k, v) => store.set(modKey(k), v),
+        get: (k, default_) => store.get(modKey(k), default_),
+        has: (k) => store.has(modKey(k)),
+        delete: (k) => store.delete(modKey(k)),
+        onDidChange: (k, cb) => store.onDidChange(modKey(k), cb)
+      })
+    }
+
 
     return mod
   } catch (e1) {

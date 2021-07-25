@@ -366,3 +366,5 @@ This hook uses the `matchName` shorthand to match the `navBanner` page, which is
 It replaces the underlying `url` object with a new one, discarding any data that was previously there. It also replaces the `labels`, but this time it only modifies the two labels relevant to the change, again using the `$super` syntax.
 
 All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.
+
+Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
