@@ -261,6 +261,11 @@
                 :data-value="option.key"
               >
                 <b>{{option.label}}</b> - {{option.desc}}
+                <span 
+                  v-if="option.settingsmodel"
+                  @click="openSubModel(option)">
+                  ⚙
+                </span>
               </li>
             </draggable>
           </div>
@@ -295,6 +300,7 @@
         </div>
       </div>
     </div>
+    <SubSettingsModal ref="modal" />
   </div>
 </template>
 
@@ -303,6 +309,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import draggable from "vuedraggable"
 
 const { ipcRenderer } = require('electron')
@@ -313,7 +320,9 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText, SpoilerBox, StoryPageLink, draggable
+    NavBanner, SubSettingsModal, 
+    PageText, SpoilerBox, StoryPageLink, 
+    draggable
   },
   data: function() {
     return {
@@ -591,7 +600,7 @@ export default {
       ipcRenderer.invoke('locate-assets', {restart: true})
     },
     factoryReset(){      
-      let args = {
+      const args = {
         title: "FACTORY RESET",
         message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!',
         okay: "Yes, delete everything"
@@ -631,6 +640,9 @@ export default {
           ipcRenderer.send('RELOAD_ARCHIVE_DATA')
         })
       }.bind(this), 4000)
+    },
+    openSubModel: function(mod) {
+      this.$refs.modal.openMod(mod)
     },
     forceReload: function() {
       ipcRenderer.invoke('reload')

@@ -23,6 +23,11 @@ var routes = undefined
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
+function getModStoreKey(mod_id, k){
+  if (k) {return `mod.${mod_id}.${k}`}
+  return `mod.${mod_id}`
+}
+
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
   // returns the path of the mod file. 
@@ -243,16 +248,14 @@ function getModJs(mod_dir, singlefile=false) {
     }
 
     if (mod.withStore != undefined) {
-      const modKey = (k) => `mod.${mod._id}.${k}`
       mod.withStore({
-        set: (k, v) => store.set(modKey(k), v),
-        get: (k, default_) => store.get(modKey(k), default_),
-        has: (k) => store.has(modKey(k)),
-        delete: (k) => store.delete(modKey(k)),
-        onDidChange: (k, cb) => store.onDidChange(modKey(k), cb)
+        set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
+        get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
+        has: (k) => store.has(getModStoreKey(mod._id, k)),
+        delete: (k) => store.delete(getModStoreKey(mod._id, k)),
+        onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb)
       })
     }
-
 
     return mod
   } catch (e1) {
@@ -545,6 +548,7 @@ if (ipcMain) {
           label: js.title,
           desc: js.desc,
           needsreload: js._needsreload,
+          settingsmodel: js.settings,
           key: dir
         }
       } catch (e) {
@@ -585,6 +589,7 @@ export default {
   editArchive,
   bakeRoutes,
   getAssetRoute,
+  getModStoreKey,
 
   modChoices
 }
