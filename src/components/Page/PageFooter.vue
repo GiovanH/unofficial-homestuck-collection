@@ -28,7 +28,9 @@ export default {
             }
         },
         bannerImage() {
-            switch (this.$root.theme) {
+            switch (this.$root.tabTheme) {
+                case 'mspa':
+                    return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
                 case 'scratch':
                     return ['/images/mspalogo_scratch.png', '/images/mspalogo_scratch.png']
                 case 'sbahj':
@@ -40,6 +42,7 @@ export default {
                 case 'pxs':
                     return ['/images/mspalogo_pxs.png', '/images/mspalogo_pxs.png']
                 default:
+                    this.$logger.warn("Couldn't read root theme?", this.$root.tabTheme)
                     return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
             }
         }
@@ -66,9 +69,9 @@ export default {
 
         user-select: none;
     }
-    .scratch {
-        padding-left: 70px;
-        padding-right: 70px;
+    .scratch .footer {
+        padding-left: 40px;
+        padding-right: 40px;
         
         background-color: var(--page-pageContent);
     }

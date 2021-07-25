@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-const {ipcMain, ipcRenderer, dialog} = require('electron')
+const {ipcMain, ipcRenderer, dialog, app} = require('electron')
+const sass = require('sass');
 
 const Store = require('electron-store')
 const store = new Store()
@@ -60,6 +61,9 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (enabled_mods, e) {
+    if (modsDir == undefined)
+      return // Pre-setup, we're probably fine ignoring this.
+
     logger.info("Mod load failure with issues in", enabled_mods)
     logger.error(e)
 
@@ -74,17 +78,22 @@ if (ipcMain) {
     // which results in bad settings-screen side effects
     store.set(store_modlist_key, [])
     logger.debug("Modlist cleared, clearing routes...")
-    bakeRoutes()
+
+    app.relaunch()
+    app.exit()
   }
 } else {
   // We are in the renderer process.
   onModLoadFail = function (enabled_mods, e) {
+    if (modsDir == undefined)
+      return // Pre-setup, we're probably fine ignoring this.
+
     logger.info("Mod load failure with modlist", enabled_mods)
     logger.debug(e)
     document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
     store.set(store_modlist_key, [])
     logger.error("Did not expect to be in the renderer process for this! Debug")
-    ipcRenderer.invoke('restart')
+    ipcRenderer.invoke('reload')
   }
 }
 
@@ -132,8 +141,6 @@ function bakeRoutes() {
   routes = all_mod_routes
 
   // Test routes
-  // TODO: This is super wasteful and should only be done when developer mode is on.
-
   const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
 
   if (do_full_check) {
@@ -168,7 +175,12 @@ function getEnabledMods() {
 }
 
 function getEnabledModsJs() {
-  return getEnabledMods().map((dir) => getModJs(dir))
+  try {
+    return getEnabledMods().map((dir) => getModJs(dir))
+  } catch {
+    logger.error("Couldn't load mod js'")
+    return []
+  }
 }
 
 function crawlFileTree(root, recursive=false) {
@@ -218,6 +230,7 @@ function getModJs(mod_dir, singlefile=false) {
     mod._id = mod_dir
     mod._singlefile = singlefile
     mod._internal = mod_dir.startsWith("_")
+    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
 
     if (!singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
@@ -283,7 +296,7 @@ function editArchive(archive) {
         // })
       }
     } catch (e) {
-      onModLoadFail(js.key, "editing archive")
+      onModLoadFail(js._id, e)
     }
   })
 
@@ -358,24 +371,45 @@ function getMainMixin(){
   // A mixin that injects on the main vue process.
   // Currently this just injects custom css
 
-  let styles = []
-  getEnabledModsJs().forEach(js => {
-    const modstyles = js.styles || []
-    modstyles.forEach(style_link => styles.push(new URL(style_link, js._mod_root_url).href))
-  })
-
   return {
     mounted() {
-      logger.debug("Mounted main mixin")
+      getEnabledModsJs().forEach(js => {
+        const modstyles = js.styles || []
+        modstyles.forEach((customstyle, i) => {
+          const style_id = `style-${js._id}-${i}`
+          this.$logger.debug(style_id)
+          
+          const body = sass.renderSync({
+            file: path.resolve(js._mod_root_dir, customstyle.source),
+            sourceComments: true
+          }).css.toString()
 
-      styles.forEach((style_link) => {
-        const link = document.createElement("link")
-        link.rel = "stylesheet"
-        link.type = "text/css"
-        link.href = style_link
+          const style = document.createElement("style")
+          style.id = style_id
+          style.rel = "stylesheet"
+          style.innerHTML = body
+          this.$el.appendChild(style)
+          this.$logger.debug(style_id, style)
+        })
 
-        this.$el.appendChild(link)
-        logger.debug(link)
+        const modThemes = js.themes || []
+        modThemes.forEach((theme, i) => {
+          const theme_class = `theme-${js._id}-${i}`
+          this.$logger.debug(theme_class)
+
+          let body = fs.readFileSync(path.resolve(js._mod_root_dir, theme.source))
+          body = sass.renderSync({
+            data: `#app.${theme_class} {\n${body}\n}`,
+            sourceComments: true
+          }).css.toString()
+
+          const style = document.createElement("style")
+          style.id = theme_class
+          style.rel = "stylesheet"
+          style.innerHTML = body
+          this.$el.appendChild(style)
+          this.$logger.debug(theme_class, style)
+        })
       })
     }
   }
@@ -388,9 +422,32 @@ function getMixins(){
 
   return getEnabledModsJs().reverse().map((js) => {
     const vueHooks = js.vueHooks || []
+    const modThemes = js.themes || []
+
+    // Keep this logic out here so it doesn't get repeated
+    // TODO: Make sure other forEachs aren't being duplicated down there
+
+    // Write theme hooks
+    // Try to minimize vue hooks (don't want a huge stack!)
+    if (modThemes.length) {
+      const newThemes = modThemes.map((theme, i) => 
+        ({text: theme.label, value: `theme-${js._id}-${i}`})
+      )
+      
+      vueHooks.push({
+        matchName: "settings",
+        data: {themes($super) {return $super.concat(newThemes)}}
+      })
+    }
+
+    if (vueHooks.length == 0) {
+      return null
+    }
+
     var mixin = {
       created() {
         const vueComponent = this
+
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {
@@ -400,6 +457,8 @@ function getMixins(){
           
           if (hook.match(this)) {
             // Data w/ optional compute function
+            this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
+
             for (const dname in (hook.data || {})) {
               const value = hook.data[dname]
               this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
@@ -435,7 +494,7 @@ function getMixins(){
       }
     }
     return mixin
-  })
+  }).filter(Boolean)
 }
 
 // Runtime
@@ -468,11 +527,12 @@ if (ipcMain) {
         acc[dir] = {
           label: js.title,
           desc: js.desc,
+          needsreload: js._needsreload,
           key: dir
         }
       } catch (e) {
         // Catch import-time mod-level errors
-        logger.error(e)
+        logger.error("Couldn't load mod choice")
       }
       return acc
     }, {})

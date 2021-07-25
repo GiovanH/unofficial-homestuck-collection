@@ -65,10 +65,34 @@
                 {{ theme.text }}
               </option>
             </select>
-            <br><br>
-            <label v-if="$localData.settings.themeOverride"><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label>
+            <template v-if="$localData.settings.themeOverride != 'default'">
+              <dt><label><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label></dt>
+            </template>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
+
+          <template v-if="!$isNewReader">
+            <dt>UI Theme Override</dt>
+            <dd >
+              <select class="themeSelector" v-model="$localData.settings.themeOverrideUI" @change="$localData.root.saveLocalStorage()">
+                <option v-for="theme in themes" :value="theme.value">
+                  {{ theme.text }}
+                </option>
+              </select>
+              <template v-if="$localData.settings.themeOverrideUI != 'default'">
+                <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
+              </template>
+            </dd>
+          </template>
+          <dt v-else>
+            <label>
+              <input type="checkbox" name="forceThemeOverrideUIMSPA"
+              :checked.prop="forceThemeOverrideUIMSPAChecked === true"
+              :indeterminate.prop="forceThemeOverrideUIMSPAChecked === undefined"
+              @click="forceThemeOverrideUIMSPA()"> Never style UI
+            </label>
+          </dt>
+
 
           <dt>Text Override</dt>
           <dd>
@@ -241,8 +265,13 @@
             </draggable>
           </div>
         </section>
-        <button v-if="$localData.settings.devMode" @click="forceReload">Force reload</button>
+
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
+
+        <div class="system">
+          <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
+          <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
+        </div>
       </div>
 
       <div class="settings system">
@@ -274,7 +303,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import draggable from "vuedraggable";
+import draggable from "vuedraggable"
 
 const { ipcRenderer } = require('electron')
 
@@ -294,6 +323,10 @@ export default {
           label: "Always show jump box",
           desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
+          model: "mspaMode",
+          label: "Use MSPA page numbers",
+          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        }, {
           model: "switchToNewTabs",
           label: "Auto-switch to new tabs",
           desc: "Opening any link in a new tab will automatically switch you to that tab."
@@ -309,14 +342,6 @@ export default {
           model: "pixelScaling",
           label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
-        }, {
-          model: "mspaMode",
-          label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
-        }, {
-          model: "bandcampEmbed",
-          label: "Enable online bandcamp player",
-          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
         }, {
           model: "devMode",
           label: "Enable Developer Mode",
@@ -344,6 +369,10 @@ export default {
           model: "credits",
           label: "Show inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
+        }, {
+          model: "bandcampEmbed",
+          label: "Enable online bandcamp player",
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
         }
       ],
       retconList: [
@@ -405,8 +434,8 @@ export default {
         }
       ],
       themes: [
-        {text: "Auto", value: ""},
-        {text: "MSPA", value: "default"},
+        {text: "Auto", value: "default"},
+        {text: "MSPA", value: "mspa"},
         {text: "Retro", value: "retro"},
         {text: "Scratch", value: "scratch"},
         {text: "SBaHJ", value: "sbahj"},
@@ -415,7 +444,7 @@ export default {
         {text: "Homosuck", value: "A6A6"},
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
-        {text: "Paradox Space", value: "pxs"},
+        {text: "Paradox Space", value: "pxs"}
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -423,7 +452,7 @@ export default {
         {text: "Verdana / Arial", value: "verdana"},
         {text: "Times New Roman", value: "times"},
         {text: "Comic Sans", value: "comicSans"},
-        {text: "OpenDyslexic", value: "openDyslexic"},
+        {text: "OpenDyslexic", value: "openDyslexic"}
       ],
       newReaderPage: this.$localData.settings.newReader.current || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
@@ -434,16 +463,17 @@ export default {
         'pxsTavros',
         'cursedHistory'
       ],
-      debounce: false
+      debounce: false,
+      needReload: false
     }
   },
   computed: {
     controversialAll(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.every(Boolean)
     },
     controversialAny(){
-      let values = this.allControversial.map(key => this.$localData.settings[key])
+      const values = this.allControversial.map(key => this.$localData.settings[key])
       return values.some(Boolean)
     },
     modsEnabled() {
@@ -453,6 +483,15 @@ export default {
     modsDisabled() {
       return Object.values(this.$modChoices).filter((choice) => 
         !this.modsEnabled.includes(choice))
+    },
+    forceThemeOverrideUIMSPAChecked(){
+      if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == true) {
+        return true
+      } else if (this.$localData.settings.themeOverrideUI == "" && this.$localData.settings.forceThemeOverrideUI == false) {
+        return false
+      } else {
+        return undefined
+      }
     }
   },
   methods: {
@@ -478,39 +517,53 @@ export default {
     },
     setNewReader() {
       this.validateNewReader() 
-      let pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
+      const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
         this.$localData.settings.themeOverride = ""
+        // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
         this.$updateNewReader(pageId, true)
       }
     },
     clearNewReader() {
-      let args = {
+      const args = {
         title: "Are you sure?",
         message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
       }
-      ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+      ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
           this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
           this.$localData.root.NEW_READER_CLEAR()
         }
       })
     },
+    forceThemeOverrideUIMSPA(){
+      if (this.forceThemeOverrideUIMSPAChecked) {
+        this.$localData.settings.themeOverrideUI = ""
+        this.$localData.settings.forceThemeOverrideUI = false
+      } else {
+        this.$localData.settings.themeOverrideUI = "default"
+        this.$localData.settings.forceThemeOverrideUI = true
+      }
+      this.$localData.root.saveLocalStorage()
+    },
     toggleAllControversial() {
       if (this.controversialAny) {
         // Normally checking an indeterminate checkbox enables it,
         // but we want to clear it instead.
+        
+        // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
         this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
       } else {
-        let args = {
+        const args = {
           title: "Are you sure?",
           message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
         }
-        ipcRenderer.invoke('prompt-okay-cancel', args).then( answer => {
+        ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
           if (answer === true) {
+            // eslint-disable-next-line no-return-assign
             this.allControversial.forEach(key => this.$localData.settings[key] = true)
           } else {
             this.$el.querySelectorAll("input[name=enableControversial]").forEach(i => {i.checked = false})
@@ -550,32 +603,43 @@ export default {
       })
     },
     onUpdateSortable: function(event){
-      let el_active = event.target;
-      let setting_key = el_active.attributes['data-setting'].value
+      const el_active = event.target
+      const setting_key = el_active.attributes['data-setting'].value
 
-      let list_active = Array(...el_active.children).map((child) =>
+      // Get lists of values
+      const old_list = this.$localData.settings[setting_key]
+      const list_active = Array(...el_active.children).map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
+
+      // Calculte needReload
+      let diff = list_active.filter(x => !old_list.includes(x))
+      diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
+      if (diff.some(key => this.$modChoices[key].needsreload)) {
+        this.$logger.info("List change requires reload", diff)
+        this.needReload = true
+      }
       
       if (this.debounce) return
       this.debounce = setTimeout(function() {
         this.debounce = false 
-        this.memoizedClearAll();
+        this.memoizedClearAll()
 
         this.$root.loadState = "LOADING"
         this.$nextTick(function () {
           ipcRenderer.send('RELOAD_ARCHIVE_DATA')
         })
-      }.bind(this), 2000)
+      }.bind(this), 4000)
     },
     forceReload: function() {
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
-      // ipcRenderer.invoke('restart')
+      ipcRenderer.invoke('reload')
+      // this.$root.loadState = "LOADING"
+      // this.$nextTick(function () {
+      //   ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      // })
+      // ipcRenderer.invoke('reload')
     }
   },
   watch: {
@@ -709,6 +773,9 @@ export default {
         }
         .themeSelector, .fontSelector {
           font-size: 16px;
+        }
+        .themeSelector + dt {
+          display: inline;
         }
         .textOverrideSettings {
           margin-top: 16px;

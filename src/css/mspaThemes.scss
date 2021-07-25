@@ -1,4 +1,5 @@
-#app {
+#app > *, .tabFrame > div {
+
 	--font-default: #000000;
 	--font-header: #000000;
 	--font-ctx: #000000;
@@ -21,6 +22,7 @@
 
 	--page-pageBody: #535353;
 	--page-pageFrame: #C6C6C6;
+	--page-pageBorder: #C6C6C6;
 	--page-pageContent: #EEEEEE;
 	--page-log-border: #808080;
 	--page-log-bg: #EEEEEE;
@@ -44,12 +46,17 @@
 
 	--find--highlight: lawngreen;
 
+	&.mspa {
+		// Use all defaults with no modifications.
+	}
+
 	&.retro {
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
 
 		--page-pageBody: #DDDDDD;
 		--page-pageFrame: #EEEEEE;
+		--page-pageBorder: #EEEEEE;
 		--page-pageContent: #FFFFFF;
 		--page-log-bg: #FFFFFF;
 
@@ -58,7 +65,7 @@
 		--ctx-bg: #FFFFFF;
 		--ctx-divider: #DDDDDD;
 		
-		.customStyles .navBanner .candyCorn:before {
+		&.customStyles .navBanner .candyCorn:before {
 			color: white;
 			content: "||"
 		}
@@ -86,6 +93,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #082a00;
+		--page-pageBorder: #082a00;
 		--page-pageContent: #0e4603;
 		--page-log-bg: #000000;
 		--page-nav-divider: #FFFFFF;
@@ -119,6 +127,7 @@
 
 		--page-pageBody: #0707ec;
 		--page-pageFrame: #f400ec;
+		--page-pageBorder: #f400ec;
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
 
@@ -139,7 +148,7 @@
 		#titleBarText {
 			font-size: 12px;
 		}
-		#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, .customStyles * {
+		#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, &.customStyles * {
 			font-family: "Comic Sans MS", "Comic Sans", cursive;
 		}
 	}
@@ -195,6 +204,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #454545;
+		--page-pageBorder: #454545;
 		--page-pageContent: #363636;
 		--page-nav-divider: red;
 		--page-nav-meta: red;
@@ -231,6 +241,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #2f2f2f;
+		--page-pageBorder: #2f2f2f;
 		--page-pageContent: #111111;
 		--page-nav-divider: #A1EE26;
 		--page-nav-meta: #A1EE26;
@@ -287,7 +298,7 @@
 		--saves-scroll: #0707ec;
 		--saves-scrollHover: #4040ee;
 
-		.customStyles {
+		&.customStyles {
 			.nextArrowLink{
 				visibility: hidden;
 				font-size: 0px;
@@ -324,6 +335,7 @@
 
 		--page-pageBody: #042300;
 		--page-pageFrame: #168500;
+		--page-pageBorder: #168500;
 		--page-pageContent: #073c00;
 		// --page-log-bg: #000000;
 		--page-nav-divider: #000000;
@@ -342,7 +354,7 @@
 		--saves-scroll: #2ed73a;
 		--saves-scrollHover: #27b731;
 
-		.customStyles .navBanner {
+		&.customStyles .navBanner {
 			height: 19px;
 		}
 	}
@@ -353,21 +365,22 @@
 		--font-ctx: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: #a9a9a933;
-	
+
 		--header-bg: #095486;
 		--header-tabSection: #003b64;
 		--header-border: #095486;
-	
+
 		--header-buttonHoverState: #ffffff1a;
 		--header-buttonClickState: #ffffff26;
-	
+
 		--nav-bg: #003b64;
 		--nav-link: #72abd2;
 		--nav-divider: #72abd2;
 		--nav-candyCornContent: url(assets://archive/comics/pxs/candycorn_pxs.png);
-	
+
 		--page-pageBody: #00101a;
 		--page-pageFrame: #002d4d;
+		--page-pageBorder: #002d4d;
 		--page-pageContent: #095486;
 		// --page-log-border: #808080;
 		// --page-log-bg: #EEEEEE;
@@ -375,7 +388,7 @@
 		--page-nav-meta: #72abd2;
 		--page-links: #72abd2;
 		--page-links-visited: #ffffff;
-	
+
 		--ctx-bg: #003b64;
 		--ctx-frame: #095486;
 		--ctx-shadow: #000000;
@@ -389,7 +402,7 @@
 		--saves-scroll: #003b64;
 		--saves-scrollHover: #0d456c;
 
-		.customStyles .navBanner {
+		&.customStyles .navBanner {
 			border-bottom: 4px solid #095486;
 			height: 23px;
 			a { 

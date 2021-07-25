@@ -473,6 +473,7 @@ window.vm = new Vue({
   data(){
     return {
       theme: 'default',
+      tabTheme: 'default',
       archive: undefined
     }
   },

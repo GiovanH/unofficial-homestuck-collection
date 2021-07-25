@@ -181,7 +181,6 @@ export default {
       }
       this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
-      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
       ipcRenderer.invoke('restart')
     },
     errorModeRestart() {
