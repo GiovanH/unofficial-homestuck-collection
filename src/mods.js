@@ -296,7 +296,7 @@ function editArchive(archive) {
         // })
       }
     } catch (e) {
-      onModLoadFail(js.key, "editing archive")
+      onModLoadFail(js._id, e)
     }
   })
 

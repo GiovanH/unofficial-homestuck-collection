@@ -1,6 +1,7 @@
 <template>
   <div id="app" :class="[
     theme,
+    'mspa',
     // $root.loadState != 'DONE' ? 'busy' : '',
     $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
