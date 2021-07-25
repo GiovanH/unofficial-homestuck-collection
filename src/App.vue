@@ -1,14 +1,12 @@
 <template>
   <div id="app" :class="[
-    theme,
-    'mspa',
     // $root.loadState != 'DONE' ? 'busy' : '',
     $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
-    <AppHeader />
+    <AppHeader :class="theme" />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
-    <Notifications ref="notifications" />
-    <ContextMenu ref="contextMenu" />
+    <Notifications :class="theme" ref="notifications" />
+    <ContextMenu :class="theme" ref="contextMenu" />
   </div>
   <div id="app" class="mspa"  v-else>
     <Setup />

@@ -1,51 +1,53 @@
-#app, .tabFrame > div {
+#app > *, .tabFrame > div {
+
+	--font-default: #000000;
+	--font-header: #000000;
+	--font-ctx: #000000;
+	--font-log: #000000;
+	--font-disabled: darkgrey;
+
+	--font-family-ui: Segoe UI, San Francisco, Helvetica Neue, Arial, sans-serif;
+
+	--header-bg: #EEEEEE;
+	--header-tabSection: #C6C6C6;
+	--header-border: #a0a0a0;
+
+	--header-buttonHoverState: rgba(0, 0, 0, 0.10);
+	--header-buttonClickState: rgba(0, 0, 0, 0.15);
+
+	--nav-bg: #5a5a5a;
+	// --nav-link: #FFFFFF;
+	--nav-divider: #FFFFFF;
+	--nav-candyCornContent: url(assets://images/candycorn.gif);
+
+	--page-pageBody: #535353;
+	--page-pageFrame: #C6C6C6;
+	--page-pageBorder: #C6C6C6;
+	--page-pageContent: #EEEEEE;
+	--page-log-border: #808080;
+	--page-log-bg: #EEEEEE;
+	--page-nav-divider: #000000;
+	--page-nav-meta: #535353;
+	--page-links: #0000EE;
+	--page-links-visited: #6300c0;
+
+	--ctx-bg: #EEEEEE;
+	--ctx-frame: #535353;
+	--ctx-shadow: #000000;
+	--ctx-select: lightblue;
+	--ctx-divider: #d3d3d3;
+
+	--saves-bg: #C6C6C6;
+	--saves-tab: #EEEEEE;
+	--saves-tabHover: #DBDBDB;
+	--saves-border: #A0A0A0;
+	--saves-scroll: #DBDBDB;
+	--saves-scrollHover: #C0C0C0;
+
+	--find--highlight: lawngreen;
 
 	&.mspa {
-		--font-default: #000000;
-		--font-header: #000000;
-		--font-ctx: #000000;
-		--font-log: #000000;
-		--font-disabled: darkgrey;
-
-		--font-family-ui: Segoe UI, San Francisco, Helvetica Neue, Arial, sans-serif;
-
-		--header-bg: #EEEEEE;
-		--header-tabSection: #C6C6C6;
-		--header-border: #a0a0a0;
-
-		--header-buttonHoverState: rgba(0, 0, 0, 0.10);
-		--header-buttonClickState: rgba(0, 0, 0, 0.15);
-
-		--nav-bg: #5a5a5a;
-		// --nav-link: #FFFFFF;
-		--nav-divider: #FFFFFF;
-		--nav-candyCornContent: url(assets://images/candycorn.gif);
-
-		--page-pageBody: #535353;
-		--page-pageFrame: #C6C6C6;
-		--page-pageBorder: #C6C6C6;
-		--page-pageContent: #EEEEEE;
-		--page-log-border: #808080;
-		--page-log-bg: #EEEEEE;
-		--page-nav-divider: #000000;
-		--page-nav-meta: #535353;
-		--page-links: #0000EE;
-		--page-links-visited: #6300c0;
-
-		--ctx-bg: #EEEEEE;
-		--ctx-frame: #535353;
-		--ctx-shadow: #000000;
-		--ctx-select: lightblue;
-		--ctx-divider: #d3d3d3;
-
-		--saves-bg: #C6C6C6;
-		--saves-tab: #EEEEEE;
-		--saves-tabHover: #DBDBDB;
-		--saves-border: #A0A0A0;
-		--saves-scroll: #DBDBDB;
-		--saves-scrollHover: #C0C0C0;
-
-		--find--highlight: lawngreen;
+		// Use all defaults with no modifications.
 	}
 
 	&.retro {

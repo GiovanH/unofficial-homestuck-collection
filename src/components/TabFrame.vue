@@ -14,7 +14,7 @@
 		ref="tabFrame"
 	>
 		<component
-			:class="'mspa ' + theme"
+			:class="theme"
 			:is="resolveComponent" 
 			:tab="tab" 
 			:routeParams="routeParams" 
