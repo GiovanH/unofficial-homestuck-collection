@@ -162,7 +162,7 @@
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</dd>
+        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</p>
 
         <div v-if="$isNewReader">
           
@@ -172,13 +172,13 @@
               :checked.prop="controversialAll && !!controversialAny"
               :indeterminate.prop="controversialAny && !controversialAll"
             >Enable controversial content</label></dt>
-          <dd class="settingDesc">
-          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
+          <p class="settingDesc">
+          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</p>
 
         </div>
 
-        <dd class="settingDesc">
-        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</dd>
+        <p class="settingDesc">
+        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</p>
           
         <SpoilerBox kind="Affected Page Numbers" class="ccPageNos">
           <div class="left col">
@@ -239,7 +239,7 @@
         <!-- TODO: IF YOU CHANGE THE MODS YOU NEED TO RELOAD -->
         <h2>Mod Settings</h2>
 
-        <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
+        <p class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</p>
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
             <draggable tag="ul" group="sortable-mods">
@@ -815,8 +815,8 @@ export default {
         }
         .ccPageNos {
           font-weight: normal;
-          width: 600px;
-          margin: 1em auto;
+          // width: 600px;
+          // margin: 1em auto;
           h3 {
             margin-top: .4em;
           }
