@@ -253,7 +253,8 @@ function getModJs(mod_dir, singlefile=false) {
         get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
         has: (k) => store.has(getModStoreKey(mod._id, k)),
         delete: (k) => store.delete(getModStoreKey(mod._id, k)),
-        onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb)
+        onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
+        clear: () => store.clear(getModStoreKey(mod._id, null))
       })
     }
 
@@ -346,6 +347,9 @@ function editArchive(archive) {
         } else if (Array.isArray(js.footnotes)) {
           logger.info(js.title, "Loading footnotes from object")
           mergeFootnotes(archive, js.footnotes)
+        } else if (typeof js.footnotes == "function") {
+          logger.info(js.title, "Loading footnotes from function")
+          mergeFootnotes(archive, js.footnotes())
         } else {
           throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
         }
@@ -362,7 +366,7 @@ function mergeFootnotes(archive, footObj) {
   }
 
   footObj.forEach(footnoteList => {
-    const default_author = footnoteList.author || "Undefined Author"
+    const default_author = (footnoteList.author === undefined) ? "Undefined Author" : footnoteList.author 
     const default_class = footnoteList.class || undefined
     const default_ispreface = footnoteList.preface
 
@@ -547,9 +551,22 @@ if (ipcMain) {
         acc[dir] = {
           label: js.title,
           desc: js.desc,
+          author: js.author,
+          modVersion: js.modVersion,
+          locked: js.locked,
+
+          hasmeta: Boolean(js.author || js.modVersion || js.settings),
           needsreload: js._needsreload,
           settingsmodel: js.settings,
-          key: dir
+          key: dir,
+          includes: {
+            routes: Boolean(js.routes || js.treeroute || js.trees),
+            edits: Boolean(js.edit),
+            // hooks: js.vueHooks ? js.vueHooks.filter(h => (h.matchName || "[complex]")) : false,
+            styles: Boolean(js.styles),
+            footnotes: Boolean(js.footnotes),
+            themes: Boolean(js.themes)
+          }
         }
       } catch (e) {
         // Catch import-time mod-level errors

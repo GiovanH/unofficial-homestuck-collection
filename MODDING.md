@@ -294,9 +294,65 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
     footnotes: "./footnotes.json"
 ```
 
-Footnotes are not supported on fullscreen flash pages like EndOfHS or Game Over.
+As yet another option, your `footnotes` field can point to a function that *returns* a footnotes object. This is a good way to make programatic changes to your footnotes object that require runtime resources, like the settings store.
+
+Footnotes are not yet supported on fullscreen flash pages like EndOfHS or Game Over.
 
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
+
+### `withLogger` and `withStore`
+
+There are some resources your mod might want to request from TUHC at runtime, like a namespaced logger object or access to a settings store. To do this, reserve a name for the object and then write a function `withLogger` or `withStore` that assigns the variable:
+
+```js
+
+let logger = null
+let store = null
+
+module.exports = {
+    `...`
+    withLogger(newLogger) { logger = newLogger },
+    withStore(newStore) { store = newStore },
+}
+```
+
+You can then use the `logger` or `store` objects in code. 
+
+The `newLogger` object is a standard logger, with `info` and `debug` methods that output information at different levels depending on user settings.
+
+The `newStore` object is a special namespaced store you can use for reading settings or other persistent data from the store.
+
+- `set(k, v)`: Set the key `k` to the value `v`.
+- `get(k, default_)`: Get the value of key `k`, or `default_` if `k` is not yet set.
+- `has(k)`
+- `delete(k)`
+- `clear()`
+
+The store provided is namespaced. This means it is safe to use commonly used keys in your mod without any risk of conflicting with the main program or other mods.
+
+For assigning values to settings, look below:
+
+### Settings
+
+Use the `settings` field to define a data model. The archive will automatically generate an interactive settings UI and attach it to the mod entry on the settings screen.
+
+- `settings`: Contains two (optional) objects, `boolean` (`List<boolSetting>`) and `radio` (`List<radioSetting>`)
+
+- `boolSetting`
+    + `model`: The storage key this setting models. The value assigned will be true, false, or undefined.
+    + `label`: A short label for the checkbox
+    + `desc`: A longer description. Optional.
+
+- `radioSetting`
+    + `model`: The storage key this setting models. This will be one of the values you specify, or undefined.
+    + `label`: A short label for the whole setting
+    + `desc`: A longer description for the whole setting. Optional.
+    + `options`: `List<radioOption>`: The values of the option
+
+- `radioOption`
+    + `value`: The value that will be set as the key. 
+    + `label`: A short label for this option
+    + `desc`: A longer description for this option. Optional.
 
 ### Vue Hooks
 

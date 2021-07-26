@@ -249,6 +249,11 @@
                 :data-value="option.key"
               >
                 <b>{{option.label}}</b> - {{option.desc}}
+                <label class="modButton"
+                  v-if="option.hasmeta"
+                  @click="openSubModel(option, 'INFO_ONLY')"
+                  v-text="'ℹ'"
+                />
               </li>
             </draggable>
           </div>
@@ -261,11 +266,12 @@
                 :data-value="option.key"
               >
                 <b>{{option.label}}</b> - {{option.desc}}
-                <span 
-                  v-if="option.settingsmodel"
-                  @click="openSubModel(option)">
-                  ⚙
-                </span>
+                <!-- n.b. hasmeta should always be true if settings exists -->
+                <label class="modButton"
+                  v-if="option.hasmeta || option.settingsmodel"
+                  @click="openSubModel(option)"
+                  v-text="option.settingsmodel ? '⚙' : 'ℹ'"
+                />
               </li>
             </draggable>
           </div>
@@ -641,8 +647,8 @@ export default {
         })
       }.bind(this), 4000)
     },
-    openSubModel: function(mod) {
-      this.$refs.modal.openMod(mod)
+    openSubModel: function(mod, info_only=false) {
+      this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
       ipcRenderer.invoke('reload')
@@ -887,6 +893,16 @@ export default {
       .col {  
           width: 100%;
           margin: 0 20px;
+      }
+      .modButton {
+        float: right;
+        width: 18px;
+        height: 18px;
+        background: #EEE;
+        text-align: center;
+        &:hover {
+          background: #c6c6c6
+        }
       }
     }
 
