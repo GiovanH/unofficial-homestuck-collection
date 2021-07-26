@@ -354,6 +354,16 @@ Use the `settings` field to define a data model. The archive will automatically 
     + `label`: A short label for this option
     + `desc`: A longer description for this option. Optional.
 
+Note that there is no setting for a default option. Values will always be undefined until the user interacts with the settings screen. You can override this behavior by including logic in your `withStore` handler, for example
+
+```js
+  withStore(newStore) { 
+    store = newStore
+    // Default to on
+    store.set("default_yes", store.get("default_yes", true))
+  }
+```
+
 ### Vue Hooks
 
 Vue hooks are the most complicated and the most powerful method of modifying the collection, and modify the Vue.js pages directly using mixins. 
