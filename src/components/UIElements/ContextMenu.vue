@@ -89,6 +89,10 @@ export default {
           cb() { shell.showItemInFolder(this.$mspaFileStream(this.target.src)) }
         },
         {
+          title: "Copy local path",
+          cb() { clipboard.writeText(this.$mspaFileStream(this.target.src)) }
+        }, 
+        {
           title: "Save Image",
           cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
         }
@@ -158,11 +162,11 @@ export default {
       this.$localData.root.TABS_DUPLICATE((this.target.closest('.tab') || this.target).id.slice(4))
     },
     openLinkInNewTab(){
-      let href = this.targetAnchor.href
+      const href = this.targetAnchor.href
       this.$openLink(href, true)
     },
     copyLink(){
-      let target = this.targetAnchor.href
+      const target = this.targetAnchor.href
       clipboard.writeText(target.replace(/.*?:\/\/(?:localhost:\d*|\.)(\/.*)$/, "$1"))
     },
     copyLinkText(){
@@ -172,7 +176,7 @@ export default {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
     },
     googleSearch() {
-      let query = window.getSelection().toString()
+      const query = window.getSelection().toString()
       this.$openLink(`https://google.com/search?q=${encodeURIComponent(query)}`)
     },
 
@@ -181,8 +185,8 @@ export default {
     },
 
     open(e, target){
-      if (target.id == 'titleBar' ||target.id == 'titleBarButtons' || target.parentNode.id == 'titleBarButtons') return
-      let box = this.$el
+      if (target.id == 'titleBar' || target.id == 'titleBarButtons' || target.parentNode.id == 'titleBarButtons') return
+      const box = this.$el
       if (document.activeElement !== box) {
         this.clickPos = {x: e.clientX, y: e.clientY}
         this.target = target
@@ -201,14 +205,14 @@ export default {
           this.tags.push('Link')
         }
 
-        this.$nextTick( () => {
+        this.$nextTick(() => {
           box.style.display = 'block'
 
-          let page = document.body
-          let boxX = e.clientX // mouse X
-          let boxY = e.clientY // mouse Y
-          let boxWidth = box.clientWidth
-          let boxHeight = box.clientHeight
+          const page = document.body
+          const boxX = e.clientX // mouse X
+          const boxY = e.clientY // mouse Y
+          const boxWidth = box.clientWidth
+          const boxHeight = box.clientHeight
 
           box.style.left = 
               (boxX + boxWidth > page.scrollLeft + page.clientWidth ? 
@@ -237,8 +241,7 @@ export default {
         if (this.wasClicked || !document.hasFocus()) {
           this.wasClicked = false
           this.partnerEl.focus()
-        }
-        else if (!this.partnerEl.contains(event.relatedTarget)) {
+        } else if (!this.partnerEl.contains(event.relatedTarget)) {
           this.partnerEl.focus()
           this.partnerEl.blur()
         }
