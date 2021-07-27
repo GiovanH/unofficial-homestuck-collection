@@ -119,7 +119,7 @@ export default {
       return this.settingsModel.radio || []
     },
     hasSettings() {
-      return Object.entries(this.settingsModel).length !== 0
+      return this.settingsModel && Object.entries(this.settingsModel).length !== 0
     }
   },
   methods: { 
