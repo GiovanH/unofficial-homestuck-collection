@@ -23,6 +23,7 @@ var routes = undefined
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
+// Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
   if (k) {return `mod.${mod_id}.${k}`}
   return `mod.${mod_id}`
@@ -236,27 +237,28 @@ function getModJs(mod_dir, singlefile=false) {
     mod._id = mod_dir
     mod._singlefile = singlefile
     mod._internal = mod_dir.startsWith("_")
-    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
 
     if (!singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
 
-    if (mod.withLogger != undefined) {
-      mod.withLogger(log.scope(mod._id))
+    if (mod.computed != undefined) {
+      const api = {
+        logger: log.scope(mod._id),
+        store: {
+          set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
+          get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
+          has: (k) => store.has(getModStoreKey(mod._id, k)),
+          delete: (k) => store.delete(getModStoreKey(mod._id, k)),
+          onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
+          clear: () => store.clear(getModStoreKey(mod._id, null))
+        }
+      }
+      Object.assign(mod, mod.computed(api))
     }
 
-    if (mod.withStore != undefined) {
-      mod.withStore({
-        set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
-        get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
-        has: (k) => store.has(getModStoreKey(mod._id, k)),
-        delete: (k) => store.delete(getModStoreKey(mod._id, k)),
-        onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
-        clear: () => store.clear(getModStoreKey(mod._id, null))
-      })
-    }
+    mod._needsreload = ['styles', 'vueHooks', 'themes', 'withStore'].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
@@ -347,9 +349,6 @@ function editArchive(archive) {
         } else if (Array.isArray(js.footnotes)) {
           logger.info(js.title, "Loading footnotes from object")
           mergeFootnotes(archive, js.footnotes)
-        } else if (typeof js.footnotes == "function") {
-          logger.info(js.title, "Loading footnotes from function")
-          mergeFootnotes(archive, js.footnotes())
         } else {
           throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
         }
@@ -559,10 +558,11 @@ if (ipcMain) {
           needsreload: js._needsreload,
           settingsmodel: js.settings,
           key: dir,
+
           includes: {
             routes: Boolean(js.routes || js.treeroute || js.trees),
             edits: Boolean(js.edit),
-            // hooks: js.vueHooks ? js.vueHooks.filter(h => (h.matchName || "[complex]")) : false,
+            hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
             styles: Boolean(js.styles),
             footnotes: Boolean(js.footnotes),
             themes: Boolean(js.themes)

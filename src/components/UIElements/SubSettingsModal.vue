@@ -3,20 +3,21 @@
     <div class="modalMask" v-if="isActive" tabindex="-1" @keydown.esc="close()" @click.self="close()">
       <div class="modalContainer" >
         <div class="modalContent">
-          <h1 v-text="modopt.label"></h1>
-
           <div class="includes">
+            <span>includes</span>
             <ul>
-              <li v-if="modopt.includes.routes">Replacements</li>
+              <li v-if="modopt.includes.routes">Assets</li>
               <li v-if="modopt.includes.edits">Edits</li>
               <li v-if="modopt.includes.styles">Styles</li>
               <li v-if="modopt.includes.themes">Themes</li>
-              <li v-if="modopt.includes.themes">Footnotes</li>
+              <li v-if="modopt.includes.footnotes">Footnotes</li>
               <template v-if="modopt.includes.hooks">
                 <li v-for="hook in modopt.includes.hooks" v-text="hook" />
               </template>
             </ul>
           </div>
+
+          <h1 v-text="modopt.label"></h1>
 
           <div class="metainfo">
             <span v-if="modopt.desc" v-html="modopt.desc"/>
@@ -28,7 +29,7 @@
             </span>
           </div>
 
-          <div v-if="settingsModel">
+          <div v-if="hasSettings">
             <hr/>
 
             <div class="bools">
@@ -71,7 +72,8 @@
                 </template>
               </dl>
             </div>
-            <p>Changing some settings may require a reload.</p>
+            <p v-if="modopt.needsreload">Changed settings <b>require</b> a reload to apply.</p>
+            <p v-else>Changing some settings may require a reload.</p>
             <div class="buttonbox">
               <button @click="clearAll">Clear All</button>
               <button @click="forceReload">Reload</button>
@@ -85,12 +87,13 @@
 
 <script>
 
+import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+
 const { getModStoreKey } = require('@/mods.js').default
+const { ipcRenderer } = require('electron')
+
 const Store = require('electron-store')
 const store = new Store()
-
-import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-const { ipcRenderer } = require('electron')
 
 export default {
   name: 'modal',
@@ -114,6 +117,9 @@ export default {
     },
     settingListRadio() {
       return this.settingsModel.radio || []
+    },
+    hasSettings() {
+      return Object.entries(this.settingsModel).length !== 0
     }
   },
   methods: { 
@@ -131,15 +137,22 @@ export default {
     },
     close() {
       this.save()
+
       this.isActive = false 
       this.settingsModel = undefined
       this.buffer = undefined
       this.storeKey = undefined
       this.info_only = undefined
+
+      // Don't do this unless we know settings have been changed,
+      // which we don't track yet.
+      // if (this.modopt.needsreload) {
+      //   ipcRenderer.invoke('reload')
+      // }
     },
     save() {
       if (this.info_only) return
-      if (!this.settingsModel) return
+      if (!this.hasSettings) return
       this.$logger.info("saving", this.buffer, this.storeKey)
       store.set(this.storeKey, this.buffer)
     },
@@ -255,6 +268,22 @@ export default {
   .includes {
     float: right;
     position: relative;
+
+    border: 4px solid #008C45;
+    font-weight: normal;
+    font-family: monospace;
+    > span {
+      width: 100%;
+      display: block;
+
+      color: #00E371;
+      background: #008C45;
+    }
+    ul {
+      padding: 0 0.5em;;
+      list-style: inside;
+      background: white;
+    }
   }
 
   .buttonbox {
