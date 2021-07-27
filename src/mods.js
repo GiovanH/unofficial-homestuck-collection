@@ -555,7 +555,7 @@ if (ipcMain) {
           modVersion: js.modVersion,
           locked: js.locked,
 
-          hasmeta: Boolean(js.author || js.modVersion || js.settings),
+          hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
           needsreload: js._needsreload,
           settingsmodel: js.settings,
           key: dir,

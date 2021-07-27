@@ -20,7 +20,7 @@
           <h1 v-text="modopt.label"></h1>
 
           <div class="metainfo">
-            <span v-if="modopt.summary" v-html="modopt.summary"/>
+            <span v-if="modopt.summary" v-text="modopt.summary"/>
             <br />
             <span v-if="modopt.author" v-html="'by <b>' + modopt.author + '</b>'" />
             <span v-if="modopt.modVersion" v-html="'v<b>' + modopt.modVersion + '</b>'" />
@@ -29,7 +29,9 @@
             </span>
           </div>
 
-          <div v-if="hasSettings">
+          <div v-if="modopt.description" v-html="modopt.description" class="description"/>
+
+          <div v-if="hasSettings" class="settings">
             <hr/>
 
             <div class="bools">
@@ -50,25 +52,23 @@
               </dl>
             </div>
             <div class="radios">
-              <dl>
-                <template v-for="ratioSetting in settingListRadio">
-                  <dt v-text="ratioSetting.label" :key="ratioSetting.model + '-label'"></dt>
-                  <dd v-html="ratioSetting.desc" :key="ratioSetting.model + '-desc'"></dd>
-                  <template v-for="option in ratioSetting.options">
-                    <dt :key="ratioSetting.model + '-' + option.value">
-                      <input type="radio" 
-                        :name="`${ratioSetting.model}=${option.value}`" 
-                        :id="`${ratioSetting.model}=${option.value}`" 
-                        :value="option.value"
-                        v-model="buffer[ratioSetting.model]"
-                        :disabled="info_only"
-                      >
-                      <label 
-                        :for="`${ratioSetting.model}=${option.value}`"
-                        v-text="option.label" />
-                    </dt> 
-                    <dd class="settingDesc" v-if="option.desc" v-html="option.desc" :key="ratioSetting.model + '-' + option.value + '-desc'"></dd>
-                  </template>
+              <dl v-for="ratioSetting in settingListRadio">
+                <dt v-text="ratioSetting.label" :key="ratioSetting.model + '-label'"></dt>
+                <dd v-html="ratioSetting.desc" :key="ratioSetting.model + '-desc'"></dd>
+                <template v-for="option in ratioSetting.options">
+                  <dt :key="ratioSetting.model + '-' + option.value">
+                    <input type="radio" 
+                      :name="`${ratioSetting.model}=${option.value}`" 
+                      :id="`${ratioSetting.model}=${option.value}`" 
+                      :value="option.value"
+                      v-model="buffer[ratioSetting.model]"
+                      :disabled="info_only"
+                    >
+                    <label 
+                      :for="`${ratioSetting.model}=${option.value}`"
+                      v-text="option.label" />
+                  </dt> 
+                  <dd class="settingDesc" v-if="option.desc" v-html="option.desc" :key="ratioSetting.model + '-' + option.value + '-desc'"></dd>
                 </template>
               </dl>
             </div>
@@ -227,6 +227,7 @@ export default {
   width: 100%;
   height: 100%;
   overflow: auto;
+  font-weight: normal;
 
   h2 {
     text-align: center;
@@ -238,25 +239,38 @@ export default {
       font-weight: bolder;
     }
   }
-  dt {
-    margin: 20px 0 5px 10px;
-  }
-  .radios {
-    dt {
-      margin-top: 0;
+
+  // Needs to apply to user-injected html, description must be deep.
+  .description::v-deep {
+    margin: 1em 0;
+    img {
+      max-width: 100%;
     }
-    dd {
-      margin-bottom: 1em;
-    }
-  }
-  dd {
-    color: var(--page-nav-meta);
-    font-weight: normal;
   }
 
-  > dd.settingDesc {
-    // Descriptions of whole sections
-    margin-top: 1em;
+  .settings {
+    font-weight: bold;
+
+    dt {
+      margin: 20px 0 5px 10px;
+    }
+    .radios {
+      dt {
+        margin-top: 0;
+      }
+      dd {
+        margin-bottom: 1em;
+      }
+    }
+    dd {
+      color: var(--page-nav-meta);
+      font-weight: normal;
+    }
+
+    > dd.settingDesc {
+      // Descriptions of whole sections
+      margin-top: 1em;
+    }
   }
 
   .metainfo > span {

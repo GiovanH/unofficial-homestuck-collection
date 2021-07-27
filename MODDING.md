@@ -50,6 +50,7 @@ These are basic metadata attributes used in the settings screen for user selecti
 
 - `title` (string): The title of your mod. This should be as short as possible while being recognizable. 
 - `summary` (string): A short description of your mod and its basic functions
+- `description` (string): A longer description of the mod. HTML formatting is allowed here. 
 - `author` (string): The name of the person or group who authored the mod.
 - `modVersion` (number): A javascript number specifying the version of the mod. This may be used for update checking, so this number should strictly increase with subsequent releases.
 - `locked` (string, optional): If your mod's name or description are spoilers, or if your mod unlocks spoiler content in some way, the mod will be hidden until the reader reaches this MSPA page number. For instance, use `"001901"` to unlock once the reader starts reading Homestuck.
