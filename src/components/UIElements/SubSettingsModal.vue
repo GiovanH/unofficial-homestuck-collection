@@ -20,7 +20,7 @@
           <h1 v-text="modopt.label"></h1>
 
           <div class="metainfo">
-            <span v-if="modopt.desc" v-html="modopt.desc"/>
+            <span v-if="modopt.summary" v-html="modopt.summary"/>
             <br />
             <span v-if="modopt.author" v-html="'by <b>' + modopt.author + '</b>'" />
             <span v-if="modopt.modVersion" v-html="'v<b>' + modopt.modVersion + '</b>'" />

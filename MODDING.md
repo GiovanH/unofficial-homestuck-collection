@@ -49,7 +49,7 @@ Names in `module.exports` are exposed directly to the modding API, and are the m
 These are basic metadata attributes used in the settings screen for user selection. These are all required.
 
 - `title` (string): The title of your mod. This should be as short as possible while being recognizable. 
-- `desc` (string): A longer description of your mod and its basic functions
+- `summary` (string): A short description of your mod and its basic functions
 - `author` (string): The name of the person or group who authored the mod.
 - `modVersion` (number): A javascript number specifying the version of the mod. This may be used for update checking, so this number should strictly increase with subsequent releases.
 - `locked` (string, optional): If your mod's name or description are spoilers, or if your mod unlocks spoiler content in some way, the mod will be hidden until the reader reaches this MSPA page number. For instance, use `"001901"` to unlock once the reader starts reading Homestuck.

@@ -549,7 +549,8 @@ if (ipcMain) {
 
         acc[dir] = {
           label: js.title,
-          desc: js.desc,
+          summary: js.summary,
+          description: js.description,
           author: js.author,
           modVersion: js.modVersion,
           locked: js.locked,

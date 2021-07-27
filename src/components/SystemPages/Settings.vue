@@ -248,7 +248,7 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.desc}}
+                <b>{{option.label}}</b> - {{option.summary}}
                 <label class="modButton"
                   v-if="option.hasmeta"
                   @click="openSubModel(option, 'INFO_ONLY')"
@@ -265,7 +265,7 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.desc}}
+                <b>{{option.label}}</b> - {{option.summary}}
                 <!-- n.b. hasmeta should always be true if settings exists -->
                 <label class="modButton"
                   v-if="option.hasmeta || option.settingsmodel"
