@@ -4,13 +4,13 @@ import difflib
 import pprint
 import itertools
 import re
+import traceback
 
 def getArgs():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("patch")
     arg_parser.add_argument("base")
-    arg_parser.add_argument("--out", default="diff.json")
-    arg_parser.add_argument("--diff", action="store_true")
+    arg_parser.add_argument("--root", default="mspa")
     return arg_parser.parse_args()
 
 def get_difference(obj_1: dict, obj_2: dict, stack="archive") -> dict:
@@ -38,8 +38,12 @@ def get_difference(obj_1: dict, obj_2: dict, stack="archive") -> dict:
 
 def jsSubscript(key):
     # can be optimized for strings
-    if re.match(r"^[a-z]+$", key):
-        return f".{key}"
+    try:
+        if isinstance(key, str) and re.match(r"^[a-z]+$", key):
+            return f".{key}"
+    except:
+        print(key)
+        raise
     return f"[{key!r}]"
 
 def get_patchlines(obj_1: dict, obj_2: dict, stack="archive.mspa") -> dict:
@@ -75,22 +79,51 @@ def get_patchlines(obj_1: dict, obj_2: dict, stack="archive.mspa") -> dict:
     return result
 
 def get_replacements(obj_1: dict, obj_2: dict, stack=[]):
-    for key in obj_1.keys():
-        value = obj_1[key]
-        other_value = obj_2.get(key)
+    if isinstance(obj_1, dict):
+        iterator = obj_1.items()
+    elif isinstance(obj_1, list):
+        iterator = enumerate(obj_1)
+
+    for key, value in iterator:
         mystack = [*stack, key]
 
+        if isinstance(obj_1, dict):
+            other_value = obj_2.get(key)
+        elif isinstance(obj_1, list):
+            try:
+                other_value = obj_2[key]
+            except IndexError:
+                print(key)
+                print("o1", repr(obj_1)[:80])
+                print("o2", repr(obj_2)[:80])
+                raise
+
         if isinstance(value, dict):
-            yield from get_replacements(value, obj_2.get(key, {}), stack=mystack)
+            yield from get_replacements(value, other_value or {}, stack=mystack)
 
         elif isinstance(value, list):
             if value != other_value:
-                yield (mystack, other_value, value)
+                try:
+                    yield from get_replacements(value, other_value or [], stack=mystack)
+                except IndexError:
+                    print(key)
+                    print("o1", repr(obj_1)[:80])
+                    print("o2", repr(obj_2)[:80])
+                    print(" v", repr(value)[:80])
+                    print("ov", repr(other_value)[:80])
+                    yield (mystack, other_value, value)
 
         elif value != other_value:
-            for v, ov in zip(value.split("<br />"), other_value.split("<br />")):
-                if v != ov:
-                    yield (mystack, ov, v)
+            if isinstance(value, str) and isinstance(other_value, str):
+                seperators = r"(<br( ){0,1}/>)|(\n)"
+                for v, ov in zip(
+                        re.split(seperators, value),
+                        re.split(seperators, other_value)
+                    ):
+                    if v != ov:
+                        yield (mystack, ov, v)
+            else:
+                yield (mystack, other_value, value)
 
 def main():
     args = getArgs()
@@ -103,7 +136,7 @@ def main():
 
     diff = get_difference(patch, base)
 
-    with open(args.out, "w", encoding="utf-8") as fp:
+    with open("args.out", "w", encoding="utf-8") as fp:
         json.dump(diff, fp, indent=2)
 
     # js = get_patchlines(patch, base)
@@ -117,7 +150,7 @@ def main():
         # ...except we don't know that everything is in a magic subscriptable `story` object.
 
         for stack, group in itertools.groupby(get_replacements(patch, base), lambda t: t[0]):
-            js_stack = "".join(["archive.mspa"] + [jsSubscript(k) for k in stack])
+            js_stack = "".join([f"archive.{args.root}"] + [jsSubscript(k) for k in stack])
             group = list(group)
 
             if len(group) == 1:
