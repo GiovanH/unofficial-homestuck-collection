@@ -283,6 +283,8 @@
           <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
         </div>
+
+        <!-- <button v-if="$localData.settings.devMode" @click="reloadModList">Reload List</button>  -->
       </div>
 
       <div class="settings system">
@@ -658,6 +660,9 @@ export default {
       //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       // })
       // ipcRenderer.invoke('reload')
+    },
+    reloadModList: function() {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
     }
   },
   watch: {
