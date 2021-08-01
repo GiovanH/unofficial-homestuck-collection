@@ -34,6 +34,11 @@ Archives like `.zip` or `.7z` files are *not* recognized as mods and need to be 
 
 Installed mods will be available in the `SETTINGS` page (jump `/settings`), under the header **Mod Settings**. Detailed instructions will be available there.
 
+Some changes don't require any sort of reload at all. Some require a soft reload, and some require a full application restart.
+
+Basically, anything that requires the main process to reload requires an application restart. This is usually if you change an actual file in the mods directory. Anything that modifies vue or adds CSS requires a soft reload, and stuff that just modifies the archive or adds footnotes can reload within vue. 
+
+
 ## API specification
 
 As per [Installing mods](#installing-mods) above, there are two forms of mods: single-file scripts and mod folders. 
@@ -453,3 +458,4 @@ It replaces the underlying `url` object with a new one, discarding any data that
 All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.
 
 Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
+
