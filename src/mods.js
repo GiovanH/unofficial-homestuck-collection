@@ -23,6 +23,13 @@ var routes = undefined
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
+let win = null;
+
+function giveWindow(new_win) {
+  win = new_win
+  logger.info("Got window")
+}
+
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
   if (k) {return `mod.${mod_id}.${k}`}
@@ -65,39 +72,62 @@ function getTreeRoutes(tree, parent=""){
 
 var onModLoadFail;
 
+function removeModsFromEnabledList(responsible_mods) {
+  // Clear enabled mods
+  // TODO: This doesn't trigger the settings.modListEnabled observer,
+  // which results in bad settings-screen side effects
+  const old_enabled_mods = getEnabledMods()
+  const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x))
+  logger.info("Changing modlist", old_enabled_mods, new_enabled_mods)
+
+  // Fully reactive settings clobber
+  if (ipcMain) {
+    logger.info("Trying to change modlist from main")
+    store.set(store_modlist_key, new_enabled_mods)
+    if (win) {
+      win.webContents.send('RELOAD_LOCALDATA')
+    } else {
+      logger.error("Don't have win!")
+    }
+  } else {
+    logger.info("Changing modlist from vm")
+    window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
+    logger.info(window.vm.$localData.settings["modListEnabled"])
+    window.vm.$localData.VM.saveLocalStorage()
+  }
+}
+
 if (ipcMain) {
-  onModLoadFail = function (enabled_mods, e) {
+  onModLoadFail = function (responsible_mods, e) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with issues in", enabled_mods)
+    logger.info("Mod load failure with issues in", responsible_mods)
     logger.error(e)
 
+    removeModsFromEnabledList(responsible_mods)
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
-      message: `Something went wrong while loading mods ${enabled_mods}! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details`
+      message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
     })
-    // Clear enabled mods
-    // TODO: This doesn't trigger the settings.modListEnabled observer,
-    // which results in bad settings-screen side effects
-    store.set(store_modlist_key, [])
-    logger.debug("Modlist cleared, clearing routes...")
 
-    app.relaunch()
-    app.exit()
+    // Used to reload here, but now that rmfel is fully reactive
+    // it shouldn't be needed
   }
 } else {
   // We are in the renderer process.
-  onModLoadFail = function (enabled_mods, e) {
+  onModLoadFail = function (responsible_mods, e) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with modlist", enabled_mods)
-    logger.debug(e)
-    document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
-    store.set(store_modlist_key, [])
+    logger.info("Mod load failure with modlist", responsible_mods)
+    logger.error(e)
+    document.body.innerText = `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you may need to restart the application.<br/>Check the console log for details<br/><pre>${e}</pre>`
+
+    removeModsFromEnabledList(responsible_mods)
+
     logger.error("Did not expect to be in the renderer process for this! Debug")
     ipcRenderer.invoke('reload')
   }
@@ -158,7 +188,8 @@ function bakeRoutes() {
           Resources.resolveURL(url)
         } catch (e) {
           logger.warn("Testing routes failed")
-          onModLoadFail([url], e)
+          logger.error(url, e)
+          onModLoadFail(enabled_mods, e)
         }
       })
     }
@@ -283,8 +314,7 @@ function getModJs(mod_dir, singlefile=false) {
         const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
         if (e2_is_notfound) {
           // Singlefile not found either
-          logger.error(mod_dir, "is missing required file 'mod.js'")
-          onModLoadFail([mod_dir], e2)
+          onModLoadFail([mod_dir], new Error(`${mod_dir} is missing required file 'mod.js'`))
         } else {
           logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
@@ -319,7 +349,7 @@ function editArchive(archive) {
         // })
       }
     } catch (e) {
-      onModLoadFail(js._id, e)
+      onModLoadFail([js._id], e)
     }
   })
 
@@ -354,7 +384,7 @@ function editArchive(archive) {
         }
       }
     } catch (e) {
-      onModLoadFail(e, "adding footnotes")
+      onModLoadFail([js._id], e)
     }
   })
 }
@@ -608,6 +638,6 @@ export default {
   bakeRoutes,
   getAssetRoute,
   getModStoreKey,
-
+  giveWindow,
   modChoices
 }
