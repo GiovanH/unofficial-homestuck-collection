@@ -4,12 +4,13 @@
     <div class="pageFrame" v-if="log">
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
-        <a :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
-        <div class="logItems">
+        <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
+        <div class="logItems" v-if="log.length > 0">
           <template v-for="page in log">
             {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
           </template>
         </div>
+        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
       </div>
     </div>
     <div class="pageFrame noLog" v-else >
@@ -31,6 +32,7 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 const { DateTime } = require('luxon');
 
@@ -47,7 +49,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, PageFooter
+    NavBanner, Media, PageFooter, MediaEmbed
   },
   data: function() {
     return {
@@ -121,9 +123,7 @@ export default {
       // The unsorted story log
       this.$archive;
 
-      // console.log("Recalculating raw story log memo")
       // Vue should really be able to keep track of this, but it just can't. 
-      // TODO: story_id is user-input, needs to be error checked
       
       return this.memoized(story_id => {
         // console.log("Recalculating raw story log (BAD)")
@@ -186,6 +186,10 @@ export default {
       align-content: center;
       .pageContent{
         background: var(--page-pageContent);
+
+        .pageContent img {
+            max-width: 100%;
+        }
         
         width: 650px;     
         h2.pageTitle {
