@@ -65,7 +65,7 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => Mods.modChoices, // This is the list of installed mods, it's okay to bake this
+    $modChoices: Mods.getModChoices,
     $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
   },
   methods: {
