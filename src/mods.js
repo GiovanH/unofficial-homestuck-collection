@@ -75,7 +75,7 @@ var onModLoadFail;
 function removeModsFromEnabledList(responsible_mods) {
   // Clear enabled mods
   const old_enabled_mods = getEnabledMods()
-  const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x))
+  const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x)).filter(x => !x.startsWith("_"))
   logger.info("Changing modlist", old_enabled_mods, new_enabled_mods)
 
   // Fully reactive settings clobber
@@ -261,6 +261,8 @@ function getModJs(mod_dir, singlefile=false) {
       modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
 
+    if (__non_webpack_require__.cache[modjs_path])
+      delete __non_webpack_require__.cache[modjs_path]
     mod = __non_webpack_require__(modjs_path)
 
     mod._id = mod_dir
@@ -627,9 +629,18 @@ if (ipcMain) {
   // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
+function getModChoices() {
+  if (ipcMain) {
+    return modChoices
+  } else {
+    return ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+  }
+}
+
 export default {
   getEnabledModsJs,  // probably shouldn't use
   getEnabledMods,
+  getModChoices,
   getMixins,
   getMainMixin,
   editArchive,

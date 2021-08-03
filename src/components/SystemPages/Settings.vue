@@ -284,7 +284,7 @@
           <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
         </div>
 
-        <!-- <button v-if="$localData.settings.devMode" @click="reloadModList">Reload List</button>  -->
+        <button v-if="$localData.settings.devMode" @click="reloadModList">Reload Choices</button> 
       </div>
 
       <div class="settings system">
@@ -663,6 +663,10 @@ export default {
     },
     reloadModList: function() {
       ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this._computedWatchers.$modChoices.run()
+      this._computedWatchers.modsEnabled.run()
+      this._computedWatchers.modsDisabled.run()
+      this.$forceUpdate()
     }
   },
   watch: {
