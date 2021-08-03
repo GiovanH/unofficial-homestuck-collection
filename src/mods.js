@@ -74,8 +74,6 @@ var onModLoadFail;
 
 function removeModsFromEnabledList(responsible_mods) {
   // Clear enabled mods
-  // TODO: This doesn't trigger the settings.modListEnabled observer,
-  // which results in bad settings-screen side effects
   const old_enabled_mods = getEnabledMods()
   const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x))
   logger.info("Changing modlist", old_enabled_mods, new_enabled_mods)
