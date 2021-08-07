@@ -115,7 +115,7 @@ export default {
                 }
                 let images = this.$el.getElementsByTagName('IMG')
                 for(let i = 0;i < images.length; i++) {
-                    images[i].src = this.$resolveURL(images[i].src)
+                    images[i].src = this.$getResourceURL(images[i].src)
                     images[i].ondragstart = (e) => {
                         e.preventDefault()
                         e.dataTransfer.effectAllowed = 'copy'

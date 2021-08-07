@@ -1,8 +1,7 @@
 <template>
   <div class="bannerDiv" v-if="!!banner"  @mouseover="mouseEnter" @mousemove="positionTooltip" @mouseleave="mouseLeave" >
     <Media :url="banner.url" :title="banner.title" class="bannerImage" />
-    <img v-if="imgTooltip" :src="$resolveURL(imgTooltip)" class="imgTooltip" />
-    <!-- TODO if imgTooltip is always an asset using asset:// would be cheaper -->
+    <img v-if="imgTooltip" :src="imgTooltip" class="imgTooltip" />
   </div>
 </template>
 
@@ -43,12 +42,11 @@ export default {
         return undefined
     },
     imgTooltip() {
-      let num = parseInt(this.page.pageId)
+      const num = parseInt(this.page.pageId)
       if (this.page.theme == 'scratch' && num >= 5976 && num <= 5981) {
-        let LEnumber = num - 5975
-        return `/storyfiles/hs2/scraps/LEtext${LEnumber}.gif`
+        const LEnumber = num - 5975
+        return `assets://storyfiles/hs2/scraps/LEtext${LEnumber}.gif`
       } else {
-        this.tooltipActive = false
         return false
       }
     }
@@ -58,18 +56,24 @@ export default {
       e = e || window.event
       e.preventDefault()
       if (this.imgTooltip) {
-        let tooltip = document.getElementById(this.tab.key).getElementsByClassName('imgTooltip')[0]  
+        const tooltip = document.getElementById(this.tab.key).getElementsByClassName('imgTooltip')[0]  
         tooltip.style.display = 'block'
         this.tooltipActive = true
         this.positionTooltip(e)
+      } else {
+        this.tooltipActive = false
       }
     },
     mouseLeave(e) {
       e = e || window.event
       e.preventDefault()
-      if (this.tooltipActive && this.imgTooltip) {
-        let tooltip = document.getElementById(this.tab.key).getElementsByClassName('imgTooltip')[0]
-        tooltip.style.display = 'none'
+      if (this.imgTooltip) {
+        if (this.tooltipActive) {
+          const tooltip = document.getElementById(this.tab.key).getElementsByClassName('imgTooltip')[0]
+          tooltip.style.display = 'none'
+          this.tooltipActive = false
+        }
+      } else {
         this.tooltipActive = false
       }
     },
@@ -77,15 +81,15 @@ export default {
       e = e || window.event
       e.preventDefault()
       if (this.tooltipActive) {
-        let page = document.getElementById(this.tab.key)
-        let tooltip = page.getElementsByClassName('imgTooltip')[0]
-        // let banner = page.getElementsByClassName('bannerImage')[0] // unused?
-        let offsetXY = [20, 30]
+        const page = document.getElementById(this.tab.key)
+        const tooltip = page.getElementsByClassName('imgTooltip')[0]
+        // const banner = page.getElementsByClassName('bannerImage')[0] // unused?
+        const offsetXY = [20, 30]
 
-        let tooltipX = e.clientX + offsetXY[0]  //mouse X
-        let tooltipY = e.clientY - offsetXY[1]  //mouse Y
-        let tooltipWidth = tooltip.clientWidth
-        let tooltipHeight = tooltip.clientHeight
+        const tooltipX = e.clientX + offsetXY[0]  //mouse X
+        const tooltipY = e.clientY - offsetXY[1]  //mouse Y
+        const tooltipWidth = tooltip.clientWidth
+        const tooltipHeight = tooltip.clientHeight
 
         tooltip.style.left = 
           (tooltipX + tooltipWidth > page.scrollLeft + page.clientWidth ? 

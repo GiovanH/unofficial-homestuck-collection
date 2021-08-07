@@ -42,7 +42,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, TextContent, PageNav,PageFooter
+    NavBanner, Media, TextContent, PageNav, PageFooter
   },
   data: function() {
     return {
@@ -78,7 +78,6 @@ export default {
     }
   },
   methods: {
-    // TODO: Passwords should be stored as data
     submitPassword(){
       let url = this.passwords[this.inputText.toUpperCase()]
 
