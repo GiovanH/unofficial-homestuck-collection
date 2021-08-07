@@ -1,13 +1,13 @@
 <template>
-  <img    v-if="getExt(url) === 'img'" :src='$resolveURL(url)' @dragstart="drag($event)" alt />
-  <video  v-else-if="getExt(url) ==='vid'" :src='$resolveURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
+  <img    v-if="getExt(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
+  <video  v-else-if="getExt(url) ==='vid'" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
   <iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
   <iframe v-else-if="getExt(url) === 'html'" 
   :src='resolveFrameUrl(url)' 
   width="650px" height="450px" class="sburb" seamless />
   <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
-  <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$resolveURL(url)" type="audio/mpeg" />
+  <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
 
 <script>
@@ -16,7 +16,6 @@ import path from 'path'
 import Resources from "@/resources.js"
 
 export default {
-  // TODO: Additional override props for height, width, bgcolor
   props: ['url'],
   data() {
     return {
@@ -56,7 +55,10 @@ export default {
         "05994": {height: 1400},
         "07083": {height: 1400},
         // HOMOSUCK ANTHEM
-        "06240": {height: 576},
+        "06240": {
+          bgcolor: '#073C00',
+          height: 576
+        },
         // CASCADE
         "04106": {
           bgcolor: '#262626',
@@ -272,8 +274,8 @@ export default {
         <object type="application/x-shockwave-flash" 
           width="${this.flashProps.width}" 
           height="${this.flashProps.height}" 
-          data="${this.$resolveURL(this.url)}">
-            <param name='movie' value="${this.$resolveURL(this.url)}"/>
+          data="${this.$getResourceURL(this.url)}">
+            <param name='movie' value="${this.$getResourceURL(this.url)}"/>
             <param name='play' value="true"/>
             <param name='loop' value="true"/>
             <param name='quality' value="high" />
@@ -414,7 +416,7 @@ export default {
       }
     },
     createAudioElement(id = this.flashProps.id) {
-      const audioElement = new Audio(this.$resolveURL(path.join(path.parse(this.url).dir, id + '.mp3')))
+      const audioElement = new Audio(this.$getResourceURL(path.join(path.parse(this.url).dir, id + '.mp3')))
 
       audioElement.preload = 'auto'
 

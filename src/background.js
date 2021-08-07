@@ -224,9 +224,9 @@ function loadArchiveData(){
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
   } catch (e) {
-    // TODO: Errors should already log/handle themselves by now
+    // Errors should already log/handle themselves by now
     // but we need to update the application state to react to it
-
+    // This is probably due to a poorly written mod, somehow.
     // specifically $localdata can be in an invalid state
     logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
 
@@ -323,7 +323,6 @@ try {
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
-  // TODO: The above logic doesn't work with the new async loading system
   port = undefined
   
   // Throw together a neutered menu for setup mode

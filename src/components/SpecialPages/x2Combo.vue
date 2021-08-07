@@ -149,7 +149,7 @@ export default {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
             let img = new Image()
-            img.src = this.$resolveURL(media)
+            img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
         })

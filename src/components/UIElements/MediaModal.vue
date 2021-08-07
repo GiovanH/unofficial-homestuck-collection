@@ -38,7 +38,7 @@ export default {
 			return [this.url.slice(0, this.url.lastIndexOf('/')), this.url.slice(this.url.lastIndexOf('/')+1)]
 		},
 		contentId() {
-			return this.$resolveURL(this.url)
+			return this.$getResourceURL(this.url)
 		}
 	},
 	methods: { 

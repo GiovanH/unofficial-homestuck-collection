@@ -114,8 +114,6 @@ Vue.mixin({
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
-          // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
-          // If we must do this we should check for a steam installation, eat least
           ipcRenderer.invoke('steam-open', urlObject.href)
         } else shell.openExternal(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
@@ -130,10 +128,8 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    // TODO: resolveURL is perhaps a bad name because this doesn't resolve assets:// urls yet?
-    // that's not handled until Resources.resolveAssetsProtocol or Resources.resolveURL() (which does both)
-    $resolveURL: Resources.getResourceURL,
-    $filterURL(u) {return this.$resolveURL(u)},
+    $getResourceURL: Resources.getResourceURL,
+    $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       const url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
@@ -416,7 +412,10 @@ Vue.mixin({
       // The new-reader setting is split into two values: "current", and "limit"
       // "current" is the highest page the reader has actually visited. By setting "useLimit" to false, you can use this function to only display content up to a point the reader has seen.
       // "limit" is the highest page the reader is *allowed* to visit. This is generally set one page ahead of the current page, but in some circumstances like character select screens, it can go much further.
-      // TODO: Better document this "friendsim" and "pesterquest" behavior
+      
+      // "Hiveswap Friendsim" and "Pesterquest" are pseudopages used by the bandcamp viewer
+      // to reference tracks and volumes, i.e. "Pesterquest: Volume 14"
+
       const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
       const parsedPage = parseInt(page)
       return this.$isNewReader && (
