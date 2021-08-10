@@ -335,6 +335,8 @@ The `store` object is a special namespaced store you can use for reading setting
 
 The store provided is namespaced. This means it is safe to use commonly used keys in your mod without any risk of conflicting with the main program or other mods.
 
+Note that values in `computed` are only computed if your mod is enabled, so you can't compute things like the title and summary.
+
 <aside>
 If you only need to access the names in functions, you can just reserve a name for the object and use `computed` to assign the object
 

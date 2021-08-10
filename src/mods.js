@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import yaml from 'js-yaml';
 
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass');
@@ -23,7 +24,7 @@ var routes = undefined
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
-let win = null;
+let win = null
 
 function giveWindow(new_win) {
   win = new_win
@@ -212,8 +213,8 @@ function getEnabledMods() {
 function getEnabledModsJs() {
   try {
     return getEnabledMods().map((dir) => getModJs(dir))
-  } catch {
-    logger.error("Couldn't load mod js'")
+  } catch (e) {
+    logger.error("Couldn't load enabled mod js'", e)
     return []
   }
 }
@@ -238,7 +239,44 @@ function crawlFileTree(root, recursive=false) {
   return ret
 }
 
-function getModJs(mod_dir, singlefile=false) {
+function buildApi(mod) {
+  function readFileSyncLocal(local_path, method_name) {
+    console.assert(!mod._singlefile, `Singlefile mods cannot use api.${method_name}`)
+    console.assert(local_path.startsWith("./"), local_path, `${method_name} paths must be mod relative (./)`)
+    console.assert(!local_path.includes("/.."), local_path, "You know what you did")
+
+    // TODO probably unsafe
+    return fs.readFileSync(path.join(mod._mod_root_dir, local_path), 'utf8')
+  }
+
+  let api = {
+    store: {
+      set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
+      get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
+      has: (k) => store.has(getModStoreKey(mod._id, k)),
+      delete: (k) => store.delete(getModStoreKey(mod._id, k)),
+      onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
+      clear: () => store.clear(getModStoreKey(mod._id, null))
+    }, 
+    readJson(asset_path) {
+      return JSON.parse(readFileSyncLocal(asset_path, "readJson"))
+    },
+    readYaml(asset_path) {
+      return yaml.safeLoad(readFileSyncLocal(asset_path, "readYaml"))
+    } 
+  }
+  var logger
+  Object.defineProperty(api, 'logger', {
+    get: function() {
+      if (logger) return logger
+      logger = log.scope(mod._id)
+      return logger
+    }
+  })
+  return api
+}
+
+function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
@@ -255,37 +293,30 @@ function getModJs(mod_dir, singlefile=false) {
       thisModsAssetRoot = imodsAssetsRoot
     } 
 
-    if (singlefile) {
+    if (options.singlefile) {
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
       modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
 
+    // eslint-disable-next-line no-undef
     if (__non_webpack_require__.cache[modjs_path])
+      // eslint-disable-next-line no-undef
       delete __non_webpack_require__.cache[modjs_path]
+    // eslint-disable-next-line no-undef
     mod = __non_webpack_require__(modjs_path)
 
     mod._id = mod_dir
-    mod._singlefile = singlefile
+    mod._singlefile = options.singlefile
     mod._internal = mod_dir.startsWith("_")
 
-    if (!singlefile) {
+    if (!options.singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
 
-    if (mod.computed != undefined) {
-      const api = {
-        logger: log.scope(mod._id),
-        store: {
-          set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
-          get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
-          has: (k) => store.has(getModStoreKey(mod._id, k)),
-          delete: (k) => store.delete(getModStoreKey(mod._id, k)),
-          onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
-          clear: () => store.clear(getModStoreKey(mod._id, null))
-        }
-      }
+    if (!options.liteload && (mod.computed != undefined)) {
+      const api = buildApi(mod)
       Object.assign(mod, mod.computed(api))
     }
 
@@ -295,7 +326,7 @@ function getModJs(mod_dir, singlefile=false) {
   } catch (e1) {
     // elaborate error checking w/ afllback
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
-    if (singlefile) {
+    if (options.singlefile) {
       if (e1_is_notfound) {
         // Tried singlefile, missing
         throw e1
@@ -309,7 +340,8 @@ function getModJs(mod_dir, singlefile=false) {
       // Tried dir/mod.js, missing
       try {
         // Try to find singlefile
-        return getModJs(mod_dir, true)
+        options.singlefile = true
+        return getModJs(mod_dir, options)
       } catch (e2) {
         const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
         if (e2_is_notfound) {
@@ -573,7 +605,7 @@ if (ipcMain) {
 
     var items = mod_folders.reduce((acc, dir) => {
       try {
-        const js = getModJs(dir)
+        const js = getModJs(dir, {liteload: true})
         if (js.hidden === true)
           return acc // continue
 
