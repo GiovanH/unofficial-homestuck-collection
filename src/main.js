@@ -297,10 +297,9 @@ Vue.mixin({
       }
     },
     $updateNewReader(thisPageId, forceOverride = false) {
-      // TODO: Rewrite $updateNewReader for datadriven
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const isInRange = '000219' <= thisPageId && thisPageId <= '010030' // in the "keep track of spoilers" range
+      const isInRange = '000219' <= thisPageId && thisPageId <= this.$archive.tweaks.endOfHSPage // in the "keep track of spoilers" range
 
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
@@ -308,22 +307,7 @@ Vue.mixin({
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
         if (!isSetupMode) {
           // Calculate nextLimit
-          var offByOnePages = [
-            // DISC TRANSITIONS + CASCADE SCRAPBOOK
-            '005643', '005984', '006000',
-
-            '008105', // JOHN CURSOR          
-            '008143', // HOMOSUCK PIANO
-
-            // A6A6I1 GLITCHED CHARACTER SELECTS
-            '008282', '008297', '008301', '008305', '008316',
-
-            // TEREZI RETCON QUEST
-            '009057', '009108', '009134', '009149', 
-            '009187', '009203', '009221', '009262',
-            
-            '010029' // CREDITS
-          ]
+          var offByOnePages = this.$archive.tweaks.offByOnePages
 
           if (offByOnePages.includes(thisPageId)) {
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
@@ -354,7 +338,7 @@ Vue.mixin({
         // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
-        if (thisPageId == '010030') {
+        if (thisPageId == this.$archive.tweaks.endOfHSPage) {
           // Finished Homestuck.
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
@@ -364,12 +348,12 @@ Vue.mixin({
 
           // If you've reached that page where a retcon happened, mark the flag.
           if (resultCurrent) {
-            this.$localData.settings.retcon1 = resultCurrent >= '007999'
-            this.$localData.settings.retcon2 = resultCurrent >= '008053'
-            this.$localData.settings.retcon3 = resultCurrent >= '008317'
-            this.$localData.settings.retcon4 = resultCurrent >= '008991'
-            this.$localData.settings.retcon5 = resultCurrent >= '009026'
-            this.$localData.settings.retcon6 = resultCurrent >= '009057'
+            this.$localData.settings.retcon1 = (resultCurrent >= '007999')
+            this.$localData.settings.retcon2 = (resultCurrent >= '008053')
+            this.$localData.settings.retcon3 = (resultCurrent >= '008317')
+            this.$localData.settings.retcon4 = (resultCurrent >= '008991')
+            this.$localData.settings.retcon5 = (resultCurrent >= '009026')
+            this.$localData.settings.retcon6 = (resultCurrent >= '009057')
           }
           
           if (resultCurrent || resultLimit) {
@@ -377,7 +361,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else this.$logger.warn("Invalid page ID, not setting")
+      } else this.$logger.warn("Invalid page ID, not updating progress")
     },
     $shouldRetcon(retcon_id){
       console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
