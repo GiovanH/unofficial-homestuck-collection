@@ -80,6 +80,7 @@ import TSO from '@/components/Comics/tso.vue'
 import SNAPS from '@/components/Comics/Snaps.vue'
 
 import TESTS from '@/components/Extras/tests.vue'
+import FILEMAN from '@/components/Extras/fileman.vue'
 
 export default {
 	name: 'TabFrame',
@@ -135,7 +136,8 @@ export default {
 		TSO,
 		SNAPS,
 
-		TESTS
+		TESTS,
+		FILEMAN
 	},
 	data() {
 		return {
@@ -179,7 +181,8 @@ export default {
 				'waywardvagabond': 'ExtrasPage',
 				'sweetbroandhellajeff': 'SBAHJ',
 				'faqs': 'ExtrasPage',
-				'oilretcon': 'ExtrasPage'
+				'oilretcon': 'ExtrasPage',
+				'file': 'Fileman'
 			}
 	
 			let component = (this.routeParams.base in mapRoute ? mapRoute[this.routeParams.base] : this.routeParams.base).toUpperCase()

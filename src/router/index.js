@@ -288,6 +288,9 @@ const routes = [
   {
     path: '/skaianet/:cursed_history',
     props: true
+  },
+  {
+    path: '/file/'
   }
 ]
 

@@ -583,6 +583,35 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   }
 })
 
+function crawlFileTree(root, recursive=false) {
+  // Gives a object that represents the file tree, starting at root
+  // Values are objects for directories or true for files that exist
+  const dir = fs.opendirSync(root)
+  let ret = {}
+  let dirent
+  while (dirent = dir.readSync()) {
+    if (dirent.isDirectory()) {
+      if (recursive) {
+        const subpath = path.join(root, dirent.name)
+        ret[dirent.name] = crawlFileTree(subpath, true)
+      } else ret[dirent.name] = undefined // Is directory, but not doing a recursive scan
+    } else {
+      ret[dirent.name] = true
+    }
+  }
+  dir.close()
+  return ret
+}
+
+ipcMain.on('file-asset-ls', (event, root) => {
+  logger.info("got file-asset-ls")
+  try {
+    event.returnValue = crawlFileTree(path.join(assetDir, root))
+  } catch {
+    event.returnValue = undefined
+  }
+})
+
 // Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {
   event.sender.startDrag({
