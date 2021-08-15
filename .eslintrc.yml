@@ -13,7 +13,7 @@ rules:
   arrow-spacing: ["warn"]
   block-spacing: ["off"]
   camelcase: ["off"]
-  curly: ["warn", "multi-or-nest", "consistent"]
+  curly: ["off"]
   dot-notation: ["warn"]
   eqeqeq: ["warn", "smart"]
   indent: ["off", 2, { "SwitchCase": 1 }]

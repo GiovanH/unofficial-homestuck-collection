@@ -113,11 +113,11 @@ function getResourceURL(request_url){
     }
   }
 
-  if (resource_url != request_url) {
-    logger.debug("[getResU]", request_url, "to", resource_url)
-  } else {
-    logger.debug("[getResU]", "no change for", request_url, fileIsAsset(resource_url))
-  }
+  // if (resource_url != request_url) {
+  //   logger.debug("[getResU]", request_url, "to", resource_url)
+  // } else {
+  //   logger.debug("[getResU]", "no change for", request_url, fileIsAsset(resource_url))
+  // }
   return resource_url
 }
 
