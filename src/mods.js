@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import yaml from 'js-yaml';
 
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass');
@@ -22,6 +23,19 @@ var routes = undefined
 
 const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
+
+let win = null
+
+function giveWindow(new_win) {
+  win = new_win
+  logger.info("Got window")
+}
+
+// Function exposed for SubSettingsModal, which directly writes to store
+function getModStoreKey(mod_id, k){
+  if (k) {return `mod.${mod_id}.${k}`}
+  return `mod.${mod_id}`
+}
 
 function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
@@ -59,39 +73,60 @@ function getTreeRoutes(tree, parent=""){
 
 var onModLoadFail;
 
+function removeModsFromEnabledList(responsible_mods) {
+  // Clear enabled mods
+  const old_enabled_mods = getEnabledMods()
+  const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x)).filter(x => !x.startsWith("_"))
+  logger.info("Changing modlist", old_enabled_mods, new_enabled_mods)
+
+  // Fully reactive settings clobber
+  if (ipcMain) {
+    logger.info("Trying to change modlist from main")
+    store.set(store_modlist_key, new_enabled_mods)
+    if (win) {
+      win.webContents.send('RELOAD_LOCALDATA')
+    } else {
+      logger.error("Don't have win!")
+    }
+  } else {
+    logger.info("Changing modlist from vm")
+    window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
+    logger.info(window.vm.$localData.settings["modListEnabled"])
+    window.vm.$localData.VM.saveLocalStorage()
+  }
+}
+
 if (ipcMain) {
-  onModLoadFail = function (enabled_mods, e) {
+  onModLoadFail = function (responsible_mods, e) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with issues in", enabled_mods)
+    logger.info("Mod load failure with issues in", responsible_mods)
     logger.error(e)
 
+    removeModsFromEnabledList(responsible_mods)
     // TODO: Replace this with a good visual traceback so users can diagnose mod issues
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Mod load error',
-      message: "Something went wrong while loading mods! All mods have been disabled for safety; you may need to restart the application.\nCheck the console log for details"
+      message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
     })
-    // Clear enabled mods
-    // TODO: This doesn't trigger the settings.modListEnabled observer,
-    // which results in bad settings-screen side effects
-    store.set(store_modlist_key, [])
-    logger.debug("Modlist cleared, clearing routes...")
 
-    app.relaunch()
-    app.exit()
+    // Used to reload here, but now that rmfel is fully reactive
+    // it shouldn't be needed
   }
 } else {
   // We are in the renderer process.
-  onModLoadFail = function (enabled_mods, e) {
+  onModLoadFail = function (responsible_mods, e) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with modlist", enabled_mods)
-    logger.debug(e)
-    document.body.innerText = `Mod load failure with modlist ${enabled_mods}`
-    store.set(store_modlist_key, [])
+    logger.info("Mod load failure with modlist", responsible_mods)
+    logger.error(e)
+    document.body.innerText = `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you may need to restart the application.<br/>Check the console log for details<br/><pre>${e}</pre>`
+
+    removeModsFromEnabledList(responsible_mods)
+
     logger.error("Did not expect to be in the renderer process for this! Debug")
     ipcRenderer.invoke('reload')
   }
@@ -152,7 +187,8 @@ function bakeRoutes() {
           Resources.resolveURL(url)
         } catch (e) {
           logger.warn("Testing routes failed")
-          onModLoadFail([url], e)
+          logger.error(url, e)
+          onModLoadFail(enabled_mods, e)
         }
       })
     }
@@ -177,8 +213,8 @@ function getEnabledMods() {
 function getEnabledModsJs() {
   try {
     return getEnabledMods().map((dir) => getModJs(dir))
-  } catch {
-    logger.error("Couldn't load mod js'")
+  } catch (e) {
+    logger.error("Couldn't load enabled mod js'", e)
     return []
   }
 }
@@ -203,7 +239,44 @@ function crawlFileTree(root, recursive=false) {
   return ret
 }
 
-function getModJs(mod_dir, singlefile=false) {
+function buildApi(mod) {
+  function readFileSyncLocal(local_path, method_name) {
+    console.assert(!mod._singlefile, `Singlefile mods cannot use api.${method_name}`)
+    console.assert(local_path.startsWith("./"), local_path, `${method_name} paths must be mod relative (./)`)
+    console.assert(!local_path.includes("/.."), local_path, "You know what you did")
+
+    // TODO probably unsafe
+    return fs.readFileSync(path.join(mod._mod_root_dir, local_path), 'utf8')
+  }
+
+  let api = {
+    store: {
+      set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
+      get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
+      has: (k) => store.has(getModStoreKey(mod._id, k)),
+      delete: (k) => store.delete(getModStoreKey(mod._id, k)),
+      onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
+      clear: () => store.clear(getModStoreKey(mod._id, null))
+    }, 
+    readJson(asset_path) {
+      return JSON.parse(readFileSyncLocal(asset_path, "readJson"))
+    },
+    readYaml(asset_path) {
+      return yaml.safeLoad(readFileSyncLocal(asset_path, "readYaml"))
+    } 
+  }
+  var logger
+  Object.defineProperty(api, 'logger', {
+    get: function() {
+      if (logger) return logger
+      logger = log.scope(mod._id)
+      return logger
+    }
+  })
+  return api
+}
+
+function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
@@ -220,28 +293,40 @@ function getModJs(mod_dir, singlefile=false) {
       thisModsAssetRoot = imodsAssetsRoot
     } 
 
-    if (singlefile) {
+    if (options.singlefile) {
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
       modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
+
+    // eslint-disable-next-line no-undef
+    if (__non_webpack_require__.cache[modjs_path])
+      // eslint-disable-next-line no-undef
+      delete __non_webpack_require__.cache[modjs_path]
+    // eslint-disable-next-line no-undef
     mod = __non_webpack_require__(modjs_path)
 
     mod._id = mod_dir
-    mod._singlefile = singlefile
+    mod._singlefile = options.singlefile
     mod._internal = mod_dir.startsWith("_")
-    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
 
-    if (!singlefile) {
+    if (!options.singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
+
+    if (!options.liteload && (mod.computed != undefined)) {
+      const api = buildApi(mod)
+      Object.assign(mod, mod.computed(api))
+    }
+
+    mod._needsreload = ['styles', 'vueHooks', 'themes', 'withStore'].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
     // elaborate error checking w/ afllback
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
-    if (singlefile) {
+    if (options.singlefile) {
       if (e1_is_notfound) {
         // Tried singlefile, missing
         throw e1
@@ -255,13 +340,13 @@ function getModJs(mod_dir, singlefile=false) {
       // Tried dir/mod.js, missing
       try {
         // Try to find singlefile
-        return getModJs(mod_dir, true)
+        options.singlefile = true
+        return getModJs(mod_dir, options)
       } catch (e2) {
         const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
         if (e2_is_notfound) {
           // Singlefile not found either
-          logger.error(mod_dir, "is missing required file 'mod.js'")
-          onModLoadFail([mod_dir], e2)
+          onModLoadFail([mod_dir], new Error(`${mod_dir} is missing required file 'mod.js'`))
         } else {
           logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
@@ -296,7 +381,7 @@ function editArchive(archive) {
         // })
       }
     } catch (e) {
-      onModLoadFail(js._id, e)
+      onModLoadFail([js._id], e)
     }
   })
 
@@ -331,7 +416,7 @@ function editArchive(archive) {
         }
       }
     } catch (e) {
-      onModLoadFail(e, "adding footnotes")
+      onModLoadFail([js._id], e)
     }
   })
 }
@@ -342,7 +427,7 @@ function mergeFootnotes(archive, footObj) {
   }
 
   footObj.forEach(footnoteList => {
-    const default_author = footnoteList.author || "Undefined Author"
+    const default_author = (footnoteList.author === undefined) ? "Undefined Author" : footnoteList.author 
     const default_class = footnoteList.class || undefined
     const default_ispreface = footnoteList.preface
 
@@ -520,15 +605,31 @@ if (ipcMain) {
 
     var items = mod_folders.reduce((acc, dir) => {
       try {
-        const js = getModJs(dir)
+        const js = getModJs(dir, {liteload: true})
         if (js.hidden === true)
           return acc // continue
 
         acc[dir] = {
           label: js.title,
-          desc: js.desc,
+          summary: js.summary,
+          description: js.description,
+          author: js.author,
+          modVersion: js.modVersion,
+          locked: js.locked,
+
+          hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
           needsreload: js._needsreload,
-          key: dir
+          settingsmodel: js.settings,
+          key: dir,
+
+          includes: {
+            routes: Boolean(js.routes || js.treeroute || js.trees),
+            edits: Boolean(js.edit),
+            hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+            styles: Boolean(js.styles),
+            footnotes: Boolean(js.footnotes),
+            themes: Boolean(js.themes)
+          }
         }
       } catch (e) {
         // Catch import-time mod-level errors
@@ -560,14 +661,24 @@ if (ipcMain) {
   // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
+function getModChoices() {
+  if (ipcMain) {
+    return modChoices
+  } else {
+    return ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+  }
+}
+
 export default {
   getEnabledModsJs,  // probably shouldn't use
   getEnabledMods,
+  getModChoices,
   getMixins,
   getMainMixin,
   editArchive,
   bakeRoutes,
   getAssetRoute,
-
+  getModStoreKey,
+  giveWindow,
   modChoices
 }

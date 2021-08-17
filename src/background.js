@@ -230,6 +230,13 @@ function loadArchiveData(){
     // This is probably due to a poorly written mod, somehow.
     // specifically $localdata can be in an invalid state
     logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+
+    dialog.showMessageBoxSync({
+      type: 'error',
+      title: 'Archive load error',
+      message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
+    })
+
     throw e
   }
 
@@ -681,6 +688,9 @@ async function createWindow () {
   win.on('closed', () => {
     win = null
   })
+
+  // Give mods a reference to the window object so it can reload 
+  Mods.giveWindow(win);
 }
 
 app.on('window-all-closed', () => {

@@ -162,6 +162,10 @@
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
       })      
+
+      electron.ipcRenderer.on('RELOAD_LOCALDATA', (event) => {
+        this.$localData.VM.reloadLocalStorage()
+      })
       
       electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
         this.$root.archive = archive

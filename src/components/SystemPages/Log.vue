@@ -17,12 +17,9 @@
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <div class="adventureLinks">
-          <div class="adventure"><a href="/log/1"><Media url="/images/archive_jb.gif" /><br>Jailbreak</a></div>
-          <div class="adventure"><a href="/log/2"><Media url="/images/archive_bq.gif" /><br>Bard Quest</a></div>
-          <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
-          <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
-          <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
-          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_rq.png" /><br>Ryanquest</a></div>
+          <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
+            <a :href="advlink.href"><Media :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
+          </div>
         </div>
       </div>
     </div>
@@ -60,7 +57,15 @@ export default {
       sortNames: {
         asc: 'oldest to newest',
         desc: 'newest to oldest'
-      }
+      },
+      adventureLinks: [
+          {href: "/log/1", img: "/images/archive_jb.gif", label: "Jailbreak"},
+          {href: "/log/2", img: "/images/archive_bq.gif", label: "Bard Quest"},
+          {href: "/log/4", img: "/images/archive_ps.gif", label: "Problem Sleuth"},
+          // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
+          {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
+          // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
+      ]
     }
   },
   computed: {

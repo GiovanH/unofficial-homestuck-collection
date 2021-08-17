@@ -34,6 +34,11 @@ Archives like `.zip` or `.7z` files are *not* recognized as mods and need to be 
 
 Installed mods will be available in the `SETTINGS` page (jump `/settings`), under the header **Mod Settings**. Detailed instructions will be available there.
 
+Some changes don't require any sort of reload at all. Some require a soft reload, and some require a full application restart.
+
+Basically, anything that requires the main process to reload requires an application restart. This is usually if you change an actual file in the mods directory. Anything that modifies vue or adds CSS requires a soft reload, and stuff that just modifies the archive or adds footnotes can reload within vue. 
+
+
 ## API specification
 
 As per [Installing mods](#installing-mods) above, there are two forms of mods: single-file scripts and mod folders. 
@@ -49,7 +54,8 @@ Names in `module.exports` are exposed directly to the modding API, and are the m
 These are basic metadata attributes used in the settings screen for user selection. These are all required.
 
 - `title` (string): The title of your mod. This should be as short as possible while being recognizable. 
-- `desc` (string): A longer description of your mod and its basic functions
+- `summary` (string): A short description of your mod and its basic functions
+- `description` (string): A longer description of the mod. HTML formatting is allowed here. 
 - `author` (string): The name of the person or group who authored the mod.
 - `modVersion` (number): A javascript number specifying the version of the mod. This may be used for update checking, so this number should strictly increase with subsequent releases.
 - `locked` (string, optional): If your mod's name or description are spoilers, or if your mod unlocks spoiler content in some way, the mod will be hidden until the reader reaches this MSPA page number. For instance, use `"001901"` to unlock once the reader starts reading Homestuck.
@@ -294,9 +300,95 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
     footnotes: "./footnotes.json"
 ```
 
-Footnotes are not supported on fullscreen flash pages like EndOfHS or Game Over.
+As yet another option, your `footnotes` field can point to a function that *returns* a footnotes object. This is a good way to make programatic changes to your footnotes object that require runtime resources, like the settings store.
+
+Footnotes are not yet supported on fullscreen flash pages like EndOfHS or Game Over.
 
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
+
+### `computed`
+
+There are some resources your mod might want to request from TUHC at runtime, like a namespaced logger object or access to a settings store. For this, use the `computed` function.
+
+(There is no relation between the `module.exports.computed` field and the vue conception of computed values, except for the general idea of computation.)
+
+While loading the mod, if there is a `computed` function defined in your mod, the loader will *call `computed` and merge the return value with the rest of the mod.* This lets you assign static fields (like `locked`, or `footnotes`) based on logic computed during runtime.
+
+The `computed` function is passed the `api` object as an argument, which currently exposes the following:
+
+```js
+api = {
+    logger,
+    store
+}
+```
+
+The `logger` object is a standard logger, with `info` and `debug` methods that output information at different levels depending on user settings.
+
+The `store` object is a special namespaced store you can use for reading settings or other persistent data from the store.
+
+- `set(k, v)`: Set the key `k` to the value `v`.
+- `get(k, default_)`: Get the value of key `k`, or `default_` if `k` is not yet set.
+- `has(k)`
+- `delete(k)`
+- `clear()`
+
+The store provided is namespaced. This means it is safe to use commonly used keys in your mod without any risk of conflicting with the main program or other mods.
+
+Note that values in `computed` are only computed if your mod is enabled, so you can't compute things like the title and summary.
+
+<aside>
+If you only need to access the names in functions, you can just reserve a name for the object and use `computed` to assign the object
+
+```js
+
+let logger = null
+let store = null
+
+module.exports = {
+    `...`
+    computed(api) { 
+        logger = api.logger
+        store = api.store
+    },
+}
+```
+
+You can then use the `logger` or `store` objects in code. 
+</aside>
+
+For assigning values to settings, look below:
+
+### Settings
+
+Use the `settings` field to define a data model. The archive will automatically generate an interactive settings UI and attach it to the mod entry on the settings screen.
+
+- `settings`: Contains two (optional) objects, `boolean` (`List<boolSetting>`) and `radio` (`List<radioSetting>`)
+
+- `boolSetting`
+    + `model`: The storage key this setting models. The value assigned will be true, false, or undefined.
+    + `label`: A short label for the checkbox
+    + `desc`: A longer description. Optional.
+
+- `radioSetting`
+    + `model`: The storage key this setting models. This will be one of the values you specify, or undefined.
+    + `label`: A short label for the whole setting
+    + `desc`: A longer description for the whole setting. Optional.
+    + `options`: `List<radioOption>`: The values of the option
+
+- `radioOption`
+    + `value`: The value that will be set as the key. 
+    + `label`: A short label for this option
+    + `desc`: A longer description for this option. Optional.
+
+Note that there is no setting for a default option. Values will always be undefined until the user interacts with the settings screen. You can override this behavior by including logic in your `computed` handler, for example
+
+```js
+  computed(api) { 
+    // Default to on
+    api.store.set("default_yes", store.get("default_yes", true))
+  }
+```
 
 ### Vue Hooks
 
@@ -366,3 +458,6 @@ This hook uses the `matchName` shorthand to match the `navBanner` page, which is
 It replaces the underlying `url` object with a new one, discarding any data that was previously there. It also replaces the `labels`, but this time it only modifies the two labels relevant to the change, again using the `$super` syntax.
 
 All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.
+
+Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
+

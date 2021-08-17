@@ -8,8 +8,7 @@
 				<div class="modalLinks">
 					<span v-text="splitPath[0]" @click.prevent="openItemInFolder()" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem()" />
 				</div>
-
-        		<FlashCredit :pageId="this.contentId"/>
+				<FlashCredit :pageId="this.contentId"/>
 			</div>
 		</div>
 	</transition>

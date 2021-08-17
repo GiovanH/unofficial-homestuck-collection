@@ -162,7 +162,7 @@
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-        <dd class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</dd>
+        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</p>
 
         <div v-if="$isNewReader">
           
@@ -172,13 +172,13 @@
               :checked.prop="controversialAll && !!controversialAny"
               :indeterminate.prop="controversialAny && !controversialAll"
             >Enable controversial content</label></dt>
-          <dd class="settingDesc">
-          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</dd>
+          <p class="settingDesc">
+          New Reader mode is currently enabled, so if checked, this option restores <em>all</em> this material without including spoilers or content warnings. More granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.</p>
 
         </div>
 
-        <dd class="settingDesc">
-        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</dd>
+        <p class="settingDesc">
+        These changes only affected a few pages and some side content. The page numbers are listed here, without spoilers, and the side content is only shown if it is unlocked.</p>
           
         <SpoilerBox kind="Affected Page Numbers" class="ccPageNos">
           <div class="left col">
@@ -239,7 +239,7 @@
         <!-- TODO: IF YOU CHANGE THE MODS YOU NEED TO RELOAD -->
         <h2>Mod Settings</h2>
 
-        <dd class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</dd>
+        <p class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</p>
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
             <draggable tag="ul" group="sortable-mods">
@@ -248,7 +248,12 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.desc}}
+                <b>{{option.label}}</b> - {{option.summary}}
+                <label class="modButton"
+                  v-if="option.hasmeta"
+                  @click="openSubModel(option, 'INFO_ONLY')"
+                  v-text="'ℹ'"
+                />
               </li>
             </draggable>
           </div>
@@ -260,7 +265,13 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.desc}}
+                <b>{{option.label}}</b> - {{option.summary}}
+                <!-- n.b. hasmeta should always be true if settings exists -->
+                <label class="modButton"
+                  v-if="option.hasmeta || option.settingsmodel"
+                  @click="openSubModel(option)"
+                  v-text="option.settingsmodel ? '⚙' : 'ℹ'"
+                />
               </li>
             </draggable>
           </div>
@@ -272,6 +283,8 @@
           <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
         </div>
+
+        <button v-if="$localData.settings.devMode" @click="reloadModList">Reload Choices</button> 
       </div>
 
       <div class="settings system">
@@ -295,6 +308,7 @@
         </div>
       </div>
     </div>
+    <SubSettingsModal ref="modal" />
   </div>
 </template>
 
@@ -303,6 +317,7 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import draggable from "vuedraggable"
 
 const { ipcRenderer } = require('electron')
@@ -313,7 +328,9 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageText, SpoilerBox, StoryPageLink, draggable
+    NavBanner, SubSettingsModal, 
+    PageText, SpoilerBox, StoryPageLink, 
+    draggable
   },
   data: function() {
     return {
@@ -591,7 +608,7 @@ export default {
       ipcRenderer.invoke('locate-assets', {restart: true})
     },
     factoryReset(){      
-      let args = {
+      const args = {
         title: "FACTORY RESET",
         message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!',
         okay: "Yes, delete everything"
@@ -632,6 +649,9 @@ export default {
         })
       }.bind(this), 4000)
     },
+    openSubModel: function(mod, info_only=false) {
+      this.$refs.modal.openMod(mod, info_only)
+    },
     forceReload: function() {
       ipcRenderer.invoke('reload')
       // this.$root.loadState = "LOADING"
@@ -640,6 +660,13 @@ export default {
       //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       // })
       // ipcRenderer.invoke('reload')
+    },
+    reloadModList: function() {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this._computedWatchers.$modChoices.run()
+      this._computedWatchers.modsEnabled.run()
+      this._computedWatchers.modsDisabled.run()
+      this.$forceUpdate()
     }
   },
   watch: {
@@ -815,8 +842,8 @@ export default {
         }
         .ccPageNos {
           font-weight: normal;
-          width: 600px;
-          margin: 1em auto;
+          // width: 600px;
+          // margin: 1em auto;
           h3 {
             margin-top: .4em;
           }
@@ -875,6 +902,16 @@ export default {
       .col {  
           width: 100%;
           margin: 0 20px;
+      }
+      .modButton {
+        float: right;
+        width: 18px;
+        height: 18px;
+        background: #EEE;
+        text-align: center;
+        &:hover {
+          background: #c6c6c6
+        }
       }
     }
 

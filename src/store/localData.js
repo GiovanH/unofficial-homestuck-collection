@@ -132,6 +132,15 @@ class LocalData {
             settings
           })
         },
+        reloadLocalStorage() {
+          let back = store.get('localData', {})
+
+          this.assetDir = back.assetDir
+          this.tabData = back.tabData
+          this.saveData = back.saveData
+          this.settings = back.settings
+          console.log(this.settings)
+        },
         TABS_RESET() {
           this.$set(this, 'tabData', {
             activeTabKey: "000",
