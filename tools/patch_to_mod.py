@@ -46,38 +46,6 @@ def jsSubscript(key):
         raise
     return f"[{key!r}]"
 
-def get_patchlines(obj_1: dict, obj_2: dict, stack="archive.mspa") -> dict:
-    result = []
-
-    for key in obj_1.keys():
-        value = obj_1[key]
-        other_value = obj_2.get(key)
-
-        if isinstance(value, dict):
-            result += get_patchlines(value, obj_2.get(key, {}), stack=f"{stack}{jsSubscript(key)}")
-
-        elif isinstance(value, list):
-            if value != other_value:
-                result.append(f"{stack}{jsSubscript(key)} = {other_value!r}")
-
-        elif value != other_value:
-            # result.append(f"{stack} = {other_value!r}")
-            # opcodes = difflib.SequenceMatcher(None, value, other_value).get_opcodes()
-
-            # o = 5
-            # for (tag, i1, i2, j1, j2) in opcodes:
-            #     a = value[i1-o:i2+o]
-            #     b = other_value[j1-o:j2+o]
-            #     if tag == "replace":
-            #         result.append(f"s/{b!r}/{a!r}/")
-            #     if tag == "insert":
-            #         result.append(f"s/{b!r}/{a!r}/")
-            for v, ov in zip(value.split("<br />"), other_value.split("<br />")):
-                if v != ov:
-                    # result.append(f"s/{ov!r}/{v!r}/")
-                    result.append(f"{stack} = {stack}.replace({ov!r}, {v!r})")
-    return result
-
 def get_replacements(obj_1: dict, obj_2: dict, stack=[]):
     if isinstance(obj_1, dict):
         iterator = obj_1.items()
@@ -138,8 +106,6 @@ def main():
 
     with open("args.out", "w", encoding="utf-8") as fp:
         json.dump(diff, fp, indent=2)
-
-    # js = get_patchlines(patch, base)
 
     # with open("edit.js", "w", encoding="utf-8") as fp:
     #     fp.write("\n".join(js))
