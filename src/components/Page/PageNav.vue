@@ -68,6 +68,10 @@ export default {
     }
   },
   methods: {
+    nextUrl(page) {
+      // Used by keyboard navigation from TabFrame
+      return this.$resolvePath(`${this.mspaBase}/${page.pageId}`)
+    },
     commandText(page) {
       // Controls what actually shows up as the command link
       function escapeHTML(str){return new Option(str).innerHTML}
