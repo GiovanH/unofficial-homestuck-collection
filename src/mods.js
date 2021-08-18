@@ -658,7 +658,6 @@ if (ipcMain) {
   // We are in the renderer process.
   logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
-  // TODO: It would be nice if force-reloading mods updated this variable too, somehow
 }
 
 function getModChoices() {
