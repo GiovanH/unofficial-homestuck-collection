@@ -653,6 +653,7 @@ export default {
       this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
       ipcRenderer.invoke('reload')
       // this.$root.loadState = "LOADING"
       // this.$nextTick(function () {

@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}">
+  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}" :data-pageid="`${thisPage.storyNum}/${thisPage.pageId}`">
     <Banner :tab="tab" :page="thisPage"/>
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
