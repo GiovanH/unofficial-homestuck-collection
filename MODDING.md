@@ -302,8 +302,6 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
 
 As yet another option, your `footnotes` field can point to a function that *returns* a footnotes object. This is a good way to make programatic changes to your footnotes object that require runtime resources, like the settings store.
 
-Footnotes are not yet supported on fullscreen flash pages like EndOfHS or Game Over.
-
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 
 ### `computed`
