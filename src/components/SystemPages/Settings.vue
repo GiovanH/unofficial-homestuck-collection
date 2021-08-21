@@ -637,17 +637,20 @@ export default {
         this.$logger.info("List change requires reload", diff)
         this.needReload = true
       }
-      
-      if (this.debounce) return
-      this.debounce = setTimeout(function() {
-        this.debounce = false 
-        this.memoizedClearAll()
+      this.queueArchiveReload()
+    },
+    queueArchiveReload(){
+      if (this.debounce) clearTimeout(this.debounce)
+      this.debounce = setTimeout(this.archiveReload, 8000)
+    },
+    archiveReload(){
+      this.debounce = false 
+      this.memoizedClearAll()
 
-        this.$root.loadState = "LOADING"
-        this.$nextTick(function () {
-          ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-        })
-      }.bind(this), 4000)
+      this.$root.loadState = "LOADING"
+      this.$nextTick(function () {
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      })
     },
     openSubModel: function(mod, info_only=false) {
       this.$refs.modal.openMod(mod, info_only)
@@ -678,6 +681,13 @@ export default {
     },
     '$localData.settings.mspaMode'() {
       this.validateNewReader()
+    },
+    '$localData.tabData.activeTabKey'(to, from) {
+      if (this.debounce) {
+        clearTimeout(this.debounce)
+        this.debounce = false
+        this.archiveReload()
+      }
     }
   }
 }
