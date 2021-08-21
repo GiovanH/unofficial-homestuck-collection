@@ -206,6 +206,10 @@ function getEnabledMods() {
     list.push("_pxsTavros")
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
+  if (store.get('localData.settings.hqAudio'))
+    list.push("_hqAudio")
+  if (store.get('localData.settings.bolin'))
+    list.push("_bolin")
 
   return list
 }

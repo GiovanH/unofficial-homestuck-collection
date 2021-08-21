@@ -598,8 +598,8 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (['unpeachy', 'pxsTavros'].includes(setting)) {
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      if (['unpeachy', 'pxsTavros', 'bolin'].includes(setting)) {
+        this.queueArchiveReload()
       }
 
       this.$localData.root.saveLocalStorage()
@@ -637,7 +637,9 @@ export default {
         this.$logger.info("List change requires reload", diff)
         this.needReload = true
       }
-      
+      this.queueArchiveReload()
+    },
+    queueArchiveReload(){
       if (this.debounce) return
       this.debounce = setTimeout(function() {
         this.debounce = false 
