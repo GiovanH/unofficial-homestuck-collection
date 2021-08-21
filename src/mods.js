@@ -206,10 +206,13 @@ function getEnabledMods() {
     list.push("_pxsTavros")
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
-  if (store.get('localData.settings.hqAudio'))
-    list.push("_hqAudio")
+
+  // Bolin must come before hqaudio in the stack so it loads after it.
   if (store.get('localData.settings.bolin'))
     list.push("_bolin")
+
+  if (store.get('localData.settings.hqAudio'))
+    list.push("_hqAudio")
 
   return list
 }

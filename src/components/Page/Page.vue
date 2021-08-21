@@ -90,20 +90,6 @@ export default {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
-      // TODO: Handle bolin with mod syntax
-      /*
-      if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
-        // const base_url = this.flashUrl.split("/").slice(0, -1).join("/")
-        // const plainname = filename.split(".").slice(0, -1).join(".")
-        // const filename = this.flashUrl.split('/').pop()
-        // const ext = filename.split('.').pop()
-        let flashPath = media[0].substring(0, media[0].length-4)
-        if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('BOLINHQ')) ? `${flashPath}_bolin_hq.swf` : `${flashPath}_bolin.swf`
-        else
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) ? `${flashPath}_hq.swf` : media[0]
-      }
-      */
       if (this.$archive.audioData[media[0]]) {
         let flashPath = media[0].substring(0, media[0].length-4)
         media[0] = `${flashPath}_hq.swf`

@@ -150,7 +150,6 @@ export default {
         '07445': '522px',
         '07953': '522px'
       },
-      audioLoop: ['00980_1', '00980_bolin_1', '00980_2', '07921'],
       audioDelay: {
         '00980_1': 1500,
         '00980_bolin_1': 3100,
@@ -401,6 +400,7 @@ export default {
       if (this.audio.length < 1) {
         if (this.audioTracks.length > 0) {
           this.audioTracks.forEach(track => {
+            this.$logger.info("Adding track", track)
             this.audio.push(this.createAudioElement(track))
           })
         }
