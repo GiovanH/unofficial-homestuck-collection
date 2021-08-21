@@ -248,6 +248,9 @@ export default {
 
       return {...defaultProps, ...customProps}
     },
+    audioTracks() {
+      return this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
+    },
     flashSrc() {
       return `
         <html>
@@ -396,31 +399,21 @@ export default {
 
     audioInit() {
       if (this.audio.length < 1) {
-        if (this.flashProps.id.startsWith('00980')){ 
-          this.audio.push(this.createAudioElement(/bolin/.test(this.flashProps.id) ? `00980_bolin_1` : `00980_1`))
-          this.audio.push(this.createAudioElement(`00980_2`))
-        } else if (this.flashProps.id == '03435') {
-          this.audio.push(this.createAudioElement(`03435_1`))
-          this.audio.push(this.createAudioElement(`03435_2`))
-        } else if (this.flashProps.id == '04106'){
-          for (var i = 1; i <= 5; i++) 
-            this.audio.push(this.createAudioElement(`cascade_segment${i}`))
-        } else if (this.flashProps.id == '04370') {
-          this.audio.push(this.createAudioElement(`04370_1`))
-          this.audio.push(this.createAudioElement(`04370_2`))
-        } else {
-          this.audio.push(this.createAudioElement())
+        if (this.audioTracks.length > 0) {
+          this.audioTracks.forEach(track => {
+            this.audio.push(this.createAudioElement(track))
+          })
         }
       } else {
         this.audioReset()
       }
     },
-    createAudioElement(id = this.flashProps.id) {
-      const audioElement = new Audio(this.$getResourceURL(path.join(path.parse(this.url).dir, id + '.mp3')))
+    createAudioElement(track) {
+      const audioElement = new Audio(this.$getResourceURL(track.href))
 
       audioElement.preload = 'auto'
-
-      if (this.audioLoop.includes(id)) audioElement.loop = true
+      
+      audioElement.loop = track.loop
 
       audioElement.load()
 
