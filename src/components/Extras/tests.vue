@@ -4,6 +4,27 @@
     <div class="pageFrame">
       <div class="pageContent">
         <div class="logItems">
+          <h2>Media Lookup</h2>
+          <input type="text" v-model="swfLookup">
+          <ul>
+            <li v-for='id in swfResults' :key='id'>
+              <StoryPageLink long :mspaId='id'></StoryPageLink>
+            </li>
+          </ul>
+        </div>
+        <div class="logItems">
+          <h2>Flag Lookup</h2>
+          <select v-model="flagLookup">
+              <option v-for='flag in allFlags' v-text="flag" :value="flag" :key="flag"></option>
+            </select>
+          <ul>
+            <li v-for='id in flagResults' :key='id'>
+              <StoryPageLink long :mspaId='id'></StoryPageLink>
+            </li>
+          </ul>
+        </div>
+        <div class="logItems">
+          <h2>Misc</h2>
           <ul>
             <li><a href="/mspa/000110">Multiple images</a></li>
             <li><a href="/mspa/000136">Multiple commands</a></li>
@@ -67,6 +88,7 @@
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 export default {
   name: 'tests',
@@ -74,15 +96,42 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageFooter
+    NavBanner, PageFooter, StoryPageLink
   },
   data: function() {
     return {
+      swfLookup: "",
+      flagLookup: ""
     }
   },
   computed: {
+    swfResults(){
+      if (!this.swfLookup || this.swfLookup.length < 4) {
+        return []
+      }
+
+      return Object.values(this.$archive.mspa.story).filter(page => 
+        page.media.some(url => url.includes(this.swfLookup))
+      ).map(page => page.pageId)
+    },
+    allFlags(){
+      return Object.values(this.$archive.mspa.story).filter(
+        page => page.flag.length > 0
+      ).reduce((acc, page) => {
+        for (const i in page.flag){
+          const f = page.flag[i]
+          if (!acc.includes(f)) acc.push(f)
+        }
+        return acc
+      }, [])
+    },
+    flagResults(){
+      return Object.values(this.$archive.mspa.story).filter(page => 
+        page.flag.includes(this.flagLookup.toUpperCase())
+      ).map(page => page.pageId)
+    }
   },
-  methods:{
+  methods: {
   },
   updated() {
   },
