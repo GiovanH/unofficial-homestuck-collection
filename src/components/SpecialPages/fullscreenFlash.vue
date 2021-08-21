@@ -12,7 +12,7 @@
               <Media :url="flashUrl" ref="flash" />
           </div>      
           <div class="textContent">
-              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" class="hidden" />
+              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
           </div>
           <div 
             :class="note.class ? 'footnote ' + note.class : 'footnote'"
@@ -45,11 +45,14 @@ export default {
   },
   computed: {
     flashUrl() {
-      let url = this.thisPage.media[0]
-      if (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) {
-        return `${url.substring(0, url.length-4)}_hq.swf`
-      }
-      else return url
+      return this.thisPage.media[0]
+    },
+    needsNav() {
+      // const base_url = this.flashUrl.split("/").slice(0, -1).join("/")
+      // const plainname = filename.split(".").slice(0, -1).join(".")
+      const filename = this.flashUrl.split('/').pop()
+      const ext = filename.split('.').pop()
+      return (ext !== "swf")
     },
     bgClass() {
       return {
