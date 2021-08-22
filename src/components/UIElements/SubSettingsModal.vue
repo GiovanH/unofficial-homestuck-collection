@@ -246,13 +246,22 @@ export default {
     img {
       max-width: 100%;
     }
+
+    h1, h2, h3, h4, h5 {
+        margin-top: 1em;
+    }
+
+    p {
+      margin-bottom: 1em;
+    }
+
   }
 
   .settings {
     font-weight: bold;
 
     dt {
-      margin: 20px 0 5px 10px;
+      margin: 10px 0 5px 10px;
     }
     .radios {
       dt {
