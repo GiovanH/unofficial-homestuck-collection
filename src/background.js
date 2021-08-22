@@ -183,6 +183,7 @@ function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   // This returns an `archive` object, and does not modify the global archive directly. 
   win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+  logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
 
@@ -198,8 +199,7 @@ function loadArchiveData(){
       music: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
-      tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
-      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+      tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8'))
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
@@ -209,7 +209,17 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  // We pre-build this here so mods have access to it
+  data.search = Object.values(data.mspa.story).map(storypage => {
+    return {
+      key: storypage.pageId,
+      chapter: Resources.getChapter(storypage.pageId),
+      content: `${storypage.title}###${storypage.content}`
+    }
+  })
+
   win.webContents.send('SET_LOAD_STAGE', "MODS")
+  logger.info("Loading mods")
 
   try {
     logger.debug("Applying mod archive edits")
@@ -220,7 +230,7 @@ function loadArchiveData(){
     Mods.bakeRoutes()
 
     // Sanity checks
-    let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+    const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
@@ -241,6 +251,7 @@ function loadArchiveData(){
   }
 
   win.webContents.send('SET_LOAD_STAGE', "PATCHES")
+  logger.info("Loading patches")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   if (data.version == "1") {
     logger.info("Applying asset pack v1 patches")
@@ -254,15 +265,7 @@ function loadArchiveData(){
     data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
   }
 
-  // Set up search index
-  chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: 'content',
-      tag: 'chapter'
-    }
-  })
-  chapterIndex.add(data.search)
+  chapterIndex = undefined
 
   return data
 }
@@ -294,7 +297,7 @@ function getFlashPath(){
 
 try {
   // Pick the appropriate flash plugin for the user's platform
-  let flashPath = getFlashPath()
+  const flashPath = getFlashPath()
 
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
@@ -374,15 +377,15 @@ ipcMain.on('STARTUP_GET_PORT', (event) => {
 
 // Speed hack, try to preload the first copy of the archive
 var first_archive
+var archive // Also, keep a reference to the latest archive, for lazy eval
 try {
-  first_archive = loadArchiveData()
+  archive = first_archive = loadArchiveData()
 } catch (e) {
   // logger.warn(e)
   // don't even warn, honestly
 }
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
-  let archive;
   win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
     if (first_archive) {
@@ -524,7 +527,35 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
   return (answer === 0)
 })
 
+function buildChapterIndex(){
+  logger.info("Building new search index")
+  chapterIndex = new FlexSearch({
+    doc: {
+      id: 'key',
+      field: 'content',
+      tag: 'chapter'
+    }
+  })
+
+  chapterIndex.add(archive.search)
+  chapterIndex.add(Object.keys(archive.footnotes.story).map(page_num => {
+    return {
+      key: page_num,
+      chapter: Resources.getChapter(page_num),
+      content: archive.footnotes.story[page_num].map(
+        note => note.content
+      ).join("###")
+    }
+  }))
+}
+
 ipcMain.handle('search', async (event, payload) => {
+  if (chapterIndex == undefined)
+    buildChapterIndex()
+
+  if (payload == undefined)
+    return // Just wanted to ensure the index
+
   const keyAlias = {
     "mc0001": 1892.5,
     "jb2_000000": 135.5,
