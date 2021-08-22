@@ -370,7 +370,8 @@ function editArchive(archive) {
   getEnabledModsJs().reverse().forEach((js) => {
     try {
       const editfn = js.edit
-      if (editfn) {
+      if (editfn) {        
+        logger.info(js._id, "editing archive")
         editfn(archive)
         console.assert(archive, js.title, "You blew it up! You nuked the archive!")
       
