@@ -3,6 +3,8 @@
       <div id="tabNavigation">
         <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
         <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
+
+        <div v-if="$localData.settings.devMode" class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 21px;"><fa-icon icon="redo"></fa-icon></div>
       </div>
       <div id="jumpBox">
         <div class="jumpBoxWrapper">
@@ -27,6 +29,8 @@
 
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
+
+const { ipcRenderer } = require('electron')
 
 export default {
   name: 'tabBar',
@@ -87,6 +91,13 @@ export default {
     historyForwardNewTab(e) {
       this.$logger.info(e.button)
       this.$localData.root.TABS_DUPLICATE(this.$localData.tabData.activeTabKey, true, 'forward')
+    },
+    reloadTab(e) {
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+    },
+    forceReload(e) {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      ipcRenderer.invoke('reload')
     },
     newTab() {
       this.$localData.root.TABS_NEW()
@@ -248,7 +259,7 @@ export default {
     #tabNavigation {
       display: inline-block;
       height: 28px;
-      width: 58px;
+      // width: 58px;
       display: flex;      
         .historyButton {
           height: 28px;
