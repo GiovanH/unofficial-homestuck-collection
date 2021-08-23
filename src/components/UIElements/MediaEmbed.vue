@@ -229,8 +229,9 @@ export default {
       return `${width}px`
     },
     flashProps() {
-      let filename = path.parse(this.url).name
-      if (/_hq/.test(filename)) filename = filename.substring(0, filename.length - 3)
+      // ID, before any underscores
+      let filename = path.parse(this.url).name.split("_")[0]
+      this.$logger.info("Getting flash props for", filename, this.url)
 
       const defaultProps = {
         id: filename, 
@@ -248,6 +249,7 @@ export default {
       return {...defaultProps, ...customProps}
     },
     audioTracks() {
+      this.$logger.info("Getting audio traks for", this.url.replace("_hq.swf", ".swf"))
       return this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
     },
     flashSrc() {

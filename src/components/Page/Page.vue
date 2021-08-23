@@ -92,6 +92,7 @@ export default {
 
       if (this.$archive.audioData[media[0]]) {
         let flashPath = media[0].substring(0, media[0].length-4)
+        this.$logger.info("Found audio for", media[0], "changing to", `${flashPath}_hq.swf`)
         media[0] = `${flashPath}_hq.swf`
       }
 
@@ -99,7 +100,7 @@ export default {
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
-            let img = new Image()
+            const img = new Image()
             img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
