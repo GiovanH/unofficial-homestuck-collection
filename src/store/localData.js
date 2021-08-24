@@ -47,6 +47,7 @@ class LocalData {
       notifications: true,
 
       showAddressBar: false,
+      urlTooltip: false,
       switchToNewTabs: false,
       forceScrollBar: true,
       smoothScrolling: true,
