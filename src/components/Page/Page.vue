@@ -92,7 +92,7 @@ export default {
 
       if (this.$archive.audioData[media[0]]) {
         let flashPath = media[0].substring(0, media[0].length-4)
-        this.$logger.info("Found audio for", media[0], "changing to", `${flashPath}_hq.swf`)
+        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
         media[0] = `${flashPath}_hq.swf`
       }
 

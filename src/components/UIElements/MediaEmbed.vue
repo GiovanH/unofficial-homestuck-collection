@@ -449,6 +449,8 @@ export default {
       let delay = 0
       if (cascadeDelay)
         delay = cascadeDelay
+      else if (this.audioTracks && this.audioTracks[0].audioDelay)
+        delay = this.audioTracks[0].audioDelay
       else if (replay && (`${this.flashProps.id}_replay`) in this.audioDelay)
         delay = this.audioDelay[`${this.flashProps.id}_replay`]
       else if (`${this.flashProps.id}_${n + 1}` in this.audioDelay)

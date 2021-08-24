@@ -45,7 +45,16 @@ export default {
   },
   computed: {
     flashUrl() {
-      return this.thisPage.media[0]
+      // Mirrored from Page.vue:pageMedia()
+      let media = Array.from(this.thisPage.media)
+      
+      if (this.$archive.audioData[media[0]]) {
+        let flashPath = media[0].substring(0, media[0].length-4)
+        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
+        media[0] = `${flashPath}_hq.swf`
+      }
+
+      return media[0]
     },
     needsNav() {
       // const base_url = this.flashUrl.split("/").slice(0, -1).join("/")
