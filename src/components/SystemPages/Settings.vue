@@ -215,7 +215,7 @@
           <dd class="settingDesc">
           Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
 
-          <SpoilerBox kind="Controversial Content">
+          <SpoilerBox kind="Controversial Content" :start-open="controversialAny">
 
             <template v-for="cc in controversialList">
               <dt><label>
