@@ -243,7 +243,7 @@ export default {
 
       let customProps = this.indexedFlashProps[filename] || {}
 
-      if (customProps)
+      if (Object.keys(customProps).length)
         this.$logger.info("Custom props for flash", filename, customProps)
 
       return {...defaultProps, ...customProps}
@@ -402,7 +402,7 @@ export default {
       if (this.audio.length < 1) {
         if (this.audioTracks.length > 0) {
           this.audioTracks.forEach(track => {
-            this.$logger.info("Adding track", track)
+            this.$logger.info("Adding track", track.href)
             this.audio.push(this.createAudioElement(track))
           })
         }

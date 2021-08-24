@@ -598,7 +598,7 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (['unpeachy', 'pxsTavros', 'bolin'].includes(setting)) {
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
         this.queueArchiveReload()
       }
 

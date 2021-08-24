@@ -200,7 +200,8 @@ function loadArchiveData(){
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
       search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8')),
-      audioData: {}
+      audioData: {},
+      flags: {}
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
