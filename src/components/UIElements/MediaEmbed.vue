@@ -492,7 +492,7 @@ export default {
       }
       let time
       let transition = 'height 0.2s'
-      let heightTo = this.flashProps.height
+      let heightTo = this.flashProps.height + 'px'
       switch (n) {
         case 'cascade1':
           time = 60900
@@ -534,7 +534,7 @@ export default {
         }, time)
       } else {
         this.$el.style.transition = transition
-        this.$el.style.height = this.flashProps.height
+        this.$el.style.height = heightTo
       }
     },
     startTimer(callback, delay){
