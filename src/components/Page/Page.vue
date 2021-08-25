@@ -20,7 +20,9 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
+                :nextPages="nextPagesArray" ref="pageNav"
+                :class="(hideNav ? 'hidden' : '')" />
           </div>
           <div 
             :class="note.class ? 'footnote ' + note.class : 'footnote'"
@@ -136,6 +138,9 @@ export default {
     },
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
+    },
+    hideNav(){
+      return this.thisPage.flag.includes('SWFNAV')
     },
     footnotes() {
       return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
