@@ -249,8 +249,9 @@ export default {
       return {...defaultProps, ...customProps}
     },
     audioTracks() {
-      this.$logger.info("Getting audio traks for", this.url.replace("_hq.swf", ".swf"))
-      return this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
+      const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
+      this.$logger.info("Getting audio tracks for", this.url.replace("_hq.swf", ".swf"), ret)
+      return ret
     },
     flashSrc() {
       return `
