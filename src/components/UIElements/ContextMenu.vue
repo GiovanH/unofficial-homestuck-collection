@@ -33,6 +33,7 @@
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
       <li @mouseup="googleSearch()">Search with Google</li>  
+      <li v-for="(action, index) in actionsText" :key="index" @mouseup="action.cb" v-text="action.title"></li>
     </ul>
     <template v-if="tags.includes('Input')">
       <ul>
@@ -51,11 +52,16 @@
       <li v-else @mouseup="openLinkInNewTab()">Open Link in New Tab</li>
       <li @mouseup="copyLink()">Copy Link</li>
       <li v-if="targetAnchor.innerText.length > 0" @mouseup="copyLinkText()">Copy Link Text</li>
+      <li v-for="(action, index) in actionsLink" :key="index" @mouseup="action.cb" v-text="action.title"></li>
     </ul>
     <ul v-if="tags.includes('Image')">
       <li @mouseup="openImage()">Open Image</li>
       <li @mouseup="openImageFile()">Open in Folder</li>      
       <li @mouseup="saveImage()">Save Image</li>
+      <li v-for="(action, index) in actionsImage" :key="index" @mouseup="action.cb" v-text="action.title"></li>
+    </ul>
+    <ul v-if="actionsEx.length">
+      <li v-for="(action, index) in actionsEx" :key="index" @mouseup="action.cb" v-text="action.title"></li>
     </ul>
     <ul v-if="$parent.zoomLevel != 0">
       <li @mouseup="resetZoom()">Reset Zoom</li>
@@ -76,6 +82,10 @@ export default {
   data(){
     return {
       tags: [],
+      actionsImage: [],
+      actionsLink: [],
+      actionsText: [],
+      actionsEx: [],
       target: undefined,
       targetAnchor: undefined,
       partnerEl: undefined,
