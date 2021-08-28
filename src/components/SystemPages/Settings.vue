@@ -337,7 +337,7 @@ export default {
       settingListBoolean: [
         {
           model: "showAddressBar",
-          label: "Always show jump box",
+          label: "Show address bar",
           desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
           model: "mspaMode",
