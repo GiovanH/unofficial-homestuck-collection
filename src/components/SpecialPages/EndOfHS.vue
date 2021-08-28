@@ -1,9 +1,15 @@
 <template>
-  <div class="pageBody" :class="bgClass">
+  <div class="pageBody" :class="bgClass" :data-pageid="`${storyNum}/${thisPage.pageId}`">
     <div class="tall">
       <div class="main">
         <div class="header">
           <Banner :id="tab.key" :page="thisPage"/>
+        </div>
+        <div 
+          :class="note.class ? 'preface ' + note.class : 'preface'"
+          v-for="note in prefaces">
+          <p v-html="note.content"/>
+          <span v-if="note.author" class="author" v-text="note.author" />
         </div>
         <div class="vid">
           <Media :url="thisPage.media[0]" />
@@ -11,6 +17,12 @@
         <div class="links">
           <FlashCredit  :pageId="thisPage.pageId" />
           <PageNav base="mspa" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+        </div>
+        <div 
+          :class="note.class ? 'footnote ' + note.class : 'footnote'"
+          v-for="note in footnotes">
+          <p v-html="note.content"/>
+          <span v-if="note.author" class="author" v-text="note.author" />
         </div>
       </div>
     </div>
@@ -50,11 +62,21 @@ export default {
     storyNum() {
       return this.$getStory(this.pageNum)
     },
+    footnotes() {
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
+    },
+    prefaces() {
+      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
+    },
     thisPage() {
-      return this.$archive.mspa.story[this.pageNum]
+      return {
+        ...this.$archive.mspa.story[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
     },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         nextPages.push(this.$archive.mspa.story[nextID])
@@ -85,6 +107,50 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
+
+    .footnote {
+      width: 600px;
+      // border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
+      padding: 30px 25px;
+      p {
+        text-align: center;
+        margin: 0 auto;
+        width: 600px;
+      }
+    }
+    .preface {
+      width: 600px;
+      margin: 1em 0;
+
+      border-style: dashed;
+      border-width: 1px;
+
+      border-color: var(--page-log-border);
+      background-color: var(--page-pageFrame);
+      color: var(--page-nav-divider);
+      p {
+        text-align: center;
+        margin: 0 auto;
+        width: 600px;
+      }
+    }
+
+    .footnote, .preface {
+      .author {
+        font-weight: 300;
+        font-size: 10px;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+
+        display: flex;
+        justify-content: flex-end;
+
+        position: relative;
+        top: 12px;
+        margin-top: -12px;
+
+        color: var(--page-nav-meta);
+      }
+    }
 
     &.collide {
       background: #000;

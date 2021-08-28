@@ -22,8 +22,8 @@ export default {
   components: {
   },
   props: [
-		'useCustomStyles'
-	],
+    'useCustomStyles'
+  ],
   data: function() {
     return {
       urls: [
@@ -84,7 +84,7 @@ export default {
     },
     getLabel(href){
       // Tries to get a themed label, otherwise just prints the URL
-      return (this.labels[this.$root.theme] || this.labels[''])[href] || href
+      return (this.labels[this.$root.tabTheme] || this.labels[''])[href] || href
     }
   },
   computed: {

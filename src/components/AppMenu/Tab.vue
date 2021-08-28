@@ -86,7 +86,7 @@ export default {
     height: 28px;
     cursor: default;
 
-    &:not(&.activeTab) {
+    &:not(.activeTab) {
       &:hover {
         background: var(--header-buttonHoverState);
       }

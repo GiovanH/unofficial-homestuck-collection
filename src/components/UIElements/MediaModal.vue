@@ -8,8 +8,7 @@
 				<div class="modalLinks">
 					<span v-text="splitPath[0]" @click.prevent="openItemInFolder()" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem()" />
 				</div>
-
-        		<FlashCredit :pageId="this.contentId"/>
+				<FlashCredit :pageId="this.contentId"/>
 			</div>
 		</div>
 	</transition>
@@ -39,7 +38,7 @@ export default {
 			return [this.url.slice(0, this.url.lastIndexOf('/')), this.url.slice(this.url.lastIndexOf('/')+1)]
 		},
 		contentId() {
-			return this.$resolveURL(this.url)
+			return this.$getResourceURL(this.url)
 		}
 	},
 	methods: { 

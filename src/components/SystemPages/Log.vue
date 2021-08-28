@@ -4,24 +4,22 @@
     <div class="pageFrame" v-if="log">
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
-        <a :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
-        <div class="logItems">
+        <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
+        <div class="logItems" v-if="log.length > 0">
           <template v-for="page in log">
             {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
           </template>
         </div>
+        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
       </div>
     </div>
     <div class="pageFrame noLog" v-else >
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <div class="adventureLinks">
-          <div class="adventure"><a href="/log/1"><Media url="/images/archive_jb.gif" /><br>Jailbreak</a></div>
-          <div class="adventure"><a href="/log/2"><Media url="/images/archive_bq.gif" /><br>Bard Quest</a></div>
-          <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
-          <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
-          <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
-          <div class="adventure"><a href="/log/ryanquest"><Media url="/images/archive_rq.png" /><br>Ryanquest</a></div>
+          <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
+            <a :href="advlink.href"><Media :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
+          </div>
         </div>
       </div>
     </div>
@@ -34,6 +32,7 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 const { DateTime } = require('luxon');
 
@@ -50,7 +49,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, PageFooter
+    NavBanner, Media, PageFooter, MediaEmbed
   },
   data: function() {
     return {
@@ -58,7 +57,15 @@ export default {
       sortNames: {
         asc: 'oldest to newest',
         desc: 'newest to oldest'
-      }
+      },
+      adventureLinks: [
+          {href: "/log/1", img: "/images/archive_jb.gif", label: "Jailbreak"},
+          {href: "/log/2", img: "/images/archive_bq.gif", label: "Bard Quest"},
+          {href: "/log/4", img: "/images/archive_ps.gif", label: "Problem Sleuth"},
+          // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
+          {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
+          // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
+      ]
     }
   },
   computed: {
@@ -116,9 +123,7 @@ export default {
       // The unsorted story log
       this.$archive;
 
-      // console.log("Recalculating raw story log memo")
       // Vue should really be able to keep track of this, but it just can't. 
-      // TODO: story_id is user-input, needs to be error checked
       
       return this.memoized(story_id => {
         // console.log("Recalculating raw story log (BAD)")
@@ -181,6 +186,10 @@ export default {
       align-content: center;
       .pageContent{
         background: var(--page-pageContent);
+
+        .pageContent img {
+            max-width: 100%;
+        }
         
         width: 650px;     
         h2.pageTitle {

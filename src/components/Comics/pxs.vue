@@ -108,8 +108,7 @@ export default {
       return this.$archive.comics.pxs.comics[this.routeParams.cid]
     },
     comicPage() {
-      if (this.routeParams.cid == 'summerteen-romance' && this.routeParams.pid == '31' && this.$localData.settings.pxsTavros) return '/archive/comics/pxs/52-summerteen-romance/31_old.png'
-      else return this.comic.pages[this.routeParams.pid-1]
+      return this.comic.pages[this.routeParams.pid-1]
     },
     titleText() {
       return this.comic.titleText[this.routeParams.pid]

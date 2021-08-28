@@ -9,7 +9,6 @@ const store = new Store()
 
 const log = require('electron-log');
 log.transports.console.format = '[{level}] {text}';
-const logger = log.scope('Vue');
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -56,8 +55,8 @@ Vue.mixin(Memoization.mixin)
 Vue.mixin({
   data(){
     return {
-      $appVersion: '1.1.0',
-      $expectedAssetVersion: '1'
+      $appVersion: '2.0.0',
+      $expectedAssetVersion: '2'
     }
   },
   computed: {
@@ -66,24 +65,28 @@ Vue.mixin({
     $isNewReader() {
       return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
     },
-    $modChoices: () => Mods.modChoices // This is the list of installed mods, it's okay to bake this
+    $modChoices: Mods.getModChoices,
+    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
   },
   methods: {
     $resolvePath(to){
       // Resolves a logical path within the vue router
+      // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to.toLowerCase()).route
       const base = route.path.slice(1).split("/")[0]
-      const vizBases = ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck']
 
       let resolvedUrl = route.path
 
       if (!this.$localData.settings.mspaMode && base == 'mspa') {
+        // Route /mspa/# to /homestuck/#
         const vizNums = this.$mspaToViz(route.params.p)
         if (vizNums) resolvedUrl = `/${vizNums.s}/${vizNums.p}`
-      } else if (this.$localData.settings.mspaMode ) {
+      } else if (this.$localData.settings.mspaMode) {
         if (base == 'mspa') {
-          if (route.params.p.padStart(6, '0') in this.$archive.mspa.story) resolvedUrl =  `/mspa/${route.params.p.padStart(6, '0')}` 
-        } else if (vizBases.includes(base)) {
+          let p_padded = route.params.p.padStart(6, '0')
+          if (p_padded in this.$archive.mspa.story) resolvedUrl =  `/mspa/${p_padded}` 
+        } else if (this.$isVizBase(base)) {
+          // Route /homestuck/# to /mspa/#
           const mspaNums = this.$vizToMspa(base, route.params.p)
           if (mspaNums.p) resolvedUrl = `/mspa/${mspaNums.p}`
         }
@@ -111,15 +114,13 @@ Vue.mixin({
       if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
-          // TODO: Why are we doing this? This requires everyone to have steam installed, and gives a cryptic protocol error if they don't.
-          // If we must do this we should check for a steam installation, eat least
           ipcRenderer.invoke('steam-open', urlObject.href)
         } else shell.openExternal(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
         shell.openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        logger.error("UNCAUGHT ASSET?", to)
+        this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
       } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
@@ -127,10 +128,8 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    // TODO: resolveURL is perhaps a bad name because this doesn't resolve assets:// urls yet?
-    // that's not handled until Resources.resolveAssetsProtocol or Resources.resolveURL() (which does both)
-    $resolveURL: Resources.getResourceURL,
-    $filterURL(u) {return this.$resolveURL(u)},
+    $getResourceURL: Resources.getResourceURL,
+    $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       const url = this.$resolvePath(to)
       this.$localData.root.TABS_PUSH_URL(url, key)
@@ -169,7 +168,6 @@ Vue.mixin({
       return undefined
     },
     $getAllPagesInStory(story_id, incl_secret=false) {
-      // TODO: Datadriven this
       const page_nums = []
       if (story_id == '1'){
         for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
@@ -299,22 +297,25 @@ Vue.mixin({
       }
     },
     $updateNewReader(thisPageId, forceOverride = false) {
-      // TODO: Rewrite $updateNewReader for datadriven
       const isSetupMode = !this.$archive
-      if (!/\D/.test(thisPageId) && '000219' <= thisPageId && thisPageId <= '010030' && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      const isNumericalPage = /\D/.test(thisPageId)
+      const isInRange = '000219' <= thisPageId && thisPageId <= this.$archive.tweaks.endOfHSPage // in the "keep track of spoilers" range
+
+      if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
-        // murder me for this horrible block of if-statements if you want, but stack overflow tells me its faster than the switch I was originall working with so shrug
         if (!isSetupMode) {
-          // DISC TRANSITIONS + CASCADE SCRAPBOOK
-          if (thisPageId == '005643') nextLimit = '005644'
-          else if (thisPageId == '005984') nextLimit = '005985'
-          else if (thisPageId == '006000') nextLimit = '006001'
+          // Calculate nextLimit
+          var offByOnePages = this.$archive.tweaks.offByOnePages
+
+          if (offByOnePages.includes(thisPageId)) {
+            nextLimit = (parseInt(thisPageId) + 1).pad(6)
+          }
 
           // A6 CHARACTER SELECTS
-          else if ('006021' <= thisPageId  && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
-          else if ('006369' <= thisPageId  && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
+          else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
+          else if ('006369' <= thisPageId && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
 
           // A6A5A1x2 COMBO
           else if ('007688' <= thisPageId && thisPageId <='007825') {
@@ -330,34 +331,6 @@ Vue.mixin({
             }
             nextLimit = nextPageId
           }
-
-          // JOHN CURSOR
-          else if (thisPageId == '008105') nextLimit = '008106'
-
-          // HOMOSUCK PIANO
-          else if (thisPageId == '008143') nextLimit = '008144'
-
-          // A6A6I1 GLITCHED CHARACTER SELECTS
-          else if (thisPageId == '008282') nextLimit = '008283'
-          else if (thisPageId == '008297') nextLimit = '008298'
-          else if (thisPageId == '008301') nextLimit = '008302'
-          else if (thisPageId == '008305') nextLimit = '008306'
-          else if (thisPageId == '008316') nextLimit = '008317'
-
-          // TEREZI RETCON QUEST
-          else if (thisPageId == '009057') nextLimit = '009058'
-          else if (thisPageId == '009108') nextLimit = '009109'
-          else if (thisPageId == '009134') nextLimit = '009135'
-          else if (thisPageId == '009149') nextLimit = '009150'
-          else if (thisPageId == '009187') nextLimit = '009188'
-          else if (thisPageId == '009203') nextLimit = '009204'
-          else if (thisPageId == '009221') nextLimit = '009222'
-          else if (thisPageId == '009262') nextLimit = '009263'
-            
-          // CREDITS
-          else if (thisPageId == '010029') nextLimit = '010030'
-          else if (thisPageId == '010030') this.$localData.root.NEW_READER_CLEAR()
-
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
           else nextLimit = [...this.$archive.mspa.story[thisPageId].next].sort()[0]
@@ -365,20 +338,22 @@ Vue.mixin({
         // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
-        if (thisPageId == '010030') {
+        if (thisPageId == this.$archive.tweaks.endOfHSPage) {
+          // Finished Homestuck.
+          this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
           const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
           const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
-          // slap some retcons in there as well cause it's not like this function was long enough already
+          // If you've reached that page where a retcon happened, mark the flag.
           if (resultCurrent) {
-            this.$localData.settings.retcon1 = resultCurrent >= '007999'
-            this.$localData.settings.retcon2 = resultCurrent >= '008053'
-            this.$localData.settings.retcon3 = resultCurrent >= '008317'
-            this.$localData.settings.retcon4 = resultCurrent >= '008991'
-            this.$localData.settings.retcon5 = resultCurrent >= '009026'
-            this.$localData.settings.retcon6 = resultCurrent >= '009057'
+            this.$localData.settings.retcon1 = (resultCurrent >= '007999')
+            this.$localData.settings.retcon2 = (resultCurrent >= '008053')
+            this.$localData.settings.retcon3 = (resultCurrent >= '008317')
+            this.$localData.settings.retcon4 = (resultCurrent >= '008991')
+            this.$localData.settings.retcon5 = (resultCurrent >= '009026')
+            this.$localData.settings.retcon6 = (resultCurrent >= '009057')
           }
           
           if (resultCurrent || resultLimit) {
@@ -386,7 +361,16 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else logger.warn("Invalid page ID, not setting")
+      } else this.$logger.warn("Invalid page ID, not updating progress")
+    },
+    $shouldRetcon(retcon_id){
+      console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
+      // If fast-forward, always retcon.
+      if (this.$localData.settings.fastForward)
+        return true
+
+      // Else, only if the flag is set.
+      return this.$localData.settings[retcon_id]
     },
     $popNotif(id) {
       this.$root.$children[0].$refs.notifications.queueNotif(id)
@@ -400,10 +384,10 @@ Vue.mixin({
       const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
 
       if (timestamp > latestTimestamp) {
-        // logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"
-        // logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
+        // this.$logger.info(`Checked timestamp ${DateTime.fromSeconds(Number(timestamp)).setZone(time_zone).toFormat("MM/dd/yy")} is earlier than ${DateTime.fromSeconds(Number(latestTimestamp)).setZone(time_zone).toFormat("MM/dd/yy")}, spoilering`)
         
         return true
       } else return false
@@ -412,7 +396,10 @@ Vue.mixin({
       // The new-reader setting is split into two values: "current", and "limit"
       // "current" is the highest page the reader has actually visited. By setting "useLimit" to false, you can use this function to only display content up to a point the reader has seen.
       // "limit" is the highest page the reader is *allowed* to visit. This is generally set one page ahead of the current page, but in some circumstances like character select screens, it can go much further.
-      // TODO: Better document this "friendsim" and "pesterquest" behavior
+      
+      // "Hiveswap Friendsim" and "Pesterquest" are pseudopages used by the bandcamp viewer
+      // to reference tracks and volumes, i.e. "Pesterquest: Volume 14"
+
       const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
       const parsedPage = parseInt(page)
       return this.$isNewReader && (
@@ -458,7 +445,7 @@ Vue.mixin({
         else if (ref == 'cherubim') date = this.$archive.mspa.story['007882'].timestamp // After Interfishin, right when Caliborn/Calliope expodump begins
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
-        logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
+        this.$logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
         return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
       } else return false
     }
@@ -469,6 +456,7 @@ window.vm = new Vue({
   data(){
     return {
       theme: 'default',
+      tabTheme: 'default',
       archive: undefined
     }
   },
@@ -478,8 +466,9 @@ window.vm = new Vue({
     '$localData.settings.devMode'(to, from){
       const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
-      logger.silly("Dev-only")
-      logger.info("Everybody")
+      this.$logger.silly("Verbose log message for devs")
+      this.$logger.info("Log message for everybody")
+      this.$localData.VM.saveLocalStorage()
     }
   }
 }).$mount('#app')

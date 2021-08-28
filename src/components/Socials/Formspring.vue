@@ -76,14 +76,14 @@ export default {
   },
   computed: {
     posts() {
-      let filteredPosts = this.$isNewReader ? this.$archive.social.formspring[this.profile].filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp) : [...this.$archive.social.formspring[this.profile]]
+      const filteredPosts = this.$isNewReader ? this.$archive.social.formspring[this.profile].filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp) : [...this.$archive.social.formspring[this.profile]]
       return this.reverse ? filteredPosts.reverse() : filteredPosts
     },
     filteredPostCount() {
       return this.$archive.social.formspring[this.profile].length - this.posts.length
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },
@@ -103,7 +103,7 @@ export default {
   },
   watch: {
     'tab.history': function (to, from) {
-      if (/^question/.test(this.routeParams.id) && this.$isNewReader) this.profile = 'mspadventures'
+      if (/^question/.test(this.routeParams.id) || this.$isNewReader) this.profile = 'mspadventures'
       else this.profile = 'andrewhussie'
 
       this.jumpToClass(this.routeParams.id)
@@ -113,7 +113,7 @@ export default {
     this.jumpToClass(this.routeParams.id)
   },
   created(){
-    if (/^question/.test(this.routeParams.id) && this.$isNewReader) this.profile = 'mspadventures'
+    if (/^question/.test(this.routeParams.id) || this.$isNewReader) this.profile = 'mspadventures'
     else this.profile = 'andrewhussie'
   }
 }

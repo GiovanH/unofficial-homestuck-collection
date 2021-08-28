@@ -47,6 +47,7 @@ class LocalData {
       notifications: true,
 
       showAddressBar: false,
+      urlTooltip: false,
       switchToNewTabs: false,
       forceScrollBar: true,
       smoothScrolling: true,
@@ -55,8 +56,11 @@ class LocalData {
       bandcampEmbed: true,
       devMode: false,
 
-      themeOverride: "",
+      themeOverride: "default",
+      themeOverrideUI: "default",
       forceThemeOverride: false,
+      forceThemeOverrideUI: false,
+
       textOverride: {
         fontFamily: "",
         bold: false,
@@ -69,6 +73,8 @@ class LocalData {
       jsFlashes: true,
       credits: true,
       footnotes: false,
+
+      fastForward: false,
 
       retcon1: true,
       retcon2: true,
@@ -126,6 +132,15 @@ class LocalData {
             saveData,
             settings
           })
+        },
+        reloadLocalStorage() {
+          let back = store.get('localData', {})
+
+          this.assetDir = back.assetDir
+          this.tabData = back.tabData
+          this.saveData = back.saveData
+          this.settings = back.settings
+          console.log(this.settings)
         },
         TABS_RESET() {
           this.$set(this, 'tabData', {
