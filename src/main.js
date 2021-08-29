@@ -382,8 +382,15 @@ Vue.mixin({
       if (!this.$isNewReader) return false
 
       const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+      let nextTimestamp
+      try {
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$localData.settings.newReader.current].next[0]].timestamp
+      } catch {
+        this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
+        nextTimestamp = latestTimestamp
+      }
 
-      if (timestamp > latestTimestamp) {
+      if (timestamp > nextTimestamp) {
         // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"
