@@ -37,7 +37,8 @@ export default {
       notifDuration: 10000,
       activeNotifs: [],
       queue: [],
-      allowEOH: false
+      allowEOH: false,
+      DateTime: require('luxon').DateTime
     }
   },
   computed: {
@@ -48,13 +49,44 @@ export default {
         acc[n.timestamp] = n
         return acc
       })
+    },
+    sortedNewspostTimestamps() {
+      return Object.keys(this.newspostsByTimestamp).sort()
     }    
   },
   methods: {
+    formatTimestamp(timestamp){
+      return this.DateTime.fromSeconds(Number(timestamp))
+        .setZone("America/New_York")
+        .toFormat("MM/dd/yyyy, ttt")
+    },
     // This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
     // We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
     allowEndOfHomestuck() {
       this.allowEOH = true
+    },
+    timestampsBetween(time1, time2, corpus) {
+      // Returns all values in `corpus` that are between `time1` and `time2`.
+      // Corpus is expected to be sorted already.
+
+      // Time1 is the "current" timestamp
+      // Time2 is the "next" timestamp
+      // Corpus is a sorted list of all the timestamps
+
+      if (time2 <= time1) return []
+
+      // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
+
+      let ret = []
+      let newst = -1
+      for (let i = 0; newst <= time2; newst = corpus[i++]) {
+        if (newst > time1) {
+          ret.push(newst)
+          // this.$logger.info("Found", this.formatTimestamp(newst))
+        }
+      }
+
+      return ret
     },
     queueFromPageId(pageId) {
       if (pageId == '010030') {
@@ -67,25 +99,34 @@ export default {
       }
 
       // Timestamp-based notifications
-
-      const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
-      const prevTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].previous].timestamp
       
       if (this.$localData.settings.subNotifications) {
         try {
-          // TODO: Optimize this so we're not iterating this much
-          this.$logger.info(prevTimestamp, latestTimestamp, latestTimestamp - prevTimestamp)
-          for (const newst in this.newspostsByTimestamp) {
-            if (newst > prevTimestamp && newst <= latestTimestamp) {
-              this.$logger.info(prevTimestamp, newst, latestTimestamp)
-              this.queueNotif({
-                title: 'New news post',
-                desc: 'wowie!',
-                url: '/news',
-                thumb: '/archive/collection/archive_skaianet.png'
-              })
-            }
-          }
+          // See also $timestampIsSpoiler
+          // but we can't reuse that logic because we're passing an explicit time point here
+          const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
+          const nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].next[0]].timestamp
+
+          // Newsposts
+          const news_between = this.timestampsBetween(
+            latestTimestamp, nextTimestamp, 
+            this.sortedNewspostTimestamps
+          )
+          news_between.forEach(newst => {
+            this.$logger.info(nextTimestamp, newst, nextTimestamp)
+
+            let d = document.createElement("div")
+            const desc_length = 140
+            d.innerHTML = this.newspostsByTimestamp[newst].html
+            const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
+
+            this.queueNotif({
+              title: 'New news post',
+              desc: desc,
+              url: `/news/${this.newspostsByTimestamp[newst].id}`,
+              thumb: '/archive/collection/archive_news.png'
+            })
+          })
         } catch (e) {
           this.$logger.warn("Couldn't compute timestamp", e)
         }

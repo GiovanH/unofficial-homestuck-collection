@@ -253,7 +253,7 @@ module.exports = {
 
     notif_snaps: {
       title: 'UNLOCKED COMIC: SNAPCHAT',
-      desc: 'Snapshots of life on Earth C. No longer canon as of The Epilogues.',
+      desc: 'Snapshots of life on Earth C. No longer "canon" as of The Epilogues.',
       url: '/snaps',
       thumb: '/archive/collection/archive_snaps.png'
     },
