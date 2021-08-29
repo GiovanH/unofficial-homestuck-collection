@@ -6,13 +6,13 @@
         <div class="innerClose">✕</div>
       </button>
 
-      <a class="frame" :href="notifData[notif.notifId].url" target="_blank" @click="clearNotif(notif.key)">
+      <a class="frame" :href="notif.url" target="_blank" @click="clearNotif(notif.key)">
         <div class="innerFrame">
-          <Media class="thumb" :url="notifData[notif.notifId].thumb" draggable="false" />
+          <Media class="thumb" :url="notif.thumb" draggable="false" />
           <div class="arrow">></div>
           <div class="info">
-            <span class="title" v-text="notifData[notif.notifId].title"></span>
-            <span class="desc" v-text="notifData[notif.notifId].desc"></span>
+            <span class="title" v-text="notif.title"></span>
+            <span class="desc" v-text="notif.desc"></span>
           </div>
         </div>
       </a>
@@ -60,10 +60,10 @@ export default {
       if (pageId == '010030') {
         if (this.allowEOH) {
           this.allowEOH = false
-          this.notifPages['010030'].forEach(notifId => this.queueNotif(notifId))
+          this.notifPages['010030'].forEach(notifId => this.queueNotif(notifData[notifId]))
         } 
       } else if (pageId in this.notifPages) {
-        this.notifPages[pageId].forEach(notifId => this.queueNotif(notifId))
+        this.notifPages[pageId].forEach(notifId => this.queueNotif(notifData[notifId]))
       }
 
       // Timestamp-based notifications
@@ -71,14 +71,19 @@ export default {
       const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
       const prevTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].previous].timestamp
       
-      if (this.$settings.subNotifications) {
+      if (this.$localData.settings.subNotifications) {
         try {
           // TODO: Optimize this so we're not iterating this much
           this.$logger.info(prevTimestamp, latestTimestamp, latestTimestamp - prevTimestamp)
           for (const newst in this.newspostsByTimestamp) {
             if (newst > prevTimestamp && newst <= latestTimestamp) {
               this.$logger.info(prevTimestamp, newst, latestTimestamp)
-              this.queueNotif('notif_news')
+              this.queueNotif({
+                title: 'New news post',
+                desc: 'wowie!',
+                url: '/news',
+                thumb: '/archive/collection/archive_skaianet.png'
+              })
             }
           }
         } catch (e) {
@@ -86,21 +91,24 @@ export default {
         }
       }
     },
-    queueNotif(notifId) {
-      if (notifId in this.notifData) {
-        let key = Math.random().toString(36).substring(2, 5) + Date.now()
+    queueNotif(notif) {
+      // Add notification to the queue and fire it if there's room to display it.
+      let key = Math.random().toString(36).substring(2, 5) + Date.now()
+      const notifEntry = {...notif, key} // Add key to notif object
 
-        if (this.activeNotifs.length < 3) this.fireNotif({key, notifId})
-        else this.queue.push({key, notifId})
-      }
+      if (this.activeNotifs.length < 3) this.fireNotif(notifEntry)
+      else this.queue.push(notifEntry)
     },
     fireNotif(queuedNotif) {
+      // Add notification to activeNotifs and also queue its removal
       let timer = setTimeout(()=>{
         this.clearNotif(queuedNotif.key)
       }, this.notifDuration)
-      this.activeNotifs.push({...queuedNotif, timer})
+      this.activeNotifs.push({...queuedNotif, timer}) // Add timer to notif object
     },
     clearNotif(key) {
+      // Remove notification with key `key` from activeNotifs
+      // If there are more notifications in the queue, process the queue.
       let notif = this.activeNotifs.findIndex(notif => notif.key == key)
       if (notif > -1) {
         clearTimeout(this.activeNotifs[notif].timer)

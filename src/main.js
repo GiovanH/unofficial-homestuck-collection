@@ -361,7 +361,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else this.$logger.warn("Invalid page ID, not updating progress")
+      } else this.$logger.warn(`Invalid page ID '${thisPageId}', not updating progress`)
     },
     $shouldRetcon(retcon_id){
       console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
