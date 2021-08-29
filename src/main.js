@@ -378,6 +378,9 @@ Vue.mixin({
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
+    $pushNotif(notif) {
+      this.$root.$children[0].$refs.notifications.queueNotif(notif)
+    },
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
