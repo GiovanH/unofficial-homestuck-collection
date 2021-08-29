@@ -11,8 +11,8 @@
           <Media class="thumb" :url="notifData[notif.notifId].thumb" draggable="false" />
           <div class="arrow">></div>
           <div class="info">
-            <span class="title">{{notifData[notif.notifId].title}}</span>
-            <span class="desc">{{notifData[notif.notifId].desc}}</span>
+            <span class="title" v-text="notifData[notif.notifId].title"></span>
+            <span class="desc" v-text="notifData[notif.notifId].desc"></span>
           </div>
         </div>
       </a>
@@ -24,9 +24,6 @@
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import {notifData, notifPages} from '@/js/notifications.js'
-const log = require('electron-log')
-
-const logger = log.scope('Notif')
 
 export default {
   name: 'Notifications',
@@ -53,9 +50,9 @@ export default {
       })
     }    
   },
-  methods:{
-    //This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
-    //We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
+  methods: {
+    // This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
+    // We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
     allowEndOfHomestuck() {
       this.allowEOH = true
     },
@@ -65,8 +62,7 @@ export default {
           this.allowEOH = false
           this.notifPages['010030'].forEach(notifId => this.queueNotif(notifId))
         } 
-      }
-      else if (pageId in this.notifPages) {
+      } else if (pageId in this.notifPages) {
         this.notifPages[pageId].forEach(notifId => this.queueNotif(notifId))
       }
 
@@ -78,15 +74,15 @@ export default {
       if (this.$settings.subNotifications) {
         try {
           // TODO: Optimize this so we're not iterating this much
-          logger.info(prevTimestamp, latestTimestamp, latestTimestamp - prevTimestamp)
+          this.$logger.info(prevTimestamp, latestTimestamp, latestTimestamp - prevTimestamp)
           for (const newst in this.newspostsByTimestamp) {
             if (newst > prevTimestamp && newst <= latestTimestamp) {
-              logger.info(prevTimestamp, newst, latestTimestamp)
+              this.$logger.info(prevTimestamp, newst, latestTimestamp)
               this.queueNotif('notif_news')
             }
           }
         } catch (e) {
-          logger.warn("Couldn't compute timestamp", e)
+          this.$logger.warn("Couldn't compute timestamp", e)
         }
       }
     },
@@ -223,7 +219,6 @@ export default {
   }
 }
 
-
 .notif-list-enter, .notif-list-leave-to {
   opacity: 0;
   transform: translateY(100%);
@@ -236,4 +231,3 @@ export default {
 }
 
 </style>
-
