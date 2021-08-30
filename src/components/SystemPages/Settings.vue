@@ -681,6 +681,13 @@ export default {
       this.$forceUpdate()
     }
   },
+  mounted(){
+    if (this.routeParams.sec) {
+      this.$nextTick(() => {
+        this.$el.querySelector(`.settings.${this.routeParams.sec}`).scrollIntoView(true)
+      })
+    }
+  },
   watch: {
     newReaderPage(to, from) {
       if (this.$localData.settings.mspaMode)

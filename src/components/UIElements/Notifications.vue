@@ -88,6 +88,27 @@ export default {
 
       return ret
     },
+    makeNewsNotif(newspost){
+      let d = document.createElement("div")
+      const desc_length = 140
+      d.innerHTML = newspost.html
+      const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
+
+      return {
+        title: 'New news post',
+        desc: desc,
+        url: `/news/${newspost.id}`,
+        thumb: '/archive/collection/archive_news.png'
+      }
+    },
+    makeModUnlockNotif(modChoice){
+      return {
+        title: 'NEW MOD UNLOCKED',
+        desc: modChoice.label,
+        url: `/settings/mod`,
+        thumb: '/archive/collection/archive_desktops.png'
+      }
+    },
     queueFromPageId(pageId) {
       if (pageId == '010030') {
         if (this.allowEOH) {
@@ -96,6 +117,13 @@ export default {
         } 
       } else if (pageId in this.notifPages) {
         this.notifPages[pageId].forEach(notifId => this.queueNotif(notifData[notifId]))
+      }
+
+      for (const modKey in this.$modChoices) {
+        const modChoice = this.$modChoices[modKey]
+        if (modChoice.locked == pageId) {
+            this.queueNotif(this.makeModUnlockNotif(modChoice))
+        }
       }
 
       // Timestamp-based notifications
@@ -115,17 +143,7 @@ export default {
           news_between.forEach(newst => {
             this.$logger.info(nextTimestamp, newst, nextTimestamp)
 
-            let d = document.createElement("div")
-            const desc_length = 140
-            d.innerHTML = this.newspostsByTimestamp[newst].html
-            const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
-
-            this.queueNotif({
-              title: 'New news post',
-              desc: desc,
-              url: `/news/${this.newspostsByTimestamp[newst].id}`,
-              thumb: '/archive/collection/archive_news.png'
-            })
+            this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
           })
         } catch (e) {
           this.$logger.warn("Couldn't compute timestamp", e)
