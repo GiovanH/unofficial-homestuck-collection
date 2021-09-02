@@ -8,20 +8,21 @@
           <div class="center">
             <h2>ART CREDITS</h2>
 
-            After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, I began including contributions from other artists into the animations. The artists are credited here. 
+            After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here. 
 
             <br><br>
             -------------------------------------------------------
             <br><br>
             
-            <template v-for="credit in artCredits">
-              <div class="artCredit" v-if="credit.pages.every(p => !$pageIsSpoiler(p))">
+            <template v-for="(credit, ci) in artCredits">
+              <div class="artCredit" :key="ci" v-if="!credit.pages.some(p => $pageIsSpoiler(p))">
                 <template v-for="(page, pi) in credit.pages" >
-                  <span v-if="page === '-'"> through </span>
+                  <span v-if="page === '-'" :key="`${pi}a`"> through </span>
                   <template v-else>
                     <StoryPageLink 
                       :mspaId='page' credit
-                      class="artCreditLink">
+                      class="artCreditLink"
+                      :key="`${pi}b`">
                     </StoryPageLink>
                   </template>
 
@@ -44,14 +45,29 @@
           <div class="archiveCredits">
             <h2>Archive credits:</h2>
             <dl>
-              <template v-for="credit in archiveCredits">
-                <dt>
+              <template v-for="(credit, ci) in archiveCredits">
+                <dt :key="`${ci}a`">
                   <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
                   <span v-else>{{credit.name}}</span>
                 :</dt>
-                <dd v-html="credit.desc"></dd>
+                <dd v-html="credit.desc" :key="`${ci}b`"></dd>
               </template>
             </dl>
+            <hr />
+            <div class="legal">
+              Legal:
+<pre>The Unofficial Homestuck Collection
+Copyright (C) 2020, 2021 Bambosh et al.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+</pre>
+              <p>
+                In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -296,6 +312,13 @@ export default {
         .logo {
           margin-bottom: 25px;
         }
+        .legal {
+          margin: 1em 0;
+          pre {
+            white-space: pre-wrap;
+            opacity: 0.6; // Not obfuscation, just coloring >.>
+          }
+        }
         .artCredits {
           width: 650px;
 
@@ -342,6 +365,7 @@ export default {
           .archiveCredits {
             width: 600px;
             margin: 0 auto;
+            padding-bottom: 2em;
             h2 {
              text-align: center;
             }
