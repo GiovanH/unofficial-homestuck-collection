@@ -6,10 +6,10 @@
         <h2>New Reader Mode</h2>
         <div class="newReaderInput" v-if="$isNewReader">
           <p>New reader mode enabled.<br>Currently up to page 
-            <!-- <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>. -->
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $localData.settings.newReader.current}" v-model="newReaderPage">
+            <!-- <strong>{{$mspaOrVizNumber(this.$newReaderCurrent)}}</strong>. -->
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $newReaderCurrent}" v-model="newReaderPage">
           </p><br>
-          <button v-if="newReaderValidation && (newReaderPage != $localData.settings.newReader.current)" @click="changeNewReader()">Set adjusted page</button>
+          <button v-if="newReaderValidation && (newReaderPage != $newReaderCurrent)" @click="changeNewReader()">Set adjusted page</button>
           <br />
           <button @click="clearNewReader()">Switch off new reader mode</button>
         </div>
@@ -471,7 +471,7 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
-      newReaderPage: this.$localData.settings.newReader.current || 
+      newReaderPage: this.$newReaderCurrent || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
       newReaderValidation: true,
       allControversial: [
@@ -528,7 +528,7 @@ export default {
           if (answer === true)
             this.$updateNewReader(pageId, true)
           else
-            this.newReaderPage = this.$localData.settings.newReader.current
+            this.newReaderPage = this.$newReaderCurrent
         })
       }
     },
@@ -550,7 +550,7 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
+          this.newReaderPage = this.$mspaOrVizNumber(this.$newReaderCurrent)
           this.$localData.root.NEW_READER_CLEAR()
         }
       })

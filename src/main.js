@@ -63,7 +63,10 @@ Vue.mixin({
     $localhost: () => `http://127.0.0.1:${port}/`,
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
+      return this.$newReaderCurrent&& this.$localData.settings.newReader.limit
+    },
+    $newReaderCurrent() {
+      return this.$localData.settings.newReader.current
     },
     $modChoices: Mods.getModChoices,
     $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
@@ -343,7 +346,7 @@ Vue.mixin({
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
-          const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
+          const resultCurrent = (forceOverride || !this.$newReaderCurrent || this.$newReaderCurrent < thisPageId) ? thisPageId : false
           const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
           // If you've reached that page where a retcon happened, mark the flag.
@@ -381,7 +384,7 @@ Vue.mixin({
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
-      const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+      const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
 
       if (timestamp > latestTimestamp) {
         // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
@@ -446,7 +449,7 @@ Vue.mixin({
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
         this.$logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
-        return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+        return date > this.$archive.mspa.story[this.$newReaderCurrent].timestamp
       } else return false
     }
   } 

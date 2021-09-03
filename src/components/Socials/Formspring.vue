@@ -76,7 +76,7 @@ export default {
   },
   computed: {
     posts() {
-      const filteredPosts = this.$isNewReader ? this.$archive.social.formspring[this.profile].filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp) : [...this.$archive.social.formspring[this.profile]]
+      const filteredPosts = this.$isNewReader ? this.$archive.social.formspring[this.profile].filter(post => post.timestamp <= this.$archive.mspa.story[this.$newReaderCurrent].timestamp) : [...this.$archive.social.formspring[this.profile]]
       return this.reverse ? filteredPosts.reverse() : filteredPosts
     },
     filteredPostCount() {
