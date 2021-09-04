@@ -20,7 +20,9 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
+                :nextPages="nextPagesArray" ref="pageNav"
+                :class="(hideNav ? 'hidden' : '')" />
           </div>
           <div 
             :class="note.class ? 'footnote ' + note.class : 'footnote'"
@@ -57,7 +59,8 @@ export default {
   data: function() {
     return {
       preload: [],
-      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
+      forceKeyboardEnable: false // overridden by oddities
     }
   },
   computed: {
@@ -90,20 +93,17 @@ export default {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
-      // TODO: Handle bolin with mod syntax
-      if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
+      if (this.$archive.audioData[media[0]]) {
         let flashPath = media[0].substring(0, media[0].length-4)
-        if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('BOLINHQ')) ? `${flashPath}_bolin_hq.swf` : `${flashPath}_bolin.swf`
-        else
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) ? `${flashPath}_hq.swf` : media[0]
+        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
+        media[0] = `${flashPath}_hq.swf`
       }
 
       this.preload = []
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
-            let img = new Image()
+            const img = new Image()
             img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
@@ -139,6 +139,9 @@ export default {
     },
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
+    },
+    hideNav(){
+      return this.thisPage.flag.includes('SWFNAV')
     },
     footnotes() {
       return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
@@ -182,6 +185,10 @@ export default {
       return media
     },
     keyNavEvent(dir) {
+      // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.forceKeyboardEnable)
+        return
+
       if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))

@@ -602,8 +602,8 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (['unpeachy', 'pxsTavros'].includes(setting)) {
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
+        this.queueArchiveReload()
       }
 
       this.$localData.root.saveLocalStorage()
