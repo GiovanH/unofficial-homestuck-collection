@@ -834,6 +834,13 @@ export default {
         .themeSelector + dt {
           display: inline;
         }
+        // Little ones
+        &.retcons dl {
+          column-count: 2;
+          dt:first-child {
+            margin-top: 0;
+          }
+        }
         .textOverrideSettings {
           margin-top: 16px;
           text-align: center;
