@@ -207,6 +207,10 @@ const routes = [
     props: true
   },
   {
+    path: '/settings/:sec',
+    props: true
+  },
+  {
     path: '/music',
     props: true,
     children: [
