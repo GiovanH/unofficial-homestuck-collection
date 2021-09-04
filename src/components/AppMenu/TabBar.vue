@@ -314,17 +314,17 @@ export default {
       height: 28px;
       // width: 58px;
       display: flex;      
-        .historyButton {
-          height: 28px;
-          width: 29px;
-          //padding-top: 2px;
-          margin: 0;
+      .historyButton {
+        height: 28px;
+        width: 29px;
+        //padding-top: 2px;
+        margin: 0;
 
-          line-height: 34px;
-          font-size: 24px;
-          text-decoration: none;
-          text-align: center;
-        }
+        line-height: 34px;
+        font-size: 24px;
+        text-decoration: none;
+        text-align: center;
+      }
     }
     #jumpBox {
       flex: 1 0 auto;
@@ -333,7 +333,7 @@ export default {
       .jumpBoxWrapper::v-deep {
         display: flex;
         flex-flow: row nowrap;
-        
+
         border-radius: 2px;
         border: 1px solid var(--header-border);
         background: var(--header-tabSection);
@@ -352,7 +352,7 @@ export default {
           justify-content: center;
           align-items: center;
           display: flex;
-          
+
           &::after {
             text-align: center;
             width: 22px;
@@ -462,7 +462,7 @@ export default {
           transition: width 0.1s;
         }
       }
-      
+
       // .tab-list-move {
       //   transition: transform 0.1s;
       // }

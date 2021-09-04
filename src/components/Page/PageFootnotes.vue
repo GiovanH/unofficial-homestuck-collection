@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="myNotes.length">
     <div 
       v-for="(note, index) in myNotes"
       :class="cssClass(note)"
