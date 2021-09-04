@@ -171,9 +171,15 @@ export default {
   methods: {
     focusLink(){
       if (!this.$refs.suggest.hovered) {
-        this.$refs.link.click()
-        this.resetJumpbox()
-        document.activeElement.blur()
+        const do_refresh_instead = (this.jumpboxText == this.$localData.root.activeTabObject.url)
+        
+        if (do_refresh_instead) {
+          this.reloadTab()
+        } else {
+          this.$refs.link.click()
+          this.resetJumpbox()
+          document.activeElement.blur()
+        }
       }
     },
     onSuggestSelect(event){
