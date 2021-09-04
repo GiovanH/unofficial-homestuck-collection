@@ -472,10 +472,22 @@ function getMainMixin(){
           const style_id = `style-${js._id}-${i}`
           this.$logger.debug(style_id)
           
-          const body = sass.renderSync({
-            file: path.resolve(js._mod_root_dir, customstyle.source),
-            sourceComments: true
-          }).css.toString()
+          var body
+          if (customstyle.source) {
+            console.assert(!customstyle.body, style_id, "Styles cannot set both source and body. Use multiple style objects.")
+            body = sass.renderSync({
+              file: path.resolve(js._mod_root_dir, customstyle.source),
+              sourceComments: true
+            }).css.toString()
+          } else if (customstyle.body) {
+            console.assert(!customstyle.source, style_id, "Styles cannot set both source and body. Use multiple style objects.")
+            body = sass.renderSync({
+              data: customstyle.body,
+              sourceComments: true
+            }).css.toString() || customstyle.body
+          } else {
+            console.assert(false, customstyle, "Styles must define some sort of body!")
+          }
 
           const style = document.createElement("style")
           style.id = style_id
