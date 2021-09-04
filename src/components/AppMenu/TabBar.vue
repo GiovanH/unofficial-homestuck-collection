@@ -28,7 +28,23 @@
               @keydown.enter="focusLink"
               @keydown.esc="resetJumpbox" 
             />
-          </vue-simple-suggest>          
+          </vue-simple-suggest>    
+          <div id="browserActions">
+            <div class="systemButton"
+              v-if="$localData.settings.devMode && thisTabPageId" 
+              :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
+              :class="{active: thisTabPageId != $newReaderCurrent}"
+              @click="$updateNewReader(thisTabPageId, true)" 
+              @click.middle="$localData.root.NEW_READER_CLEAR">
+              <fa-icon icon="lock"></fa-icon>
+              <span class="badge" v-text="$newReaderCurrent"></span>
+            </div>
+            <div class="systemButton"
+              @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
+              :class="{active: isCurrentPageBookmarked}">
+              <fa-icon icon="save"></fa-icon>
+            </div>
+          </div>      
         </div>
       </div>
       <div class="lineBreak"/>
@@ -84,6 +100,40 @@ export default {
     },
     dragTab(){
       return document.getElementById("dragTab")
+    },
+    thisTabPageId(){
+      // // This is a good implementation to grab an inner page, so I'm leaving 
+      // // it as a reference, but it has a race condition which makes it
+      // // a poor fit here.
+      // try {
+      //   const page = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.page
+      //   if (page.$options.name == "page")
+      //     return page.thisPage.pageId
+      //   else
+      //     return undefined
+      // } catch {
+      //   return undefined
+      // }
+      const activeTabUrl = this.$localData.root.activeTabObject.url
+      let match
+      // eslint-disable-next-line no-cond-assign
+      if (match = /^\/mspa\/(\d+)$/.exec(activeTabUrl))
+        return match[1]
+      // eslint-disable-next-line no-cond-assign
+      if (match = /^\/(\w+?)\/(\d+)$/.exec(activeTabUrl)) {
+        const viz = this.$vizToMspa(match[1], match[2])
+        if (viz) return viz.p
+      }
+    
+      return undefined
+    },
+    isCurrentPageBookmarked(){
+      return Object.values(this.$localData.saveData.saves).some(
+        s => (s.url == this.$localData.root.activeTabObject.url)
+      )
+    },
+    tabComponent() {
+      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
     },
     allHistory(){
       return this.$localData.root.tabData.tabList.map(
@@ -197,7 +247,6 @@ export default {
       e.preventDefault()
 
       if (Math.abs(e.clientX - this.clickAnchor) > 5) {
-
         let snapDistance = e.clientX - this.clickAnchor
         this.clickAnchor -= this.dragTarget.getBoundingClientRect().left
 
@@ -215,7 +264,7 @@ export default {
         document.onmousemove = this.elementDrag
 
         this.$nextTick(()=>{
-          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 //Offsets 5px of padding on left
+          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 // Offsets 5px of padding on left
           let titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
           this.dragTitleFade = titleWidth < titleTextWidth
 
@@ -255,7 +304,6 @@ export default {
       if (dragId != hoverId) {
         this.$localData.root.TABS_SWAP(dragId, hoverId)
       }
-
     },
 
     closeDragElement() {
@@ -270,7 +318,7 @@ export default {
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
     }
   },
-  watch:{
+  watch: {
     '$localData.root.activeTabObject.url'(to, from){
       this.jumpboxText = to
     },
@@ -308,7 +356,32 @@ export default {
         display: none;
       }
     }
+    #browserActions {
+      display: inline-block;
+      height: 28px;
+      // width: 58px;
+      display: flex; 
+      > div {
+        position: relative;
+        padding: 2px;
+        color: var(--font-header);
+        font-size: 24px;
 
+        .badge {
+          display: block;
+          position: absolute;
+          background: var(--header-bg);
+          font-size: 10px;
+          height: 1em;
+          line-height: normal;
+          bottom: 0;
+          right: 0;
+        }
+      }   
+      svg {opacity: 40%;}
+      div.active svg {opacity: 100%;
+      }
+    }
     #tabNavigation {
       display: inline-block;
       height: 28px;
