@@ -147,7 +147,14 @@ export default {
         title: url,
         url: url
       })
-      const simple = ["/music", "/news", "/settings", "/credits"].map(dumbUrlMap)
+      const simple = ['/credits', '/decode', '/map', '/music', '/news', '/sbahj', '/settings', '/settings/mod', '/tso'].map(dumbUrlMap)
+      const unlocked = [
+        {url: "/formspring", show: this.$pageIsSpoiler('003478')},
+        {url: "/tumblr",     show: this.$pageIsSpoiler('006010')},
+        {url: "/namcohigh",  show: this.$pageIsSpoiler('008135')},
+        {url: "/pxs",        show: this.$pageIsSpoiler('008753')},
+        {url: "/snaps",      show: !this.isNewReader}
+      ].filter(t => t.show).map(t => t.url).map(dumbUrlMap)
       const history = this.allHistory.map(dumbUrlMap)
 
       const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
@@ -155,7 +162,7 @@ export default {
         url: bookmark.url
       }))
 
-      return [...simple, ...bookmarks, ...history].filter((obj, pos, arr) => {
+      return [...bookmarks, ...simple, ...unlocked, ...history].filter((obj, pos, arr) => {
         // Deduplicate based on 'url' param
         return arr.map(mapObj => mapObj['url']).indexOf(obj['url']) === pos
       })
