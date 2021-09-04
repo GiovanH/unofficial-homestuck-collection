@@ -53,7 +53,7 @@ export default {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
-      forceKeyboardEnable: false // overridden by oddities
+      forceKeyboardEnable: false, // overridden by oddities
       showMetadata: false
     }
   },
