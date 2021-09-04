@@ -425,6 +425,9 @@ export default {
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
 			let title, adventureTitle
 			switch(component){
+				case "HOMEPAGE": 
+					title = "The Unofficial Homestuck Collection"
+					break
 				case "PAGE":
 				case "X2COMBO":
 				case "TZPASSWORD":
@@ -569,7 +572,8 @@ export default {
 					title = "Spoilers!"
 					break
 				default:
-					title = "The Unofficial Homestuck Collection"
+					// title = "The Unofficial Homestuck Collection"
+					title = this.tab.url
 			}
 			// title = this.tab.url
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)

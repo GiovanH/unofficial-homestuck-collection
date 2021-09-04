@@ -3,11 +3,32 @@
       <div id="tabNavigation">
         <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
         <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
+
+        <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 21px;"><fa-icon icon="redo"></fa-icon></div>
       </div>
       <div id="jumpBox">
         <div class="jumpBoxWrapper">
           <a :href="jumpboxText" class="jumpboxLink" ref="link" />
-          <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText" @keydown.esc="resetJumpbox()" @keydown.enter="focusLink()" />
+          <vue-simple-suggest
+            v-model="jumpboxText" 
+            :list="allUrlSuggestions"
+            display-attribute="title"
+            value-attribute="url"
+            @select="onSuggestSelect"
+            :filter-by-query="true"
+            :max-suggestions="15"
+            ref="suggest" 
+          >
+            <input 
+              class="jumpBoxInput" 
+              ref="input" 
+              type="text" 
+              spellcheck="false" 
+              v-model="jumpboxText" 
+              @keydown.enter="focusLink"
+              @keydown.esc="resetJumpbox" 
+            />
+          </vue-simple-suggest>          
         </div>
       </div>
       <div class="lineBreak"/>
@@ -27,11 +48,14 @@
 
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
+import VueSimpleSuggest from 'vue-simple-suggest'
+
+const { ipcRenderer } = require('electron')
 
 export default {
   name: 'tabBar',
   components: {
-    Tab, 
+    Tab, VueSimpleSuggest
   },
   data(){
     return {
@@ -60,19 +84,52 @@ export default {
     },
     dragTab(){
       return document.getElementById("dragTab")
+    },
+    allHistory(){
+      return this.$localData.root.tabData.tabList.map(
+        key => this.$localData.root.tabData.tabs[key]
+      ).reduce((a, t) => {
+        return a.concat(t.history)
+      }, [])
+    },
+    allUrlSuggestions(){
+      const dumbUrlMap = url => ({
+        title: url,
+        url: url
+      })
+      const simple = ["/music", "/news", "/settings", "/credits"].map(dumbUrlMap)
+      const history = this.allHistory.map(dumbUrlMap)
+
+      const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
+        title: `${bookmark.url} - ${bookmark.name}`,
+        url: bookmark.url
+      }))
+
+      return [...simple, ...bookmarks, ...history].filter((obj, pos, arr) => {
+        // Deduplicate based on 'url' param
+        return arr.map(mapObj => mapObj['url']).indexOf(obj['url']) === pos
+      })
     }
   },
   methods: {
     focusLink(){
-      this.$refs.link.click()
+      if (!this.$refs.suggest.hovered) {
+        this.$refs.link.click()
+        this.resetJumpbox()
+        document.activeElement.blur()
+      }
+    },
+    onSuggestSelect(event){
+      this.jumpboxText = event.url
+      // this.$nextTick(this.focusLink)
+      this.$localData.root.TABS_PUSH_URL(event.url) // avoids some weird focus cases
+      this.$refs.suggest.hideList()
       document.activeElement.blur()
     },
     resetJumpbox() {
       this.jumpboxText = this.$localData.root.activeTabObject.url
       
-      this.$nextTick(()=> {
-        this.$refs.input.select()
-      })
+      this.$nextTick(() => this.$refs.input.select())
     },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
@@ -87,6 +144,13 @@ export default {
     historyForwardNewTab(e) {
       this.$logger.info(e.button)
       this.$localData.root.TABS_DUPLICATE(this.$localData.tabData.activeTabKey, true, 'forward')
+    },
+    reloadTab(e) {
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+    },
+    forceReload(e) {
+      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      ipcRenderer.invoke('reload')
     },
     newTab() {
       this.$localData.root.TABS_NEW()
@@ -248,7 +312,7 @@ export default {
     #tabNavigation {
       display: inline-block;
       height: 28px;
-      width: 58px;
+      // width: 58px;
       display: flex;      
         .historyButton {
           height: 28px;
@@ -266,13 +330,17 @@ export default {
       flex: 1 0 auto;
       margin: auto 5px;
 
-      .jumpBoxWrapper {
+      .jumpBoxWrapper::v-deep {
         display: flex;
         flex-flow: row nowrap;
         
         border-radius: 2px;
         border: 1px solid var(--header-border);
         background: var(--header-tabSection);
+
+        .vue-simple-suggest {
+          width: 100%;
+        }
 
         .jumpboxLink {
           border-radius:  1px 0 0 1px ;
@@ -301,6 +369,28 @@ export default {
           font-family: var(--font-family-ui);
           background: var(--header-tabSection);
           color: var(--font-header);
+        }
+        .suggestions {
+          background-color: var(--ctx-bg);
+          border: solid 1px var(--ctx-frame);
+          color: var(--font-ctx);
+
+          font-family: var(--font-family-ui);
+          font-weight: normal;
+
+          list-style: none;
+
+          li[aria-selected="true"] {
+            background: var(--ctx-select);
+          }
+
+          z-index: 5;
+          padding: 5px;
+          outline: none;
+          cursor: default;
+          position: fixed;
+          user-select: none;
+          white-space: nowrap;
         }
       }
     }

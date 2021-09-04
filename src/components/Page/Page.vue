@@ -1,16 +1,12 @@
 <template>
-  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}" :data-pageid="`${thisPage.storyNum}/${thisPage.pageId}`">
+  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}" :data-pageid="`${thisPage.storyId}/${thisPage.pageId}`">
     <Banner :tab="tab" :page="thisPage"/>
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
+      <Metadata v-if="showMetadata" :thisPage="thisPage" />
       <div class="pageContent">
-          <div 
-            :class="note.class ? 'preface ' + note.class : 'preface'"
-            v-for="note in prefaces">
-            <p v-html="note.content"/>
-            <span v-if="note.author" class="author" v-text="note.author" />
-          </div>
+        <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -24,12 +20,7 @@
                 :nextPages="nextPagesArray" ref="pageNav"
                 :class="(hideNav ? 'hidden' : '')" />
           </div>
-          <div 
-            :class="note.class ? 'footnote ' + note.class : 'footnote'"
-            v-for="note in footnotes">
-            <p v-html="note.content"/>
-            <span v-if="note.author" class="author" v-text="note.author" />
-          </div>
+        <Footnotes :pageId="thisPage.pageId" />
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
@@ -44,6 +35,8 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
 
 import Firefly from '@/components/SpecialPages/Firefly.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
@@ -54,13 +47,14 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes, Metadata
   },
   data: function() {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
       forceKeyboardEnable: false // overridden by oddities
+      showMetadata: false
     }
   },
   computed: {
@@ -143,12 +137,6 @@ export default {
     hideNav(){
       return this.thisPage.flag.includes('SWFNAV')
     },
-    footnotes() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
-    },
-    prefaces() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
-    },
     footerBanner() {
       switch (this.$root.tabTheme) {
         case 'scratch':
@@ -164,7 +152,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     deretcon(media) {
       // TODO: Refactor retcon resource reservations
       if (
@@ -267,6 +255,7 @@ export default {
       padding-top: 7px;
       padding-bottom: 23px;
       margin: 0 auto;
+      position: relative; // Allow things to align to the page
 
       flex: 0 1 auto;
       display: flex;
@@ -314,49 +303,6 @@ export default {
           display: flex;
           flex-direction: column;
           
-        }
-        .footnote {
-          width: 600px;
-          border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 25px;
-          p {
-            text-align: center;
-            margin: 0 auto;
-            width: 600px;
-          }
-        }
-        .preface {
-          width: 600px;
-          margin: 1em 0;
-
-          border-style: dashed;
-          border-width: 1px;
-
-          border-color: var(--page-log-border);
-          background-color: var(--page-pageFrame);
-          color: var(--page-nav-divider);
-          p {
-            text-align: center;
-            margin: 0 auto;
-            width: 600px;
-          }
-        }
-
-        .footnote, .preface {
-          .author {
-            font-weight: 300;
-            font-size: 10px;
-            font-family: Verdana, Arial, Helvetica, sans-serif;
-
-            display: flex;
-            justify-content: flex-end;
-
-            position: relative;
-            top: 12px;
-            margin-top: -12px;
-
-            color: var(--page-nav-meta);
-          }
         }
       }
     }
