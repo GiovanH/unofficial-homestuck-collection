@@ -352,6 +352,10 @@ export default {
           label: "Always display scroll bar",
           desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
         }, {
+          model: 'forceFullscreenHeader', 
+          label: "Display fullscreen header", 
+          desc: "Shows header content (such as the jump box, title and tab bars) even in fullscreen mode (F11)."
+        }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
           desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
