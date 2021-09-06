@@ -1,5 +1,5 @@
 <template>
-    <div id="appHeader" class="headerHoverEnabled">
+    <div id="appHeader" :class="{hideInFullscreen: hideInFullscreen}">
       <TitleBar />
       <TabBar />
     </div>
@@ -16,18 +16,29 @@ export default {
   },
   data(){
     return {
+      windowHeight: window.innerHeight
     }
   },
   computed: {
-
+    hideInFullscreen() {
+      const isFullscreen = this.windowHeight === screen.height;
+      return isFullscreen && !this.$localData.settings.forceFullscreenHeader;
+    }
   },
   methods: {
 
+  },
+  mounted () {
+    // Vue won't let us use innerWidth in a computed function otherwise
+    window.onresize = () => {
+      this.windowHeight = window.innerHeight
+    }
   }
 }
 </script>
 
 <style lang="scss">
+  
 #appHeader {
   z-index: 4;
   background: var(--header-bg);
@@ -35,10 +46,8 @@ export default {
   * {
     user-select: none;
   }
-  &:not(.headerHoverEnabled) {
-    .systemButton, .tab{
-      pointer-events: none;
-    }
+  &.hideInFullscreen {
+    display: none;
   }
 }
 .systemButton {

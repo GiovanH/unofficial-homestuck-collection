@@ -49,6 +49,7 @@ class LocalData {
       showAddressBar: false,
       switchToNewTabs: false,
       forceScrollBar: true,
+      forceFullscreenHeader: false,
       smoothScrolling: true,
       pixelScaling: true,
       mspaMode: false,
