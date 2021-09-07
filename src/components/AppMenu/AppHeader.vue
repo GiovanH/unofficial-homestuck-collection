@@ -1,5 +1,5 @@
 <template>
-    <div id="appHeader" :class="{hideInFullscreen: hideInFullscreen}">
+    <div id="appHeader" :class="{hidden: isHidden}">
       <TitleBar />
       <TabBar />
     </div>
@@ -20,9 +20,9 @@ export default {
     }
   },
   computed: {
-    hideInFullscreen() {
-      const isFullscreen = this.windowHeight === screen.height;
-      return isFullscreen && !this.$localData.settings.forceFullscreenHeader;
+    isHidden() {
+      const isFullscreen = (this.windowHeight === screen.height)
+      return isFullscreen && !this.$localData.settings.forceFullscreenHeader
     }
   },
   methods: {
@@ -30,6 +30,7 @@ export default {
   },
   mounted () {
     // Vue won't let us use innerWidth in a computed function otherwise
+    // since the window object isn't a reactive vue element
     window.onresize = () => {
       this.windowHeight = window.innerHeight
     }
@@ -45,9 +46,6 @@ export default {
   color: var(--font-header);
   * {
     user-select: none;
-  }
-  &.hideInFullscreen {
-    display: none;
   }
 }
 .systemButton {
