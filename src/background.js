@@ -614,7 +614,8 @@ async function createWindow () {
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
-      plugins: true
+      plugins: true,
+      webviewTag: true
     }
   })
 
