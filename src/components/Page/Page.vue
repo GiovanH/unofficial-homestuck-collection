@@ -4,7 +4,7 @@
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
-      <Metadata v-if="showMetadata" :thisPage="thisPage" />
+      <Metadata v-if="showMetadata == true" :thisPage="thisPage" />
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
