@@ -202,26 +202,25 @@ function bakeRoutes() {
   
   // Modify script-global `routes`
   routes = all_mod_routes
+}
 
-  // Test routes
-  const do_full_check = (store.has(store_devmode_key) ? store.get(store_devmode_key) : false)
-
-  if (do_full_check) {
-    logger.debug("Doing full resources check (devMode on)")
-    const Resources = require("@/resources.js")
-    if (Resources.isReady()) {
-      Object.keys(all_mod_routes).forEach(url => {
-        try {
-          Resources.resolveURL(url)
-        } catch (e) {
-          logger.warn("Testing routes failed")
-          logger.error(url, e)
-          onModLoadFail(enabled_mods, e)
-        }
-      })
-    }
-  } else 
-    logger.debug("Skipping full resources check (devMode off)")
+function doFullRouteCheck(){
+  logger.debug("Doing full resources check (devMode on)")
+  const enabled_mods = getEnabledMods()
+  const Resources = require("@/resources.js")
+  if (Resources.isReady()) {
+    Object.keys(routes).forEach(url => {
+      try {
+        Resources.resolveURL(url)
+      } catch (e) {
+        logger.warn("Testing routes failed")
+        logger.error(url, e)
+        onModLoadFail(enabled_mods, e)
+      }
+    })
+  } else {
+    logger.warn("Resources uninitialized, can't check.")
+  }
 }
 
 function getEnabledMods() {
@@ -720,5 +719,7 @@ export default {
   getAssetRoute,
   getModStoreKey,
   giveWindow,
-  modChoices
+  modChoices,
+
+  doFullRouteCheck
 }
