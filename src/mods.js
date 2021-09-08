@@ -101,19 +101,20 @@ if (ipcMain) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with issues in", responsible_mods)
-    logger.error(e)
-
-    removeModsFromEnabledList(responsible_mods)
-    // TODO: Replace this with a good visual traceback so users can diagnose mod issues
-    dialog.showMessageBoxSync({
-      type: 'error',
-      title: 'Mod load error',
-      message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
-    })
-
-    // Used to reload here, but now that rmfel is fully reactive
-    // it shouldn't be needed
+    if (win) {
+      win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
+    } else {
+      logger.info("MAIN: Mod load failure with issues in", responsible_mods)
+      logger.error(e)
+      logger.error("Don't have win!")
+      // This only happens if we can't even display the pretty traceback. Absolute fallback.
+      dialog.showMessageBoxSync({
+        type: 'error',
+        title: 'Mod load error',
+        message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
+      })
+      removeModsFromEnabledList(responsible_mods)
+    }
   }
 } else {
   // We are in the renderer process.
@@ -121,15 +122,42 @@ if (ipcMain) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
-    logger.info("Mod load failure with modlist", responsible_mods)
+    logger.info("RENDER: Mod load failure with modlist", responsible_mods)
     logger.error(e)
-    document.body.innerText = `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you may need to restart the application.<br/>Check the console log for details<br/><pre>${e}</pre>`
 
-    removeModsFromEnabledList(responsible_mods)
+    window.doErrorRecover = () => {
+      removeModsFromEnabledList(responsible_mods)
+      // Have to invoke reload because we probably don't even have the VM at this point
+      ipcRenderer.invoke('reload')
+    }
 
-    logger.error("Did not expect to be in the renderer process for this! Debug")
-    ipcRenderer.invoke('reload')
+    document.body.innerHTML = `
+    <style>
+    div {
+      background: #fff;
+      color: #000;
+    }
+    div > * { max-width: 100% }
+    div > div { padding: 1em; }
+    p { font-family: sans-serif; }
+    pre { white-space: pre-wrap; }
+    </style>
+    <div>
+      <p style="-webkit-app-region: drag; background: #aaa;">Error</p>
+      <div>
+        <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
+        These have been disabled for safety.</p>
+        <pre>${e}</pre>
+        <input type="button" value="Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
+        <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
+        <p>Stacktrace:</p>
+        <pre>${e.stack}</pre>
+      </div>
+    </div>`
   }
+  ipcRenderer.on('MOD_LOAD_FAIL', (event, responsible_mods, e) => {
+    onModLoadFail(responsible_mods, e)
+  })
 }
 
 function bakeRoutes() {
@@ -225,6 +253,7 @@ function crawlFileTree(root, recursive=false) {
   const dir = fs.opendirSync(root)
   let ret = {}
   let dirent
+  // eslint-disable-next-line no-cond-assign
   while (dirent = dir.readSync()) {
     if (dirent.isDirectory()) {
       if (recursive) {
@@ -320,7 +349,9 @@ function getModJs(mod_dir, options={}) {
       Object.assign(mod, mod.computed(api))
     }
 
-    mod._needsreload = ['styles', 'vueHooks', 'themes', 'withStore'].some(k => mod.hasOwnProperty(k))
+    // TODO: Do computed properties automatically require a reload?
+    // eslint-disable-next-line no-prototype-builtins
+    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
@@ -434,9 +465,7 @@ function mergeFootnotes(archive, footObj) {
 
     footnote_categories.forEach(category => {
       for (var page_num in footnoteList[category]) {
-        // TODO replace this with some good defaultdict juice
-        if (!archive.footnotes[category][page_num])
-          archive.footnotes[category][page_num] = []
+        if (!archive.footnotes[category][page_num]) archive.footnotes[category][page_num] = []
 
         footnoteList[category][page_num].forEach(note => {
           const new_note = {
@@ -523,7 +552,7 @@ function getMixins(){
     const modThemes = js.themes || []
 
     // Keep this logic out here so it doesn't get repeated
-    // TODO: Make sure other forEachs aren't being duplicated down there
+    // TODO: Make sure other forEach s aren't being duplicated down there
 
     // Write theme hooks
     // Try to minimize vue hooks (don't want a huge stack!)
@@ -542,17 +571,20 @@ function getMixins(){
       return null
     }
 
+    // Precompute as much as possible since mixins run everywhere
+    vueHooks.forEach((hook) => {
+      // Shorthand
+      if (hook.matchName)
+        hook.match = (c) => (c.$options.name == hook.matchName)
+    })
+
     var mixin = {
       created() {
         const vueComponent = this
 
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
-        vueHooks.forEach((hook) => {
-          // Shorthand
-          if (hook.matchName)
-            hook.match = (c) => (c.$options.name == hook.matchName)
-          
+        vueHooks.forEach((hook) => {          
           if (hook.match(this)) {
             // Data w/ optional compute function
             this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
@@ -581,10 +613,6 @@ function getMixins(){
       },
       updated() {
         vueHooks.forEach((hook) => {
-          // Shorthand
-          if (hook.matchName)
-            hook.match = (c) => (c.$options.name == hook.matchName)
-
           if (hook.updated && hook.match(this)) {
             hook.updated.bind(this)()
           }
@@ -597,6 +625,30 @@ function getMixins(){
 
 // Runtime
 // Grey magic. This file can be run from either process, but only the main process will do file handling.
+function jsToChoice(js, dir){
+  return {
+    label: js.title,
+    summary: js.summary,
+    description: js.description,
+    author: js.author,
+    modVersion: js.modVersion,
+    locked: js.locked,
+
+    hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
+    needsreload: js._needsreload,
+    settingsmodel: js.settings,
+    key: dir,
+
+    includes: {
+      routes: Boolean(js.routes || js.treeroute || js.trees),
+      edits: Boolean(js.edit),
+      hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+      styles: Boolean(js.styles),
+      footnotes: Boolean(js.footnotes),
+      themes: Boolean(js.themes)
+    }
+  }
+}
 
 if (ipcMain) {
   // We are in the main process.
@@ -604,7 +656,6 @@ if (ipcMain) {
     // Get the list of mods players can choose to enable/disable
     var mod_folders
     try {
-      // TODO: Replace this with proper file globbing
       const tree = crawlFileTree(modsDir, false)
       // .js file or folder of some sort
       mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
@@ -613,8 +664,6 @@ if (ipcMain) {
       logger.error(e)
       return []
     }
-    // logger.info("Mod folders seen")
-    // logger.debug(mod_folders)
 
     var items = mod_folders.reduce((acc, dir) => {
       try {
@@ -622,28 +671,7 @@ if (ipcMain) {
         if (js.hidden === true)
           return acc // continue
 
-        acc[dir] = {
-          label: js.title,
-          summary: js.summary,
-          description: js.description,
-          author: js.author,
-          modVersion: js.modVersion,
-          locked: js.locked,
-
-          hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
-          needsreload: js._needsreload,
-          settingsmodel: js.settings,
-          key: dir,
-
-          includes: {
-            routes: Boolean(js.routes || js.treeroute || js.trees),
-            edits: Boolean(js.edit),
-            hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
-            styles: Boolean(js.styles),
-            footnotes: Boolean(js.footnotes),
-            themes: Boolean(js.themes)
-          }
-        }
+        acc[dir] = jsToChoice(js, dir)
       } catch (e) {
         // Catch import-time mod-level errors
         logger.error("Couldn't load mod choice")
