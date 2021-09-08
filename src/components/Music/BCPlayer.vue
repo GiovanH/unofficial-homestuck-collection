@@ -1,16 +1,24 @@
 <template>
-  <div class="toolbar">
-    <div class="systemButton musicButton" 
-      @click="track = getRandomTrack()" ><fa-icon icon="random"></fa-icon></div>
-    <webview v-if="$localData.settings.bandcampEmbed" 
+  <div class="toolbar" v-if="$localData.settings.bandcampEmbed" >
+    <template v-if="track">
+      <div class="systemButton musicButton" 
+        @click="turnOff" ><fa-icon icon="chevron-up"></fa-icon></div>
+      <div class="systemButton musicButton" 
+        @click="track = getRandomTrack()" ><fa-icon icon="random"></fa-icon></div>
+    </template>
+    <template v-else>
+      <div class="systemButton musicButton" 
+      @click="turnOn" ><fa-icon icon="chevron-down"></fa-icon></div>
+    </template>
+    <webview
       class="bandcamp" 
       allowtransparency 
       disablewebsecurity
       seamless
-      src="about://blank"
+      :src="webviewTargetUrl"
       ref="webview"
       ></webview>
-      <div class="systemButton musicButton" 
+    <div v-if="track" class="systemButton musicButton" 
       @click="$localData.root.TABS_NEW($resolvePath(`/music/track/${track.directory}`), true)()" ><fa-icon icon="music"></fa-icon></div>
     
   </div>
@@ -44,6 +52,13 @@ export default {
         transparent: true
       }
     },
+    webviewTargetUrl(){
+      return (
+        this.track 
+        ? `https://bandcamp.com/EmbeddedPlayer/${this.renderBcParams(this.bc_params)}` 
+        : "about://blank"
+      )
+    },
     nonSpoilerAlbums(){
       return Object.keys(this.$archive.music.albums).filter(a => !this.$albumIsSpoiler(a)).map(a => this.$archive.music.albums[a])
     },
@@ -55,6 +70,15 @@ export default {
     }
   },
   methods: {
+    turnOn(){
+      this.$logger.info("Turning on")
+      if (!this.track)
+        this.track = this.getRandomTrack()
+    },
+    turnOff(){
+      this.$logger.info("Turning off")
+      this.track = undefined
+    },
     renderBcParams(bc_params){
       return Object.keys(bc_params).reduce(
         (out, k) => `${out}${k}=${bc_params[k]}/`, 
@@ -81,51 +105,57 @@ export default {
     }
   },
   created(){
-    this.track = this.getRandomTrack()
+    // this.track = this.getRandomTrack()
   },
   mounted(){
     this.webview.addEventListener('did-finish-load', () => {
-      this.webview.executeJavaScript(`document.getElementById("player").style.maxWidth = "none"
-        var audio = document.querySelector('audio');
-        if (!audio) console.log("Audio Complete")
-        else {
-          audio.addEventListener('ended', () => {
-            if (!audio.seeking) console.log("Audio Complete")
-          })
-          audio.style = "height: 42px; position: absolute; right: 68px; padding-top: 1px;";
-          audio.controls = true;
-          
-          setTimeout(function() {
-            if (!audio.playing)
-            document.getElementById("big_play_button").click()
-          }, 500)
-        }
-        `)
+      if (this.track) {
+        this.webview.executeJavaScript(`document.getElementById("player").style.maxWidth = "none"
+          var audio = document.querySelector('audio');
+          if (!audio) console.log("Audio Complete")
+          else {
+            audio.addEventListener('ended', () => {
+              if (!audio.seeking) console.log("Audio Complete")
+            })
+            audio.style = "height: 42px; position: absolute; right: 68px; padding: 1px 0;";
+            audio.controls = true;
+            
+            setTimeout(function() {
+              if (!audio.playing)
+              document.getElementById("big_play_button").click()
+            }, 500)
+          }
+          `)
 
-      this.webview.addEventListener("console-message", (event) => {
-        if (event.message == "Audio Complete") {
-          this.$logger.info(`Audio complete!`)
-          this.track = this.getRandomTrack()
-        }
-      })
+        this.webview.addEventListener("console-message", (event) => {
+          if (event.message == "Audio Complete") {
+            this.$logger.info(`Audio complete!`)
+            this.track = this.getRandomTrack()
+          }
+        })
 
-      this.webview.openDevTools()
+        this.webview.openDevTools()
 
-      this.webContents = electron.remote.webContents.fromId(this.webview.getWebContentsId())
+        this.webContents = electron.remote.webContents.fromId(this.webview.getWebContentsId())
+      }
     })
   },
   watch: {
-    'track' (to, from){
-      try {
-        this.webview.loadURL(`https://bandcamp.com/EmbeddedPlayer/${this.renderBcParams(this.bc_params)}`)
-      } catch {
-        // This seems to be the only way to see if a webview is loaded. Yikes.
-        this.webview.addEventListener('dom-ready', () => {
-          this.$logger.info("Track: webview ready")
-          this.webview.loadURL(`https://bandcamp.com/EmbeddedPlayer/${this.renderBcParams(this.bc_params)}`)
-        }, { once: true })
-      }
-    }
+  //   'track' (to, from){
+  //     this.$logger.info(`Track changed from ${from} to ${to} (${this.webviewTargetUrl})`)
+
+  //     // This seems to be the only way to see if a webview is loaded. Yikes.
+  //     try {
+  //       this.webview.loadURL(this.webviewTargetUrl)
+  //       this.$logger.info(`Loaded url ${this.webviewTargetUrl} (direct)`)
+  //     } catch {
+  //       this.webview.addEventListener('dom-ready', () => {
+  //         this.$logger.info("Track: webview ready")
+  //         this.webview.loadURL(this.webviewTargetUrl)
+  //         this.$logger.info(`Loaded url ${this.webviewTargetUrl} (dom-ready)`)
+  //       }, { once: true })
+  //     }
+  //   }
   }
 }
 </script>
