@@ -7,6 +7,7 @@
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
     <Notifications :class="theme" ref="notifications" />
     <ContextMenu :class="theme" ref="contextMenu" />
+    <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
   </div>
   <div id="app" class="mspa"  v-else>
     <Setup />
@@ -21,6 +22,7 @@
   import Notifications from '@/components/UIElements/Notifications.vue'
 
   import ContextMenu from '@/components/UIElements/ContextMenu.vue'
+  import UrlTooltip from '@/components/UIElements/UrlTooltip.vue'
 
   import Mods from "./mods.js"
 
@@ -30,7 +32,7 @@
     name: 'HomestuckCollection',
     mixins: [Mods.getMainMixin()],
     components: {
-      Setup, AppHeader, TabFrame, ContextMenu, Notifications
+      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip
     },
     data() {
       return {

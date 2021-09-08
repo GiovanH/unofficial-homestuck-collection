@@ -660,6 +660,10 @@ async function createWindow () {
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
+
+  win.webContents.on('update-target-url', (event, new_url) => {
+    win.webContents.send('update-target-url', new_url)
+  })
   
   // Resolve asset URLs
   

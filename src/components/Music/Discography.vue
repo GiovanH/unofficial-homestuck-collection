@@ -228,6 +228,12 @@ export default {
         thumbnail: 'ps_titlescreen',
         url: '/unlock/ps_titlescreen'
       })
+      else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') return ({
+        title: 'SBAHJthemovie1',
+        pageNum: 'SBAHJthemovie1',
+        thumbnail: 'SBAHJthemovie1',
+        url: 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf'
+      })
       else return ({
         title: page,
         pageNum: page,

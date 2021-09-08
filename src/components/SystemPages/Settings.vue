@@ -65,7 +65,7 @@
                 {{ theme.text }}
               </option>
             </select>
-            <template v-if="$localData.settings.themeOverride != 'default'">
+            <template v-if="$localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default'">
               <dt><label><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label></dt>
             </template>
           </dd>
@@ -79,7 +79,7 @@
                   {{ theme.text }}
                 </option>
               </select>
-              <template v-if="$localData.settings.themeOverrideUI != 'default'">
+              <template v-if="$localData.settings.forceThemeOverrideUI || $localData.settings.themeOverrideUI != 'default'">
                 <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
               </template>
             </dd>
@@ -359,6 +359,10 @@ export default {
           model: "pixelScaling",
           label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
+        }, {
+          model: "urlTooltip",
+          label: "Show URL Tooltip",
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/newreader'>New reader</a>"
         }, {
           model: "devMode",
           label: "Enable Developer Mode",
