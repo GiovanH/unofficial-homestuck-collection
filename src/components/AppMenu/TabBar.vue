@@ -1,77 +1,39 @@
 <template>
-    <div id="tabBar" :class="{showAddressBar: $localData.settings.showAddressBar}">
-      <div id="tabNavigation">
-        <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
-        <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
-
-        <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 21px;"><fa-icon icon="redo"></fa-icon></div>
-      </div>
-      <div id="jumpBox">
-        <div class="jumpBoxWrapper">
-          <a :href="jumpboxText" class="jumpboxLink" ref="link" />
-          <vue-simple-suggest
-            v-model="jumpboxText" 
-            :list="allUrlSuggestions"
-            display-attribute="title"
-            value-attribute="url"
-            @select="onSuggestSelect"
-            :filter-by-query="true"
-            :max-suggestions="15"
-            ref="suggest" 
-          >
-            <input 
-              class="jumpBoxInput" 
-              ref="input" 
-              type="text" 
-              spellcheck="false" 
-              v-model="jumpboxText" 
-              @keydown.enter="focusLink"
-              @keydown.esc="resetJumpbox" 
-            />
-          </vue-simple-suggest>    
-          <div id="browserActions">
-            <div class="systemButton"
-              v-if="$localData.settings.devMode && thisTabPageId" 
-              :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
-              :class="{active: thisTabPageId != $newReaderCurrent}"
-              @click="$updateNewReader(thisTabPageId, true)" 
-              @click.middle="$localData.root.NEW_READER_CLEAR">
-              <fa-icon icon="lock"></fa-icon>
-              <span class="badge" v-text="$newReaderCurrent"></span>
-            </div>
-            <div class="systemButton"
-              @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
-              :class="{active: isCurrentPageBookmarked}">
-              <fa-icon icon="save"></fa-icon>
-            </div>
-          </div>      
-        </div>
-      </div>
-      <div class="lineBreak"/>
-      <div id="tabSection">
-        <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
-          <div class="tabTitle" :class="{dragTitleFade}"></div>
-          <div class="systemButton closeTabButton">✕</div>
-        </div>
-        <transition-group name="tab-list" tag="ul" id="tabs">
-          <Tab v-for="key in sortedTabList" :key="key" :tab="tabs[key]" :ref="'tab_' + key" @mousedown.left.native="initDrag()" />
-        </transition-group>
-        <div class="systemButton newTabButton" @click="newTab()">＋</div>
-      </div>
-      <div />
+  <div id="tabBar">
+    <div id="tabNavigation">
+      <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
+      <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
+      <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 21px;"><fa-icon icon="redo"></fa-icon></div>
     </div>
+    <template v-if="$localData.settings.showAddressBar">
+      <AddressBar/>
+      <div class="lineBreak"/>
+    </template>
+    <!-- Toolbars go here -->
+    <div id="tabSection">
+      <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
+        <div class="tabTitle" :class="{dragTitleFade}"></div>
+        <div class="systemButton closeTabButton">✕</div>
+      </div>
+      <transition-group name="tab-list" tag="ul" id="tabs">
+        <Tab v-for="key in sortedTabList" :key="key" :tab="tabs[key]" :ref="'tab_' + key" @mousedown.left.native="initDrag()" />
+      </transition-group>
+      <div class="systemButton newTabButton" @click="newTab()">＋</div>
+    </div>
+    <div />
+  </div>
 </template>
 
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
-import VueSimpleSuggest from 'vue-simple-suggest'
+import AddressBar from '@/components/AppMenu/AddressBar.vue'
 
 const { ipcRenderer } = require('electron')
 
 export default {
   name: 'tabBar',
   components: {
-    Tab, VueSimpleSuggest
+    Tab, AddressBar
   },
   data(){
     return {
@@ -81,8 +43,7 @@ export default {
       clickAnchor: undefined,
       dragTarget: undefined,
       showDragTab: false,
-      dragTitleFade: false,
-      jumpboxText: this.$localData.root.activeTabObject.url
+      dragTitleFade: false
     }
   },
   computed: {
@@ -127,73 +88,11 @@ export default {
     
       return undefined
     },
-    isCurrentPageBookmarked(){
-      return Object.values(this.$localData.saveData.saves).some(
-        s => (s.url == this.$localData.root.activeTabObject.url)
-      )
-    },
     tabComponent() {
       return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
-    },
-    allHistory(){
-      return this.$localData.root.tabData.tabList.map(
-        key => this.$localData.root.tabData.tabs[key]
-      ).reduce((a, t) => {
-        return a.concat(t.history)
-      }, [])
-    },
-    allUrlSuggestions(){
-      const dumbUrlMap = url => ({
-        title: url,
-        url: url
-      })
-      const simple = ['/credits', '/decode', '/map', '/music', '/news', '/sbahj', '/settings', '/settings/mod', '/tso'].map(dumbUrlMap)
-      const unlocked = [
-        {url: "/formspring", show: this.$pageIsSpoiler('003478')},
-        {url: "/tumblr",     show: this.$pageIsSpoiler('006010')},
-        {url: "/namcohigh",  show: this.$pageIsSpoiler('008135')},
-        {url: "/pxs",        show: this.$pageIsSpoiler('008753')},
-        {url: "/snaps",      show: !this.isNewReader}
-      ].filter(t => t.show).map(t => t.url).map(dumbUrlMap)
-      const history = this.allHistory.map(dumbUrlMap)
-
-      const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
-        title: `${bookmark.url} - ${bookmark.name}`,
-        url: bookmark.url
-      }))
-
-      return [...bookmarks, ...simple, ...unlocked, ...history].filter((obj, pos, arr) => {
-        // Deduplicate based on 'url' param
-        return arr.map(mapObj => mapObj['url']).indexOf(obj['url']) === pos
-      })
     }
   },
   methods: {
-    focusLink(){
-      if (!this.$refs.suggest.hovered) {
-        const do_refresh_instead = (this.jumpboxText == this.$localData.root.activeTabObject.url)
-        
-        if (do_refresh_instead) {
-          this.reloadTab()
-        } else {
-          this.$refs.link.click()
-          this.resetJumpbox()
-          document.activeElement.blur()
-        }
-      }
-    },
-    onSuggestSelect(event){
-      this.jumpboxText = event.url
-      // this.$nextTick(this.focusLink)
-      this.$localData.root.TABS_PUSH_URL(event.url) // avoids some weird focus cases
-      this.$refs.suggest.hideList()
-      document.activeElement.blur()
-    },
-    resetJumpbox() {
-      this.jumpboxText = this.$localData.root.activeTabObject.url
-      
-      this.$nextTick(() => this.$refs.input.select())
-    },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
     },
@@ -331,14 +230,6 @@ export default {
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
     }
   },
-  watch: {
-    '$localData.root.activeTabObject.url'(to, from){
-      this.jumpboxText = to
-    },
-    '$localData.tabData.activeTabKey'(to, from){
-      this.jumpboxText = this.$localData.root.activeTabObject.url
-    }
-  },
   created(){
   },
   updated(){
@@ -348,62 +239,17 @@ export default {
 
 <style lang="scss" scoped>
   #tabBar {
-    height: 28px;
     display: flex;
     flex-flow: row wrap;
     border-bottom: 1px solid var(--header-border);
 
-    &.showAddressBar {
-      height: 59px;
-      #tabSection {
-        width: 100%;
-        max-width: 100%;
-      }
-    }
-
-    &:not(.showAddressBar) {
-      .lineBreak {
-        display: none;
-      }
-      #jumpBox {
-        display: none;
-      }
-    }
-    #browserActions {
-      display: inline-block;
-      height: 28px;
-      // width: 58px;
-      display: flex; 
-      > div {
-        position: relative;
-        padding: 2px;
-        color: var(--font-header);
-        font-size: 24px;
-
-        .badge {
-          display: block;
-          position: absolute;
-          background: var(--header-bg);
-          font-size: 10px;
-          height: 1em;
-          line-height: normal;
-          bottom: 0;
-          right: 0;
-        }
-      }   
-      svg {opacity: 40%;}
-      div.active svg {opacity: 100%;
-      }
-    }
     #tabNavigation {
       display: inline-block;
       height: 28px;
-      // width: 58px;
       display: flex;      
       .historyButton {
         height: 28px;
         width: 29px;
-        //padding-top: 2px;
         margin: 0;
 
         line-height: 34px;
@@ -412,82 +258,15 @@ export default {
         text-align: center;
       }
     }
-    #jumpBox {
-      flex: 1 0 auto;
-      margin: auto 5px;
-
-      .jumpBoxWrapper::v-deep {
-        display: flex;
-        flex-flow: row nowrap;
-
-        border-radius: 2px;
-        border: 1px solid var(--header-border);
-        background: var(--header-tabSection);
-
-        .vue-simple-suggest {
-          width: 100%;
-        }
-
-        .jumpboxLink {
-          border-radius:  1px 0 0 1px ;
-          background: var(--header-tabSection);
-          color: var(--font-header);
-          font-size: 16px;
-          text-decoration: none;
-
-          justify-content: center;
-          align-items: center;
-          display: flex;
-
-          &::after {
-            text-align: center;
-            width: 22px;
-            margin: 0;
-          }
-        }
-        input {
-          border-radius: 0 1px 1px 0;
-          padding: 2px 0;
-          font-size: 15px;
-          line-height: 20px;
-          width: 100%;
-          border: none;
-          font-family: var(--font-family-ui);
-          background: var(--header-tabSection);
-          color: var(--font-header);
-        }
-        .suggestions {
-          background-color: var(--ctx-bg);
-          border: solid 1px var(--ctx-frame);
-          color: var(--font-ctx);
-
-          font-family: var(--font-family-ui);
-          font-weight: normal;
-
-          list-style: none;
-
-          li[aria-selected="true"] {
-            background: var(--ctx-select);
-          }
-
-          z-index: 5;
-          padding: 5px;
-          outline: none;
-          cursor: default;
-          position: fixed;
-          user-select: none;
-          white-space: nowrap;
-        }
-      }
-    }
+    
     .lineBreak {
       flex-basis: 100%;
       height: 3px;
     }
     #tabSection {
       background: var(--header-tabSection);
-      width: calc(100vw - 58px);
-      max-width: calc(100vw - 58px);
+      width: 1px; // Grow to fit
+      flex-grow: 1;
       height: 28px;
       display: inline-flex;
 

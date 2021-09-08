@@ -7,7 +7,8 @@ import localData from './store/localData'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -21,7 +22,8 @@ log.transports.console.format = '[{level}] {text}';
 
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
