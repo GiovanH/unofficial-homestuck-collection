@@ -350,7 +350,7 @@ function getModJs(mod_dir, options={}) {
 
     // TODO: Do computed properties automatically require a reload?
     // eslint-disable-next-line no-prototype-builtins
-    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
+    mod._needsreload = ['styles', 'vueHooks', 'themes', 'browserPages'].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
@@ -556,6 +556,26 @@ function getMixins(){
     })
   }
 
+  var newPages = getEnabledModsJs().reverse().reduce((pages, js) => {
+    if (!js.browserPages) return pages
+    return {...js.browserPages, ...pages}
+  }, {})
+  if (newPages) {
+    var pageComponents = {}
+    for (let k in newPages)
+      pageComponents[k] = newPages[k].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "TabFrame",
+        data: {modBrowserPages($super) {return {...newPages, ...$super}}},
+        created(){
+          this.$options.components = {...pageComponents, ...this.$options.components}
+        }
+      }]
+    })
+  }
+
   var mixins = mixables.map((js) => {
     const vueHooks = js.vueHooks || []
     if (vueHooks.length == 0) {
@@ -577,6 +597,10 @@ function getMixins(){
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {          
           if (hook.match(this)) {
+            // Literal created hook
+            if (hook.created)
+              hook.created.bind(this)()
+
             // Data w/ optional compute function
             this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
 

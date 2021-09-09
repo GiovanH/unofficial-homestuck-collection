@@ -474,3 +474,13 @@ All functions within vuehooks have `this` bound to the component element, so syn
 
 Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
 
+### Custom vue components
+
+`browserPages`: `Map<Name: PageDefinition>`
+
+`Name`s should be all-caps and represent the base URL of the page.
+
+Each `PageDefinition` has the following properties:
+
+- `component` (object): The object defining the vue component. See [documentation](https://vuejs.org/v2/guide/components.html).
+- `title` (`function(url)`): A function that should return the tab title of the page, given its url. This function is passed the whole url, not routeParams.

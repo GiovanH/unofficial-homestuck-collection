@@ -140,7 +140,8 @@ export default {
 	data() {
 		return {
 			forceLoad: false,
-			gameOverThemeOverride: false
+			gameOverThemeOverride: false,
+			modBrowserPages: {}
 		}
 	},
 	computed: {
@@ -330,7 +331,11 @@ export default {
 				}
 			}
 			
-			let result = component.toUpperCase() in this.$options.components ? component.toUpperCase() : 'ERROR404'
+			let result = 
+				(component.toUpperCase() in this.$options.components)
+				|| (component.toUpperCase() in this.modBrowserPages)
+				? component.toUpperCase() 
+				: 'ERROR404'
 			this.setTitle(result)
 			return result
 		},
@@ -571,6 +576,9 @@ export default {
 				default:
 					title = "The Unofficial Homestuck Collection"
 			}
+			const modComponentDef = this.modBrowserPages[component]
+			if (modComponentDef && modComponentDef.title)
+				title = modComponentDef.title(this.url)
 			// title = this.tab.url
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
 		}
