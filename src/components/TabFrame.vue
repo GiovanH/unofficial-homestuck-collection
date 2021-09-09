@@ -342,32 +342,39 @@ export default {
 		contentTheme() {
 			// Get the expected theme for this page, based on the content
 			let theme = 'default'
-			if (this.resolveComponent == 'PAGE'){
+			const component = this.resolveComponent
+			if (component == 'PAGE'){
 				let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
 				if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
 			}
-			else if (this.resolveComponent == 'FULLSCREENFLASH') {
+			else if (component == 'FULLSCREENFLASH') {
 				if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
 			}
-			else if (this.resolveComponent == 'ENDOFHS') {
+			else if (component == 'ENDOFHS') {
 				let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
 				if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
 			}
-			else if (this.resolveComponent == 'SBAHJ'){
+			else if (component == 'SBAHJ'){
 				theme = 'sbahj'
 			}
-			else if (this.resolveComponent == 'PXS'){
+			else if (component == 'PXS'){
 				theme = 'pxs'
 			}
-			else if (this.resolveComponent == 'TSO'){
+			else if (component == 'TSO'){
 				theme = 'tso'
 			}
-			else if (this.resolveComponent == 'EXTRASPAGE') {
+			else if (component == 'EXTRASPAGE') {
 				if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
 			}
-			else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+			else if (component == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+
+			const modComponentDef = this.modBrowserPages[component]
+			if (modComponentDef && modComponentDef.theme) {
+				var modTheme = modComponentDef.theme(this.url)
+				if (modTheme) theme = modTheme
+			}
+
 			return theme
-			
 		},
 		theme() {
 			// Get the actual displayed theme, factoring in settings.
