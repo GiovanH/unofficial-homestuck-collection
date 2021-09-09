@@ -1,15 +1,15 @@
 import fs from 'fs'
 import path from 'path'
-import yaml from 'js-yaml';
+import yaml from 'js-yaml'
 
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
-const sass = require('sass');
+const sass = require('sass')
 
 const Store = require('electron-store')
 const store = new Store()
 
-const log = require('electron-log');
-const logger = log.scope('Mods');
+const log = require('electron-log')
+const logger = log.scope('Mods')
 
 const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
 const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
@@ -376,7 +376,7 @@ function getModJs(mod_dir, options={}) {
         const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
         if (e2_is_notfound) {
           // Singlefile not found either
-          onModLoadFail([mod_dir], new Error(`${mod_dir} is missing required file 'mod.js'`))
+          onModLoadFail([mod_dir], e1)
         } else {
           logger.error("Singlefile found, other error 2")
           onModLoadFail([mod_dir], e2)
@@ -416,13 +416,13 @@ function editArchive(archive) {
     }
   })
 
+  // Footnotes
   archive.footnotes = {}
 
   footnote_categories.forEach(category => {
     archive.footnotes[category] = []
   })
 
-  // Footnotes
   getEnabledModsJs().reverse().forEach((js) => {
     try {
       if (js.footnotes) {
@@ -491,7 +491,6 @@ function getMainMixin(){
         const modstyles = js.styles || []
         modstyles.forEach((customstyle, i) => {
           const style_id = `style-${js._id}-${i}`
-          this.$logger.debug(style_id)
           
           var body
           if (customstyle.source) {
@@ -510,18 +509,14 @@ function getMainMixin(){
             console.assert(false, customstyle, "Styles must define some sort of body!")
           }
 
-          const style = document.createElement("style")
-          style.id = style_id
-          style.rel = "stylesheet"
-          style.innerHTML = body
-          this.$el.appendChild(style)
-          this.$logger.debug(style_id, style)
+          this.stylesheets.push({
+            id: style_id, body
+          })
         })
 
         const modThemes = js.themes || []
         modThemes.forEach((theme, i) => {
           const theme_class = `theme-${js._id}-${i}`
-          this.$logger.debug(theme_class)
 
           let body = fs.readFileSync(path.resolve(js._mod_root_dir, theme.source))
           body = sass.renderSync({
@@ -529,12 +524,9 @@ function getMainMixin(){
             sourceComments: true
           }).css.toString()
 
-          const style = document.createElement("style")
-          style.id = theme_class
-          style.rel = "stylesheet"
-          style.innerHTML = body
-          this.$el.appendChild(style)
-          this.$logger.debug(theme_class, style)
+          this.stylesheets.push({
+            id: theme_class, body
+          })
         })
       })
     }
@@ -546,26 +538,26 @@ function getMixins(){
 
   const nop = () => undefined
 
-  return getEnabledModsJs().reverse().map((js) => {
-    const vueHooks = js.vueHooks || []
-    const modThemes = js.themes || []
+  var mixables = getEnabledModsJs().reverse()
 
-    // Keep this logic out here so it doesn't get repeated
-    // TODO: Make sure other forEach s aren't being duplicated down there
-
-    // Write theme hooks
-    // Try to minimize vue hooks (don't want a huge stack!)
-    if (modThemes.length) {
-      const newThemes = modThemes.map((theme, i) => 
+  // Custom themes
+  var newThemes = getEnabledModsJs().reverse().reduce((themes, js) => {
+    if (!js.themes) return themes
+    return themes.concat(js.themes.map((theme, i) => 
         ({text: theme.label, value: `theme-${js._id}-${i}`})
-      )
-      
-      vueHooks.push({
+      ))
+  }, [])
+  if (newThemes) {
+    mixables.push({
+      vueHooks: [{
         matchName: "settings",
         data: {themes($super) {return $super.concat(newThemes)}}
-      })
-    }
+      }]
+    })
+  }
 
+  var mixins = mixables.map((js) => {
+    const vueHooks = js.vueHooks || []
     if (vueHooks.length == 0) {
       return null
     }
@@ -577,7 +569,7 @@ function getMixins(){
         hook.match = (c) => (c.$options.name == hook.matchName)
     })
 
-    var mixin = {
+    return {
       created() {
         const vueComponent = this
 
@@ -618,8 +610,9 @@ function getMixins(){
         })
       }
     }
-    return mixin
   }).filter(Boolean)
+
+  return mixins
 }
 
 // Runtime
