@@ -91,7 +91,7 @@ export default {
   },
   computed: {
     trackographySorted() {
-      //Always send unreleased-tracks to the bottom of the list. Otherwise, sort in chronological order of release
+      // Always send unreleased-tracks to the bottom of the list. Otherwise, sort in chronological order of release
       let keys = Object.keys(this.$archive.music.albums).sort((key1, key2) => {
         if (key1 == 'unreleased-tracks') return 1
         else if (key2 == 'unreleased-tracks') return -1
@@ -114,7 +114,7 @@ export default {
       return result
     },
     artistographySorted() {
-      //Sort artists in alphabetical order, and split into a maximum of three equal-ish columns. Try to hit around a minimum of 50 per column.
+      // Sort artists in alphabetical order, and split into a maximum of three equal-ish columns. Try to hit around a minimum of 50 per column.
       let keys = Object.keys(this.$archive.music.artists).sort((key1, key2) => {
         if (key1 < key2) return -1
         if (key1 > key2) return 1
@@ -123,7 +123,7 @@ export default {
       return keys.map(artist => `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`)
     },
     flashographySorted() {
-      //Sort in chronological order of release
+      // Sort in chronological order of release
       let keys = Object.keys(this.$archive.music.flashes).sort((key1, key2) => {
         let timestamp1 = key1 in this.$archive.mspa.story && this.$archive.mspa.story[key1].timestamp ? this.$archive.mspa.story[key1].timestamp : new Date(this.$archive.music.flashes[key1].date).getTime()/1000
         let timestamp2 = key2 in this.$archive.mspa.story && this.$archive.mspa.story[key2].timestamp ? this.$archive.mspa.story[key2].timestamp : new Date(this.$archive.music.flashes[key2].date).getTime()/1000
@@ -160,14 +160,14 @@ export default {
       return result
     },
     discographySorted() {
-      //Sort in reverse-chronological order of release.
+      // Sort in reverse-chronological order of release.
       let keys = Object.keys(this.$archive.music.albums).filter(album => !this.$albumIsSpoiler(album))
       let sorted = keys.sort((key1, key2) => new Date(this.$archive.music.albums[key2].date) - new Date(this.$archive.music.albums[key1].date))
       return this.reverseDiscography ? sorted.reverse() : sorted
     }
   },
-  methods:{
-    //thnks florrie 👍
+  methods: {
+    // thnks florrie 👍
     joinNoOxford(array, plural = 'and') {
       if (array.length === 0) {
           return ''

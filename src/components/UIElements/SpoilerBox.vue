@@ -28,7 +28,7 @@ export default {
       this.logHidden = false
     }
   },
-  methods:{
+  methods: {
     loggle() {
       this.logHidden = !this.logHidden
     },

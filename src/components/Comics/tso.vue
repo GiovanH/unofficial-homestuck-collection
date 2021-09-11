@@ -151,7 +151,7 @@ export default {
       else return `/tso/${this.routeParams.cid}/${p}`
     }
   },
-  methods:{
+  methods: {
     openComic(key) {
       if (this.selectedComic == key) this.selectedComic = undefined
       else this.selectedComic = key

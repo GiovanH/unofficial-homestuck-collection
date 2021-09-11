@@ -224,7 +224,7 @@ export default {
       return this.reverse ? [...this.$archive.social.blogspot].reverse() : this.$archive.social.blogspot
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },

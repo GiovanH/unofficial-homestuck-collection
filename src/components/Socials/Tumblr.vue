@@ -73,7 +73,7 @@ export default {
       return this.$archive.social.tumblr.length - this.posts.length
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },

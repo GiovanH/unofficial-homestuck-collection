@@ -51,7 +51,7 @@ export default {
         // list<theme => list<href => label>>
         // default theme in settings is the empty string
         "": {
-          "https://www.homestuck.com": "HOMESTUCK.COM",
+          "https:// www.homestuck.com": "HOMESTUCK.COM",
           "/": "HOME",
           "toggleJumpBox": "JUMP",
           "/map": "MAP",
@@ -62,7 +62,7 @@ export default {
           "/credits": "CREDITS"
         },
         A6A6: {
-          "https://www.homestuck.com": "WORTHLESS GARBAGE.",
+          "https:// www.homestuck.com": "WORTHLESS GARBAGE.",
           "/": "STUPID.",
           "toggleJumpBox": "WHO CARES?",
           "/map": "WOW.",
@@ -75,7 +75,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     toggleBookmarks(){
       this.tabComponent.$refs.bookmarks.toggle()
     },
@@ -166,7 +166,7 @@ export default {
       justify-content: center;
       .candyCorn {
         margin: 0 9px;
-        content: url(assets://images/candycorn.gif);
+        content: url(assets:// images/candycorn.gif);
       }
       ul {
         height: 17px;

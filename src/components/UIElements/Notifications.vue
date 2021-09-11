@@ -42,9 +42,9 @@ export default {
   },
   computed: {
   },
-  methods:{
-    //This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
-    //We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
+  methods: {
+    // This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
+    // We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
     allowEndOfHomestuck() {
       this.allowEOH = true
     },

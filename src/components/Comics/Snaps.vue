@@ -78,7 +78,7 @@ export default {
 
       let prevPage = parseInt(this.routeParams.pid) - 1
       if (prevPage < 1)  {
-        //We're going to serve up the last page of the previous comic
+        // We're going to serve up the last page of the previous comic
         let prevIndex = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) - 1
         let prevComic = this.$archive.comics.snaps.list[prevIndex]
 
@@ -100,7 +100,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     openStory(key) {
       if (this.selectedStory == key) this.selectedStory = undefined
       else this.selectedStory = key

@@ -27,7 +27,7 @@ export default {
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
   updated() {
   },

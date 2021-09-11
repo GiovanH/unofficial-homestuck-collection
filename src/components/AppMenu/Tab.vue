@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     getId(){
-      //Used by TabBar to swap tabs while dragging
+      // Used by TabBar to swap tabs while dragging
       return this.tab.key
     },
     clickTab() {
@@ -48,7 +48,7 @@ export default {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
     onResize() { 
-      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 //Offsets 5px of padding on left
+      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
       let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
       
       this.titleFade = titleWidth < titleTextWidth

@@ -74,7 +74,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    //Classes copied from original pages to preserve original theme through style changes
+    // Classes copied from original pages to preserve original theme through style changes
 
   .pageBody {
     margin: 0;

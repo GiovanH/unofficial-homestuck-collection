@@ -403,7 +403,7 @@ export default {
       .historyButton {
         height: 28px;
         width: 29px;
-        //padding-top: 2px;
+        // padding-top: 2px;
         margin: 0;
 
         line-height: 34px;
@@ -498,7 +498,7 @@ export default {
 
         background: var(--header-bg);
 
-        //tab css copied
+        // tab css copied
         display: inline-flex;
         justify-content: space-between;
         align-items: center;

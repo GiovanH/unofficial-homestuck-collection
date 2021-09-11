@@ -678,7 +678,7 @@ export default {
       return this.routeParams.mode == '6'
     }
   },
-  methods:{
+  methods: {
   },
 }
 </script>

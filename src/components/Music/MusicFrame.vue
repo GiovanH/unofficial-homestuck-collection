@@ -86,7 +86,7 @@ export default {
       return (this.routeParams.mode == 'artist' && key in this.$archive.music.artists) ? this.$archive.music.artists[key] : undefined
     }
   },
-  methods:{
+  methods: {
   }
 }
 </script>

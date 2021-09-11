@@ -154,7 +154,7 @@ export default {
       return output.join('')
     }
   },
-  methods:{
+  methods: {
   },
 }
 </script>

@@ -140,7 +140,7 @@ export default {
   },
   computed: {
   },
-  methods:{
+  methods: {
     async search() {
       let input = this.inputText
 
@@ -160,7 +160,7 @@ export default {
           if (value in this.chapters) filter = filter.concat(this.chapters[value])
         }
       }
-      filter = [...new Set(filter)] //remove duplicates
+      filter = [...new Set(filter)] // remove duplicates
 
       this.query = input
         .replace(/&/g, "&amp;")

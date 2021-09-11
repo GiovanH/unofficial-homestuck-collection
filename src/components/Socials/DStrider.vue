@@ -122,7 +122,7 @@ export default {
       return this.reverse ? [...this.$archive.social.dstrider].reverse() : this.$archive.social.dstrider
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },

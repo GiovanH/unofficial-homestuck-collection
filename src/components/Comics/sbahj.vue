@@ -163,7 +163,7 @@ export default {
       return `/sbahj/${cid}`
     },
   },
-  methods:{
+  methods: {
     keyNavEvent(dir) {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.nextPage)
