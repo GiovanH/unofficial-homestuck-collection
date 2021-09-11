@@ -6,8 +6,9 @@ import localData from './store/localData'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
-  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faRandom,
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar, faRandom
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -20,8 +21,9 @@ const log = require('electron-log');
 log.transports.console.format = '[{level}] {text}';
 
 library.add([
-  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faRandom,
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar, faRandom
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
