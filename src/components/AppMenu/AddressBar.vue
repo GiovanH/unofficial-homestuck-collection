@@ -33,12 +33,7 @@
           <fa-icon icon="lock"></fa-icon>
           <span class="badge" v-text="$newReaderCurrent"></span>
         </div>
-        <div class="systemButton"
-          @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
-          :class="{active: isCurrentPageBookmarked}">
-          <fa-icon 
-            :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
-        </div>
+        <component v-for="(__, action) in browserActions" :is="action" :key="action" />
       </div>      
     </div>
   </div>
@@ -48,16 +43,7 @@
 
 import VueSimpleSuggest from 'vue-simple-suggest'
 
-export default {
-  name: 'addressBar',
-  components: {
-    VueSimpleSuggest
-  },
-  data(){
-    return {
-      jumpboxText: this.$localData.root.activeTabObject.url
-    }
-  },
+const BrowserActionBookmark = {
   computed: {
     isCurrentPageBookmarked(){
       return Object.values(this.$localData.saveData.saves).some(
@@ -66,7 +52,52 @@ export default {
     },
     tabComponent() {
       return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
-    },
+    }
+  },
+// template: `
+// <div class="systemButton"
+//   @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
+//   :class="{active: isCurrentPageBookmarked}">
+//   <fa-icon 
+//     :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
+// </div>
+// `,
+  render: function(h){
+    return h('div', {
+      staticClass: "systemButton",
+      class: {
+        active: this.isCurrentPageBookmarked
+      },
+      on: {
+        click: function($event) {
+          const bookmarks = this.tabComponent.$refs.bookmarks
+          this.isCurrentPageBookmarked ? bookmarks.open() : bookmarks.newSave()
+        }
+      }
+    }, [h('fa-icon', {
+      attrs: {
+        // todo hollow star icon
+        "icon": this.isCurrentPageBookmarked ? 'star' : 'star' 
+      }
+    })], 1)
+  }
+}
+
+export default {
+  name: 'addressBar',
+  components: {
+    VueSimpleSuggest
+  },
+  data(){
+    return {
+      jumpboxText: this.$localData.root.activeTabObject.url,
+      browserActions: {BrowserActionBookmark}
+    }
+  },        
+  created(){
+    Object.assign(this.$options.components, this.browserActions)
+  },
+  computed: {
     thisTabPageId(){
       // // This is a good implementation to grab an inner page, so I'm leaving 
       // // it as a reference, but it has a race condition which makes it
@@ -233,7 +264,7 @@ export default {
     }
   }
 }
-#browserActions {
+#browserActions::v-deep {
   display: inline-block;
   height: 28px;
   // width: 58px;
