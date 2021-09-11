@@ -153,7 +153,7 @@ export default {
     save() {
       if (this.info_only) return
       if (!this.hasSettings) return
-      this.$logger.info("saving", this.buffer, this.storeKey)
+      this.$logger.debug("saving", this.buffer, this.storeKey)
       store.set(this.storeKey, this.buffer)
     },
     clearAll() {

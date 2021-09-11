@@ -150,7 +150,6 @@ export default {
         '07445': '522px',
         '07953': '522px'
       },
-      audioLoop: ['00980_1', '00980_bolin_1', '00980_2', '07921'],
       audioDelay: {
         '00980_1': 1500,
         '00980_bolin_1': 3100,
@@ -230,8 +229,9 @@ export default {
       return `${width}px`
     },
     flashProps() {
-      let filename = path.parse(this.url).name
-      if (/_hq/.test(filename)) filename = filename.substring(0, filename.length - 3)
+      // ID, before any underscores
+      let filename = path.parse(this.url).name.split("_")[0]
+      this.$logger.info("Getting flash props for", filename, this.url)
 
       const defaultProps = {
         id: filename, 
@@ -243,10 +243,15 @@ export default {
 
       let customProps = this.indexedFlashProps[filename] || {}
 
-      if (customProps)
+      if (Object.keys(customProps).length)
         this.$logger.info("Custom props for flash", filename, customProps)
 
       return {...defaultProps, ...customProps}
+    },
+    audioTracks() {
+      const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
+      this.$logger.info("Getting audio tracks for", this.url.replace("_hq.swf", ".swf"), ret)
+      return ret
     },
     flashSrc() {
       return `
@@ -396,31 +401,22 @@ export default {
 
     audioInit() {
       if (this.audio.length < 1) {
-        if (this.flashProps.id.startsWith('00980')){ 
-          this.audio.push(this.createAudioElement(/bolin/.test(this.flashProps.id) ? `00980_bolin_1` : `00980_1`))
-          this.audio.push(this.createAudioElement(`00980_2`))
-        } else if (this.flashProps.id == '03435') {
-          this.audio.push(this.createAudioElement(`03435_1`))
-          this.audio.push(this.createAudioElement(`03435_2`))
-        } else if (this.flashProps.id == '04106'){
-          for (var i = 1; i <= 5; i++) 
-            this.audio.push(this.createAudioElement(`cascade_segment${i}`))
-        } else if (this.flashProps.id == '04370') {
-          this.audio.push(this.createAudioElement(`04370_1`))
-          this.audio.push(this.createAudioElement(`04370_2`))
-        } else {
-          this.audio.push(this.createAudioElement())
+        if (this.audioTracks.length > 0) {
+          this.audioTracks.forEach(track => {
+            this.$logger.info("Adding track", track.href)
+            this.audio.push(this.createAudioElement(track))
+          })
         }
       } else {
         this.audioReset()
       }
     },
-    createAudioElement(id = this.flashProps.id) {
-      const audioElement = new Audio(this.$getResourceURL(path.join(path.parse(this.url).dir, id + '.mp3')))
+    createAudioElement(track) {
+      const audioElement = new Audio(this.$getResourceURL(track.href))
 
       audioElement.preload = 'auto'
-
-      if (this.audioLoop.includes(id)) audioElement.loop = true
+      
+      audioElement.loop = track.loop
 
       audioElement.load()
 
@@ -454,6 +450,8 @@ export default {
       let delay = 0
       if (cascadeDelay)
         delay = cascadeDelay
+      else if (this.audioTracks && this.audioTracks[0].audioDelay)
+        delay = this.audioTracks[0].audioDelay
       else if (replay && (`${this.flashProps.id}_replay`) in this.audioDelay)
         delay = this.audioDelay[`${this.flashProps.id}_replay`]
       else if (`${this.flashProps.id}_${n + 1}` in this.audioDelay)
@@ -497,7 +495,7 @@ export default {
       }
       let time
       let transition = 'height 0.2s'
-      let heightTo = this.flashProps.height
+      let heightTo = this.flashProps.height + 'px'
       switch (n) {
         case 'cascade1':
           time = 60900
@@ -539,7 +537,7 @@ export default {
         }, time)
       } else {
         this.$el.style.transition = transition
-        this.$el.style.height = this.flashProps.height
+        this.$el.style.height = heightTo
       }
     },
     startTimer(callback, delay){

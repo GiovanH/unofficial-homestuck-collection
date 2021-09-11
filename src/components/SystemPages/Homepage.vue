@@ -1,8 +1,8 @@
 <template>
-  <div class="pageBody customStyles">
+  <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
     <div class="card Logo">
-      <a href="/" class="topLogo"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a href="/" class="topLogo cardContent"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent collection">
         <div class="links">
           <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="card">
-      <Media url="/archive/collection/hs_logo.png" class="logo hsLogo" />
+      <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" />
       <div class="cardContent cardEntry hsCard">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
@@ -166,7 +166,7 @@
     </div>
     
     <div class="card">
-      <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo" />
+      <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
       <div class="cardContent cardEntry jbCard">
         <div class="icon">
           <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
@@ -227,7 +227,7 @@
     </div>
 
     <div class="card">
-      <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo" />
+      <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo cardContent" />
       <div class="cardContent cardEntry tsoCard">
         <div class="icon">
           <a href="/tso" ><Media url="/archive/collection/archive_tso.png" /></a>
@@ -449,8 +449,6 @@ export default {
     }
 
     .topLogo {
-      margin: 25px;
-
       img {
         width: 700px;
       }
@@ -461,7 +459,7 @@ export default {
     .card {
       position: relative;
       margin-bottom: 75px;
-      padding: 0 50px;
+      padding: 25px 50px;
       border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
       box-sizing: border-box;
       width: 950px;
@@ -475,34 +473,29 @@ export default {
 
       .logo {
         max-width: 920px;
-        position: absolute;
+        // position: absolute;
         &.hsLogo {
           // padding: 10px 0;
-          top: -60px;
+          margin-top: -85px;
         }
         &.mspaLogo {
-          top: -40px;
-          // padding: 10px 0;
+          margin-top: -65px;
         }
         &.tsoLogo {
-          top: -80px;
-        }
-      }
-      .logo {
-        // Correctly position cards under logos
-        &.hsLogo + .cardEntry {
-          padding-top: 120px;
-        }
-        &.mspaLogo + .cardEntry {
-          padding-top: 50px;
-        }
-        &.tsoLogo + .cardEntry {
-          padding-top: 80px;
+          margin-top: -105px;
         }
       }
       .cardContent {
-        width: 100%;
-        padding-bottom: 25px;
+        // img cardContent have special widths
+        &div {
+          width: 100%;
+        }
+        // Space between items
+        // We use the .cardContent class for this
+        // because vue makes > * { & + & } rules annoying.
+        & + .cardContent  {
+          padding-top: 25px;
+        }
 
         &.collection {
           text-align: center;
@@ -519,8 +512,8 @@ export default {
         }
         &.cardEntry {
           // Styles for big adventure cards
-          padding-top: 25px;
-          border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
+          // padding-top: 25px;
+          // border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
 
           display: flex;
           flex-flow: row nowrap;
@@ -572,7 +565,6 @@ export default {
             border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
 
             &.noBorder {
-              margin-top: 15px;
               border-top: none;
             }
 
@@ -583,7 +575,6 @@ export default {
               flex-flow: row nowrap;
               align-items: center;
               
-
               .thumbnail {
                 img {
                   display: block;

@@ -4,6 +4,7 @@
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
+      <Metadata v-if="showMetadata == true" :thisPage="thisPage" />
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
@@ -15,7 +16,9 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
+                :nextPages="nextPagesArray" ref="pageNav"
+                :class="(hideNav ? 'hidden' : '')" />
           </div>
         <Footnotes :pageId="thisPage.pageId" />
       </div>
@@ -33,6 +36,7 @@ import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
 
 import Firefly from '@/components/SpecialPages/Firefly.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
@@ -43,12 +47,14 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes, Metadata
   },
   data: function() {
     return {
       preload: [],
-      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
+      forceKeyboardEnable: false, // overridden by oddities
+      showMetadata: false
     }
   },
   theme: function(ctx) {
@@ -112,13 +118,10 @@ export default {
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
 
-      // TODO: Handle bolin with mod syntax
-      if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
+      if (this.$archive.audioData[media[0]]) {
         let flashPath = media[0].substring(0, media[0].length-4)
-        if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('BOLINHQ')) ? `${flashPath}_bolin_hq.swf` : `${flashPath}_bolin.swf`
-        else
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) ? `${flashPath}_hq.swf` : media[0]
+        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
+        media[0] = `${flashPath}_hq.swf`
       }
 
       // TODO: This doesn't seem to be used anywhere or do anything.
@@ -127,7 +130,7 @@ export default {
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
-            let img = new Image()
+            const img = new Image()
             img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
@@ -160,6 +163,9 @@ export default {
     },
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
+    },
+    hideNav(){
+      return this.thisPage.flag.includes('SWFNAV')
     },
     footerBanner() {
       switch (this.$root.tabTheme) {
@@ -197,6 +203,10 @@ export default {
       return media
     },
     keyNavEvent(dir) {
+      // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.forceKeyboardEnable)
+        return
+
       if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
@@ -275,6 +285,7 @@ export default {
       padding-top: 7px;
       padding-bottom: 23px;
       margin: 0 auto;
+      position: relative; // Allow things to align to the page
 
       flex: 0 1 auto;
       display: flex;

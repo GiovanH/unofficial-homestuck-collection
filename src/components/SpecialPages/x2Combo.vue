@@ -7,6 +7,7 @@
       <NavBanner class="rightNavBanner" useCustomStyles="true" />
     </div>
     <div class="pageFrame">
+      <Metadata v-if="showMetadata" :thisPage="thisPage[0]" />
       <div class="pageContent leftPage">
         <Footnotes :pageId="thisPage[0].pageId" preface />
           <div class="mediaContent">
@@ -49,6 +50,7 @@ import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/SpecialPages/x2ComboNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
 
 import PAGE from '@/components/Page/Page.vue'
 
@@ -58,11 +60,12 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Footnotes
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Footnotes, Metadata
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      showMetadata: false
     }
   },
   theme: PAGE.theme,

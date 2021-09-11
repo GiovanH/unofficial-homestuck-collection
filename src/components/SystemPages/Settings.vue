@@ -38,6 +38,10 @@
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
+          <div class="subOption" v-if="$localData.settings['notifications']">
+            <dt><label><input type="checkbox" name="subNotifications" v-model="$localData.settings['subNotifications']" @click="toggleSetting('subNotifications')">Show minor notifications</label></dt>
+          <dd class="settingDesc">Also show notifications for minor updates like news announcements.</dd>
+          </div>
         </dl>
       </div>
       <div class="settings application">
@@ -603,8 +607,8 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (['unpeachy', 'pxsTavros'].includes(setting)) {
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
+        this.queueArchiveReload()
       }
 
       this.$localData.root.saveLocalStorage()
@@ -676,6 +680,13 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+    }
+  },
+  mounted(){
+    if (this.routeParams.sec) {
+      this.$nextTick(() => {
+        this.$el.querySelector(`.settings.${this.routeParams.sec}`).scrollIntoView(true)
+      })
     }
   },
   watch: {
@@ -761,6 +772,10 @@ export default {
         .settingDesc {
           color: var(--page-nav-meta);
           font-weight: normal;
+        }
+
+        div.subOption {
+          margin-left: 40px;
         }
 
         > dd.settingDesc {

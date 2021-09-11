@@ -158,7 +158,7 @@ export default {
     }
   },
   computed: {
-    intersectResults(){
+    intersectResults() {
       return intersect(
         ...Object.keys(this.selectedIntersections).filter(
             k => this.selectedIntersections[k]
@@ -168,7 +168,7 @@ export default {
         )
       )
     },
-    swfResults(){
+    swfResults() {
       if (!this.swfLookup || this.swfLookup.length < 4) {
         return []
       }
@@ -177,7 +177,7 @@ export default {
         page.media.some(url => url.includes(this.swfLookup))
       ).map(page => page.pageId)
     },
-    allFlags(){
+    allFlags() {
       return Object.values(this.$archive.mspa.story).filter(
         page => page.flag.length > 0
       ).reduce((acc, page) => {
@@ -186,13 +186,34 @@ export default {
           if (!acc.includes(f)) acc.push(f)
         }
         return acc
-      }, [])
+      }, []).concat([
+        "*NO_NEXT",
+        "*NO_NEXT_SWF"
+      ])
     },
-    flagResults(){
+    flagResults() {
+      if (this.flagLookup == "*NO_NEXT")
+        return this.pagesNoNext
+      if (this.flagLookup == "*NO_NEXT_SWF")
+        return this.pagesNoNextSwf
+
+      return this.pagesFlagResults
+    },
+    pagesNoNextSwf() {
+      return Object.values(this.$archive.mspa.story).filter(page => 
+        (page.next.length == 0) && (page.media[0].endsWith(".swf"))
+      ).map(page => page.pageId)
+    },
+    pagesNoNext() {
+      return Object.values(this.$archive.mspa.story).filter(page => 
+        page.next.length == 0
+      ).map(page => page.pageId)
+    },
+    pagesFlagResults() {
       return Object.values(this.$archive.mspa.story).filter(page => 
         page.flag.includes(this.flagLookup.toUpperCase())
       ).map(page => page.pageId)
-    }
+    },
   },
   methods: {
   },

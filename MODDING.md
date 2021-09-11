@@ -527,3 +527,16 @@ Note that the `component` object has two special page functions that take, as th
 
 - `title` (`function(ctx)`): A function that should return the tab title of the page.
 - `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
+
+### Misc
+
+The archive has a `flags` object designed to be used for asynchronous, cooperative mod communication. For instance, if Mod B wants to check if Mod A is loaded, Mod A can run
+
+`archive.flags['MOD_A_LOADED'] = true`
+
+and Mod B can check
+
+`archive.flags['MOD_A_LOADED']`
+
+Note that there is no special namespacing done on these flags; any mod can theoretically read and write to any flag at any time. Also note that in the above example, Mod A must be loaded before Mod B in order to recognize its presence. This is intentional behavior.
+

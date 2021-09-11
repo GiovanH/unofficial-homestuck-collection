@@ -7,7 +7,8 @@ import localData from './store/localData'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -21,7 +22,8 @@ log.transports.console.format = '[{level}] {text}';
 
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
+  faRedo, faStar
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -372,7 +374,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else this.$logger.warn("Invalid page ID, not updating progress")
+      } else this.$logger.warn(`Invalid page ID '${thisPageId}', not updating progress`)
     },
     $shouldRetcon(retcon_id){
       console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
@@ -389,12 +391,22 @@ Vue.mixin({
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
+    $pushNotif(notif) {
+      this.$root.$children[0].$refs.notifications.queueNotif(notif)
+    },
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
       const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
+      let nextTimestamp
+      try {
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$localData.settings.newReader.current].next[0]].timestamp
+      } catch {
+        this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
+        nextTimestamp = latestTimestamp
+      }
 
-      if (timestamp > latestTimestamp) {
+      if (timestamp > nextTimestamp) {
         // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"

@@ -6,13 +6,13 @@
         <div class="innerClose">✕</div>
       </button>
 
-      <a class="frame" :href="notifData[notif.notifId].url" target="_blank" @click="clearNotif(notif.key)">
+      <a class="frame" :href="notif.url" target="_blank" @click="clearNotif(notif.key)">
         <div class="innerFrame">
-          <Media class="thumb" :url="notifData[notif.notifId].thumb" draggable="false" />
+          <Media class="thumb" :url="notif.thumb" draggable="false" />
           <div class="arrow">></div>
           <div class="info">
-            <span class="title">{{notifData[notif.notifId].title}}</span>
-            <span class="desc">{{notifData[notif.notifId].desc}}</span>
+            <span class="title" v-text="notif.title"></span>
+            <span class="desc" v-text="notif.desc"></span>
           </div>
         </div>
       </a>
@@ -37,43 +37,137 @@ export default {
       notifDuration: 10000,
       activeNotifs: [],
       queue: [],
-      allowEOH: false
+      allowEOH: false,
+      DateTime: require('luxon').DateTime
     }
   },
   computed: {
+    newspostsByTimestamp() {
+      return Object.values(this.$archive.news).reduce(function(acc, y){
+        return acc.concat(y)
+      }, []).reduce(function(acc, n){
+        acc[n.timestamp] = n
+        return acc
+      })
+    },
+    sortedNewspostTimestamps() {
+      return Object.keys(this.newspostsByTimestamp).sort()
+    }    
   },
   methods: {
+    formatTimestamp(timestamp){
+      return this.DateTime.fromSeconds(Number(timestamp))
+        .setZone("America/New_York")
+        .toFormat("MM/dd/yyyy, ttt")
+    },
     // This switch gets flipped when new reader mode is disabled. While it is active, notifications from page '010030' are allowed to appear.
     // We use this let the credits page itself trigger the notifications once it is destroyed, but only after the reader leaves new-reader mode
     allowEndOfHomestuck() {
       this.allowEOH = true
     },
+    timestampsBetween(time1, time2, corpus) {
+      // Returns all values in `corpus` that are between `time1` and `time2`.
+      // Corpus is expected to be sorted already.
+
+      // Time1 is the "current" timestamp
+      // Time2 is the "next" timestamp
+      // Corpus is a sorted list of all the timestamps
+
+      if (time2 <= time1) return []
+
+      // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
+
+      let ret = []
+      let newst = -1
+      for (let i = 0; newst <= time2; newst = corpus[i++]) {
+        if (newst > time1) {
+          ret.push(newst)
+          // this.$logger.info("Found", this.formatTimestamp(newst))
+        }
+      }
+
+      return ret
+    },
+    makeNewsNotif(newspost){
+      let d = document.createElement("div")
+      const desc_length = 140
+      d.innerHTML = newspost.html
+      const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
+
+      return {
+        title: 'New news post',
+        desc: desc,
+        url: `/news/${newspost.id}`,
+        thumb: '/archive/collection/archive_news.png'
+      }
+    },
+    makeModUnlockNotif(modChoice){
+      return {
+        title: 'NEW MOD UNLOCKED',
+        desc: modChoice.label,
+        url: `/settings/mod`,
+        thumb: '/archive/collection/archive_desktops.png'
+      }
+    },
     queueFromPageId(pageId) {
       if (pageId == '010030') {
         if (this.allowEOH) {
           this.allowEOH = false
-          this.notifPages['010030'].forEach(notifId => this.queueNotif(notifId))
+          this.notifPages['010030'].forEach(notifId => this.queueNotif(notifData[notifId]))
         } 
+      } else if (pageId in this.notifPages) {
+        this.notifPages[pageId].forEach(notifId => this.queueNotif(notifData[notifId]))
       }
-      else if (pageId in this.notifPages ) {
-        this.notifPages[pageId].forEach(notifId => this.queueNotif(notifId))
+
+      for (const modKey in this.$modChoices) {
+        const modChoice = this.$modChoices[modKey]
+        if (modChoice.locked == pageId) {
+            this.queueNotif(this.makeModUnlockNotif(modChoice))
+        }
+      }
+
+      // Timestamp-based notifications
+      
+      if (this.$localData.settings.subNotifications) {
+        try {
+          // See also $timestampIsSpoiler
+          // but we can't reuse that logic because we're passing an explicit time point here
+          const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
+          const nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].next[0]].timestamp
+
+          // Newsposts
+          const news_between = this.timestampsBetween(
+            latestTimestamp, nextTimestamp, 
+            this.sortedNewspostTimestamps
+          )
+          news_between.forEach(newst => {
+            this.$logger.info(nextTimestamp, newst, nextTimestamp)
+
+            this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
+          })
+        } catch (e) {
+          this.$logger.warn("Couldn't compute timestamp", e)
+        }
       }
     },
-    queueNotif(notifId) {
-      if (notifId in this.notifData) {
-        let key = Math.random().toString(36).substring(2, 5) + Date.now()
+    queueNotif(notif) {
+      // Add notification to the queue and fire it if there's room to display it.
+      let key = Math.random().toString(36).substring(2, 5) + Date.now()
+      const notifEntry = {...notif, key} // Add key to notif object
 
-        if (this.activeNotifs.length < 3) this.fireNotif({key, notifId})
-        else this.queue.push({key, notifId})
-      }
+      if (this.activeNotifs.length < 3) this.fireNotif(notifEntry)
+      else this.queue.push(notifEntry)
     },
     fireNotif(queuedNotif) {
+      // Add notification to activeNotifs and also queue its removal
       let timer = setTimeout(()=>{
         this.clearNotif(queuedNotif.key)
       }, this.notifDuration)
-      this.activeNotifs.push({...queuedNotif, timer})
+      this.activeNotifs.push({...queuedNotif, timer}) // Add timer to notif object
     },
     clearNotif(key) {
+      // Remove notification with key `key` from activeNotifs
+      // If there are more notifications in the queue, process the queue.
       let notif = this.activeNotifs.findIndex(notif => notif.key == key)
       if (notif > -1) {
         clearTimeout(this.activeNotifs[notif].timer)
@@ -192,7 +286,6 @@ export default {
   }
 }
 
-
 .notif-list-enter, .notif-list-leave-to {
   opacity: 0;
   transform: translateY(100%);
@@ -205,4 +298,3 @@ export default {
 }
 
 </style>
-
