@@ -3,14 +3,14 @@
     <NavBanner />
     <div class="pageFrame">
       <div class="pageContent">
-        <div class="logItems">
+        <div class="logItems" v-if="otherComponents.length">
           <h2>Overview</h2>
           <div v-for="ikey in intersectionKeys" class="flexbox">
             <h3 v-text="ikey" /><br />
             <div v-for="COMP in otherComponents" class="column">
               <h4 v-text="COMP.name" />
               <ul class="intersectionOverview">
-                <li v-for='k in Object.keys(COMP[ikey])'>
+                <li v-for='(__, k) in COMP[ikey]'>
                   <span class="match" v-if="COMP[ikey][k] == otherComponents['PAGE'][ikey][k]" v-text="k" :data-value="COMP[ikey][k]"/>
                   <span class="notmatch" v-else-if="k in otherComponents['PAGE'][ikey]" v-text="k" />
                   <span class="new" v-else v-text="k" />
@@ -18,7 +18,7 @@
               </ul>
             </div>
           </div>
-          <h2>Intersections</h2>
+          <!-- <h2>Intersections</h2>
           <select v-model="intersectionKeySelected">
             <option v-for="k in intersectionKeys" :value="k" :key="k" v-text="k" />
           </select>
@@ -32,7 +32,12 @@
             <li v-for='r in intersectResults' :key='r' v-text="r">
               
             </li>
-          </ul>
+          </ul> -->
+        </div>
+        <div class="logItems">
+          <h2>Vue template compiler</h2>
+          <textarea v-model="compileTemplate" style="width: 100%;" />
+          <pre v-text="compiledResult" style="white-space: pre-wrap;"/>
         </div>
         <div class="logItems">
           <h2>Media Lookup</h2>
@@ -121,12 +126,14 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
-import PAGE from '@/components/Page/Page.vue'
-import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
-import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
-import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
-import ECHIDNA from '@/components/SpecialPages/Echidna.vue'
-import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
+// import PAGE from '@/components/Page/Page.vue'
+// import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
+// import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
+// import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
+// import ECHIDNA from '@/components/SpecialPages/Echidna.vue'
+// import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
+
+import Vue from 'vue'
 
 function intersect(...sets) {
     if (!sets.length) return new Set();
@@ -149,25 +156,35 @@ export default {
   },
   data: function() {
     return {
-      swfLookup: "",
+      swfLookup: "04812.swf",
       flagLookup: "",
-      otherComponents: {PAGE, FULLSCREENFLASH, X2COMBO, TZPASSWORD, ECHIDNA, ENDOFHS},
+      otherComponents: {}, // {PAGE, FULLSCREENFLASH, X2COMBO, TZPASSWORD, ECHIDNA, ENDOFHS},
       selectedIntersections: {},
-      intersectionKeySelected: "computed",
-      intersectionKeys: ["computed", "methods"]
+      // intersectionKeySelected: "computed",
+      intersectionKeys: ["computed", "methods"],
+      compileTemplate: ""
     }
   },
   computed: {
-    intersectResults() {
-      return intersect(
-        ...Object.keys(this.selectedIntersections).filter(
-            k => this.selectedIntersections[k]
-          ).map(k => new Set(
-            Object.keys(this.otherComponents[k][this.intersectionKeySelected])
-          )
-        )
-      )
+    compiledResult(){
+      try {
+        const compiled = Vue.compile(this.compileTemplate)
+        this.$logger.info(compiled)
+        return compiled.render.toString()
+      } catch (e) {
+        return e.stack
+      }
     },
+    // intersectResults() {
+    //   return intersect(
+    //     ...Object.keys(this.selectedIntersections).filter(
+    //         k => this.selectedIntersections[k]
+    //       ).map(k => new Set(
+    //         Object.keys(this.otherComponents[k][this.intersectionKeySelected])
+    //       )
+    //     )
+    //   )
+    // },
     swfResults() {
       if (!this.swfLookup || this.swfLookup.length < 4) {
         return []
