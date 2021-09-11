@@ -46,6 +46,8 @@ export default {
   components: {
     NavBanner, Media, TextContent, PageNav, PageFooter
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   data: function() {
     return {
       inputText: '',

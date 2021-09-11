@@ -119,7 +119,6 @@
         <br />
         <a href="/sbahj/1">COMIC #1: man listen, stairs. i am TELLING you</a>
 
-        
         <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
       </div>
     </div>
@@ -140,6 +139,7 @@ export default {
     NavBanner, MediaEmbed
   },
   title: () => "sweet bro and hella jeff",
+  theme: () => 'sbahj',
   data: function() {
     return {
     }

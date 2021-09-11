@@ -65,6 +65,8 @@ export default {
       preload: []
     }
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   computed: {
     pageNum: PAGE.computed.pageNum,  // Page number of the left page
     storyId: PAGE.computed.storyId,

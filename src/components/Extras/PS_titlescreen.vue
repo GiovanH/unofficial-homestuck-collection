@@ -27,6 +27,7 @@ export default {
     NavBanner, MediaEmbed, PageFooter, FlashCredit
   },
   title: () => "Problem Sleuth",
+  theme: () => 'retro',
   data: function() {
     return {
     }

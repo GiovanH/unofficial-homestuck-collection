@@ -116,6 +116,7 @@ export default {
     else 
       return "Team Special Olympics"
   },
+  theme: () => 'tso',
   data: function() {
     return {
       selectedComic: undefined

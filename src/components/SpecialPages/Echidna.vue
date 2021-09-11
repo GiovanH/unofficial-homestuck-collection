@@ -34,6 +34,8 @@ export default {
   components: {
      Media, PageNav, FlashCredit, Footnotes
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   data: function() {
     return {
     }

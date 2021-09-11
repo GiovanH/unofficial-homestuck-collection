@@ -104,6 +104,7 @@ export default {
       return `${comic} - Paradox Space`
     }
   },
+  theme: () => 'pxs',
   data: function() {
     return {
       selectedStory: undefined

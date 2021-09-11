@@ -86,7 +86,7 @@ export default {
     props: [
         'tab'
     ],
-    components : {
+    components: {
         Bookmarks,
         FindBox,
         JumpBox,
@@ -343,35 +343,13 @@ export default {
             // Get the expected theme for this page, based on the content
             let theme = 'default'
             const component = this.resolveComponent
-            if (component == 'PAGE'){
-                let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-                if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-            }
-            else if (component == 'FULLSCREENFLASH') {
-                if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
-            }
-            else if (component == 'ENDOFHS') {
-                let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-                if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-            }
-            else if (component == 'SBAHJ'){
-                theme = 'sbahj'
-            }
-            else if (component == 'PXS'){
-                theme = 'pxs'
-            }
-            else if (component == 'TSO'){
-                theme = 'tso'
-            }
-            else if (component == 'EXTRASPAGE') {
-                if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
-            }
-            else if (component == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
 
-            const modComponentDef = this.modBrowserPages[component]
-            if (modComponentDef && modComponentDef.theme) {
-                var modTheme = modComponentDef.theme(this.url)
-                if (modTheme) theme = modTheme
+            // if (this.gameOverThemeOverride) return this.gameOverThemeOverride
+
+            const componentObj = this.$options.components[component]
+            if (componentObj && componentObj.theme) {
+                const context = this
+                theme = componentObj.theme(context) || theme
             }
 
             return theme

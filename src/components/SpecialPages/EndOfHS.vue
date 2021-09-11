@@ -46,6 +46,11 @@ export default {
   components: {
     Media, PageNav, Banner, FlashCredit
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.$archive.mspa.story[p].theme) return ctx.$archive.mspa.story[p].theme
+  },
+  title: PAGE.title,
   data: function() {
     return {
     }

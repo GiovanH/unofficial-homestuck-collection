@@ -28,6 +28,9 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  theme(ctx) {
+    if (ctx.routeParams.p in ctx.$archive.mspa.psExtras) return 'retro'
+  },
   title(ctx) {
     if (ctx.routeParams.base == 'oilretcon') 
       return 'Oil Retcon'

@@ -51,6 +51,10 @@ export default {
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
     }
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) theme = ctx.$archive.mspa.story[p].theme
+  },
   title: function(ctx) {
     var title
     

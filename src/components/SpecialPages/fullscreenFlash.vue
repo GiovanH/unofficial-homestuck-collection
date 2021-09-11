@@ -31,6 +31,11 @@ export default {
   components: {
     Media, PageNav, Footnotes
   },
+  theme: function(ctx) {
+    ctx.$logger.info("Checked theme", ctx.gameOverThemeOverride)
+    if (ctx.gameOverThemeOverride) return ctx.gameOverThemeOverride
+  },
+  title: PAGE.title,
   data: function() {
     return {
       appThemeOverride: 'default'
