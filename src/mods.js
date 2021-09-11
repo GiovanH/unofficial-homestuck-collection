@@ -589,6 +589,24 @@ function getMixins(){
     })
   }
 
+  var newBrowserActions = getEnabledModsJs().reverse().reduce((actions, js) => {
+    if (!js.browserActions) return actions
+    return {...js.browserActions, ...actions}
+  }, {})
+  if (newBrowserActions) {
+    var actionComponents = {}
+    for (let k in newBrowserActions)
+      actionComponents[k] = newBrowserActions[k].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "addressBar",
+        // browserActions are raw components
+        data: {browserActions($super) {return {...actionComponents, ...$super}}}
+      }]
+    })
+  }
+
   var mixins = mixables.map((js) => {
     const vueHooks = js.vueHooks || []
     if (vueHooks.length == 0) {

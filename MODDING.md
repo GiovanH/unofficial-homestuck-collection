@@ -478,7 +478,7 @@ Note that within all vue hooks you have access to the `this` element, and thus `
 
 `browserPages`: `Map<Name: PageDefinition>`
 
-`Name`s should be all-caps and represent the base URL of the page.
+`Name`s **must be all-caps** and represent the base URL of the page.
 
 Each `PageDefinition` has the following properties:
 
@@ -521,7 +521,6 @@ Overscoped (won't work!):
   }
 }
 ```
-
 
 Note that the `component` object has two special page functions that take, as their argument, the context state of the *tabframe* element, as the page itself will usually be unloaded.
 

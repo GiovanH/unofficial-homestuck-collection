@@ -23,7 +23,6 @@
         />
       </vue-simple-suggest>    
       <div id="browserActions">
-        <!-- Browser actions go here -->
         <div class="systemButton"
           v-if="$localData.settings.devMode && thisTabPageId" 
           :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
@@ -33,6 +32,13 @@
           <fa-icon icon="lock"></fa-icon>
           <span class="badge" v-text="$newReaderCurrent"></span>
         </div>
+        <div class="systemButton"
+          @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
+          :class="{active: isCurrentPageBookmarked}">
+          <fa-icon 
+            :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
+        </div>
+        <!-- Browser actions go here -->
         <component v-for="(__, action) in browserActions" :is="action" :key="action" />
       </div>      
     </div>
@@ -43,45 +49,8 @@
 
 import VueSimpleSuggest from 'vue-simple-suggest'
 
-const BrowserActionBookmark = {
-  computed: {
-    isCurrentPageBookmarked(){
-      return Object.values(this.$localData.saveData.saves).some(
-        s => (s.url == this.$localData.root.activeTabObject.url)
-      )
-    },
-    tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
-    }
-  },
-// template: `
-// <div class="systemButton"
-//   @click="isCurrentPageBookmarked ? tabComponent.$refs.bookmarks.open() : tabComponent.$refs.bookmarks.newSave()"
-//   :class="{active: isCurrentPageBookmarked}">
-//   <fa-icon 
-//     :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
-// </div>
-// `,
-  render: function(h){
-    return h('div', {
-      staticClass: "systemButton",
-      class: {
-        active: this.isCurrentPageBookmarked
-      },
-      on: {
-        click: function($event) {
-          const bookmarks = this.tabComponent.$refs.bookmarks
-          this.isCurrentPageBookmarked ? bookmarks.open() : bookmarks.newSave()
-        }
-      }
-    }, [h('fa-icon', {
-      attrs: {
-        // todo hollow star icon
-        "icon": this.isCurrentPageBookmarked ? 'star' : 'star' 
-      }
-    })], 1)
-  }
-}
+// Mixin currently unused
+// import ModBrowserActionMixin from '@/components/CustomContent/ModBrowserActionMixin.vue'
 
 export default {
   name: 'addressBar',
@@ -91,13 +60,28 @@ export default {
   data(){
     return {
       jumpboxText: this.$localData.root.activeTabObject.url,
-      browserActions: {BrowserActionBookmark}
+      browserActions: {}
     }
   },        
   created(){
+    // for (const COM in this.browserActions) {
+    //     let mixins = this.browserActions[COM].mixins || []
+    //     if (!mixins.includes(ModBrowserActionMixin)) {
+    //         mixins.push(ModBrowserActionMixin)
+    //         this.browserActions[COM].mixins = mixins
+    //     }
+    // }
     Object.assign(this.$options.components, this.browserActions)
   },
   computed: {
+    isCurrentPageBookmarked(){
+      return Object.values(this.$localData.saveData.saves).some(
+        s => (s.url == this.$localData.root.activeTabObject.url)
+      )
+    },
+    tabComponent() {
+      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+    },
     thisTabPageId(){
       // // This is a good implementation to grab an inner page, so I'm leaving 
       // // it as a reference, but it has a race condition which makes it
@@ -170,6 +154,9 @@ export default {
           document.activeElement.blur()
         }
       }
+    },
+    reloadTab(e) {
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
     },
     onSuggestSelect(event){
       this.jumpboxText = event.url
