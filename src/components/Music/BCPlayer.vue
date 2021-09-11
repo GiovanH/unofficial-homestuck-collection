@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar" v-if="$localData.settings.bandcampEmbed" >
+  <div v-if="$localData.settings.bandcampEmbed" >
     <template v-if="track">
       <div class="systemButton musicButton" 
         @click="turnOff" ><fa-icon icon="chevron-up"></fa-icon></div>
@@ -20,6 +20,8 @@
       ></webview>
     <div v-if="track" class="systemButton musicButton" 
       @click="$localData.root.TABS_NEW($resolvePath(`/music/track/${track.directory}`), true)()" ><fa-icon icon="music"></fa-icon></div>
+    <div v-if="$localData.settings.devMode" class="systemButton musicButton" 
+      @click="webview.openDevTools()" ><fa-icon icon="mouse-pointer"></fa-icon></div>
     
   </div>
 </template>
@@ -133,8 +135,6 @@ export default {
             this.track = this.getRandomTrack()
           }
         })
-
-        this.webview.openDevTools()
 
         this.webContents = electron.remote.webContents.fromId(this.webview.getWebContentsId())
       }

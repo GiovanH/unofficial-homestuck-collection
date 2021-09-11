@@ -2,19 +2,17 @@
     <div id="appHeader" class="headerHoverEnabled">
       <TitleBar />
       <TabBar />
-      <BCPlayer />
     </div>
 </template>
 
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import TabBar from '@/components/AppMenu/TabBar.vue'
-import BCPlayer from '@/components/Music/BCPlayer.vue'
 
 export default {
   name: 'appHeader',
   components: {
-    TitleBar, TabBar, BCPlayer
+    TitleBar, TabBar
   },
   data(){
     return {

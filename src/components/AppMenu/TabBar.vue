@@ -10,6 +10,8 @@
       <div class="lineBreak"/>
     </template>
     <!-- Toolbars go here -->
+    <BCPlayer class="toolbar" />
+
     <div id="tabSection">
       <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
         <div class="tabTitle" :class="{dragTitleFade}"></div>
@@ -27,13 +29,14 @@
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
 import AddressBar from '@/components/AppMenu/AddressBar.vue'
+import BCPlayer from '@/components/Music/BCPlayer.vue'
 
 const { ipcRenderer } = require('electron')
 
 export default {
   name: 'tabBar',
   components: {
-    Tab, AddressBar
+    Tab, AddressBar, BCPlayer
   },
   data(){
     return {
@@ -262,6 +265,9 @@ export default {
     .lineBreak {
       flex-basis: 100%;
       height: 3px;
+    }
+    .toolbar {
+      flex-basis: 100%;
     }
     #tabSection {
       background: var(--header-tabSection);
