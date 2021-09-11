@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody" :class="bgClass" :data-pageid="`${storyNum}/${thisPage.pageId}`">
+  <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
     <div class="pageFrame">
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface />
@@ -21,7 +21,6 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 
-
 import PAGE from '@/components/Page/Page.vue'
 
 export default {
@@ -38,6 +37,12 @@ export default {
     }
   },
   computed: {
+    pageNum: PAGE.computed.pageNum,
+    storyId: PAGE.computed.storyId,
+    thisPage: PAGE.computed.thisPage,
+    pageCollection: PAGE.computed.pageCollection,
+    nextPagesArray: PAGE.computed.nextPagesArray,
+    isRyanquest: PAGE.computed.isRyanquest,
     flashUrl() {
       let url = this.thisPage.media[0]
       if (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) {
@@ -51,29 +56,6 @@ export default {
         gameover: this.thisPage.flag.includes('GAMEOVER'),
         shes8ack: this.thisPage.flag.includes('SHES8ACK')
       }
-    },
-    pageNum: PAGE.computed.pageNum,
-    storyNum: PAGE.computed.storyNum,
-    // pageNum() {
-    //   return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    // },
-    // storyNum() {
-    //   return this.$getStory(this.pageNum)
-    // },
-    thisPage() {
-      return {
-        ...this.$archive.mspa.story[this.pageNum],
-        storyId: this.storyId,
-        isRyanquest: this.isRyanquest
-      }
-    },
-    nextPagesArray() {
-      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
-      let nextPages = []
-      this.thisPage.next.forEach(nextID => {
-        nextPages.push(this.$archive.mspa.story[nextID])
-      })
-      return nextPages
     }
   },
   methods: {

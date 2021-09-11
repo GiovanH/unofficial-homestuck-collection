@@ -90,6 +90,8 @@ export default {
           media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) ? `${flashPath}_hq.swf` : media[0]
       }
 
+      // TODO: This doesn't seem to be used anywhere or do anything.
+      // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
@@ -102,9 +104,6 @@ export default {
       })
 
       return media
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)

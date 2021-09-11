@@ -4,6 +4,20 @@
     <div class="pageFrame">
       <div class="pageContent">
         <div class="logItems">
+          <h2>Overview</h2>
+          <div v-for="ikey in intersectionKeys" class="flexbox">
+            <h3 v-text="ikey" /><br />
+            <div v-for="COMP in otherComponents" class="column">
+              <h4 v-text="COMP.name" />
+              <ul class="intersectionOverview">
+                <li v-for='k in Object.keys(COMP[ikey])'>
+                  <span class="match" v-if="COMP[ikey][k] == otherComponents['PAGE'][ikey][k]" v-text="k" :data-value="COMP[ikey][k]"/>
+                  <span class="notmatch" v-else-if="k in otherComponents['PAGE'][ikey]" v-text="k" />
+                  <span class="new" v-else v-text="k" />
+                </li>
+              </ul>
+            </div>
+          </div>
           <h2>Intersections</h2>
           <select v-model="intersectionKeySelected">
             <option v-for="k in intersectionKeys" :value="k" :key="k" v-text="k" />
@@ -245,14 +259,26 @@ export default {
             font-size: 18px;
           }
         }
-        .switchOrder {
-          padding-left: 30px;
-        }
         .logItems {
           padding: 30px;
 
           font-family: Verdana, Geneva, Tahoma, sans-serif;
           font-size: 12px;
+        }
+        .flexbox {
+          display: flex;
+          flex-flow: row wrap;
+          h3, h4 {
+            flex-basis: 100%
+          }
+          .column {
+            flex: 1;
+          }
+        }
+        .intersectionOverview {
+          .match {color: green;}
+          .new {color: orange;}
+          .notmatch {color: darkred;}
         }
       }
     }

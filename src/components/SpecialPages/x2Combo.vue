@@ -50,6 +50,8 @@ import PageNav from '@/components/SpecialPages/x2ComboNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 
+import PAGE from '@/components/Page/Page.vue'
+
 export default {
   name: 'x2Combo',
   props: [
@@ -64,23 +66,10 @@ export default {
     }
   },
   computed: {
-    isRyanquest(){
-      return (this.routeParams.base === 'ryanquest')
-    },
-    pageNum() {
-      // Page number of the left page
-      if (this.$isVizBase(this.routeParams.base))
-        return this.$vizToMspa(this.routeParams.base, this.routeParams.p).p
-      else
-        return this.routeParams.p
-    },
-    storyId() {
-      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
-    },
-    pageCollection() {
-      const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
-      return this.$archive.mspa[storyDataKey]
-    },
+    pageNum: PAGE.computed.pageNum,  // Page number of the left page
+    storyId: PAGE.computed.storyId,
+    isRyanquest: PAGE.computed.isRyanquest,
+    pageCollection: PAGE.computed.pageCollection,
     thisPage() {
       let thisPageId = this.pageNum
       let leftPageId, rightPageId
@@ -106,6 +95,8 @@ export default {
       ]
     },
     pageMedia() {
+      // TODO: This doesn't seem to be used anywhere or do anything.
+      // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
       let preloadPages = [
         this.nextPagesArray[1][0],
@@ -120,6 +111,7 @@ export default {
           }
         })
       })
+
       return [this.thisPage[0].media, this.thisPage[1].media]
     },
     nextPagesArray() {
@@ -135,10 +127,7 @@ export default {
     }
   },
   methods: {
-    keyNavEvent(dir) {
-      if (dir == 'left' && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav1.backUrl)
-      else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.$refs.pageNav2.nextUrl(this.nextPagesArray[1][0]))
-    }
+    keyNavEvent: PAGE.methods.keyNavEvent
   }
 }
 </script>

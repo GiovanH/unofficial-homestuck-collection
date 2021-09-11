@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody" :class="bgClass" :data-pageid="`${storyNum}/${thisPage.pageId}`">
+  <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
     <div class="tall">
       <div class="main">
         <div class="header">
@@ -36,6 +36,8 @@ import PageNav from '@/components/Page/PageNav.vue'
 import Banner from '@/components/Page/PageBanner.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
+import PAGE from '@/components/Page/Page.vue'
+
 export default {
   name: 'EndOfHS',
   props: [
@@ -49,49 +51,23 @@ export default {
     }
   },
   computed: {
+    pageNum: PAGE.computed.pageNum,
+    storyId: PAGE.computed.storyId,
+    thisPage: PAGE.computed.thisPage,
+    nextPagesArray: PAGE.computed.nextPagesArray,
     bgClass() {
       return {
         collide: this.pageNum === "009987",
         act7: this.pageNum === "010027",
         credits: this.pageNum === "010030"
       }
-    },
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
-    footnotes() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
-    },
-    prefaces() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
-    },
-    thisPage() {
-      return {
-        ...this.$archive.mspa.story[this.pageNum],
-        storyId: this.storyId,
-        isRyanquest: this.isRyanquest
-      }
-    },
-    nextPagesArray() {
-      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
-      let nextPages = []
-      this.thisPage.next.forEach(nextID => {
-        nextPages.push(this.$archive.mspa.story[nextID])
-      })
-      return nextPages
     }
   },
-  methods:{
-    keyNavEvent(dir) {
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.nextPagesArray.length == 1 && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
-    }
+  methods: {
+    keyNavEvent: PAGE.methods.keyNavEvent
   },
   beforeDestroy() {
-    //Trigger EOH notifications if leaving new-reader mode
+    // Trigger EOH notifications if leaving new-reader mode
     if (this.pageNum === "010030") this.$popNotifFromPageId('010030')
   }
 }
