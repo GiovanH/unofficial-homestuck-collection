@@ -6,10 +6,10 @@
         <h2>New Reader Mode</h2>
         <div class="newReaderInput" v-if="$isNewReader">
           <p>New reader mode enabled.<br>Currently up to page 
-            <!-- <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>. -->
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $localData.settings.newReader.current}" v-model="newReaderPage">
+            <!-- <strong>{{$mspaOrVizNumber(this.$newReaderCurrent)}}</strong>. -->
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $newReaderCurrent}" v-model="newReaderPage">
           </p><br>
-          <button v-if="newReaderValidation && (newReaderPage != $localData.settings.newReader.current)" @click="changeNewReader()">Set adjusted page</button>
+          <button v-if="newReaderValidation && (newReaderPage != $newReaderCurrent)" @click="changeNewReader()">Set adjusted page</button>
           <br />
           <button @click="clearNewReader()">Switch off new reader mode</button>
         </div>
@@ -215,7 +215,7 @@
           <dd class="settingDesc">
           Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
 
-          <SpoilerBox kind="Controversial Content">
+          <SpoilerBox kind="Controversial Content" :start-open="controversialAny">
 
             <template v-for="cc in controversialList">
               <dt><label>
@@ -337,7 +337,7 @@ export default {
       settingListBoolean: [
         {
           model: "showAddressBar",
-          label: "Always show jump box",
+          label: "Show address bar",
           desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
           model: "mspaMode",
@@ -475,7 +475,7 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
-      newReaderPage: this.$localData.settings.newReader.current || 
+      newReaderPage: this.$newReaderCurrent || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
       newReaderValidation: true,
       allControversial: [
@@ -532,7 +532,7 @@ export default {
           if (answer === true)
             this.$updateNewReader(pageId, true)
           else
-            this.newReaderPage = this.$localData.settings.newReader.current
+            this.newReaderPage = this.$newReaderCurrent
         })
       }
     },
@@ -554,7 +554,7 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
+          this.newReaderPage = this.$mspaOrVizNumber(this.$newReaderCurrent)
           this.$localData.root.NEW_READER_CLEAR()
         }
       })
@@ -818,6 +818,13 @@ export default {
         }
         .themeSelector + dt {
           display: inline;
+        }
+        // Little ones
+        &.retcons dl {
+          column-count: 2;
+          dt:first-child {
+            margin-top: 0;
+          }
         }
         .textOverrideSettings {
           margin-top: 16px;

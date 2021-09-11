@@ -2,24 +2,14 @@
   <div class="pageBody" :class="bgClass" :data-pageid="`${storyNum}/${thisPage.pageId}`">
     <div class="pageFrame">
       <div class="pageContent">
-          <div 
-            :class="note.class ? 'preface ' + note.class : 'preface'"
-            v-for="note in prefaces">
-            <p v-html="note.content"/>
-            <span v-if="note.author" class="author" v-text="note.author" />
-          </div>
+        <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
               <Media :url="flashUrl" ref="flash" />
           </div>      
           <div class="textContent">
               <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" class="hidden" />
           </div>
-          <div 
-            :class="note.class ? 'footnote ' + note.class : 'footnote'"
-            v-for="note in footnotes">
-            <p v-html="note.content"/>
-            <span v-if="note.author" class="author" v-text="note.author" />
-          </div>
+        <Footnotes :pageId="thisPage.pageId" />
       </div>
     </div>
   </div>
@@ -29,6 +19,7 @@
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
 
 
 import PAGE from '@/components/Page/Page.vue'
@@ -39,7 +30,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    Media, PageNav
+    Media, PageNav, Footnotes
   },
   data: function() {
     return {
@@ -69,12 +60,6 @@ export default {
     // storyNum() {
     //   return this.$getStory(this.pageNum)
     // },
-    footnotes() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
-    },
-    prefaces() {
-      return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => n.preface)
-    },
     thisPage() {
       return {
         ...this.$archive.mspa.story[this.pageNum],
@@ -91,7 +76,7 @@ export default {
       return nextPages
     }
   },
-  methods:{
+  methods: {
   },
   mounted() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
@@ -99,44 +84,44 @@ export default {
       this.$watch(
         "$refs.flash.gameOver.count", (count) => {
           switch(count) {
-            //Swipe to A6A6I3
+            // Swipe to A6A6I3
             case 1:
               this.$el.style.transition = 'background-position 0.15s ease'
               this.$el.style.backgroundPosition = 'right bottom'
               this.$parent.gameOverThemeOverride = 'default'
               this.$parent.setTitle()
               break
-            //Swipe to A6A6A3
+            // Swipe to A6A6A3
             case 2:
               this.$el.style.backgroundPosition = 'left bottom'
               this.$parent.gameOverThemeOverride = 'A6A6'
               this.$parent.setTitle()
               break
-            //Swipe to A6A6I3
+            // Swipe to A6A6I3
             case 3:
               this.$el.style.backgroundPosition = 'right bottom'
               this.$parent.gameOverThemeOverride = 'default'
               this.$parent.setTitle()
               break
-            //Fade to dark
+            // Fade to dark
             case 4:
-              // 2984 -> 3034 = 50 frames at 25fps = 2s
+              //  2984 -> 3034 = 50 frames at 25fps = 2s
               this.$el.style.transition = 'background-color 2s linear'
               this.$el.style.background = '#313131'
               break
-            //Fade to white
+            // Fade to white
             case 5:
-              // 3619 -> 3689 = 70 frames at 25fps = 2.8s
+              //  3619 -> 3689 = 70 frames at 25fps = 2.8s
               this.$el.style.transition = 'background-color 2.8s linear'
               this.$el.style.background = '#ffffff'
               break
-            //Fade to normal
+            // Fade to normal
             case 6:
-              //3694 -> 3696 = 3 frames at 25fps = 0.06s
+              // 3694 -> 3696 = 3 frames at 25fps = 0.06s
               this.$el.style.transition = 'background-color 0.06s linear'
               this.$el.style.background = '#535353'
               break
-            //Swipe to A6A6A3
+            // Swipe to A6A6A3
             case 7:
               this.$el.style.background = 'linear-gradient(to right, #042300 50%, #535353 50%) right bottom'
               this.$el.style.backgroundSize = '200% 100%'
@@ -164,8 +149,7 @@ export default {
       this.$el.style.backgroundSize = '200% 100%'
       this.$parent.gameOverThemeOverride = 'A6A6'
       this.$parent.setTitle()
-    }
-    else {
+    } else {
       this.$el.style.cssText = ''
       this.$parent.gameOverThemeOverride = false
     }
@@ -221,55 +205,8 @@ export default {
           align-items: center;
           flex-flow: column;
         }
-        
-        .footnote {
-          width: 600px;
-          // border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 25px;
-          p {
-            text-align: center;
-            margin: 0 auto;
-            width: 600px;
-          }
-        }
-        .preface {
-          width: 600px;
-          margin: 1em 0;
-
-          border-style: dashed;
-          border-width: 1px;
-
-          border-color: var(--page-log-border);
-          background-color: var(--page-pageFrame);
-          color: var(--page-nav-divider);
-          p {
-            text-align: center;
-            margin: 0 auto;
-            width: 600px;
-          }
-        }
-
-        .footnote, .preface {
-          .author {
-            font-weight: 300;
-            font-size: 10px;
-            font-family: Verdana, Arial, Helvetica, sans-serif;
-
-            display: flex;
-            justify-content: flex-end;
-
-            position: relative;
-            top: 12px;
-            margin-top: -12px;
-
-            color: var(--page-nav-meta);
-          }
-        }
       }	
     }
-
   }
-  
-
 </style>
 

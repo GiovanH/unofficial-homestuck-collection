@@ -448,6 +448,9 @@ export default {
 			}
 
 			switch(component){
+				case "HOMEPAGE": 
+					title = "The Unofficial Homestuck Collection"
+					break
 				case "PAGE":
 				case "X2COMBO":
 				case "TZPASSWORD":
@@ -583,7 +586,8 @@ export default {
 					title = "Spoilers!"
 					break
 				default:
-					title = "The Unofficial Homestuck Collection"
+					// title = "The Unofficial Homestuck Collection"
+					title = this.tab.url
 			}
 
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)

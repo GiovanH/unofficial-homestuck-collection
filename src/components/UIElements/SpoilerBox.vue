@@ -9,17 +9,23 @@
   </div>
 </template>
 
+<!-- Note that this is a generic spoiler, and *not* the element used by PageText -->
 <script>
 export default {
   name: 'SpoilerBox',
   props: [
-    'kind'
+    'kind', 'start-open'
   ],
   components: {
   },
   data: function() {
     return {
       logHidden: true,
+    }
+  },
+  mounted(){
+    if (this.startOpen) {
+      this.logHidden = false
     }
   },
   methods:{
