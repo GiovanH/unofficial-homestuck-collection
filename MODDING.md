@@ -483,6 +483,45 @@ Note that within all vue hooks you have access to the `this` element, and thus `
 Each `PageDefinition` has the following properties:
 
 - `component` (object): The object defining the vue component. See [documentation](https://vuejs.org/v2/guide/components.html).
+- `scss` (string): Page-specific css. Note that this will be scoped to the page instance. You should *not* include root-level specifiers like `.pageBody`.
+
+Good SCSS and good `scss`:
+
+```scss
+& {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
+Good `scss`:
+
+```scss
+background: black;
+
+.navBanner {
+margin: 0 auto;
+background: black;
+}
+```
+
+Overscoped (won't work!):
+
+```scss
+.pageBody {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
 
 Note that the `component` object has two special page functions that take, as their argument, the context state of the *tabframe* element, as the page itself will usually be unloaded.
 

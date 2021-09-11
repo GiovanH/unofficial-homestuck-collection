@@ -81,6 +81,8 @@ import SNAPS from '@/components/Comics/Snaps.vue'
 
 import TESTS from '@/components/Extras/tests.vue'
 
+import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
+
 export default {
     name: 'TabFrame',
     props: [
@@ -144,13 +146,23 @@ export default {
             modBrowserPages: {}
         }
     },
+    created(){
+        this.$logger.info("Tabframe created")
+        for (const COM in this.modBrowserPages) {
+            let mixins = this.modBrowserPages[COM].component.mixins || []
+            if (!mixins.includes(ModBrowserPageMixin)) {
+                mixins.push(ModBrowserPageMixin)
+                this.modBrowserPages[COM].component.mixins = mixins
+            }
+        }
+    },
     computed: {
         routeParams() {
             let base = this.tab.url.split('/').filter(Boolean)[0]
             return  {
                 base: base || '', 
                 ...this.$router.resolve(this.tab.url).route.params
-                }
+            }
         },
         tabIsActive() {
             return this.tab.key == this.$localData.tabData.activeTabKey

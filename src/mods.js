@@ -576,7 +576,7 @@ function getMixins(){
         matchName: "TabFrame",
         data: {modBrowserPages($super) {return {...newPages, ...$super}}},
         created(){
-          this.$options.components = {...pageComponents, ...this.$options.components}
+          this.$options.components = Object.assign(this.$options.components, pageComponents)
         }
       }]
     })
