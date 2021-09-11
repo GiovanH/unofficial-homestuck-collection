@@ -435,7 +435,18 @@ export default {
 		},
 		setTitle(component = this.resolveComponent){
 			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
+
+			// there is now fucker
 			let title, adventureTitle
+
+			const componentObj = this.$options.components[component]
+			if (componentObj && componentObj.title) {
+				const context = this
+				title = componentObj.title(context)
+				this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
+				return
+			}
+
 			switch(component){
 				case "PAGE":
 				case "X2COMBO":
@@ -468,15 +479,6 @@ export default {
 							title = this.$archive.mspa.story[p].title + adventureTitle
 						}
 					}
-					break
-				case 'MUSIC': 
-					if (this.routeParams.mode == 'tracks') title = `All tracks - Homestuck Music`
-					else if (this.routeParams.mode == 'artists') title = `All artists - Homestuck Music`
-					else if (this.routeParams.mode == 'features') title = `All features - Homestuck Music`
-					else if (this.routeParams.mode == 'album') title = `${this.$archive.music.albums[this.routeParams.id].name} - Homestuck Music`
-					else if (this.routeParams.mode == 'track') title = `${this.$archive.music.tracks[this.routeParams.id].name} - Homestuck Music`
-					else if (this.routeParams.mode == 'artist') title = `${this.$archive.music.artists[this.routeParams.id].name} - Homestuck Music`
-					else title = 'Homestuck Music'
 					break
 				case "SBAHJ":
 					title = "sweet bro and hella jeff"
@@ -583,10 +585,7 @@ export default {
 				default:
 					title = "The Unofficial Homestuck Collection"
 			}
-			const modComponentDef = this.modBrowserPages[component]
-			if (modComponentDef && modComponentDef.title)
-				title = modComponentDef.title(this.url)
-			// title = this.tab.url
+
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
 		}
 	},

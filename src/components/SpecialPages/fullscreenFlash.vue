@@ -30,6 +30,9 @@
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 
+
+import PAGE from '@/components/Page/Page.vue'
+
 export default {
   name: 'fullscreenFlash',
   props: [
@@ -58,12 +61,14 @@ export default {
         shes8ack: this.thisPage.flag.includes('SHES8ACK')
       }
     },
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
+    pageNum: PAGE.computed.pageNum,
+    storyNum: PAGE.computed.storyNum,
+    // pageNum() {
+    //   return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+    // },
+    // storyNum() {
+    //   return this.$getStory(this.pageNum)
+    // },
     footnotes() {
       return (this.$archive.footnotes['story'][this.pageNum] || []).filter(n => !n.preface)
     },
