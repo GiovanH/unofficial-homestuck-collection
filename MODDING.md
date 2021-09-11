@@ -483,5 +483,8 @@ Note that within all vue hooks you have access to the `this` element, and thus `
 Each `PageDefinition` has the following properties:
 
 - `component` (object): The object defining the vue component. See [documentation](https://vuejs.org/v2/guide/components.html).
-- `title` (`function(url)`): A function that should return the tab title of the page, given its url. This function is passed the whole url, not routeParams.
-- `theme` (`function(url)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. See above for url details. Return anything falsey to use the default theme.
+
+Note that the `component` object has two special page functions that take, as their argument, the context state of the *tabframe* element, as the page itself will usually be unloaded.
+
+- `title` (`function(ctx)`): A function that should return the tab title of the page.
+- `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
