@@ -131,6 +131,12 @@ if (ipcMain) {
       ipcRenderer.invoke('reload')
     }
 
+    function sanitizeHTML(str) {
+      var temp = document.createElement('div')
+      temp.textContent = str
+      return temp.innerHTML
+    };
+
     document.body.innerHTML = `
     <style>
     div {
@@ -147,11 +153,11 @@ if (ipcMain) {
       <div>
         <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
         These have been disabled for safety.</p>
-        <pre>${e}</pre>
+        <pre>${sanitizeHTML(e)}</pre>
         <input type="button" value="Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
         <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
         <p>Stacktrace:</p>
-        <pre>${e.stack}</pre>
+        <pre>${sanitizeHTML(e.stack)}</pre>
       </div>
     </div>`
   }
