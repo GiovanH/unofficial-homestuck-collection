@@ -91,6 +91,9 @@ export default {
   components: {
     NavBanner, Media, PageFooter, StoryPageLink
   },
+  title(ctx) {
+    return ctx.routeParams.mode == 'artcredits' ? "Art Credits" : "Credits"
+  },
   data: function() {
     return {
       archiveCredits: [

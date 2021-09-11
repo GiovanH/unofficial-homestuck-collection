@@ -661,6 +661,12 @@ export default {
     Media,
     PageFooter
   },
+  title(ctx) {
+    const adventureTitle = [
+      " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+    ][ctx.routeParams.mode - 1]
+    return "Adventure Map" + (adventureTitle || '')
+  },
   data: function() {
     return {}
   },

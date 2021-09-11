@@ -434,162 +434,17 @@ export default {
 			this.$refs.modal.open(url)
 		},
 		setTitle(component = this.resolveComponent){
-			//Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
-
-			// there is now fucker
-			let title, adventureTitle
+			// you would not believe how bad this used to be
+			let title
 
 			const componentObj = this.$options.components[component]
 			if (componentObj && componentObj.title) {
 				const context = this
 				title = componentObj.title(context)
-				this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
-				return
+			} else {
+				title = this.tab.url
 			}
-
-			switch(component){
-				case "HOMEPAGE": 
-					title = "The Unofficial Homestuck Collection"
-					break
-				case "PAGE":
-				case "X2COMBO":
-				case "TZPASSWORD":
-				case "FULLSCREENFLASH":
-				case "ECHIDNA":
-				case "ENDOFHS":
-					let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-
-					if (this.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
-					else if (this.routeParams.base === 'ryanquest' && p in this.$archive.mspa.ryanquest) {
-						title = `${this.$archive.mspa.ryanquest[p].title} - Ryanquest`
-					}
-					else {
-						let exceptions = {
-							'006715': 'DOTA',
-							'008801': 'GAME OVER',
-							'009305': 'shes8ack',
-							'009987': "ACT 6 ACT 6 ACT 6",
-							'010027': 'ACT 7',
-							'010030': 'Credits'
-						}
-						if (p in exceptions) {
-							title = exceptions[p]
-						}
-						else {
-							adventureTitle = [
-								" - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-							][this.$getStory(p) - 1]
-							title = this.$archive.mspa.story[p].title + adventureTitle
-						}
-					}
-					break
-				case "SBAHJ":
-					title = "sweet bro and hella jeff"
-					break
-				case "PXS":
-					if (!this.routeParams.cid)
-						title = 'Paradox Space' 
-					else {
-						let comic = this.$archive.comics.pxs.comics[this.routeParams.cid].name
-						title = `${comic} - Paradox Space`
-					}
-					break
-				case "UNLOCK":
-				case "EXTRASPAGE":
-					if (this.routeParams.base == 'oilretcon') title = 'Oil Retcon'
-					else if (this.routeParams.base == 'waywardvagabond' && this.routeParams.p in this.$archive.mspa.wv) title = "Homestuck"
-					else title = 'Extra Content'
-					break
-				case "DECODE":
-					if (this.routeParams.mode) {
-						if (this.routeParams.mode === 'morse') title = "Morse Decoder"
-						else if (this.routeParams.mode === 'alternian') title = "Alternian Cheatsheet"
-						else if (this.routeParams.mode === 'damaramegido') title = "Damara Megido Translated Dialogue"
-					}
-					else title = "Tools for Decodin'"
-					break
-				case "PS_TITLESCREEN":
-					title = "Problem Sleuth"
-					break
-				case "TSO":
-					if (this.routeParams.cid) title = `${this.$archive.comics.tso.comics[this.routeParams.cid].name} - Team Special Olympics`
-					else title = "Team Special Olympics"
-					break
-				case "NEWS":
-					title = "MSPA Newsposts"
-					break
-				case "BLOGSPOT":
-					title = "Andrew's Blog"
-					break
-				case "MAGICALJOURNEY":
-					title = "Come With Me on a Magical Journey Through the Internet"
-					break
-				case "OFFERYOUCANTREFUSE":
-					title = "An Offer You Can't Refuse"
-					break
-				case "FORMSPRING":
-					title = "Andrew Hussie | Formspring"
-					break
-				case "TUMBLR":
-					title = ":o"
-					break
-				case "DSTRIDER":
-					title = 'the blog of dave strider'
-					break
-				case "TBIY":
-					title = "The Baby Is You: A Rock Opera by Toby Fox"
-					break
-				case "NAMCOHIGH":
-					title = "Namco High"
-					break
-				case "VIGILPRINCE":
-					title = "The Vigil Prince"
-					break
-				case "SKAIANET":
-					title = "Skaianet Systems"
-					break
-				case "SNAPS":
-					title = "Snapchat Memories"
-					break
-				case "LOG":
-					let adventure = this.routeParams.mode ? this.routeParams.mode[0] - 1 : undefined
-					adventureTitle = [
-						" - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-					][adventure]
-					title = "Adventure Log" + (adventureTitle || '')
-					break
-				case "MAP":
-					adventureTitle = [
-						" - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-					][this.routeParams.mode - 1]
-					title = "Adventure Map" + (adventureTitle || '')
-					break
-				case "SEARCH":
-					title = "Search"
-					break
-				case "SETTINGS":
-					title = "Settings"
-					break
-				case "CREDITS":
-					title = this.routeParams.mode == 'artcredits' ? "Art Credits" : "Credits"
-					break
-				case "NEWREADER": 
-					title = "New reader tips"
-					break
-				case "USERGUIDE": 
-					title = "Navigation tips"
-					break
-				case "ERROR404": 
-					title = "Page not found"
-					break
-				case "SPOILER": 
-					title = "Spoilers!"
-					break
-				default:
-					// title = "The Unofficial Homestuck Collection"
-					title = this.tab.url
-			}
-
+			
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
 		}
 	},

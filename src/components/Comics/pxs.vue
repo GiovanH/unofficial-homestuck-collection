@@ -96,6 +96,14 @@ export default {
   components: {
     NavBanner, Media
   },
+  title(ctx) {
+    if (!ctx.routeParams.cid)
+      return 'Paradox Space' 
+    else {
+      let comic = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
+      return `${comic} - Paradox Space`
+    }
+  },
   data: function() {
     return {
       selectedStory: undefined

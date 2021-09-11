@@ -45,6 +45,7 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Search",
   data: function() {
     return {
       results: [],

@@ -630,6 +630,7 @@ export default {
   components: {
     NavBanner, MediaEmbed
   },
+  title: () => "Skaianet Systems",
   data: function() {
     return {
       marqueeInterval: undefined,

@@ -48,6 +48,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Navigation tips",
   data: function() {
     return {
     }

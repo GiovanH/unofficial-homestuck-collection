@@ -41,6 +41,7 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Extra Content",
   data: function() {
     return {
     }

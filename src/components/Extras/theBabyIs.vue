@@ -390,6 +390,7 @@ export default {
     NavBanner,
     MediaEmbed
   },
+  title: () => "The Baby Is You: A Rock Opera by Toby Fox",
   data: function() {
     return {
     }

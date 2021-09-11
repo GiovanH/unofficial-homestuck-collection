@@ -213,6 +213,7 @@ export default {
   components: {
     MediaEmbed, NavBanner
   },
+  title: () => "Andrew's Blog",
   data: function() {
     return {
       reverse: false

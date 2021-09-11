@@ -27,6 +27,7 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Page not found",
   data: function() {
     return {
     }

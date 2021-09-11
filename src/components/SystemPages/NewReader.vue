@@ -39,6 +39,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "New reader tips",
   data: function() {
     return {
     }

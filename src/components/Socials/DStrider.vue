@@ -111,6 +111,7 @@ export default {
     MediaEmbed,
     NavBanner
   },
+  title: () => 'the blog of dave strider',
   data: function() {
     return {
       reverse: false

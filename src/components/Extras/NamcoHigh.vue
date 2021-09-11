@@ -541,6 +541,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Namco High",
   data: function() {
     return {
       gameWidth: undefined,

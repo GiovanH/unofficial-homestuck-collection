@@ -26,14 +26,15 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter, FlashCredit
   },
+  title: () => "Problem Sleuth",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
-  },
+  methods: {
+  }
 }
 </script>
 

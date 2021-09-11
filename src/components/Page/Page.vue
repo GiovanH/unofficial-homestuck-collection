@@ -51,6 +51,33 @@ export default {
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"]
     }
   },
+  title: function(ctx) {
+    var title
+    
+    const exceptions = {
+      '006715': 'DOTA',
+      '008801': 'GAME OVER',
+      '009305': 'shes8ack',
+      '009987': "ACT 6 ACT 6 ACT 6",
+      '010027': 'ACT 7',
+      '010030': 'Credits'
+    }
+    const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+
+    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
+      title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
+    } else {
+      if (p in exceptions) {
+        title = exceptions[p]
+      } else {
+        title = ctx.$archive.mspa.story[p].title + [
+          " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+        ][ctx.$getStory(p) - 1]
+      }
+    }
+    return title
+  },
   computed: {
     isRyanquest(){
       return (this.routeParams.base === 'ryanquest')

@@ -58,6 +58,7 @@ export default {
   components: {
     Media, NavBanner
   },
+  title: () => ":o",
   data() {
     return {
       reverse: true

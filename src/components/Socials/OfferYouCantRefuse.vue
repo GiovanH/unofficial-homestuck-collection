@@ -108,6 +108,7 @@ export default {
     MediaEmbed,
     NavBanner
   },
+  title: () => "An Offer You Can't Refuse",
   data: function() {
     return {
     }

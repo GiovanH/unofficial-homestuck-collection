@@ -68,6 +68,7 @@ export default {
   components: {
     Media, NavBanner
   },
+  title: () => "Andrew Hussie | Formspring",
   data() {
     return {
       profile: 'andrewhussie',

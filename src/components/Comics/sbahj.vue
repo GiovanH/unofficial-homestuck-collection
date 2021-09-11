@@ -139,6 +139,7 @@ export default {
   components: {
     NavBanner, MediaEmbed
   },
+  title: () => "sweet bro and hella jeff",
   data: function() {
     return {
     }

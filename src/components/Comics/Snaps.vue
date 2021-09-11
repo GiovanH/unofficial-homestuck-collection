@@ -47,6 +47,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Snapchat Memories",
   data: function() {
     return {
       selectedStory: undefined
