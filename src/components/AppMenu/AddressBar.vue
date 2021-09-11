@@ -140,6 +140,9 @@ export default {
         }
       }
     },
+    reloadTab(e) {
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+    },
     onSuggestSelect(event){
       this.jumpboxText = event.url
       // this.$nextTick(this.focusLink)
