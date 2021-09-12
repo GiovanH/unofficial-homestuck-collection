@@ -115,6 +115,19 @@ class LocalData {
         },
         activeTabObject() {
           return this.tabData.tabs[this.tabData.activeTabKey]
+        },
+        allHistory() {
+          return this.tabData.tabList.map(
+            key => this.tabData.tabs[key]
+          ).reduce((a, t) => {
+            a.push(t.url)
+            return a.concat(t.history)
+          }, [])
+        },
+        openUrls() {
+          return this.tabData.tabList.map(
+            key => this.tabData.tabs[key]
+          ).map(tab => tab.url)
         }
       },
       methods: {
@@ -141,6 +154,12 @@ class LocalData {
           this.saveData = back.saveData
           this.settings = back.settings
           console.log(this.settings)
+        },
+        HISTORY_CLEAR() {
+          this.tabData.tabList.forEach(k => {
+            this.tabData.tabs[k].history = []
+          })
+          this.saveLocalStorage()
         },
         TABS_RESET() {
           this.$set(this, 'tabData', {
@@ -483,27 +502,35 @@ class LocalData {
     })
     
     this.VM.saveLocalStorage()
-
   }
+
   get root() {
     return this.VM
   }
+
   get assetDir() {
     return this.VM.$data.assetDir
   }
+
   get tabData() {
     return this.VM.$data.tabData
   }
+
   get saveData() {
     return this.VM.$data.saveData
   }
+
   get settings() {
     return this.VM.$data.settings
   }
+
   get temp() {
     return this.VM.$data.temp
   }
 
+  get allHistory() {
+    return this.VM.allHistory
+  }
 }
 
 export default {

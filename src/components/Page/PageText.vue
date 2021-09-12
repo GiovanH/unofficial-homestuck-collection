@@ -108,13 +108,13 @@ export default {
         filterDOM() {
             if (this.$el.nodeType !== 8){
                 let links = this.$el.getElementsByTagName('A')
-                for(let i = 0;i < links.length; i++) {
+                for (let i = 0; i < links.length; i++) {
                     let filteredLink = this.$filterURL(links[i].href)
                     links[i].href = filteredLink
-                    if (this.usePurpleLinks && this.$localData.temp.visited.includes(filteredLink.slice(-6))) links[i].classList.add('visited')
+                    if (this.usePurpleLinks && this.$localData.allHistory.includes(filteredLink)) links[i].classList.add('visited')
                 }
                 let images = this.$el.getElementsByTagName('IMG')
-                for(let i = 0;i < images.length; i++) {
+                for (let i = 0; i < images.length; i++) {
                     images[i].src = this.$getResourceURL(images[i].src)
                     images[i].ondragstart = (e) => {
                         e.preventDefault()
@@ -127,15 +127,9 @@ export default {
     },
     mounted() {
         if (this.$localData.settings.openLogs) {
-            //Manual exception for pre-ministrife fakeout
+            // Manual exception for pre-ministrife fakeout
             this.logHidden = this.pageId == '007326' 
         }
-        
-        // Purple visited links were originally intended to function on every page, but it was too much of a pain in the ass
-        // So instead, you get this awful fucking hyperspecific implementation that handles precisely one page that requires them and nothing else
-        // ur welcom
-        if (this.pageId == '009386') this.usePurpleLinks = true
-        if (['009387','009393','009397','009400','009402','009408','009410','009413'].includes(this.pageId) && !this.$localData.temp.visited.includes(this.pageId)) this.$localData.temp.visited.push(this.pageId) 
 
         this.filterDOM()
     },
