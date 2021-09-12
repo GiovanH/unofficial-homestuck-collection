@@ -8,7 +8,7 @@
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>
       <!-- Toolbars go here -->
-      <BCPlayer class="toolbar"/>
+      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
       <div class="lineBreak"/>
     </template>
 
@@ -28,7 +28,7 @@
 
     <template v-if="!$localData.settings.showAddressBar">
       <!-- Toolbars go here too (compact layout) -->
-      <BCPlayer class="toolbar"/>
+      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
     </template>
     <div />
   </div>
@@ -37,14 +37,15 @@
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
 import AddressBar from '@/components/AppMenu/AddressBar.vue'
-import BCPlayer from '@/components/Music/BCPlayer.vue'
+
+import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
 const { ipcRenderer } = require('electron')
 
 export default {
   name: 'tabBar',
   components: {
-    Tab, AddressBar, BCPlayer
+    Tab, AddressBar
   },
   data(){
     return {
@@ -54,8 +55,19 @@ export default {
       clickAnchor: undefined,
       dragTarget: undefined,
       showDragTab: false,
-      dragTitleFade: false
+      dragTitleFade: false,
+      browserToolbars: {}
     }
+  },  
+  created(){
+    for (const COM in this.browserToolbars) {
+        let mixins = this.browserToolbars[COM].mixins || []
+        if (!mixins.includes(ModBrowserToolbarMixin)) {
+            mixins.push(ModBrowserToolbarMixin)
+            this.browserToolbars[COM].mixins = mixins
+        }
+    }
+    Object.assign(this.$options.components, this.browserToolbars)
   },
   computed: {
     sortedTabList() {
@@ -240,10 +252,6 @@ export default {
 
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
     }
-  },
-  created(){
-  },
-  updated(){
   }
 }
 </script>

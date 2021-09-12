@@ -299,6 +299,10 @@ function buildApi(mod) {
       onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
       clear: () => store.clear(getModStoreKey(mod._id, null))
     }, 
+    readFile(asset_path) {
+      let data = readFileSyncLocal(asset_path, "readJson")
+      return data
+    },
     readJson(asset_path) {
       return JSON.parse(readFileSyncLocal(asset_path, "readJson"))
     },
@@ -363,7 +367,9 @@ function getModJs(mod_dir, options={}) {
 
     // TODO: Do computed properties automatically require a reload?
     // eslint-disable-next-line no-prototype-builtins
-    mod._needsreload = ['styles', 'vueHooks', 'themes', 'browserPages'].some(k => mod.hasOwnProperty(k))
+    mod._needsreload = ['styles', 'vueHooks', 'themes',
+     'browserPages', 'browserActions', 'browserToolbars'
+    ].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
@@ -410,7 +416,8 @@ const footnote_categories = ['story']
 // Interface
 
 function editArchive(archive) {
-  getEnabledModsJs().reverse().forEach((js) => {
+  const enabledModsJs = getEnabledModsJs()
+  enabledModsJs.reverse().forEach((js) => {
     try {
       const editfn = js.edit
       if (editfn) {        
@@ -436,7 +443,7 @@ function editArchive(archive) {
     archive.footnotes[category] = []
   })
 
-  getEnabledModsJs().reverse().forEach((js) => {
+  enabledModsJs.reverse().forEach((js) => {
     try {
       if (js.footnotes) {
         if (typeof js.footnotes == "string") {
@@ -551,10 +558,12 @@ function getMixins(){
 
   const nop = () => undefined
 
-  var mixables = getEnabledModsJs().reverse()
+  const enabledModsJs = getEnabledModsJs()
+
+  var mixables = enabledModsJs.reverse()
 
   // Custom themes
-  var newThemes = getEnabledModsJs().reverse().reduce((themes, js) => {
+  var newThemes = enabledModsJs.reverse().reduce((themes, js) => {
     if (!js.themes) return themes
     return themes.concat(js.themes.map((theme, i) => 
         ({text: theme.label, value: `theme-${js._id}-${i}`})
@@ -569,7 +578,7 @@ function getMixins(){
     })
   }
 
-  var newPages = getEnabledModsJs().reverse().reduce((pages, js) => {
+  var newPages = enabledModsJs.reverse().reduce((pages, js) => {
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
   }, {})
@@ -589,25 +598,48 @@ function getMixins(){
     })
   }
 
-  var newBrowserActions = getEnabledModsJs().reverse().reduce((actions, js) => {
+  var newBrowserActions = enabledModsJs.reverse().reduce((actions, js) => {
     if (js.browserActions) {
       for (let k in js.browserActions) {
-        const actionkey = `${js._id}-${k}`
-        actions[actionkey] = js.browserActions[k]
+        const componentkey = `${js._id}-${k}`
+        actions[componentkey] = js.browserActions[k]
       }
     }
     return actions
   }, {})
   if (newBrowserActions) {
     var actionComponents = {}
-    for (let k in newBrowserActions)
-      actionComponents[k] = newBrowserActions[k].component
+    for (let ck in newBrowserActions)
+      actionComponents[ck] = newBrowserActions[ck].component
 
     mixables.push({
       vueHooks: [{
         matchName: "addressBar",
         // browserActions are raw components
         data: {browserActions($super) {return {...actionComponents, ...$super}}}
+      }]
+    })
+  }
+
+  var newBrowserToolbars = enabledModsJs.reverse().reduce((toolbars, js) => {
+    if (js.browserToolbars) {
+      for (let k in js.browserToolbars) {
+        const componentkey = `${js._id}-${k}`
+        toolbars[componentkey] = js.browserToolbars[k]
+      }
+    }
+    return toolbars
+  }, {})
+  if (newBrowserToolbars) {
+    var toolbarComponents = {}
+    for (let ck in newBrowserToolbars)
+      toolbarComponents[ck] = newBrowserToolbars[ck].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "tabBar",
+        // browserToolbars are raw components
+        data: {browserToolbars($super) {return {...toolbarComponents, ...$super}}}
       }]
     })
   }
