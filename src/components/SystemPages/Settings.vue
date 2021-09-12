@@ -604,7 +604,12 @@ export default {
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
-        this.$popNotif('notif_enabled')
+        this.$pushNotif({
+          title: 'NOTIFICATIONS ENABLED',
+          desc: 'You can click me to visit whatever you just unlocked!',
+          url: '/',
+          thumb: '/archive/collection/archive_news.png'
+        })
       }
       if (['unpeachy', 'pxsTavros'].includes(setting)) {
         ipcRenderer.send('RELOAD_ARCHIVE_DATA')

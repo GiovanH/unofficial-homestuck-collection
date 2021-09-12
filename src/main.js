@@ -372,9 +372,6 @@ Vue.mixin({
       // Else, only if the flag is set.
       return this.$localData.settings[retcon_id]
     },
-    $popNotif(id) {
-      this.$root.$children[0].$refs.notifications.queueNotif(id)
-    },
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
