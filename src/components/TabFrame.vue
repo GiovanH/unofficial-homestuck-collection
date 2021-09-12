@@ -579,15 +579,20 @@ export default {
 			this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
 		}
 	},
+    updated(){
+      this.$nextTick(function () {
+        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video, audio`).length > 0))
+      })
+    },
 	watch: {
 		'tabIsActive'(to, from) {
 			if (to)
 				this.$root.tabTheme = this.theme
-			//Prevents tab from unloading if there's anything that might need to run in the background
-			if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
+			// Prevents tab from unloading if there's anything that might need to run in the background
+			if (!to) this.forceLoad = this.tab.hasAudio
 			else if (this.forceLoad) {
-				//Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
-				//Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
+				// Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
+				// Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
 				this.$el.style.borderTop = 'solid 1px #000000FF'
 				setTimeout(() =>{
 					this.$el.style.borderTop = ''

@@ -44,6 +44,11 @@ export default {
     }
   },
   computed: {
+    otherAudioSource() {
+      return this.$localData.tabData.tabList
+        .map(k => this.$localData.tabData.tabs[k])
+        .some(t => t.hasAudio)
+    },
     bc_params() {
       return {
         size: 'small',
@@ -141,6 +146,11 @@ export default {
     })
   },
   watch: {
+    otherAudioSource (to, from) {
+      if (to === true) {
+        this.turnOff()
+      }
+    }
   //   'track' (to, from){
   //     this.$logger.info(`Track changed from ${from} to ${to} (${this.webviewTargetUrl})`)
 

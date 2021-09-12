@@ -1,9 +1,12 @@
 <template>
-  <li class="tabShell" :class="{activeTabShell: isActiveTab}" @mousedown.left="clickTab()" @click.middle="closeTab()">
+  <li class="tabShell" 
+    :class="{activeTabShell: isActiveTab}" 
+    @mousedown.left="clickTab()" @click.middle="closeTab()">
     <div class="tab" tabindex="-1" :id="'tab_' + tab.key" :class="{activeTab: isActiveTab}">
       <div class="tabTitle" :class="{titleFade}" ref="title" >
-        <span v-html="title" ref="titleText"/>
+        <span v-text="title" ref="titleText"/>
       </div>
+      <fa-icon v-if="hasAudio" icon="music" />
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -25,6 +28,9 @@ export default {
     }
   },
   computed: {
+    hasAudio() {
+      return this.tab.hasAudio
+    },
     isActiveTab() {
       return this.tab.key === this.$localData.tabData.activeTabKey
     },    
@@ -34,11 +40,11 @@ export default {
     title() {
         let result = !!this.tab.title ? this.tab.title : this.tab.url
         return result
-    },
+    }
   },
   methods: {
     getId(){
-      //Used by TabBar to swap tabs while dragging
+      // Used by TabBar to swap tabs while dragging
       return this.tab.key
     },
     clickTab() {
@@ -76,6 +82,10 @@ export default {
   width: 240px;
   min-width: 30px;
   flex: 0 10 auto;
+
+  &.hasAudio {
+    color: red;
+  }
 
   .tab {
     display: inline-flex;

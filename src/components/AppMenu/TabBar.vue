@@ -18,7 +18,10 @@
         <div class="systemButton closeTabButton">✕</div>
       </div>
       <transition-group name="tab-list" tag="ul" id="tabs">
-        <Tab v-for="key in sortedTabList" :key="key" :tab="tabs[key]" :ref="'tab_' + key" @mousedown.left.native="initDrag()" />
+        <Tab v-for="key in sortedTabList" 
+          :key="key" :tab="tabs[key]" 
+          :ref="'tab_' + key" 
+          @mousedown.left.native="initDrag()" />
       </transition-group>
       <div class="systemButton newTabButton" @click="newTab()">＋</div>
     </div>

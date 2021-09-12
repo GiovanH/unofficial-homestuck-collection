@@ -18,6 +18,7 @@ class LocalData {
             key: "000",
             url: '/',
             title: '',
+            hasAudio: false,
             history: [],
             future: []
           }
@@ -150,6 +151,7 @@ class LocalData {
                 key: "000",
                 url: '/',
                 title: '',
+                hasAudio: false,
                 history: [],
                 future: []
               }
@@ -192,6 +194,7 @@ class LocalData {
             key: key,
             url: url.toLowerCase(),
             title: '',
+            hasAudio: false,
             history: [],
             future: []
           })
@@ -256,6 +259,7 @@ class LocalData {
               key: key,
               url,
               title: '',
+              hasAudio: false,
               history,
               future
             })
@@ -376,6 +380,16 @@ class LocalData {
             return
           }
           this.tabData.tabs[key].title = title
+
+          this.saveLocalStorage()
+        },
+
+        TABS_SET_HASAUDIO(key, hasAudio) {
+          if (!key) {
+            console.warn("Can't set hasAudio of a tab you haven't sent me")
+            return
+          }
+          this.tabData.tabs[key].hasAudio = hasAudio
 
           this.saveLocalStorage()
         },
