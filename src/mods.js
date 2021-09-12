@@ -590,8 +590,13 @@ function getMixins(){
   }
 
   var newBrowserActions = getEnabledModsJs().reverse().reduce((actions, js) => {
-    if (!js.browserActions) return actions
-    return {...js.browserActions, ...actions}
+    if (js.browserActions) {
+      for (let k in js.browserActions) {
+        const actionkey = `${js._id}-${k}`
+        actions[actionkey] = js.browserActions[k]
+      }
+    }
+    return actions
   }, {})
   if (newBrowserActions) {
     var actionComponents = {}

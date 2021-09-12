@@ -39,7 +39,7 @@
             :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
         </div>
         <!-- Browser actions go here -->
-        <component v-for="(__, action) in browserActions" :is="action" :key="action" />
+        <component v-for="(__, actionkey) in browserActions" :is="actionkey" :key="actionkey" />
       </div>      
     </div>
   </div>
