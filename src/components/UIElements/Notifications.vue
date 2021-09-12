@@ -37,6 +37,7 @@ export default {
       notifDuration: 10000,
       activeNotifs: [],
       queue: [],
+      maxActiveNotifs: 3,
       allowEOH: false,
       DateTime: require('luxon').DateTime
     }
@@ -140,11 +141,22 @@ export default {
             latestTimestamp, nextTimestamp, 
             this.sortedNewspostTimestamps
           )
-          news_between.forEach(newst => {
-            this.$logger.info(nextTimestamp, newst, nextTimestamp)
 
-            this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
-          })
+          // Group newsposts if too many
+          if (news_between.length <= this.maxActiveNotifs) { 
+            news_between.forEach(newst => {
+              this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
+            })
+          } else {
+            let newspost_0 = this.newspostsByTimestamp[news_between[0]]
+            this.$logger.info(newspost_0)
+            this.queueNotif({
+              title: 'New news posts',
+              desc: `${news_between.length} new news posts`,
+              url: `/news/${newspost_0.id}`,
+              thumb: '/archive/collection/archive_news.png'
+            })
+          }
         } catch (e) {
           this.$logger.warn("Couldn't compute timestamp", e)
         }
@@ -155,7 +167,7 @@ export default {
       let key = Math.random().toString(36).substring(2, 5) + Date.now()
       const notifEntry = {...notif, key} // Add key to notif object
 
-      if (this.activeNotifs.length < 3) this.fireNotif(notifEntry)
+      if (this.activeNotifs.length < this.maxActiveNotifs) this.fireNotif(notifEntry)
       else this.queue.push(notifEntry)
     },
     fireNotif(queuedNotif) {
