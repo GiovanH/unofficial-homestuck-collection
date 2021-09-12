@@ -10,6 +10,7 @@
       <div class="systemButton musicButton" 
       @click="turnOn" ><fa-icon icon="chevron-down"></fa-icon></div>
     </template>
+    <FlashCredit forceShow="true" class="FlashCredit" v-if="track" :trackIds="[track.directory]"/>
     <webview
       class="bandcamp" 
       allowtransparency 
@@ -18,8 +19,8 @@
       :src="webviewTargetUrl"
       ref="webview"
       ></webview>
-    <div v-if="track" class="systemButton musicButton" 
-      @click="$localData.root.TABS_NEW($resolvePath(`/music/track/${track.directory}`), true)()" ><fa-icon icon="music"></fa-icon></div>
+    <!-- <div v-if="track" class="systemButton musicButton" 
+      @click="$localData.root.TABS_NEW($resolvePath(`/music/track/${track.directory}`), true)()" ><fa-icon icon="music"></fa-icon></div> -->
     <div v-if="$localData.settings.devMode" class="systemButton musicButton" 
       @click="webview.openDevTools()" ><fa-icon icon="mouse-pointer"></fa-icon></div>
     
@@ -29,10 +30,12 @@
 <!-- Music: Wolf Spider ([Stop music](javascript:stopBandcampEmbeds())) <iframe alt="Wolf Spider" style="border: 0; width: 100%; height: 42px;" src="https://bandcamp.com/EmbeddedPlayer/album=1859004217/size=small/bgcol=ffffff/linkcol=0687f5/track=335878925/transparent=true/" seamless></iframe> -->
 <script>
 const electron = require('electron')
+import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
 export default {
   name: 'BCPlayer',
   components: {
+    FlashCredit
   },
   props: [
     // 'track'
@@ -40,7 +43,8 @@ export default {
   data(){
     return {
       webContents: undefined,
-      track: undefined
+      track: undefined,
+      showAudio: false
     }
   },
   computed: {
@@ -70,7 +74,9 @@ export default {
       return Object.keys(this.$archive.music.albums).filter(a => !this.$albumIsSpoiler(a)).map(a => this.$archive.music.albums[a])
     },
     nonSpoilerTracks(){
-      return this.nonSpoilerAlbums.map(a => a.tracks).reduce((all, album) => all.concat(album), [])
+      return this.nonSpoilerAlbums.map(a => a.tracks)
+        .reduce((all, album) => all.concat(album), [])
+        .filter(track => this.$archive.music.tracks[track].bandcampId)
     },
     webview(){
       return this.$refs['webview']
@@ -124,8 +130,7 @@ export default {
             audio.addEventListener('ended', () => {
               if (!audio.seeking) console.log("Audio Complete")
             })
-            audio.style = "height: 42px; position: absolute; right: 68px; padding: 1px 0;";
-            audio.controls = true;
+            ${this.showAudio ? `audio.style = "height: 42px; position: absolute; right: 68px; padding: 1px 0;"; audio.controls = true;` : ''}
             
             setTimeout(function() {
               if (!audio.playing)
@@ -133,6 +138,16 @@ export default {
             }, 500)
           }
           `)
+
+//         this.webview.insertCSS(`
+// div#infolayer, div#linkareaalt {
+//     display: none;
+// }}
+// div#nonartarea {
+//   width: unset !important;
+// }
+//         `)
+
 
         this.webview.addEventListener("console-message", (event) => {
           if (event.message == "Audio Complete") {
@@ -177,21 +192,26 @@ export default {
     > * {
       height: 100%;
     }
-  }
-  .musicButton {
-    height: 42px;
-    width: 42px;
-    //padding-top: 2px;
-    margin: 0;
-
-    line-height: 46px;
-    font-size: 24px;
-    text-decoration: none;
-    text-align: center;
-  }
-  .bandcamp {
-      width: 100%; 
+    .FlashCredit {
+      margin: 4px 8px;
+      height: auto;
+      flex: 1;
+    }
+    .musicButton {
       height: 42px;
-      background: var(--header-bg);
+      width: 42px;
+      //padding-top: 2px;
+      margin: 0;
+
+      line-height: 46px;
+      font-size: 24px;
+      text-decoration: none;
+      text-align: center;
+    }
+    .bandcamp {
+        flex: 1;
+        height: 42px;
+        background: var(--header-bg);
+    }
   }
 </style>
