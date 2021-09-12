@@ -727,6 +727,9 @@ function jsToChoice(js, dir){
       routes: Boolean(js.routes || js.treeroute || js.trees),
       edits: Boolean(js.edit),
       hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+      browserPages: js.browserPages ? Object.keys(js.browserPages) : false,
+      toolbars: Boolean(js.browserToolbars),
+      browserActions: Boolean(js.browserActions),
       styles: Boolean(js.styles),
       footnotes: Boolean(js.footnotes),
       themes: Boolean(js.themes)
@@ -758,7 +761,9 @@ if (ipcMain) {
         acc[dir] = jsToChoice(js, dir)
       } catch (e) {
         // Catch import-time mod-level errors
-        logger.error("Couldn't load mod choice")
+        logger.error("Couldn't load mod choice", e)
+        // Can't fail here: haven't loaded enough main to even show a dialog.
+        // onModLoadFail([dir], e)
       }
       return acc
     }, {})
