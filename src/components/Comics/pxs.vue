@@ -96,6 +96,15 @@ export default {
   components: {
     NavBanner, Media
   },
+  title(ctx) {
+    if (!ctx.routeParams.cid)
+      return 'Paradox Space' 
+    else {
+      let comic = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
+      return `${comic} - Paradox Space`
+    }
+  },
+  theme: () => 'pxs',
   data: function() {
     return {
       selectedStory: undefined
@@ -132,7 +141,7 @@ export default {
 
       let prevPage = parseInt(this.routeParams.pid) - 1
       if (prevPage < 1)  {
-        //We're going to serve up the last page of the previous comic
+        // We're going to serve up the last page of the previous comic
         let prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
         let prevComic = this.$archive.comics.pxs.list[prevIndex]
 
@@ -154,7 +163,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     openStory(key) {
       if (this.selectedStory == key) this.selectedStory = undefined
       else this.selectedStory = key

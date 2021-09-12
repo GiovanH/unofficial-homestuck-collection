@@ -420,10 +420,13 @@ export default {
     return {
     }
   },
+  title: function(ctx) {
+    return "The Unofficial Homestuck Collection"
+  },
   computed: {
   },
-  methods:{
-  },
+  methods: {
+  }
 }
 </script>
 

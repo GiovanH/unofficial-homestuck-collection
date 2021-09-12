@@ -45,6 +45,8 @@ Resources.init({
 // Must init resources first.
 import Mods from "./mods.js"
 
+window.doFullRouteCheck = Mods.doFullRouteCheck
+
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
 

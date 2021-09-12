@@ -54,7 +54,7 @@ export default {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
     onResize() { 
-      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 //Offsets 5px of padding on left
+      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
       let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
       
       this.titleFade = titleWidth < titleTextWidth

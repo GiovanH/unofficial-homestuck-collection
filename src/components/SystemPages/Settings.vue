@@ -237,13 +237,14 @@
 
           </SpoilerBox>
         </div>
-      </div> <!-- TODO: I am so angry about this. -->
+      </div>
 
       <div class="settings mod">
-        <!-- TODO: IF YOU CHANGE THE MODS YOU NEED TO RELOAD -->
         <h2>Mod Settings</h2>
 
         <p class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</p>
+
+        <button v-if="$localData.settings.devMode" @click="reloadModList">Dev: Reload Choices</button> 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
             <draggable tag="ul" group="sortable-mods">
@@ -285,10 +286,9 @@
 
         <div class="system">
           <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
-          <button v-if="$localData.settings.devMode || needReload" @click="forceReload">Reload</button>
+          <!-- v-if="$localData.settings.devMode || needReload"  -->
+          <button @click="forceReload">Reload</button>
         </div>
-
-        <button v-if="$localData.settings.devMode" @click="reloadModList">Reload Choices</button> 
       </div>
 
       <div class="settings system">
@@ -336,6 +336,7 @@ export default {
     PageText, SpoilerBox, StoryPageLink, 
     draggable
   },
+  title: () => "Settings",
   data: function() {
     return {
       settingListBoolean: [

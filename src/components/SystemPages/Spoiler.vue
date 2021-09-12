@@ -30,13 +30,14 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Spoilers!",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
 }
 </script>

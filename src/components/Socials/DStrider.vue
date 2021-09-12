@@ -111,6 +111,7 @@ export default {
     MediaEmbed,
     NavBanner
   },
+  title: () => 'the blog of dave strider',
   data: function() {
     return {
       reverse: false
@@ -121,7 +122,7 @@ export default {
       return this.reverse ? [...this.$archive.social.dstrider].reverse() : this.$archive.social.dstrider
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },

@@ -26,14 +26,16 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter, FlashCredit
   },
+  title: () => "Problem Sleuth",
+  theme: () => 'retro',
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
-  },
+  methods: {
+  }
 }
 </script>
 

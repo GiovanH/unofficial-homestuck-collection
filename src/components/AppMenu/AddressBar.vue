@@ -23,7 +23,6 @@
         />
       </vue-simple-suggest>    
       <div id="browserActions">
-        <!-- Browser actions go here -->
         <div class="systemButton"
           v-if="$localData.settings.devMode && thisTabPageId" 
           :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
@@ -39,6 +38,8 @@
           <fa-icon 
             :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
         </div>
+        <!-- Browser actions go here -->
+        <component v-for="(__, action) in browserActions" :is="action" :key="action" />
       </div>      
     </div>
   </div>
@@ -48,6 +49,9 @@
 
 import VueSimpleSuggest from 'vue-simple-suggest'
 
+// Mixin currently unused
+// import ModBrowserActionMixin from '@/components/CustomContent/ModBrowserActionMixin.vue'
+
 export default {
   name: 'addressBar',
   components: {
@@ -55,8 +59,19 @@ export default {
   },
   data(){
     return {
-      jumpboxText: this.$localData.root.activeTabObject.url
+      jumpboxText: this.$localData.root.activeTabObject.url,
+      browserActions: {}
     }
+  },        
+  created(){
+    // for (const COM in this.browserActions) {
+    //     let mixins = this.browserActions[COM].mixins || []
+    //     if (!mixins.includes(ModBrowserActionMixin)) {
+    //         mixins.push(ModBrowserActionMixin)
+    //         this.browserActions[COM].mixins = mixins
+    //     }
+    // }
+    Object.assign(this.$options.components, this.browserActions)
   },
   computed: {
     isCurrentPageBookmarked(){
@@ -236,7 +251,7 @@ export default {
     }
   }
 }
-#browserActions {
+#browserActions::v-deep {
   display: inline-block;
   height: 28px;
   // width: 58px;

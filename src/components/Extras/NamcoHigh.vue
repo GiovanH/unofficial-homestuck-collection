@@ -541,6 +541,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Namco High",
   data: function() {
     return {
       gameWidth: undefined,
@@ -557,7 +558,7 @@ export default {
       return Resources.resolveURL("assets://archive/namcohigh/game/index2.html")
     }
   },
-  methods:{
+  methods: {
     // The slideshow functions have two modes of operation: Student, and Artist. The bool tells it which box to affect
     slidesJump(index, isStudent = false) {
       if (isStudent) this.studentIndex = index

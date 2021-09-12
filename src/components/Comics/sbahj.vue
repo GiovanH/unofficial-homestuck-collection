@@ -119,7 +119,6 @@
         <br />
         <a href="/sbahj/1">COMIC #1: man listen, stairs. i am TELLING you</a>
 
-        
         <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
       </div>
     </div>
@@ -139,6 +138,8 @@ export default {
   components: {
     NavBanner, MediaEmbed
   },
+  title: () => "sweet bro and hella jeff",
+  theme: () => 'sbahj',
   data: function() {
     return {
     }
@@ -162,7 +163,7 @@ export default {
       return `/sbahj/${cid}`
     },
   },
-  methods:{
+  methods: {
     keyNavEvent(dir) {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.nextPage)

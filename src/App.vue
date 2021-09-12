@@ -8,6 +8,7 @@
     <Notifications :class="theme" ref="notifications" />
     <ContextMenu :class="theme" ref="contextMenu" />
     <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+    <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
   </div>
   <div id="app" class="mspa"  v-else>
     <Setup />
@@ -36,7 +37,8 @@
     },
     data() {
       return {
-        zoomLevel: 0
+        zoomLevel: 0,
+        stylesheets: [] // Mod optimization
       }
     },
     computed: {

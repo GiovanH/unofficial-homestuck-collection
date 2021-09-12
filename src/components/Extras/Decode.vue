@@ -78,6 +78,17 @@ export default {
   components: {
     NavBanner, Media, PageText, PageFooter
   },
+  title(ctx) {
+    if (ctx.routeParams.mode) {
+      if (ctx.routeParams.mode === 'morse') 
+        return "Morse Decoder"
+      else if (ctx.routeParams.mode === 'alternian') 
+        return "Alternian Cheatsheet"
+      else if (ctx.routeParams.mode === 'damaramegido') 
+        return "Damara Megido Translated Dialogue"
+    } else 
+      return "Tools for Decodin'"
+  },
   data: function() {
     return {
       morseInput: '',
@@ -143,7 +154,7 @@ export default {
       return output.join('')
     }
   },
-  methods:{
+  methods: {
   },
 }
 </script>

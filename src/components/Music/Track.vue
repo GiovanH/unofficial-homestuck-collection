@@ -60,9 +60,11 @@
 
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Resources from '@/resources.js'
 
 export default {
   name: 'MusicTrack',
+  mixins: [ Resources.UrlFilterMixin ],
   props: [
     'track'
   ],
@@ -130,8 +132,8 @@ export default {
       else return false
     }
   },
-  methods:{
-    //thnks florrie 👍
+  methods: {
+    // thnks florrie 👍
     joinNoOxford(array, plural = 'and') {
       if (array.length === 0) {
           return ''
@@ -179,7 +181,7 @@ export default {
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
-      return filterLinksAndImages(this.$refs.commentary);
+      return this.filterLinksAndImages(this.$refs.commentary);
     }
   },
   mounted(){

@@ -474,6 +474,59 @@ All functions within vuehooks have `this` bound to the component element, so syn
 
 Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
 
+### Custom vue components
+
+`browserPages`: `Map<Name: PageDefinition>`
+
+`Name`s **must be all-caps** and represent the base URL of the page.
+
+Each `PageDefinition` has the following properties:
+
+- `component` (object): The object defining the vue component. See [documentation](https://vuejs.org/v2/guide/components.html).
+- `scss` (string): Page-specific css. Note that this will be scoped to the page instance. You should *not* include root-level specifiers like `.pageBody`.
+
+Good SCSS and good `scss`:
+
+```scss
+& {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
+Good `scss`:
+
+```scss
+background: black;
+
+.navBanner {
+margin: 0 auto;
+background: black;
+}
+```
+
+Overscoped (won't work!):
+
+```scss
+.pageBody {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
+Note that the `component` object has two special page functions that take, as their argument, the context state of the *tabframe* element, as the page itself will usually be unloaded.
+
+- `title` (`function(ctx)`): A function that should return the tab title of the page.
+- `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
+
 ### Misc
 
 The archive has a `flags` object designed to be used for asynchronous, cooperative mod communication. For instance, if Mod B wants to check if Mod A is loaded, Mod A can run

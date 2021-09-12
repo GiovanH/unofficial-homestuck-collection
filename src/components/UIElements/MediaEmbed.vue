@@ -262,8 +262,8 @@ export default {
           object{${this.flashProps.rawStyle}}
         </style>
         <script>
-          //JS Enhancements: ${this.$localData.settings.jsFlashes}
-          //HQ Audio: ${this.$localData.settings.hqAudio}
+          // JS Enhancements: ${this.$localData.settings.jsFlashes}
+          // HQ Audio: ${this.$localData.settings.hqAudio}
           window.onhashchange = (e) => {
             if (window.location.hash != '#unset') {
               let hash = window.location.hash.substr(1).split('&')

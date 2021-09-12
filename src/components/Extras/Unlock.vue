@@ -41,6 +41,8 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Extra Content",
+  theme: () => 'retro',
   data: function() {
     return {
     }

@@ -36,6 +36,8 @@ import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
+import PAGE from '@/components/Page/Page.vue'
+
 export default {
   name: 'tzPassword',
   props: [
@@ -44,13 +46,15 @@ export default {
   components: {
     NavBanner, Media, TextContent, PageNav, PageFooter
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   data: function() {
     return {
       inputText: '',
       passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`,
       failText: "&lt;- <b>WRONG!</b> GO B4CK!!!",
       passwords: {
-        "TESTPASS": '/mspa/6',
+        // "TESTPASS": '/mspa/6',
         "HOME": '/mspa/009059',
         "R3UN1ON": '/mspa/009110',
         "FR4M3D": '/mspa/009136',
@@ -63,16 +67,11 @@ export default {
     }
   },
   computed: {
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    },
-    thisPage() {
-      return {
-        ...this.$archive.mspa.story[this.pageNum],
-        storyId: this.storyId,
-        isRyanquest: this.isRyanquest
-      }
-    },
+    pageNum: PAGE.computed.pageNum,
+    thisPage: PAGE.computed.thisPage,
+    pageCollection: PAGE.computed.pageCollection,
+    storyId: PAGE.computed.storyId,
+    isRyanquest: PAGE.computed.isRyanquest,
     nextPagesArray() {
       return []
     }
@@ -87,10 +86,8 @@ export default {
         document.getElementById('passwordFailure').innerHTML = this.failText
       }
     },
-    keyNavEvent(dir) {
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-    }
-  },
+    keyNavEvent: PAGE.methods.keyNavEvent
+  }
 }
 </script>
 

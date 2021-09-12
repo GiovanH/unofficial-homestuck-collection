@@ -57,6 +57,37 @@ export default {
       showMetadata: false
     }
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) theme = ctx.$archive.mspa.story[p].theme
+  },
+  title: function(ctx) {
+    var title
+    
+    const exceptions = {
+      '006715': 'DOTA',
+      '008801': 'GAME OVER',
+      '009305': 'shes8ack',
+      '009987': "ACT 6 ACT 6 ACT 6",
+      '010027': 'ACT 7',
+      '010030': 'Credits'
+    }
+    const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+
+    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
+      title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
+    } else {
+      if (p in exceptions) {
+        title = exceptions[p]
+      } else {
+        title = ctx.$archive.mspa.story[p].title + [
+          " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+        ][ctx.$getStory(p) - 1]
+      }
+    }
+    return title
+  },
   computed: {
     isRyanquest(){
       return (this.routeParams.base === 'ryanquest')
@@ -93,6 +124,8 @@ export default {
         media[0] = `${flashPath}_hq.swf`
       }
 
+      // TODO: This doesn't seem to be used anywhere or do anything.
+      // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
@@ -105,9 +138,6 @@ export default {
       })
 
       return media
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)

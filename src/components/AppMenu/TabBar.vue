@@ -286,7 +286,7 @@ export default {
 
         background: var(--header-bg);
 
-        //tab css copied
+        // tab css copied
         display: inline-flex;
         justify-content: space-between;
         align-items: center;

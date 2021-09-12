@@ -92,8 +92,8 @@ class LocalData {
       modListEnabled: []  // name hardcoded in mods.js, be careful
     }
 
-    //Data will only contain settings if the app has already been used.
-    //In this case, copy replace all default values with the user's values
+    // Data will only contain settings if the app has already been used.
+    // In this case, copy replace all default values with the user's values
     if (data.settings) {
       Object.keys(data.settings).forEach(setting => {
         if (setting in initSettings) initSettings[setting] = data.settings[setting]
@@ -201,7 +201,7 @@ class LocalData {
 
           this.tabData.tabList.push(key)
 
-          //If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
+          // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
           if (adjacent) {
             this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
             this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
@@ -216,7 +216,7 @@ class LocalData {
             this.TABS_SWITCH_TO(key)
           }
           else {
-            //TABS_SWITCH_TO also saves localStorage, so we only need to run this here if we're not switching tabs
+            // TABS_SWITCH_TO also saves localStorage, so we only need to run this here if we're not switching tabs
             this.saveLocalStorage()
           }
         },
@@ -230,7 +230,7 @@ class LocalData {
 
             this.tabData.tabList.push(key)
             
-            //If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
+            // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
             if (adjacent) {
               this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
               this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
@@ -342,7 +342,7 @@ class LocalData {
           if (this.tabData.tabList.length > this.tabData.sortedTabList.length) this.TABS_RESYNC()
 
           this.saveLocalStorage()
-          //Dont remove tab from tab object, so it can be re-opened
+          // Dont remove tab from tab object, so it can be re-opened
         },
 
         TABS_CLOSE_ON_RIGHT(key = this.tabData.activeTabKey) {

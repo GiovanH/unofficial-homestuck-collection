@@ -127,7 +127,7 @@ export default {
     },
     mounted() {
         if (this.$localData.settings.openLogs) {
-            //Manual exception for pre-ministrife fakeout
+            // Manual exception for pre-ministrife fakeout
             this.logHidden = this.pageId == '007326' 
         }
         

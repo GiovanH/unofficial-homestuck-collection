@@ -31,11 +31,11 @@ export default {
       if (this.pageId in this.$archive.music.flashes && this.pageId != '008143') {
         if (this.$localData.settings.bolin && 'bolin' in this.$archive.music.flashes[this.pageId]) return this.$archive.music.flashes[this.pageId].bolin
         else return this.$archive.music.flashes[this.pageId].tracks
-      }
-      else return false
-    },
+      } else 
+        return false
+    }
   },
-  methods:{
+  methods: {
     musicLink(ref){
       if (ref in this.$archive.music.tracks) return `/music/track/${ref}`
       else return false
@@ -53,7 +53,6 @@ export default {
       let marquee = this.$refs.credit[i].querySelector('.marquee')
       let overflow = marquee.clientWidth - this.$refs.credit[i].querySelector('.credit').clientWidth + 5
       if (overflow > 0) {
-
         let distance = marquee.clientWidth + 25
 
         this.marqueeText = marquee.innerText

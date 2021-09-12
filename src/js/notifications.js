@@ -274,99 +274,99 @@ module.exports = {
   },
   
   notifPages: {
-    "002340": [ //During third Rose GameFAQs, after Nanna expodump (override)
+    "002340": [ // During third Rose GameFAQs, after Nanna expodump (override)
       "notif_hsvol1"
     ],
-    "002821": [ //Just after grandpa strife
+    "002821": [ // Just after grandpa strife
       "notif_blogspot"
     ],
-    "002921": [ //Just after AR introduction
+    "002921": [ // Just after AR introduction
       "notif_hsvol23"
     ],
-    "003053": [ //End of act 3
+    "003053": [ // End of act 3
       "notif_dstrider"
     ],
-    "003207": [ //Just after Spades rides horse hitcher
+    "003207": [ // Just after Spades rides horse hitcher
       "notif_drawingdead"
     ],
-    "003257": [ //End of Intermission
+    "003257": [ // End of Intermission
       "notif_desktops"
     ],
-    "003478": [ //Act 4 Scene transition to John at crashed car
+    "003478": [ // Act 4 Scene transition to John at crashed car
       "notif_formspring"
     ],
-    "003569": [ //Just after Jack Ascend
+    "003569": [ // Just after Jack Ascend
       "notif_hsvol4"
     ],
-    "003841": [ //End of Act 4 curtains (override)
+    "003841": [ // End of Act 4 curtains (override)
       "notif_hsvol5"
     ],
-    "003890": [ //Start of Act 5 Act 1
+    "003890": [ // Start of Act 5 Act 1
       "notif_alternian"
     ],
-    "004177": [ //Equius's land introduction
+    "004177": [ // Equius's land introduction
       "notif_alternia"
     ],
-    "004432": [ //Nepeta's land introduction
+    "004432": [ // Nepeta's land introduction
       "notif_squiddles"
     ],
-    "004527": [ //Just after Act 5 Act 2 intro flash
+    "004527": [ // Just after Act 5 Act 2 intro flash
       "notif_tbiy"
     ],
-    "004885": [ //After John does the windy thing, before LOFAF
+    "004885": [ // After John does the windy thing, before LOFAF
       "notif_felt"
     ],
-    "005127": [ //During LE/Recap 3 Huss interruption
+    "005127": [ // During LE/Recap 3 Huss interruption
       "notif_hsvol6"
     ],
-    "005445": [ //After x5 showdown settles, right before switching to Mom/Dad dead
+    "005445": [ // After x5 showdown settles, right before switching to Mom/Dad dead
       "notif_strife"
     ],
-    "005548": [ //During Hussie SBaHJ timeout
+    "005548": [ // During Hussie SBaHJ timeout
       "notif_alterniabound"
     ],
-    "005615": [ //after eoy2
+    "005615": [ // after eoy2
       "notif_medium"
     ],
-    "005708": [ //Just after jack follows vriskas sugar trail
+    "005708": [ // Just after jack follows vriskas sugar trail
       "notif_hsvol6mtahk"
     ],
-    "005836": [ //"Oh wonderful, another interruption"
+    "005836": [ // "Oh wonderful, another interruption"
       "notif_sburbwanderers"
     ],
-    "005996": [ //delayed slightly to post x5 showdown
+    "005996": [ // delayed slightly to post x5 showdown
       "notif_prospitandderse"
     ],
-    "006010": [ //Just after cascade
+    "006010": [ // Just after cascade
       "notif_hsvol8",
       "notif_tumblr"
     ],
-    "006291": [ //Immediately after EOA6I1
+    "006291": [ // Immediately after EOA6I1
       "notif_songofskaia"
     ],
-    "006716": [ //Immediately after DOTA, before EOY3 shown
+    "006716": [ // Immediately after DOTA, before EOY3 shown
       "notif_coloursandmayhem"
     ],
-    "006928": [ //After Terry: FF to Liv, before cherub chess
+    "006928": [ // After Terry: FF to Liv, before cherub chess
       "notif_hsvol9"
     ],
-    "007162": [ //Just after Caliborn: Enter, before openbound 1
+    "007162": [ // Just after Caliborn: Enter, before openbound 1
       "notif_symphonyoyo"
     ],
-    "007299": [ //after third meenahquest
+    "007299": [ // after third meenahquest
       "notif_genesisfrog",
       "notif_damara"
     ],
-    "007882": [ //After Interfishin, right when Caliborn/Calliope expodump begins
+    "007882": [ // After Interfishin, right when Caliborn/Calliope expodump begins
       "notif_cherubim"
     ],
-    "008135": [ //End of Act 6 Act 5
+    "008135": [ // End of Act 6 Act 5
       "notif_namcohigh"
     ],
-    "008753": [ //Act 6 Act 6 Act 3
+    "008753": [ // Act 6 Act 6 Act 3
       "notif_pxs"
     ],
-    "010030": [ //End of Homestuck
+    "010030": [ // End of Homestuck
       "notif_finaldiscog",
       "notif_snaps",
       "notif_skaianet"

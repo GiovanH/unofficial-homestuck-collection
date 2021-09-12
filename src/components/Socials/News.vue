@@ -42,6 +42,7 @@ export default {
   components: {
     Media, NavBanner, PageFooter
   },
+  title: () => "MSPA Newsposts",
   data() {
     return {
       activeYear: undefined

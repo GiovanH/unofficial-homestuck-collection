@@ -110,6 +110,13 @@ export default {
   components: {
     NavBanner, Media
   },
+  title(ctx) {
+    if (ctx.routeParams.cid)
+      return `${ctx.$archive.comics.tso.comics[ctx.routeParams.cid].name} - Team Special Olympics`
+    else 
+      return "Team Special Olympics"
+  },
+  theme: () => 'tso',
   data: function() {
     return {
       selectedComic: undefined
@@ -127,8 +134,8 @@ export default {
     nextPage() {
       if (!this.routeParams.cid) return false
 
-      //Pages are zero index, but pid is 1-indexed. So, pid can be used as the next page without adding 1. make sense? 
-      //god i hope you aren't thinking 'yes' right now
+      // Pages are zero index, but pid is 1-indexed. So, pid can be used as the next page without adding 1. make sense? 
+      // god i hope you aren't thinking 'yes' right now
       let p = parseInt(this.routeParams.pid)
       if (!this.comic.pages[p])  {
         return false
@@ -145,7 +152,7 @@ export default {
       else return `/tso/${this.routeParams.cid}/${p}`
     }
   },
-  methods:{
+  methods: {
     openComic(key) {
       if (this.selectedComic == key) this.selectedComic = undefined
       else this.selectedComic = key

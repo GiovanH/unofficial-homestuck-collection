@@ -48,13 +48,14 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Navigation tips",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
 }
 </script>

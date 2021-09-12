@@ -75,7 +75,7 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     toggleBookmarks(){
       this.tabComponent.$refs.bookmarks.toggle()
     },

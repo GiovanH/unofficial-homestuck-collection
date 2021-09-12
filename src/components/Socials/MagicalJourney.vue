@@ -296,13 +296,14 @@ export default {
     MediaEmbed,
     NavBanner
   },
+  title: () => "Come With Me on a Magical Journey Through the Internet",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   }
 }
 </script>

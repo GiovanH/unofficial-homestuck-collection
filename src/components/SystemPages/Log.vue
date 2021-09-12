@@ -51,6 +51,13 @@ export default {
   components: {
     NavBanner, Media, PageFooter, MediaEmbed
   },
+  title(ctx){
+    const adventure = ctx.routeParams.mode ? ctx.routeParams.mode[0] - 1 : undefined
+    const suffix = [
+      " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+    ][adventure]
+    return "Adventure Log" + (suffix || '')
+  },
   data: function() {
     return {
       sort: 'log',

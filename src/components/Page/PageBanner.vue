@@ -86,8 +86,8 @@ export default {
         // const banner = page.getElementsByClassName('bannerImage')[0] // unused?
         const offsetXY = [20, 30]
 
-        const tooltipX = e.clientX + offsetXY[0]  //mouse X
-        const tooltipY = e.clientY - offsetXY[1]  //mouse Y
+        const tooltipX = e.clientX + offsetXY[0]  // mouse X
+        const tooltipY = e.clientY - offsetXY[1]  // mouse Y
         const tooltipWidth = tooltip.clientWidth
         const tooltipHeight = tooltip.clientHeight
 
