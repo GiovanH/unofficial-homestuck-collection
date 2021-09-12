@@ -73,7 +73,7 @@ Vue.mixin({
       // Resolves a logical path within the vue router
       // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to.toLowerCase()).route
-      const base = route.path.slice(1).split("/")[0]
+      const base = route.path.split("/")[1]
 
       let resolvedUrl = route.path
 
