@@ -254,9 +254,10 @@ export default {
 #browserActions::v-deep {
   display: inline-block;
   height: 28px;
-  // width: 58px;
   display: flex; 
   > div {
+    height: 24px;
+    width: 24px;
     position: relative;
     padding: 2px;
     color: var(--font-header);

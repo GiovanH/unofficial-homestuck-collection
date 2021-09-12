@@ -29,8 +29,12 @@
 
 <!-- Music: Wolf Spider ([Stop music](javascript:stopBandcampEmbeds())) <iframe alt="Wolf Spider" style="border: 0; width: 100%; height: 42px;" src="https://bandcamp.com/EmbeddedPlayer/album=1859004217/size=small/bgcol=ffffff/linkcol=0687f5/track=335878925/transparent=true/" seamless></iframe> -->
 <script>
-const electron = require('electron')
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
+const electron = require('electron')
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
 
 export default {
   name: 'BCPlayer',
@@ -78,9 +82,7 @@ export default {
         .reduce((all, album) => all.concat(album), [])
         .filter(track => this.$archive.music.tracks[track].bandcampId)
     },
-    webview(){
-      return this.$refs['webview']
-    }
+    webview() {return this.$refs['webview']}
   },
   methods: {
     turnOn(){
@@ -97,13 +99,7 @@ export default {
         (out, k) => `${out}${k}=${bc_params[k]}/`, 
         "")
     },
-    setAudioMuted(muted) {
-      this.webview.setAudioMuted(muted)
-    },
     getRandomTrack(){
-      function randomChoice(arr) {
-        return arr[Math.floor(Math.random() * arr.length)]
-      }
       return this.$archive.music.tracks[randomChoice(this.nonSpoilerTracks)]
     },
     getComputedStyle(var_name, default_){
@@ -116,9 +112,6 @@ export default {
     isCurrentlyAudible(){
       return this.webview.isCurrentlyAudible()
     }
-  },
-  created(){
-    // this.track = this.getRandomTrack()
   },
   mounted(){
     this.webview.addEventListener('did-finish-load', () => {
@@ -138,7 +131,6 @@ export default {
             }, 500)
           }
           `)
-
 //         this.webview.insertCSS(`
 // div#infolayer, div#linkareaalt {
 //     display: none;
@@ -147,8 +139,6 @@ export default {
 //   width: unset !important;
 // }
 //         `)
-
-
         this.webview.addEventListener("console-message", (event) => {
           if (event.message == "Audio Complete") {
             this.$logger.info(`Audio complete!`)

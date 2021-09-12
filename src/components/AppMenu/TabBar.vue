@@ -7,10 +7,10 @@
     </div>
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>
+      <!-- Toolbars go here -->
+      <BCPlayer class="toolbar"/>
       <div class="lineBreak"/>
     </template>
-    <!-- Toolbars go here -->
-    <BCPlayer class="toolbar" />
 
     <div id="tabSection">
       <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
@@ -25,6 +25,11 @@
       </transition-group>
       <div class="systemButton newTabButton" @click="newTab()">＋</div>
     </div>
+
+    <template v-if="!$localData.settings.showAddressBar">
+      <!-- Toolbars go here too (compact layout) -->
+      <BCPlayer class="toolbar"/>
+    </template>
     <div />
   </div>
 </template>
