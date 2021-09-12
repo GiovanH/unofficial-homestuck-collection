@@ -1,11 +1,11 @@
+import Vue from 'vue'
+
 const Store = require('electron-store')
 const store = new Store()
 
 const LOADED_TAB_LIMIT = 10
 const DEAD_TAB_LIMIT = 15
 const HISTORY_LIMIT = 350
-
-import Vue from 'vue'
 
 class LocalData {
   constructor(init) {
@@ -293,8 +293,7 @@ class LocalData {
             if (!this.temp.loadedTabList.includes(key)) {
               this.temp.loadedTabList.push(key)
               while (this.temp.loadedTabList.length > LOADED_TAB_LIMIT) this.temp.loadedTabList.shift()
-            }
-            else {
+            } else {
               this.temp.loadedTabList.splice(this.temp.loadedTabList.indexOf(key), 1)
               this.temp.loadedTabList.push(key)
             }
@@ -391,7 +390,7 @@ class LocalData {
           }
           this.tabData.tabs[key].hasAudio = hasAudio
 
-          this.saveLocalStorage()
+          // this.saveLocalStorage()
         },
 
         TABS_SWAP(key1, key2) {
