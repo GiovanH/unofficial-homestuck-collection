@@ -209,6 +209,9 @@ Mods can inject custom CSS into the whole app. `styles` declares a list of local
 A CustomStyle has fields
 
 `source`: A relative path to a stylesheet
+`data`: A string with a style body
+
+Use only one of these per style!
 
 ```js
 styles: [
@@ -470,4 +473,16 @@ It replaces the underlying `url` object with a new one, discarding any data that
 All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.
 
 Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
+
+### Misc
+
+The archive has a `flags` object designed to be used for asynchronous, cooperative mod communication. For instance, if Mod B wants to check if Mod A is loaded, Mod A can run
+
+`archive.flags['MOD_A_LOADED'] = true`
+
+and Mod B can check
+
+`archive.flags['MOD_A_LOADED']`
+
+Note that there is no special namespacing done on these flags; any mod can theoretically read and write to any flag at any time. Also note that in the above example, Mod A must be loaded before Mod B in order to recognize its presence. This is intentional behavior.
 
