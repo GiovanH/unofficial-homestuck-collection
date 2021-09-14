@@ -199,7 +199,9 @@ function loadArchiveData(){
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
-      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8')),
+      audioData: {},
+      flags: {}
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
@@ -628,6 +630,10 @@ async function createWindow () {
   // Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
+  })
+
+  win.webContents.on('update-target-url', (event, new_url) => {
+    win.webContents.send('update-target-url', new_url)
   })
   
   // Resolve asset URLs
