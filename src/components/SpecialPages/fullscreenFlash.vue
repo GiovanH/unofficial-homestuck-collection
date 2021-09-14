@@ -7,7 +7,7 @@
               <Media :url="flashUrl" ref="flash" />
           </div>      
           <div class="textContent">
-              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" class="hidden" />
+              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
           </div>
         <Footnotes :pageId="thisPage.pageId" />
       </div>
@@ -36,11 +36,23 @@ export default {
   },
   computed: {
     flashUrl() {
-      let url = this.thisPage.media[0]
-      if (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) {
-        return `${url.substring(0, url.length-4)}_hq.swf`
+      // Mirrored from Page.vue:pageMedia()
+      let media = Array.from(this.thisPage.media)
+      
+      if (this.$archive.audioData[media[0]]) {
+        let flashPath = media[0].substring(0, media[0].length-4)
+        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
+        media[0] = `${flashPath}_hq.swf`
       }
-      else return url
+
+      return media[0]
+    },
+    needsNav() {
+      // const base_url = this.flashUrl.split("/").slice(0, -1).join("/")
+      // const plainname = filename.split(".").slice(0, -1).join(".")
+      const filename = this.flashUrl.split('/').pop()
+      const ext = filename.split('.').pop()
+      return (ext !== "swf")
     },
     bgClass() {
       return {
