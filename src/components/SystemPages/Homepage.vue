@@ -571,6 +571,9 @@ export default {
             &.noBorder {
               margin-top: 15px;
               border-top: none;
+              .rowItem:nth-child(1) {
+                padding-top: 0;
+              }
             }
 
             .rowItem {
