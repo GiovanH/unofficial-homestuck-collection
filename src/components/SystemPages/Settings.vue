@@ -51,7 +51,7 @@
                 @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
+            <dd class="settingDesc" v-html="boolSetting.desc" />
           </template>
         </dl>
       </div>
@@ -60,13 +60,19 @@
         <dl>
           <dt>Theme Override</dt>
           <dd v-if="!$isNewReader">
-            <select class="themeSelector" v-model="$localData.settings.themeOverride" @change="$localData.root.saveLocalStorage()">
-              <option v-for="theme in themes" :value="theme.value">
+            <select class="themeSelector" 
+              v-model="$localData.settings.themeOverride" 
+              @change="onChangeThemeOverride">
+              <option v-for="theme in themes" :value="theme.value" :key="theme.value">
                 {{ theme.text }}
               </option>
             </select>
-            <template v-if="$localData.settings.themeOverride != 'default'">
-              <dt><label><input type="checkbox" name="forceThemeOverride" v-model="$localData.settings['forceThemeOverride']" @click="toggleSetting('forceThemeOverride')"> Override page-specific theme changes</label></dt>
+            <template v-if="$localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default'">
+              <dt><label><input type="checkbox" 
+                name="forceThemeOverride" 
+                v-model="$localData.settings['forceThemeOverride']" 
+                @click="toggleSetting('forceThemeOverride')"> 
+              Override page-specific theme changes</label></dt>
             </template>
           </dd>
           <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
@@ -74,22 +80,28 @@
           <template v-if="!$isNewReader">
             <dt>UI Theme Override</dt>
             <dd >
-              <select class="themeSelector" v-model="$localData.settings.themeOverrideUI" @change="$localData.root.saveLocalStorage()">
-                <option v-for="theme in themes" :value="theme.value">
+              <select class="themeSelector" 
+                v-model="$localData.settings.themeOverrideUI" 
+                @change="$localData.root.saveLocalStorage()">
+                <option v-for="theme in themes" :value="theme.value" :key="theme.value+'!ui'">
                   {{ theme.text }}
                 </option>
               </select>
-              <template v-if="$localData.settings.themeOverrideUI != 'default'">
-                <dt><label><input type="checkbox" name="forceThemeOverrideUI" v-model="$localData.settings.forceThemeOverrideUI" @click="$localData.root.saveLocalStorage()"> Override page-specific theme changes</label></dt>
+              <template v-if="$localData.settings.forceThemeOverrideUI || $localData.settings.themeOverrideUI != 'default'">
+                <dt><label><input type="checkbox" 
+                  name="forceThemeOverrideUI" 
+                  v-model="$localData.settings.forceThemeOverrideUI" 
+                  @click="$localData.root.saveLocalStorage()"> 
+                Override page-specific theme changes</label></dt>
               </template>
             </dd>
           </template>
           <dt v-else>
             <label>
               <input type="checkbox" name="forceThemeOverrideUIMSPA"
-              :checked.prop="forceThemeOverrideUIMSPAChecked === true"
-              :indeterminate.prop="forceThemeOverrideUIMSPAChecked === undefined"
-              @click="forceThemeOverrideUIMSPA()"> Never style UI
+              :checked.prop="forceThemeOverrideUINewReaderChecked === true"
+              :indeterminate.prop="forceThemeOverrideUINewReaderChecked === undefined"
+              @click="forceThemeOverrideUINewReader()"> Never style UI
             </label>
           </dt>
 
@@ -505,7 +517,7 @@ export default {
       return Object.values(this.$modChoices).filter((choice) => 
         !this.modsEnabled.includes(choice))
     },
-    forceThemeOverrideUIMSPAChecked(){
+    forceThemeOverrideUINewReaderChecked(){
       if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == true) {
         return true
       } else if (this.$localData.settings.themeOverrideUI == "" && this.$localData.settings.forceThemeOverrideUI == false) {
@@ -540,7 +552,7 @@ export default {
       this.validateNewReader() 
       const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
-        this.$localData.settings.themeOverride = ""
+        this.$localData.settings.themeOverride = "default"
         // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
@@ -559,12 +571,20 @@ export default {
         }
       })
     },
-    forceThemeOverrideUIMSPA(){
-      if (this.forceThemeOverrideUIMSPAChecked) {
-        this.$localData.settings.themeOverrideUI = ""
+    onChangeThemeOverride(){
+      // Disable override of the "forced" theme is default
+      if (this.$localData.settings.themeOverride == "default")
+        this.$localData.settings.forceThemeOverride = false
+      this.$localData.root.saveLocalStorage()
+    },
+    forceThemeOverrideUINewReader(){
+      if (this.forceThemeOverrideUINewReaderChecked) {
+        // Uncheck "never style"
+        this.$localData.settings.themeOverrideUI = "default"
         this.$localData.settings.forceThemeOverrideUI = false
       } else {
-        this.$localData.settings.themeOverrideUI = "default"
+        // Check "never style"
+        this.$localData.settings.themeOverrideUI = "mspa"
         this.$localData.settings.forceThemeOverrideUI = true
       }
       this.$localData.root.saveLocalStorage()
@@ -602,9 +622,13 @@ export default {
       if (setting == 'notifications' && this.$localData.settings[setting]) {
         this.$popNotif('notif_enabled')
       }
-      if (['unpeachy', 'pxsTavros'].includes(setting)) {
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
+        this.queueArchiveReload()
       }
+
+      // Unforce if theme just changed to auto
+      if (setting == 'themeOverride' && this.$localData.settings.themeOverride == "default")
+        this.$localData.settings.forceThemeOverride = false
 
       this.$localData.root.saveLocalStorage()
     },

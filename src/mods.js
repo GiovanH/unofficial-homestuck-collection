@@ -234,6 +234,13 @@ function getEnabledMods() {
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
 
+  // Bolin must come before hqaudio in the stack so it loads after it.
+  if (store.get('localData.settings.bolin'))
+    list.push("_bolin")
+
+  if (store.get('localData.settings.hqAudio'))
+    list.push("_hqAudio")
+
   return list
 }
 
