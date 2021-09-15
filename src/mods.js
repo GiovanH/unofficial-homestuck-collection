@@ -720,6 +720,7 @@ export default {
   getModStoreKey,
   giveWindow,
   modChoices,
+  modsDir,
 
   doFullRouteCheck
 }
