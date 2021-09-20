@@ -263,7 +263,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <label class="modButton"
                   v-if="option.hasmeta"
                   @click="openSubModel(option, 'INFO_ONLY')"
@@ -280,7 +281,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <!-- n.b. hasmeta should always be true if settings exists -->
                 <label class="modButton"
                   v-if="option.hasmeta || option.settingsmodel"
@@ -932,6 +934,9 @@ export default {
           border: 1px solid rgba(0,0,0,.125);
           margin-bottom: -1px;
           padding: .2em;
+          .summary:before {
+            content: ' - '
+          }
       }
 
       ul li {
