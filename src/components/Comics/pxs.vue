@@ -62,8 +62,12 @@
           <a href="/pxs"><Media url="/archive/comics/pxs/logo.png" /></a>
         </div>
         <!-- Thought: tabs? -->
-        <div class="storyContainer">
-          <div class="title">STORIES</div><br>
+        <div class="tabContainer">
+          <a class="tabButton" :class="{selected: homeTab=='archive'}" @click="homeTab = 'archive'">Stories</a>
+          <a class="tabButton" :class="{selected: homeTab=='contributors'}" @click="homeTab = 'contributors'">Contributors</a>
+          <a class="tabButton" :class="{selected: homeTab=='news'}" @click="homeTab = 'news'">News</a>
+        </div>
+        <div class="storyContainer" v-if="homeTab=='archive'">
           <div v-for="story in $archive.comics.pxs.list" :key="story">
             <div class="storyButtonContainer">
               <div class="storyButton" @click="openStory(story)">
@@ -83,9 +87,9 @@
               </transition>
             </div>
           </div>
-        </div>
-        <div class="contributorsContainer">
-          <div class="title">CONTRIBUTORS</div><br>
+        </div> <!-- End Stories -->
+        <div class="contributorsContainer" v-if="homeTab=='contributors'">
+          <div class="panel-heading" />
           <div v-for="c, name in $archive.comics.pxs.contributors" :key="name" class="contributor">
             <span class="name" v-text="name" />
             <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${c.avatar || 'undefined.png'}`" />
@@ -98,6 +102,27 @@
               </ul>
             </div>
           </div>
+          <div class="panel-footer" />
+        </div> <!-- End contributors -->
+        <div class="newsContainer" v-if="homeTab=='news'">
+          <div class="panel-heading" />
+          <template v-for="newspost in $archive.comics.pxs.newsfeed">
+            <div :key="newspost.timestamp" class="newspost">
+              <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${newspost.author || 'undefined'}.png`" />
+              <div>
+                <h4 class="media-heading" v-text="newspost.title" :id="newspost.timestamp"/>
+                <h5 class="media-subheading">
+                  <span class="date" v-text="newspost.date" />
+                  <span>by</span>
+                  <span class="author" v-text="newspost.author" />
+                </h5>
+                <div v-html="newspost.body" />
+
+                <img src='assets://archive/comics/pxs/divider.png' class='divider'/>
+              </div>
+            </div>
+          </template>
+          <div class="panel-footer" />
         </div>
       </div>
     </div>
@@ -128,7 +153,8 @@ export default {
   theme: () => 'pxs',
   data: function() {
     return {
-      selectedStory: undefined
+      selectedStory: undefined,
+      homeTab: 'archive'
     }
   },
   computed: {
@@ -201,7 +227,10 @@ export default {
     },
     linkToUrl(linkstr) {
       try {
-        return new URL('http://' + linkstr).href
+        let href = new URL('http://' + linkstr).href
+        if (href.includes("http//"))
+          href = linkstr
+        return href
       } catch {
         return linkstr
       }
@@ -216,6 +245,10 @@ export default {
   background-image: url(assets://archive/comics/pxs/pixels_top.png), url(assets://archive/comics/pxs/pixels_bottom.png) !important;
   background-position: center top, center bottom !important;
   background-repeat: no-repeat !important;
+
+  ::v-deep a {
+    color: #2a6496;
+  }
 
   ::v-deep .navBanner {
     width: 100%;
@@ -253,7 +286,29 @@ export default {
         padding: 12px 0;
       }
 
-      .title, .archive {
+      .tabContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        margin-bottom: 2em;
+
+        .tabButton {
+          font-family: "Century Gothic",arial, sans-serif;
+          font-size: 20px;
+          font-weight: bold;
+          color: white;
+          text-decoration: none;
+          text-transform: uppercase;
+
+          cursor: pointer;
+          &.selected, &:focus, &:hover {
+            text-shadow: 0 0 5px #0ca6ff, 0 0 5px #0ca6ff;
+          }
+        }
+      }
+
+      .title, .archive, {
         font-family: "Century Gothic",arial, sans-serif;
         font-size: 20px;
         font-weight: bold;
@@ -340,25 +395,41 @@ export default {
         }
       }
 
-      .contributorsContainer {
+      .panel-heading {
+        height: 20px;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        background-image: linear-gradient(to bottom, #012b3e 0%, #011925 100%);
+        background-repeat: repeat-x;
+      }
+      .panel-footer {
+        height: 20px;
+          border-bottom-right-radius: 10px;
+          border-bottom-left-radius: 10px;
+          border-top: 2px solid #002d4d;
+        background-image: url(assets://archive/comics/pxs/news-pixelburst-right.png);
+          background-position: right;
+          background-repeat: no-repeat;
+          background-color: #051729;
+      }
+
+      .contributorsContainer, .newsContainer {
         margin: 2em;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         font-size: 14px;
         font-weight: normal;
-        a {
-          color: #2a6496;
-        }
+        // background: #424242;
+
         .title {
           margin: auto;
           width: fit-content;
         }
-        .contributor {
+        .contributor, .newspost {
           color: white;
           background: black;
-          width: 100%;
-          margin-bottom: 1em;
           padding: 4px 8px;
-
+          padding-bottom: 1em;
+          border-bottom: 4px solid #204b69;
           display: flex;
           flex-wrap: wrap;
           .avatar {
@@ -389,6 +460,57 @@ export default {
           }
           ul.social {
             list-style: inside;
+          }
+        }
+      }
+
+      .newsContainer {
+        width: 1024px;
+        position: relative;
+        left: -154px;
+
+        .newspost {
+          color: #aaaaaa;
+          border-bottom: none;
+          border-left: 8px solid #262626;
+          border-right: 8px solid #262626;
+
+          h4 {font-size: 18px;}
+          h5 {font-size: 14px;}
+          h4, h5, h6, .avatar {
+            margin-top: 10px;
+            margin-bottom: 10px;
+          }
+          .media-subheading {
+            font-style: italic;
+            span {
+              padding-right: .3em;
+            }
+            .author {
+              color: #5f5f5f;
+              font-weight: bold;
+            }
+            .date {
+              color: #346a8e;
+              font-weight: bold;
+            }
+          }
+          ::v-deep .media-body {
+            p {margin: 0 0 10px;}
+            img {
+              display: block;
+              margin: 1em 0;
+            }
+          }
+          .divider {
+            margin: auto;
+            display: block;
+          }
+          .avatar {
+            width: 100px;
+            height: 100px;
+            flex-basis: 100px;
+            border-radius: 50%;
           }
         }
       }
