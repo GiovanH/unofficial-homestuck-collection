@@ -39,7 +39,7 @@
               <Media url="/archive/comics/pxs/comnavPrev.png" />
             </a>
           </div>
-          <span class="archive" v-text="`${this.routeParams.pid}/${comic.pages.length}`" />
+          <span class="archive" v-text="`${this.page_num}/${comic.pages.length}`" />
           <div class="forward">
             <a :href="nextPage || false" :class="{disabled: !nextPage}">
               <Media url="/archive/comics/pxs/comnavNext.png" />
@@ -49,6 +49,11 @@
             </a>
           </div>
         </div>
+        <div id="content-tags" v-if="pageTags.length">
+          <div class="tags">
+            <a v-for="tag in pageTags" class="tag" v-text="'#' + tag" :key="tag"/>
+          </div>
+        </div>
       </div>
     </div>
     <div class="pageFrame archive" v-else>
@@ -56,9 +61,10 @@
         <div class="logo">
           <a href="/pxs"><Media url="/archive/comics/pxs/logo.png" /></a>
         </div>
+        <!-- Thought: tabs? -->
         <div class="storyContainer">
           <div class="title">STORIES</div><br>
-          <div v-for="story in $archive.comics.pxs.list">
+          <div v-for="story in $archive.comics.pxs.list" :key="story">
             <div class="storyButtonContainer">
               <div class="storyButton" @click="openStory(story)">
                 <p class="storyName" v-text="$archive.comics.pxs.comics[story].name" />
@@ -75,6 +81,21 @@
                   </a>
                 </div>
               </transition>
+            </div>
+          </div>
+        </div>
+        <div class="contributorsContainer">
+          <div class="title">CONTRIBUTORS</div><br>
+          <div v-for="c, name in $archive.comics.pxs.contributors" :key="name" class="contributor">
+            <span class="name" v-text="name" />
+            <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${c.avatar || 'undefined.png'}`" />
+            <div>
+              <p class="bio" v-html="c.bio" />
+              <ul v-if="c.social" class="social">
+                <li v-if="link" v-for="link in c.social">
+                  <a :href="linkToUrl(link)" v-text="link" />
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -116,47 +137,53 @@ export default {
 
       return this.$archive.comics.pxs.comics[this.routeParams.cid]
     },
+    page_num(){
+      return this.routeParams.pid
+    },
     comicPage() {
-      return this.comic.pages[this.routeParams.pid-1]
+      return this.comic.pages[this.page_num-1]
     },
     titleText() {
-      return this.comic.titleText[this.routeParams.pid]
+      return this.comic.titleText[this.page_num]
+    },
+    pageTags() {
+      if (this.comic.tags) return (this.comic.tags[this.page_num] || [])
+      return []
     },
     nextPage() {
       if (!this.routeParams.cid) return ''
 
-      let nextPage = parseInt(this.routeParams.pid) + 1
+      const nextPage = parseInt(this.page_num) + 1
       if (this.comic.pages[nextPage - 1]) return `/pxs/${this.routeParams.cid}/${nextPage}`
       else return this.nextComic
     },
     nextComic() {
       if (!this.routeParams.cid) return ''
 
-      let nextComic = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) + 1
+      const nextComic = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) + 1
       if (this.$archive.comics.pxs.list[nextComic]) return `/pxs/${this.$archive.comics.pxs.list[nextComic]}/1`
       else return ''
     },
     prevPage() {
       if (!this.routeParams.cid) return ''
 
-      let prevPage = parseInt(this.routeParams.pid) - 1
+      const prevPage = parseInt(this.page_num) - 1
       if (prevPage < 1)  {
         // We're going to serve up the last page of the previous comic
-        let prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.pxs.list[prevIndex]
+        const prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.pxs.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/pxs/${prevComic}/${this.$archive.comics.pxs.comics[prevComic].pages.length}`
-      }
-      else return `/pxs/${this.routeParams.cid}/${prevPage}`
+      } else return `/pxs/${this.routeParams.cid}/${prevPage}`
     },
     prevComic() {
       if (!this.routeParams.cid) return ''
 
-      if (this.routeParams.pid != '1') return `/pxs/${this.routeParams.cid}/1`
+      if (this.page_num != '1') return `/pxs/${this.routeParams.cid}/1`
       else {
-        let prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.pxs.list[prevIndex]
+        const prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.pxs.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/pxs/${prevComic}/1`
@@ -171,8 +198,15 @@ export default {
     keyNavEvent(dir) {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0 && this.prevPage) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth && this.nextPage) this.$pushURL(this.nextPage)
+    },
+    linkToUrl(linkstr) {
+      try {
+        return new URL('http://' + linkstr).href
+      } catch {
+        return linkstr
+      }
     }
-  },
+  }
 }
 </script>
 
@@ -220,13 +254,13 @@ export default {
       }
 
       .title, .archive {
-          font-family: "Century Gothic",arial, sans-serif;
-          font-size: 20px;
-          font-weight: bold;
-          color: white;
-          text-shadow: 0 0 5px #0ca6ff, 0 0 5px #0ca6ff;
-          text-decoration: none;
-        }
+        font-family: "Century Gothic",arial, sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 0 5px #0ca6ff, 0 0 5px #0ca6ff;
+        text-decoration: none;
+      }
 
       .nav {
         margin: 0 10px;
@@ -245,6 +279,56 @@ export default {
         }
       }
 
+      #content-tags {
+        padding: 15px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: normal;
+        .tags {
+          padding: 10px;
+          border: 2px solid #232323;
+        }
+        .tag {
+          display: inline-block;
+          padding: 0px 3px;
+          margin: 3px;
+          color: #ffffff;
+          background: #626262;
+          border: 1px solid #7c7c7c;
+        }
+        a.tag {
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        .description-tag {
+          background-image: -webkit-linear-gradient(top, #00364e 0%, #001823 100%);
+          background-image: linear-gradient(to bottom, #00364e 0%, #001823 100%);
+          background-repeat: repeat-x;
+          border: 1px solid #424242;
+        }
+        .tag-writer {
+          background: #b0913f;
+          border: 1px solid #c5a85d;
+        }
+        .tag-art {
+          background: #4492a9;
+          border: 1px solid #61aabf;
+        }
+        .tag-layout {
+          border: 1px solid #93a1c6;
+          background: #7284b4;
+        }
+        .tag-lettering {
+          border: 1px solid #5ec2b1;
+          background: #41ac9a;
+        }
+        .tag-char {
+          border: 1px solid #cc8c79;
+          background: #be6c54;
+        }
+      }
+
       .mediaContent {
         margin: 5px auto;
         max-width: 750px;
@@ -253,6 +337,59 @@ export default {
         box-shadow: 0px 0px 10px #095486;
         img {
           display: block;
+        }
+      }
+
+      .contributorsContainer {
+        margin: 2em;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: normal;
+        a {
+          color: #2a6496;
+        }
+        .title {
+          margin: auto;
+          width: fit-content;
+        }
+        .contributor {
+          color: white;
+          background: black;
+          width: 100%;
+          margin-bottom: 1em;
+          padding: 4px 8px;
+
+          display: flex;
+          flex-wrap: wrap;
+          .avatar {
+            border-radius: 10px;
+            width: 180px;
+            height: 180px;
+            flex-basis: 180px;
+          }
+          > div {
+            flex: 1;
+            padding: 0 1em;
+          }
+          .name {
+            flex-basis: 100%;
+
+            color: #fff;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px #0a3e54;
+            font-size: 24px;
+          }
+          .bio::v-deep {
+            line-height: 1.5;
+            img {
+              display: block;
+            }
+          }
+          ul.social {
+            list-style: inside;
+          }
         }
       }
 
