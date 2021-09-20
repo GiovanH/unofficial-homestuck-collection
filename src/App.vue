@@ -46,21 +46,24 @@
         return this.$localData.tabData.tabList
       },
       tabTheme() {
-        let page_theme
         const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
 
         if (tab_components) {
           // Get theme from inner tab
-          page_theme = {
+          const page_theme = {
             defined: tab_components[0].contentTheme, 
             rendered: tab_components[0].theme
           }
+          return page_theme
         } else {
           // There are no tabs at all yet
           this.$logger.warn("No tabs! Using default")
-          page_theme = {defined: 'default', rendered: 'default'}
+          // this.$nextTick(() => {
+          //   this._computedWatchers.tabTheme.run()
+          //   this._computedWatchers.theme.run()
+          // })
+          return {defined: 'default', rendered: 'default'}
         }
-        return page_theme
       },
       theme() {
         let set_theme = this.$localData.settings.themeOverrideUI

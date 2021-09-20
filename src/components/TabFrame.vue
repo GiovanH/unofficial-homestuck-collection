@@ -592,6 +592,7 @@ export default {
 		},
 		// When the tab changes or the tab changes theme,
 		// update the global variable right away
+			// I don't think these do anything. Root.tabTheme is computed?
 		'isLoaded'(to, from){
 			if (this.tabIsActive)
 				this.$root.tabTheme = this.theme
