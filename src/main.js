@@ -457,13 +457,11 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default',
-      tabTheme: 'default',
       archive: undefined
     }
   },
   router,
-  render: function (h) { return h(App) },
+  render: function (h) { return h(App, {ref: 'App'}) },
   watch: {
     '$localData.settings.devMode'(to, from){
       const is_dev = to
