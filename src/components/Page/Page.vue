@@ -22,7 +22,7 @@
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
               <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
-                :class="(hideNav ? 'hidden' : '')" />
+                :class="{'hidden': hideNav}" />
           </div>
           <div 
             :class="note.class ? 'footnote ' + note.class : 'footnote'"
