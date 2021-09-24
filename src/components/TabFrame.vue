@@ -48,6 +48,7 @@ import SETTINGS from '@/components/SystemPages/Settings.vue'
 import CREDITS from '@/components/SystemPages/Credits.vue'
 
 import PAGE from '@/components/Page/Page.vue'
+import SINGLEPAGE from '@/components/Page/SinglePage.vue'
 import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
 import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
 import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
@@ -112,6 +113,7 @@ export default {
         TZPASSWORD,
         ECHIDNA,
         ENDOFHS,
+        SINGLEPAGE,
         
         UNLOCK,
         DECODE,
@@ -192,7 +194,8 @@ export default {
                 'waywardvagabond': 'ExtrasPage',
                 'sweetbroandhellajeff': 'SBAHJ',
                 'faqs': 'ExtrasPage',
-                'oilretcon': 'ExtrasPage'
+                'oilretcon': 'ExtrasPage',
+                'page': 'SinglePage'
             }
     
             const base = this.routeParams.base.toLowerCase()
