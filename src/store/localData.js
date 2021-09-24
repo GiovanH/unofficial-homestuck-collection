@@ -179,7 +179,7 @@ class LocalData {
           this.tabData.tabs[key].history.push(this.tabData.tabs[key].url)
           this.tabData.tabs[key].future = []
           while (this.tabData.tabs[key].history.length > HISTORY_LIMIT) this.tabData.tabs[key].history.shift()
-          this.$set(this.tabData.tabs[key], 'url', url.toLowerCase())
+          this.$set(this.tabData.tabs[key], 'url', url)
           
           this.saveLocalStorage()
         },
@@ -192,7 +192,7 @@ class LocalData {
 
           this.$set(this.tabData.tabs, key, {
             key: key,
-            url: url.toLowerCase(),
+            url: url,
             title: '',
             hasAudio: false,
             history: [],
@@ -241,7 +241,7 @@ class LocalData {
             
             let targetTab = this.tabData.tabs[target]
 
-            let url = targetTab.url.toLowerCase()
+            let url = targetTab.url
             let history = [...targetTab.history]
             let future = [...targetTab.future]
 
@@ -438,7 +438,7 @@ class LocalData {
           do {
             key = Math.random().toString(36).substring(2, 5)
           } while (key in this.saveData.saves)
-          this.$set(this.saveData.saves, key, {key, name, url: url.toLowerCase()})
+          this.$set(this.saveData.saves, key, {key, name, url})
           this.saveData.saveList.unshift(key)
 
           this.saveLocalStorage()
@@ -447,7 +447,7 @@ class LocalData {
         },
         SAVES_EDIT(key, name, url) {
           this.saveData.saves[key].name = name
-          this.saveData.saves[key].url = url.toLowerCase()
+          this.saveData.saves[key].url = url
 
           this.saveLocalStorage()
         },

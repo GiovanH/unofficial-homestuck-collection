@@ -16,9 +16,9 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
+              <PageNav :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
-                :class="(hideNav ? 'hidden' : '')" />
+                :class="{'hidden': hideNav}" />
           </div>
         <Footnotes :pageId="thisPage.pageId" />
       </div>
@@ -59,7 +59,8 @@ export default {
   },
   theme: function(ctx) {
     let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
-    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) theme = ctx.$archive.mspa.story[p].theme
+    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) 
+      return ctx.$archive.mspa.story[p].theme
   },
   title: function(ctx) {
     var title
@@ -114,14 +115,20 @@ export default {
         isRyanquest: this.isRyanquest
       }
     },
-    pageMedia() {
+    audioData(){
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
+      return this.$archive.audioData[media[0]]
+    },
+    pageMedia() {
+      const media = Array.from(this.thisPage.media)
+      this.deretcon(media)
+      const mediakey = media[0]
 
-      if (this.$archive.audioData[media[0]]) {
-        let flashPath = media[0].substring(0, media[0].length-4)
-        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
-        media[0] = `${flashPath}_hq.swf`
+      if (this.audioData) {
+        let flashPath = mediakey.substring(0, mediakey.length-4)
+        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+        mediakey = `${flashPath}_hq.swf`
       }
 
       // TODO: This doesn't seem to be used anywhere or do anything.

@@ -195,7 +195,8 @@ export default {
                 'oilretcon': 'ExtrasPage'
             }
     
-            let component = (this.routeParams.base in mapRoute ? mapRoute[this.routeParams.base] : this.routeParams.base).toUpperCase()
+            const base = this.routeParams.base.toLowerCase()
+            let component = (base in mapRoute ? mapRoute[base] : base).toUpperCase()
             if (!this.routeParams.base) component = 'Homepage'
             switch (component) {
                 case 'PAGE': {
