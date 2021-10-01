@@ -25,29 +25,43 @@ export default {
     const args = urlToArgObj(ctx.tab.url)
     return args.c || 'SinglePage'
   },
+  methods: {
+    ...VanillaPage.methods,
+    argLookup(key, def) {
+      const islist = Array.isArray(def)
+      if (islist) {
+        return this.$props[key] 
+          ? this.$props[key]
+          : (this.queryArgs[key] ? this.queryArgs[key].split(',') : def)
+      } else 
+        return this.$props[key] || this.queryArgs[key] || def
+    }
+  },
   computed: {
     ...VanillaPage.computed,
     isRyanquest(){
       return false
     },
     pageNum() {
-      return undefined // "001983"
+      return undefined
     },
     pageCollection() {
       return this.$archive.mspa['story']
     },
+    queryArgs() {
+      return urlToArgObj(this.tab.url)
+    },
     thisPage() {
       // Add useful information to archive object
-      const args = urlToArgObj(this.tab.url)
       return {
-        "title": args.c || "",
-        "pageId": args.id || "",
-        "timestamp": args.t || "",
-        "flag": args.f ? [args.f] : [],
-        "next": args.n ? [args.n] : [],
-        "media": args.m ? [args.m] : [],
-        "content": args.b || '',
-        "storyId": args.s || ''
+        "title": this.argLookup('c', ''),
+        "pageId": this.argLookup('id', ''),
+        "timestamp": this.argLookup('t', ''),
+        "flag": this.argLookup('f', []),
+        "next": this.argLookup('n', []),
+        "media": this.argLookup('m', []),
+        "content": this.argLookup('b', ''),
+        "storyId": this.argLookup('s', '')
       }
     },
     // audioData(){

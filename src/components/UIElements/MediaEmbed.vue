@@ -5,7 +5,7 @@
   <!-- HTML iframes must not point to assets :c -->
   <iframe v-else-if="getExt(url) === 'html'" 
   :src='resolveFrameUrl(url)' 
-  width="650px" height="450px" class="sburb" seamless />
+  :width="`${flashProps.width}px`" :height="`${flashProps.height}px`" class="sburb" seamless />
   <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
   <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
@@ -16,6 +16,7 @@ import path from 'path'
 import Resources from "@/resources.js"
 
 export default {
+  name: "MediaEmbed",
   props: ['url'],
   data() {
     return {
