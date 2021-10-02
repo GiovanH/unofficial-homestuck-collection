@@ -509,6 +509,9 @@ function getMainMixin(){
     mounted() {
       getEnabledModsJs().forEach(js => {
         const modstyles = js.styles || []
+        if (!Array.isArray(modstyles)) {
+          throw Error(`${js._id} styles object is not a list`)
+        }
         modstyles.forEach((customstyle, i) => {
           const style_id = `style-${js._id}-${i}`
           
@@ -657,7 +660,7 @@ function getMixins(){
         hook.match = (c) => (c.$options.name == hook.matchName)
     })
 
-    return {
+    const mixin =  {
       created() {
         const vueComponent = this
 
@@ -700,8 +703,17 @@ function getMixins(){
             hook.updated.bind(this)()
           }
         })
+      },
+      mounted() {
+        vueHooks.forEach((hook) => {
+          if (hook.mounted && hook.match(this)) {
+            hook.mounted.bind(this)()
+          }
+        })
       }
     }
+    
+    return mixin
   }).filter(Boolean)
 
   return mixins
