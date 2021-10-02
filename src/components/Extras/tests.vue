@@ -40,6 +40,24 @@
           <pre v-text="compiledResult" style="white-space: pre-wrap;"/>
         </div>
         <div class="logItems">
+          <h2>Conversations</h2>
+          <ul>
+            <li  v-for="__, color in speakerColorData.pagesByColor" :key="color">
+              <label>
+                <input type="checkbox" v-model="selectedConvoColors[color]" />
+                <span :style="`color: #${color}`">
+                  #{{color}} {{speakerColorData.speakersByColor[color]}}</span>
+              </label>
+            </li>
+          </ul>
+          <ul v-if="Object.values(selectedConvoColors).some(Boolean)">
+            <hr />
+            <li v-for='idc in convoResults' :key='idc[0]'>
+              <StoryPageLink long :mspaId='idc[0]'></StoryPageLink> {{idc[1]}}
+            </li>
+          </ul>
+        </div>
+        <div class="logItems">
           <h2>Media Lookup</h2>
           <input type="text" v-model="swfLookup">
           <ul>
@@ -163,10 +181,14 @@ export default {
       selectedIntersections: {},
       // intersectionKeySelected: "computed",
       intersectionKeys: ["computed", "methods"],
-      compileTemplate: ""
+      compileTemplate: "",
+      selectedConvoColors: {}
     }
   },
   computed: {
+    storyPages(){
+      return Object.values(this.$archive.mspa.story)
+    },
     compiledResult(){
       try {
         const compiled = Vue.compile(this.compileTemplate)
@@ -176,6 +198,49 @@ export default {
         return e.stack
       }
     },
+    allConversations(){
+      let re = /<span style="color: #([^>]+?)">(\S+?):/g
+      return this.storyPages.filter(
+          page => re.exec(page.content)
+        ).reduce((acc, page) => {
+          // Output 'color:nickname' strings and remove duplicates 
+          // Strings are the only way to automatically remove duplicates :(
+          acc[page.pageId] = [...new Set([...page.content.matchAll(re)].map(s => s[1] + ':' + s[2]))]
+          return acc
+      }, {})
+    },
+    speakerColorData(){
+      // Compute color: list<page> and color: set<nickname> mappings
+      const {pagesByColor, speakersByColor} = Object.keys(this.allConversations).reduce((acc, pageId) => {
+          this.allConversations[pageId].forEach(pair => {
+              const [color, nickname] = pair.split(":")
+              acc.pagesByColor[color] = acc.pagesByColor[color] || []
+              acc.pagesByColor[color].push(pageId)
+              acc.speakersByColor[color] = acc.speakersByColor[color] || []
+              acc.speakersByColor[color].push(nickname)
+          })
+          return acc
+      }, {pagesByColor: {}, speakersByColor: {}})
+      return {
+        pagesByColor,
+        speakersByColor: Object.keys(speakersByColor).reduce((acc, k) => {
+          acc[k] = [...new Set(speakersByColor[k])]
+          return acc
+        }, {})
+      }
+    },
+    convoResults(){
+      return Object.entries(this.allConversations).filter(a => {
+        // Conversations in which all selected colors are participants
+        const [pageId, pairs] = a
+        const selectedConvoColors = Object.keys(this.selectedConvoColors).filter(k => this.selectedConvoColors[k])
+        return selectedConvoColors.every(
+          c => [...pairs].some(p => p.includes(c))
+      )}).map(
+        // Just get the nicknames
+        a => {a[1] = a[1].map(pair => pair.split(':')[1]); return a}
+      )
+    },    
     // intersectResults() {
     //   return intersect(
     //     ...Object.keys(this.selectedIntersections).filter(
@@ -191,12 +256,12 @@ export default {
         return []
       }
 
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.media.some(url => url.includes(this.swfLookup))
       ).map(page => page.pageId)
     },
     allFlags() {
-      return Object.values(this.$archive.mspa.story).filter(
+      return this.storyPages.filter(
         page => page.flag.length > 0
       ).reduce((acc, page) => {
         for (const i in page.flag){
@@ -218,17 +283,17 @@ export default {
       return this.pagesFlagResults
     },
     pagesNoNextSwf() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         (page.next.length == 0) && (page.media[0].endsWith(".swf"))
       ).map(page => page.pageId)
     },
     pagesNoNext() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.next.length == 0
       ).map(page => page.pageId)
     },
     pagesFlagResults() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.flag.includes(this.flagLookup.toUpperCase())
       ).map(page => page.pageId)
     },

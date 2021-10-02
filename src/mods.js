@@ -672,9 +672,6 @@ function getMixins(){
             if (hook.created)
               hook.created.bind(this)()
 
-            // Data w/ optional compute function
-            this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
-
             for (const dname in (hook.data || {})) {
               const value = hook.data[dname]
               this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
@@ -712,7 +709,7 @@ function getMixins(){
         })
       }
     }
-    
+
     return mixin
   }).filter(Boolean)
 

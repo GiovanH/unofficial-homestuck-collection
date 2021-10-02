@@ -123,7 +123,7 @@ export default {
     pageMedia() {
       const media = Array.from(this.thisPage.media)
       this.deretcon(media)
-      const mediakey = media[0]
+      var mediakey = media[0]
 
       if (this.audioData) {
         let flashPath = mediakey.substring(0, mediakey.length-4)
