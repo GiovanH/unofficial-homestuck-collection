@@ -3,9 +3,11 @@
   <video  v-else-if="getExt(url) ==='vid'" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
   <iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
-  <iframe v-else-if="getExt(url) === 'html'" 
+  <component v-else-if="getExt(url) === 'html'" 
+  :is="frameType"
   :src='resolveFrameUrl(url)' 
-  :width="`${flashProps.width}px`" :height="`${flashProps.height}px`" class="sburb" seamless />
+  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px`"
+  class="sburb"  @did-finish-load="initHtmlFrame" seamless />
   <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
   <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
@@ -218,6 +220,9 @@ export default {
     }
   },
   computed: {
+    frameType() {
+      return 'iframe'
+    },
     videoWidth() {
       const filename = path.parse(this.url).name
       let width = 950
@@ -295,6 +300,9 @@ export default {
     }
   },
   methods: {
+    initHtmlFrame(event) {
+      // stub
+    },
     initIframe() {
       this.$el.contentWindow.vm = this
     },
