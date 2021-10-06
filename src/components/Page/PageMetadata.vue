@@ -1,6 +1,6 @@
 <template>
   <div class="metadata">
-    <div :title="getChapter(thisPage.pageId)">
+    <div :title="$getChapter(thisPage.pageId)">
       <p v-text="`${thisPage.storyId}/${thisPage.pageId}`"/>
       <p v-html="vizLink"/>
     </div>
@@ -23,8 +23,7 @@ export default {
   },
   data: function() {
     return {
-      DateTime: require('luxon').DateTime,
-      getChapter: ()=>"" //stub
+      DateTime: require('luxon').DateTime
     }
   },
   computed: {
