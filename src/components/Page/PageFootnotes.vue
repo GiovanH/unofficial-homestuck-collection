@@ -53,7 +53,7 @@ export default {
 
 <style scoped lang="scss">
   .footnote {
-    width: 600px;
+    width: calc(100% - 50px);
     border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
     padding: 30px 25px;
     p {
@@ -63,7 +63,7 @@ export default {
     }
   }
   .preface {
-    width: 600px;
+    width: calc(100% - 50px);
     margin: 1em 0;
 
     border-style: dashed;
@@ -75,7 +75,7 @@ export default {
     p {
       text-align: center;
       margin: 0 auto;
-      width: 600px;
+      width: calc(100% - 50px);
     }
   }
 
