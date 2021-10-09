@@ -256,7 +256,7 @@ export default {
     },
     audioTracks() {
       const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
-      this.$logger.info("Getting audio tracks for", this.url.replace("_hq.swf", ".swf"), ret)
+      this.$logger.info("Getting audio tracks for", this.url, this.url.replace("_hq.swf", ".swf"), ret)
       return ret
     },
     flashSrc() {

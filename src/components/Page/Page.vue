@@ -129,6 +129,8 @@ export default {
         let flashPath = mediakey.substring(0, mediakey.length-4)
         this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
         mediakey = `${flashPath}_hq.swf`
+      } else if (mediakey.includes(".swf")) {
+        this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
 
       // TODO: This doesn't seem to be used anywhere or do anything.
