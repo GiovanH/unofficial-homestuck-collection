@@ -5,15 +5,27 @@ import VanillaPage from '@/components/Page/Page.vue'
 function urlToArgObj(url) {
   // Can't be sure URL has a real protocol :(
   const querystr = url.replace(/.+?\//, '').replace(/\//g, "&")
-  console.log(querystr)
   const params = new URL('phony://?' + querystr).searchParams
-  console.log(Object.fromEntries(params.entries()))
   return Object.fromEntries(params.entries())
 }
 
 export default {
   ...VanillaPage,
   name: 'singlepage',
+  data: function() {
+    return {
+      shortVer: {
+        "title": 'c',
+        "pageId": 'id',
+        "timestamp": 't',
+        "flag": 'f',
+        "next": 'n',
+        "media": 'm',
+        "content": 'b',
+        "storyId": 's'
+      }
+    }
+  },
   props: [
     'tab', 'routeParams'
   ],
@@ -35,6 +47,14 @@ export default {
           : (this.queryArgs[key] ? this.queryArgs[key].split(',') : def)
       } else 
         return this.$props[key] || this.queryArgs[key] || def
+    },
+    makeUrl(thispage) {
+      let url = "/page/"
+      Object.keys(thispage).forEach(k => {
+        if (this.shortVer[k] && thispage[k])
+          url += `${this.shortVer[k]}=${encodeURIComponent(thispage[k])}/`
+      })
+      return url
     }
   },
   computed: {
@@ -54,16 +74,16 @@ export default {
     thisPage() {
       // Add useful information to archive object
       return {
-        "title": this.argLookup('c', ''),
-        "pageId": this.argLookup('id', ''),
-        "timestamp": this.argLookup('t', ''),
-        "flag": this.argLookup('f', []),
-        "next": this.argLookup('n', []),
-        "media": this.argLookup('m', []),
-        "content": this.argLookup('b', ''),
-        "storyId": this.argLookup('s', '')
+        "title": this.argLookup(this.shortVer['title'], ''),
+        "pageId": this.argLookup(this.shortVer['pageId'], ''),
+        "timestamp": this.argLookup(this.shortVer['timestamp'], ''),
+        "flag": this.argLookup(this.shortVer['flag'], []),
+        "next": this.argLookup(this.shortVer['next'], []),
+        "media": this.argLookup(this.shortVer['media'], []),
+        "content": this.argLookup(this.shortVer['content'], ''),
+        "storyId": this.argLookup(this.shortVer['storyId'], '')
       }
-    },
+    }
     // audioData(){
     //   let media = Array.from(this.thisPage.media)
     //   this.deretcon(media)
