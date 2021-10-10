@@ -9,6 +9,8 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const APP_VERSION = '2.0.0'
+const unzipper = require("unzipper")
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -179,6 +181,22 @@ var menuTemplate = [
   }
 ]
 
+function extractimods(){
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  const [match, contentType, base64] = require("url-loader!./imods.zip").match(/^data:(.+);base64,(.*)$/)
+
+  let izip_buffer = Buffer.from(base64, 'base64')
+
+  unzipper.Open.buffer(izip_buffer).then(d => {
+    const outpath = path.join(store.get('localData.assetDir'), "archive", "imods")
+    console.log("Extracting to ", outpath)
+    d.extract({
+      path: outpath, 
+      concurrency: 5
+    })
+  })
+}
+
 function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
   // This returns an `archive` object, and does not modify the global archive directly. 
@@ -243,6 +261,9 @@ function loadArchiveData(){
     // This is probably due to a poorly written mod, somehow.
     // specifically $localdata can be in an invalid state
     logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
+
+    extractimods() // just in case, try to recover from broken imods
 
     dialog.showMessageBoxSync({
       type: 'error',
@@ -270,6 +291,7 @@ function loadArchiveData(){
 
   chapterIndex = undefined
 
+  chapterIndex = undefined
   return data
 }
 
@@ -377,6 +399,23 @@ try {
 ipcMain.on('STARTUP_GET_PORT', (event) => {
   event.returnValue = port
 })
+
+if (assetDir) {
+  // App version checks
+  const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+
+  const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
+  if (semverGreater(APP_VERSION, last_app_version)) {
+    console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
+    extractimods()
+  } else {
+    console.log(`last version ${last_app_version} gte current version ${APP_VERSION}`)
+  }
+
+  store.set("appVersion", APP_VERSION)
+} else {
+  console.log("Deferring app version checks until initial configuration is complete.")
+}
 
 // Speed hack, try to preload the first copy of the archive
 var first_archive
