@@ -28,7 +28,11 @@ A mod folder with the folder name `mybigmod` should be installed in the form
 
 `{asset folder}/mods/mybigmod/` such that the file `{asset folder}/mods/mybigmod/mod.js` exists. 
 
-Archives like `.zip` or `.7z` files are *not* recognized as mods and need to be extracted as per the above.
+On startup, UHC will scan the mods folder for zip archives and automatically extract any archives it finds. 
+
+Zip archives packed in this way *must* pack folders or js files, as per above. UHC will *not* create a wrapper folder, so you must distribute zip files correctly in order for unpacking to work.
+
+Other archives like `.7z` files are *not* recognized as mods and need to be extracted as per the above.
 
 ### Using mods
 

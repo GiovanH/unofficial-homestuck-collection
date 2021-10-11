@@ -4,6 +4,7 @@ import yaml from 'js-yaml'
 
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass')
+const unzipper = require("unzipper")
 
 const Store = require('electron-store')
 const store = new Store()
@@ -25,6 +26,20 @@ const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
 let win = null
+
+function extractimods(){
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  const [match, contentType, base64] = require("url-loader!./imods.zip").match(/^data:(.+);base64,(.*)$/)
+
+  unzipper.Open.buffer(Buffer.from(base64, 'base64')).then(d => {
+    const outpath = path.join(assetDir, "archive", "imods")
+    console.log("Extracting imods to ", outpath)
+    d.extract({
+      path: outpath, 
+      concurrency: 5
+    })
+  })
+}
 
 function giveWindow(new_win) {
   win = new_win
@@ -369,7 +384,18 @@ function getModJs(mod_dir, options={}) {
     } else {
       if (__non_webpack_require__.cache[modjs_path])
         delete __non_webpack_require__.cache[modjs_path]
-      mod = __non_webpack_require__(modjs_path)
+
+      try {
+        mod = __non_webpack_require__(modjs_path)
+      } catch (e) {
+        // imod AND this is the second attempt at importing it
+        if (options.singlefile && mod_dir.startsWith("_")) {
+          console.log(e)
+          console.log("Couldn't load imod, trying re-extract")
+          extractimods()
+          mod = __non_webpack_require__(modjs_path)
+        } else throw e
+      }
     }
 
     mod._id = mod_dir
@@ -779,8 +805,29 @@ if (ipcMain) {
     var mod_folders
     try {
       const tree = crawlFileTree(modsDir, false)
+
+      // Extract zips
+      const outpath = path.join(assetDir, "mods")
+      const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
+      zip_archives.forEach(zip_name => {
+        const zip_path = path.join(modsDir, zip_name)
+        console.log(`Extracting ${zip_path} to ${outpath}`)
+        fs.createReadStream(zip_path).pipe(
+          unzipper.Extract({
+            path: outpath, 
+            concurrency: 5
+          })
+        ).on('finish', function() {
+          fs.unlink(zip_path, err => {
+            if (err) console.log(err)
+          })
+        })
+      })
+
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
+      mod_folders = Object.keys(tree).filter(p => 
+        /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p)
+      )
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
@@ -846,6 +893,7 @@ export default {
   giveWindow,
   modChoices,
   modsDir,
+  extractimods,
 
   doFullRouteCheck
 }
