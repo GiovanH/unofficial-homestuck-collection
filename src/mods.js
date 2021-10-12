@@ -26,21 +26,6 @@ const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
 let win = null
-
-function extractimods(){
-  // eslint-disable-next-line import/no-webpack-loader-syntax
-  const [match, contentType, base64] = require("url-loader!./imods.zip").match(/^data:(.+);base64,(.*)$/)
-
-  unzipper.Open.buffer(Buffer.from(base64, 'base64')).then(d => {
-    const outpath = path.join(assetDir, "archive", "imods")
-    console.log("Extracting imods to ", outpath)
-    d.extract({
-      path: outpath, 
-      concurrency: 5
-    })
-  })
-}
-
 function giveWindow(new_win) {
   win = new_win
   logger.info("Got window")
@@ -86,7 +71,44 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
-var onModLoadFail;
+var extractimods;
+
+if (ipcMain) {
+  extractimods = function(){
+    function zipImods() {
+      logger.log("Repacking imods zip (running development version)")
+      const { exec } = require('child_process')
+      exec('zip -r imods.zip ./imods/', {
+        cwd: path.join(process.cwd(), 'src')
+      }, (error, stdout, stderr) => {
+        if (error) {
+          logger.error(error)
+        } else {
+          logger.log(stdout)
+          logger.error(stderr)
+        }
+      })
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      // We're in development mode. Create a fresh zip file.
+      zipImods()
+    }
+
+    // eslint-disable-next-line import/no-webpack-loader-syntax
+    const [match, contentType, base64] = require("url-loader!./imods.zip").match(/^data:(.+);base64,(.*)$/)
+
+    unzipper.Open.buffer(Buffer.from(base64, 'base64')).then(d => {
+      const outpath = path.join(assetDir, "archive", "imods")
+      console.log("Extracting imods to ", outpath)
+      d.extract({
+        path: outpath, 
+        concurrency: 5
+      })
+    })
+  }
+} else {
+  extractimods = () => logger.error("Can't extract imods from foreground process")
+}
 
 function removeModsFromEnabledList(responsible_mods) {
   // Clear enabled mods
@@ -110,6 +132,8 @@ function removeModsFromEnabledList(responsible_mods) {
     window.vm.$localData.VM.saveLocalStorage()
   }
 }
+
+var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
@@ -818,9 +842,9 @@ if (ipcMain) {
             concurrency: 5
           })
         ).on('finish', function() {
-          fs.unlink(zip_path, err => {
+          setTimeout(__ => fs.unlink(zip_path, err => {
             if (err) console.log(err)
-          })
+          }), 1000)
         })
       })
 
@@ -881,19 +905,19 @@ function getModChoices() {
 }
 
 export default {
-  getEnabledModsJs,  // probably shouldn't use
+  getEnabledModsJs,  // bg
   getEnabledMods,
-  getModChoices,
-  getMixins,
-  getMainMixin,
-  editArchive,
-  bakeRoutes,
-  getAssetRoute,
-  getModStoreKey,
-  giveWindow,
+  getModChoices, // fg
+  getMixins, // fg
+  getMainMixin, // fg
+  editArchive, // bg
+  bakeRoutes, // bg
+  getAssetRoute, // bg, fg
+  getModStoreKey, // fg
+  giveWindow, // bg
   modChoices,
-  modsDir,
-  extractimods,
+  modsDir, // fg
+  extractimods, // bg
 
-  doFullRouteCheck
+  doFullRouteCheck // fg
 }
