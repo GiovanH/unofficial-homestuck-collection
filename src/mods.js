@@ -5,6 +5,7 @@ import yaml from 'js-yaml'
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass')
 const unzipper = require("unzipper")
+const Tar = require('tar');
 
 const Store = require('electron-store')
 const store = new Store()
@@ -71,43 +72,25 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
-var extractimods;
+function extractimods(){
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
+  let tar_buffer = Buffer.from(base64, 'base64')
 
-if (ipcMain) {
-  extractimods = function(){
-    function zipImods() {
-      logger.log("Repacking imods zip (running development version)")
-      const { exec } = require('child_process')
-      exec('zip -r imods.zip ./imods/', {
-        cwd: path.join(process.cwd(), 'src')
-      }, (error, stdout, stderr) => {
-        if (error) {
-          logger.error(error)
-        } else {
-          logger.log(stdout)
-          logger.error(stderr)
-        }
-      })
-    }
-    if (process.env.NODE_ENV !== 'production') {
-      // We're in development mode. Create a fresh zip file.
-      zipImods()
-    }
-
-    // eslint-disable-next-line import/no-webpack-loader-syntax
-    const [match, contentType, base64] = require("url-loader!./imods.zip").match(/^data:(.+);base64,(.*)$/)
-
-    unzipper.Open.buffer(Buffer.from(base64, 'base64')).then(d => {
-      const outpath = path.join(assetDir, "archive", "imods")
-      console.log("Extracting imods to ", outpath)
-      d.extract({
-        path: outpath, 
-        concurrency: 5
-      })
-    })
-  }
-} else {
-  extractimods = () => logger.error("Can't extract imods from foreground process")
+  const outpath = path.join(assetDir, "archive")
+  console.log("Extracting imods to ", outpath)
+  // sorry! this is very silly but javascript refuses to let me
+  // wait for a promise before returning, so here we are
+  fs.writeFileSync('_imods.tar', tar_buffer)
+  Tar.extract({
+    file: '_imods.tar',
+    sync: true,
+    cwd: outpath
+  })
+  fs.unlink('_imods.tar', err => {
+    if (err) console.log(err)
+  })
+  console.log("Extracting imods to ", outpath)
 }
 
 function removeModsFromEnabledList(responsible_mods) {
@@ -123,7 +106,8 @@ function removeModsFromEnabledList(responsible_mods) {
     if (win) {
       win.webContents.send('RELOAD_LOCALDATA')
     } else {
-      logger.error("Don't have win!")
+      // probably pre-window, don't need to worry here
+      logger.warn("Don't have win!")
     }
   } else {
     logger.info("Changing modlist from vm")
@@ -173,8 +157,8 @@ if (ipcMain) {
       // Have to invoke reload because we probably don't even have the VM at this point
       ipcRenderer.invoke('reload')
     }
-    window.doReloadNoRecover = __ => ipcRenderer.invoke('reload')
-    window.doFullRestart = __ => ipcRenderer.invoke('restart')
+    window.doReloadNoRecover = () => ipcRenderer.invoke('reload')
+    window.doFullRestart = () => ipcRenderer.invoke('restart')
 
     function sanitizeHTML(str) {
       var temp = document.createElement('div')
@@ -842,9 +826,9 @@ if (ipcMain) {
             concurrency: 5
           })
         ).on('finish', function() {
-          setTimeout(__ => fs.unlink(zip_path, err => {
+          setTimeout(() => fs.unlink(zip_path, err => {
             if (err) console.log(err)
-          }), 1000)
+          }), 200) // OS doesn't release it right away even after finish
         })
       })
 
