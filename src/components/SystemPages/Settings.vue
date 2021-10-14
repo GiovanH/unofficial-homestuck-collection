@@ -504,6 +504,7 @@ export default {
         'cursedHistory'
       ],
       debounce: false,
+      clearThemesForNewReader: false,
       needReload: false
     }
   },
@@ -564,9 +565,15 @@ export default {
       this.validateNewReader() 
       const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
-        this.$localData.settings.themeOverride = "default"
         // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
+
+        if (this.clearThemesForNewReader) {
+          this.$localData.settings.themeOverride = "default"
+          this.$localData.settings.themeOverrideUI = "default"
+          this.$localData.settings.forceThemeOverride = false
+          this.$localData.settings.forceThemeOverrideUI = false
+        }
 
         this.$updateNewReader(pageId, true)
       }
