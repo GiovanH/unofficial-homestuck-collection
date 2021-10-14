@@ -96,12 +96,19 @@
               </template>
             </dd>
           </template>
-          <dt v-else>
+          <dt > 
+            <!-- v-else -->
             <label>
               <input type="checkbox" name="forceThemeOverrideUIMSPA"
               :checked.prop="forceThemeOverrideUINewReaderChecked === true"
               :indeterminate.prop="forceThemeOverrideUINewReaderChecked === undefined"
               @click="forceThemeOverrideUINewReader()"> Never style UI
+            </label>
+            <label>
+              <input type="checkbox" name="toggleDarkMode"
+              :checked.prop="darkModeChecked === true"
+              :indeterminate.prop="darkModeChecked === undefined"
+              @click="toggleDarkMode()"> Dark Mode
             </label>
           </dt>
 
@@ -518,13 +525,18 @@ export default {
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
-      if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == true) {
+      if (this.$localData.settings.themeOverrideUI == "mspa" && this.$localData.settings.forceThemeOverrideUI == true) {
         return true
-      } else if (this.$localData.settings.themeOverrideUI == "" && this.$localData.settings.forceThemeOverrideUI == false) {
+      } else if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == false) {
         return false
       } else {
         return undefined
       }
+    },
+    darkModeChecked(){
+      if (this.$localData.settings.themeOverride == "cascade") return true
+      else if (this.$localData.settings.themeOverride == "default") return false
+      return undefined
     }
   },
   methods: {
@@ -575,6 +587,16 @@ export default {
       // Disable override of the "forced" theme is default
       if (this.$localData.settings.themeOverride == "default")
         this.$localData.settings.forceThemeOverride = false
+      this.$localData.root.saveLocalStorage()
+    },
+    toggleDarkMode(){
+      if (this.darkModeChecked) {
+        // Uncheck "dark mode"
+        this.$localData.settings.themeOverride = "default"
+      } else {
+        // Check "dark mode style"
+        this.$localData.settings.themeOverride = "cascade"
+      }
       this.$localData.root.saveLocalStorage()
     },
     forceThemeOverrideUINewReader(){
