@@ -26,7 +26,7 @@
             <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page).</dd>
+          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page.</dd>
 
           <dt>
             <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
@@ -170,18 +170,19 @@
               <input type="checkbox" 
                 :name="retcon.model" 
                 v-model="$localData.settings[retcon.model]" 
+                :disabled="$localData.settings.fastForward"
                 @click="toggleSetting(retcon.model)"
               >{{retcon.label}}</label></dt>
             <dd class="settingDesc">
               Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
             </dd>
           </template>
-
         </dl>
+        <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</p>
+        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited.</p>
 
         <div v-if="$isNewReader">
           
@@ -503,7 +504,7 @@ export default {
         'pxsTavros',
         'cursedHistory'
       ],
-      enableAllControversialConfirmMsg: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?",
+      enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
       clearThemesForNewReader: false,
       needReload: false
