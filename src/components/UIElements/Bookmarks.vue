@@ -1,7 +1,7 @@
 <template>
 <transition name="bookmarks">
   <div class="bookmarkWrapper" v-if="isActive" tabindex="-1" 
-    @keydown.esc="close()">
+    @keydown.esc="close()" @blur="close()">
     <div class="bookmarkWindow">
       <div class="header">
         <div>Game data</div>
@@ -48,7 +48,7 @@
         </transition-group>
       </div>
     </div>
-    <div class="bookmarkShadow" @click="close()"></div>
+    <!-- <div class="bookmarkShadow" @click="close()"></div> -->
   </div>
 </transition>
 </template>
@@ -83,6 +83,9 @@ export default {
   methods: {
     open() {
       this.isActive = true
+      if (document.activeElement !== this.$el) {
+        this.$nextTick(() => this.$el.focus())
+      }
     },
     close(){
       this.isActive = false

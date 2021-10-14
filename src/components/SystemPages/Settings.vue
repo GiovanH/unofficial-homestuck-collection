@@ -397,7 +397,7 @@ export default {
         }, {
           model: "openLogs",
           label: "Automatically open logs",
-          desc: "Text logs begin open on each page, instead of requiring you to click them."
+          desc: "Collapsed text logs begin open on each page, instead of requiring you to click them."
         }, {
           model: "hqAudio",
           label: "Enable high quality Flash audio",
