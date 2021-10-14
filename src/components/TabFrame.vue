@@ -188,7 +188,7 @@ export default {
 				case 'PAGE': {
 					let convertedPage = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p) : this.routeParams
 					let p = convertedPage.p ? convertedPage.p : undefined
-					if (this.$pageIsSpoiler(p, true)) component = 'Spoiler'
+					if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
 					else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
 					else if (this.routeParams.base !== 'ryanquest') {
 						//If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
