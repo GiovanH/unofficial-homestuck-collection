@@ -308,7 +308,8 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const isInRange = '000219' <= thisPageId && thisPageId <= this.$archive.tweaks.endOfHSPage // in the "keep track of spoilers" range
+      const endOfHSPage = this.$archive ? this.$archive.tweaks.endOfHSPage : '010030' // archive may not be loaded in setup mode
+      const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
@@ -347,7 +348,7 @@ Vue.mixin({
         // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
-        if (thisPageId == this.$archive.tweaks.endOfHSPage) {
+        if (thisPageId == endOfHSPage) {
           // Finished Homestuck.
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
