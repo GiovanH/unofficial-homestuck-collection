@@ -702,6 +702,10 @@ export default {
     }
   },
   watch: {
+    "$localData.settings.newReader.current"(to, from){
+      if (!this.$parent.tabIsActive)
+        this.newReaderPage = to
+    },
     newReaderPage(to, from) {
       if (this.$localData.settings.mspaMode)
         this.newReaderPage = Number(to).pad(6)
