@@ -26,7 +26,7 @@
             <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page).</dd>
+          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page) (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
 
           <dt>
             <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
@@ -708,16 +708,22 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+    },
+    scrollToSec(sectionClass) {
+      this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
     }
   },
   mounted(){
     if (this.routeParams.sec) {
-      this.$nextTick(() => {
-        this.$el.querySelector(`.settings.${this.routeParams.sec}`).scrollIntoView(true)
-      })
+      this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
   },
   watch: {
+    'tab.history': function (to, from) {
+      if (this.routeParams.sec) {
+        this.scrollToSec(this.routeParams.sec)
+      }
+    },
     newReaderPage(to, from) {
       if (this.$localData.settings.mspaMode)
         this.newReaderPage = Number(to).pad(6)
