@@ -503,6 +503,7 @@ export default {
         'pxsTavros',
         'cursedHistory'
       ],
+      enableAllControversialConfirmMsg: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?",
       debounce: false,
       clearThemesForNewReader: false,
       needReload: false
@@ -629,7 +630,7 @@ export default {
       } else {
         const args = {
           title: "Are you sure?",
-          message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
+          message: this.enableAllControversialConfirmMsg
         }
         ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
           if (answer === true) {
