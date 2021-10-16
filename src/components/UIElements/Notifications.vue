@@ -52,7 +52,7 @@ export default {
       })
     },
     sortedNewspostTimestamps() {
-      return Object.keys(this.newspostsByTimestamp).sort()
+      return Object.keys(this.newspostsByTimestamp).map(Number).sort()
     }    
   },
   methods: {
@@ -134,21 +134,22 @@ export default {
           // See also $timestampIsSpoiler
           // but we can't reuse that logic because we're passing an explicit time point here
           const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
-          const nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].next[0]].timestamp
+          const nextTimestamp = Math.min(...this.$archive.mspa.story[pageId].next.map(
+            npageid => this.$archive.mspa.story[npageid].timestamp
+          ))
 
           // Newsposts
           const news_between = this.timestampsBetween(
             latestTimestamp, nextTimestamp, 
             this.sortedNewspostTimestamps
           )
-
           // Group newsposts if too many
           if (news_between.length <= this.maxActiveNotifs) { 
             news_between.forEach(newst => {
               this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
             })
           } else {
-            let newspost_0 = this.newspostsByTimestamp[news_between[0]]
+            const newspost_0 = this.newspostsByTimestamp[news_between[0]]
             this.$logger.info(newspost_0)
             this.queueNotif({
               title: 'New news posts',
