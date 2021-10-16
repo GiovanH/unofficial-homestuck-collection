@@ -76,11 +76,29 @@ export default {
 
       if (time2 <= time1) return []
 
+      function fuzzyBinarySearch(arr, val) {
+        let start = 0
+        let end = arr.length - 1
+        let mid
+        do {
+          mid = Math.floor((start + end) / 2)
+
+          if (arr[mid] === val) return mid
+
+          if (val < arr[mid]) {
+            end = mid - 1
+          } else {
+            start = mid + 1
+          }
+        } while (start <= end)
+        return mid // Near where to start. (Should be mid-1?)
+      }
+
       // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
 
       let ret = []
       let newst = -1
-      for (let i = 0; newst <= time2; newst = corpus[i++]) {
+      for (let i = fuzzyBinarySearch(corpus, time1); newst <= time2; newst = corpus[i++]) {
         if (newst > time1) {
           ret.push(newst)
           // this.$logger.info("Found", this.formatTimestamp(newst))
