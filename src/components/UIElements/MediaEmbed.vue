@@ -6,7 +6,7 @@
   <component v-else-if="getExt(url) === 'html'" 
   :is="frameType"
   :src='resolveFrameUrl(url)' 
-  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px`"
+  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
   class="sburb"  @did-finish-load="initHtmlFrame" seamless />
   <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
   <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
@@ -138,7 +138,10 @@ export default {
         // TRICKSTER BANNER
         "menu": {width: 950, height: 20},
         // TRICKSTER BANNER
-        "echidna": {width: 30, height: 30}
+        "echidna": {width: 30, height: 30},
+        "Cheerfulbear%20-%20PLAY%20ME": {width: 1120, height: 750},
+        "Dear%20Andrew": {width: 1120, height: 750},
+        "SBaHJ%20Origins": {width: 1120, height: 750}
       },
       gameOver: {
         count: 0,
