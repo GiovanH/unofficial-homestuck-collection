@@ -1,7 +1,8 @@
 default: test
 
 install: package.json
-# 	yarn install
+	yarn install
+	touch install
 
 clean:
 	rm -r src/imods.tar
@@ -10,9 +11,7 @@ lint: install
 	yarn lint
 
 src/imods.tar: $(wildcard src/imods/*)
-	pushd src
-	tar -czf imods.tar imods/
-	popd
+	cd src && tar -czf imods.tar imods/
 	
 test: install src/imods.tar
 	yarn dev
