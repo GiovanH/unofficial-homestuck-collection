@@ -50,6 +50,7 @@ class LocalData {
       urlTooltip: false,
       switchToNewTabs: false,
       forceScrollBar: true,
+      hideFullscreenHeader: false,
       smoothScrolling: true,
       pixelScaling: true,
       mspaMode: false,
