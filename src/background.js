@@ -730,6 +730,18 @@ async function createWindow () {
     win = null
   })
 
+  var current_icon // = "build/icons/icon.ico"
+  // win.setIcon(current_icon)
+
+  ipcMain.on('set-sys-icon', (event, new_icon) => {
+    new_icon = new_icon || "build/icons/icon.ico"
+    if (new_icon && new_icon != current_icon) {
+      win.setIcon(new_icon)
+      logger.info("Changing icon to", new_icon)
+      current_icon = new_icon
+    }
+  })
+
   // Give mods a reference to the window object so it can reload 
   Mods.giveWindow(win);
 
