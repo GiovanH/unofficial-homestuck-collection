@@ -53,6 +53,8 @@
 	}
 
 	&.retro {
+		--app-icon: "build/icons/default.ico";
+		
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
 
@@ -120,6 +122,8 @@
 	}
 
 	&.sbahj {
+		--app-icon: "build/icons/sbahj.ico";
+
 		--font-disabled: #00000060;
 		--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
 
@@ -366,6 +370,8 @@
 	}
 
 	&.pxs {
+		--app-icon: "build/icons/pxs.ico";
+
 		--font-default: #ffffff;
 		--font-header: #ffffff;
 		--font-ctx: #ffffff;
