@@ -1,7 +1,7 @@
 <template>
 <transition name="bookmarks">
   <div class="bookmarkWrapper" v-if="isActive" tabindex="-1" 
-    @keydown.esc="close()" @blur="close()">
+    @keydown.esc="close()">
     <div class="bookmarkWindow">
       <div class="header">
         <div>Game data</div>
