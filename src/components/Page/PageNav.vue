@@ -18,7 +18,7 @@
       </ul>
       <ul class="meta">
         <li v-if="'timestamp' in thisPage && !!getTimestamp()">
-          <div class="timestamp" v-html="this.getTimestamp()" />
+          <div class="timestamp" :data-timestamp="thisPage.timestamp" v-html="this.getTimestamp()" />
         </li>
         <li>
           <a class="vizLink" :href="vizLink" v-html="pageIdText" />

@@ -6,7 +6,7 @@
     <div class="pageFrame">
       <Metadata v-if="showMetadata == true" :thisPage="thisPage" />
       <div class="pageContent">
-        <Footnotes :pageId="thisPage.pageId" preface />
+        <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -20,7 +20,7 @@
                 :nextPages="nextPagesArray" ref="pageNav"
                 :class="(hideNav ? 'hidden' : '')" />
           </div>
-        <Footnotes :pageId="thisPage.pageId" />
+        <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
@@ -270,6 +270,10 @@ export default {
         flex: 0 1 auto;
         align-items: center;
         flex-flow: column;
+
+        .footnotesContainer {
+          width: 100%;
+        }
 
         .mediaContent {
           display: flex;
