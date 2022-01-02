@@ -20,106 +20,17 @@
         <MediaEmbed url="/sweetbroandhellajeff/awyeahbitches.gif" />
         <div class="ad">
           <a href="/tbiy" target="_blank"><MediaEmbed url="/sweetbroandhellajeff/becomebaby.jpg" /></a>
-          <div class="projectWonderful">Ads by Project Wonderful! Your ad here, right now: $9999999999999</div>
+          <div class="projectWonderful">Ads by Project Wonderful! Your ad here, right now: {{projectWonderfulBid}}</div>
         </div>
         <MediaEmbed url="/sweetbroandhellajeff/makemesomemoney.gif" />
         <MediaEmbed url="/sweetbroandhellajeff/madlewwtz.gif" />
       </div>
       <div class="linkhole">
         <div>ARFTER #46: a bunch of other comomics to!</div>
-        <br />
-        <a href="/sbahj/46">COMIC #46: the game........... is afoof</a>
-        <br />
-        <a href="/sbahj/45">COMIC #45: cloink</a>
-        <br />
-        <a href="/sbahj/44">COMIC #44: this is complete bulb shit</a>
-        <br />
-        <a href="/sbahj/43">COMIC #433: BWEEEEEEEEEEEEEEEEEEEEE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE EEEEEE EEEEEEEEEE EEEEEE EEEEEEEEEEEEEEEEEEEEEEEEEEE EEEEEEEEEEE EEE EEEEE</a>
-        <br />
-        <a href="/sbahj/42">COMIC #42: shearching 4 bobby shitfuck</a>
-        <br />
-        <a href="/sbahj/41">COMIC #41: IS THERE ANYTHING THAT DOISHE BLASTS THATS NOT QUADS.</a>
-        <br />
-        <a href="/sbahj/40">COMIC #40: bube just no</a>
-        <br />
-        <a href="/sbahj/38">COMIC #38: pthhbhthbhpthhhthtbbbthb</a>
-        <br />
-        <a href="/sbahj/37">COMIC #37: brough to u by the BIBTCHEZ &amp; THA GANJOG B)</a>
-        <br />
-        <a href="/sbahj/36">COMIC #36: um, last I checked, the zoo didn't allow IDIDOT GAYS inside</a>
-        <br />
-        <a href="/sbahj/35">COMIC #35: sububaway is for ONLY when your high, ONLY ... </a>
-        <br />
-        <a href="/sbahj/34">COMIC #34: if this guy any more stoned then that, he's belong in the holy fucking buble</a>
-        <a href="/sbahj/33">COMIC #33: BAOOOOOOOOOOOOOOOOOOOOOOOOOOAM!!!!!!!!!!!!!!!!</a>
-        <br />
-        <a href="/sbahj/32">COMIC #32: (wall)</a>
-        <br />
-        <a href="/sbahj/31">COMIC #31: tititled, "THE GRODIRON"!</a>
-        <br />
-        <a href="/sbahj/30">COMIC #30: &lt;bold.....&gt;this redard can sit his soggy ass in a car on your shirt like an asshole FORE EVERiiiiiii</a>
-        <br />
-        <a href="/sbahj/29">COMIC <b>#29</b>: NITE MANGIC!</a>
-        <br />
-        <a href="/sbahj/28">COM<b>IC #28: spor</b>ts</a>
-        <br />
-        <a href="/sbahj/27">COMIC #27: DONG</a>
-        <br />
-        <a href="/sbahj/26">COMIC #26: this fapass dunkstick does this EVEREY fucking time</a>
-        <br />
-        <a href="/sbahj/25">COMIC #25: more like legrend of the unreal shithead</a>
-        <br />
-        <a href="/sbahj/24">COMIC #24: them man, the dickhead, the LERGEND.</a>
-        <br />
-        <a href="/sbahj/23">COMIC #23: oOoOoOoOoOoOoOoOooOoOoOOOoOOHHhhh hah just fucking with uou...</a>
-        <br />
-        <a href="/sbahj/22">COMIC #22: borack bobdama STILL haven't got the hang of this ecolomy thing yet;</a>
-        <br />
-        <a href="/sbahj/21">COMIC #21: this fine apparell secretly holds a mystery.... SHHHHHHHHHH</a>
-        <br />
-        <a href="/sbahj/20">CO<b>MIC #20: CHECK OUT THUS HOT NEW MORC</b>H..........</a>
-        <br />
-        <a href="/sbahj/19">COMIC #19: okay shup up everybody this shit is a SERIOUS, issue</a>
-        <br />
-        <a href="/sbahj/18">COMIC #18: spoot problems? so want else is new........</a>
-        <br />
-        <a href="/sbahj/17">COMIC #17: wowoof woof, aha hah what a fuckin IDIOT!</a>
-        <br />
-        <a href="/sweetbroandhellajeff/movies/SBAHJthemovie1.swf">MOVIE #1: hooly SHIT, wear a MOVIE???????????</a>
-        <br />
-        <a href="/sbahj/16">COMIC #16: he LAUGHED when he shok, like a bowl full of WEED!!! omfg</a>
-        <br />
-        <a href="/sbahj/15">COMIC #15: you don't boguard chips in the shitter dude, you just DONT</a>
-        <br />
-        <a href="/sbahj/14">COMIC #14: HAHAHAHAHAHA they juts don't ever hit the ground, what is WRONG with this picture. "3" of ten</a>
-        <br />
-        <a href="/sbahj/13">COMIC #13:um, EATH TO ASSHOLE. hello can you here me..... (part 2 of thenacho party thing)</a>
-        <br />
-        <a href="/sbahj/12">COMIC #12: evrybody was high when this went down, EVERYBODY (part 1 of 10</a>
-        <br />
-        <a href="/sbahj/11">COMIC #11: ok put the can down dude.... haha, unbealievible</a>
-        <br />
-        <a href="/sbahj/10">COMIC #10: ok, AGAIN with the ANGEL problems. seariously dude??????????</a>
-        <br />
-        <a href="/sbahj/9">COMIC #9: no way i mean no fucking way, NO WON is that good..</a>
-        <br />
-        <a href="/sbahj/8">COMIC #8: just do me a FAVOR, put it bock in the fridge bro....</a>
-        <br />
-        <a href="/sbahj/7">COMIC #7: a GAIN with the socks, you have GOT to be SHITTONG me</a>
-        <br />
-        <a href="/sbahj/6">COMIC #6: this guy.... he OWNS the glass, he OWNS it</a>
-        <br />
-        <a href="/sbahj/5">COMIC #5: sweet bro comes thru.......... AGAIN</a>
-        <br />
-        <a href="/sbahj/4">COMIC #4: not even BARACK obana can bail him out of THIS jam.....</a>
-        <br />
-        <a href="/sbahj/3">COMIC #3: so messed up.... jelly??? omfg thats SO MESSED UP!!!</a>
-        <br />
-        <a href="/sbahj/2">COMIC #2: HE HE HE</a>
-        <br />
-        <a href="/sbahj/1">COMIC #1: man listen, stairs. i am TELLING you</a>
-
-        
+        <template v-for="comic, i in listedPages">
+          <br :key="`comic${i}br`"/>
+          <a :href="comic.url" v-text="comic.title" :key="`comic${i}`"/>
+        </template>
         <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
       </div>
     </div>
@@ -141,6 +52,55 @@ export default {
   },
   data: function() {
     return {
+      projectWonderfulBid: "$9999999999999",
+      listedPages: [
+        {url: "/sbahj/46", title: "COMIC #46: the game........... is afoof"},
+        {url: "/sbahj/45", title: "COMIC #45: cloink"},
+        {url: "/sbahj/44", title: "COMIC #44: this is complete bulb shit"},
+        {url: "/sbahj/43", title: "COMIC #433: BWEEEEEEEEEEEEEEEEEEEEE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE EEEEEE EEEEEEEEEE EEEEEE EEEEEEEEEEEEEEEEEEEEEEEEEEE EEEEEEEEEEE EEE EEEEE"},
+        {url: "/sbahj/42", title: "COMIC #42: shearching 4 bobby shitfuck"},
+        {url: "/sbahj/41", title: "COMIC #41: IS THERE ANYTHING THAT DOISHE BLASTS THATS NOT QUADS."},
+        {url: "/sbahj/40", title: "COMIC #40: bube just no"},
+        {url: "/sbahj/38", title: "COMIC #38: pthhbhthbhpthhhthtbbbthb"},
+        {url: "/sbahj/37", title: "COMIC #37: brough to u by the BIBTCHEZ &amp; THA GANJOG B)"},
+        {url: "/sbahj/36", title: "COMIC #36: um, last I checked, the zoo didn't allow IDIDOT GAYS inside"},
+        {url: "/sbahj/35", title: "COMIC #35: sububaway is for ONLY when your high, ONLY ... "},
+        {url: "/sbahj/34", title: "COMIC #34: if this guy any more stoned then that, he's belong in the holy fucking buble"},
+        {url: "/sbahj/33", title: "COMIC #33: BAOOOOOOOOOOOOOOOOOOOOOOOOOOAM!!!!!!!!!!!!!!!!"},
+        {url: "/sbahj/32", title: "COMIC #32: (wall)"},
+        {url: "/sbahj/31", title: "COMIC #31: tititled, \"THE GRODIRON\"!"},
+        {url: "/sbahj/30", title: "COMIC #30: &lt;bold.....&gt;this redard can sit his soggy ass in a car on your shirt like an asshole FORE EVERiiiiiii"},
+        {url: "/sbahj/29", title: "COMIC <b>#29</b>: NITE MANGIC!"},
+        {url: "/sbahj/28", title: "COM<b>IC #28: spor</b>ts"},
+        {url: "/sbahj/27", title: "COMIC #27: DONG"},
+        {url: "/sbahj/26", title: "COMIC #26: this fapass dunkstick does this EVEREY fucking time"},
+        {url: "/sbahj/25", title: "COMIC #25: more like legrend of the unreal shithead"},
+        {url: "/sbahj/24", title: "COMIC #24: them man, the dickhead, the LERGEND."},
+        {url: "/sbahj/23", title: "COMIC #23: oOoOoOoOoOoOoOoOooOoOoOOOoOOHHhhh hah just fucking with uou..."},
+        {url: "/sbahj/22", title: "COMIC #22: borack bobdama STILL haven't got the hang of this ecolomy thing yet;"},
+        {url: "/sbahj/21", title: "COMIC #21: this fine apparell secretly holds a mystery.... SHHHHHHHHHH"},
+        {url: "/sbahj/20", title: "CO<b>MIC #20: CHECK OUT THUS HOT NEW MORC</b>H.........."},
+        {url: "/sbahj/19", title: "COMIC #19: okay shup up everybody this shit is a SERIOUS, issue"},
+        {url: "/sbahj/18", title: "COMIC #18: spoot problems? so want else is new........"},
+        {url: "/sbahj/17", title: "COMIC #17: wowoof woof, aha hah what a fuckin IDIOT!"},
+        {url: "/sweetbroandhellajeff/movies/SBAHJthemovie1.swf", title: "MOVIE #1: hooly SHIT, wear a MOVIE???????????"},
+        {url: "/sbahj/16", title: "COMIC #16: he LAUGHED when he shok, like a bowl full of WEED!!! omfg"},
+        {url: "/sbahj/15", title: "COMIC #15: you don't boguard chips in the shitter dude, you just DONT"},
+        {url: "/sbahj/14", title: "COMIC #14: HAHAHAHAHAHA they juts don't ever hit the ground, what is WRONG with this picture. \"3\" of ten"},
+        {url: "/sbahj/13", title: "COMIC #13:um, EATH TO ASSHOLE. hello can you here me..... (part 2 of thenacho party thing)"},
+        {url: "/sbahj/12", title: "COMIC #12: evrybody was high when this went down, EVERYBODY (part 1 of 10"},
+        {url: "/sbahj/11", title: "COMIC #11: ok put the can down dude.... haha, unbealievible"},
+        {url: "/sbahj/10", title: "COMIC #10: ok, AGAIN with the ANGEL problems. seariously dude??????????"},
+        {url: "/sbahj/9", title: "COMIC #9: no way i mean no fucking way, NO WON is that good.."},
+        {url: "/sbahj/8", title: "COMIC #8: just do me a FAVOR, put it bock in the fridge bro...."},
+        {url: "/sbahj/7", title: "COMIC #7: a GAIN with the socks, you have GOT to be SHITTONG me"},
+        {url: "/sbahj/6", title: "COMIC #6: this guy.... he OWNS the glass, he OWNS it"},
+        {url: "/sbahj/5", title: "COMIC #5: sweet bro comes thru.......... AGAIN"},
+        {url: "/sbahj/4", title: "COMIC #4: not even BARACK obana can bail him out of THIS jam....."},
+        {url: "/sbahj/3", title: "COMIC #3: so messed up.... jelly??? omfg thats SO MESSED UP!!!"},
+        {url: "/sbahj/2", title: "COMIC #2: HE HE HE"},
+        {url: "/sbahj/1", title: "COMIC #1: man listen, stairs. i am TELLING you"}
+      ]
     }
   },
   computed: {   

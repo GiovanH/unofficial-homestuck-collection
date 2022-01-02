@@ -16,11 +16,13 @@ export default {
   props: [
     'mspaId',
     'long',
+    'titleOnly',
     'credit'
   ],
   computed: {
     page(){return this.$archive.mspa.story[this.mspaId]},
     isLong(){return (this.long !== undefined)},
+    isTitleOnly(){return (this.titleOnly !== undefined)},
     isCredit(){return (this.credit !== undefined)},
     isSpoiler(){return this.$pageIsSpoiler(this.mspaId)},
     href(){return `/mspa/${this.mspaId}`},
@@ -37,9 +39,11 @@ export default {
       return false
     },
     innerText(){
-      let num = this.displayNum
+      const num = this.displayNum
       if (this.isSpoiler)
         return num
+      else if (this.isTitleOnly)
+        return this.page.title
       else if (this.isLong)
         return `${num} - ${this.page.title}`
       else
@@ -50,7 +54,7 @@ export default {
         return "???????????"
       else
         return this.page.title
-    },
+    }
   }
 }
 </script>
