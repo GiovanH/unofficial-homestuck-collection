@@ -253,7 +253,7 @@ module.exports = {
 
     notif_snaps: {
       title: 'UNLOCKED COMIC: SNAPCHAT',
-      desc: 'Snapshots of life on Earth C. No longer canon as of The Epilogues.',
+      desc: 'Snapshots of life on Earth C. No longer "canon" as of The Epilogues.',
       url: '/snaps',
       thumb: '/archive/collection/archive_snaps.png'
     },
@@ -262,6 +262,13 @@ module.exports = {
       title: 'UNLOCKED PAGE: SKAIANET SYSTEMS',
       desc: 'Tomorrow\'s canon, today! Homestuck still has plenty in store for you.',
       url: '/skaianet',
+      thumb: '/archive/collection/archive_skaianet.png'
+    },
+
+    notif_news: {
+      title: 'New news post',
+      desc: 'wowie!',
+      url: '/news',
       thumb: '/archive/collection/archive_skaianet.png'
     }
   },

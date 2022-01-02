@@ -26,7 +26,7 @@
             <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page).</dd>
+          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page) (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
 
           <dt>
             <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
@@ -38,6 +38,10 @@
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
+          <div class="subOption" v-if="$localData.settings['notifications']">
+            <dt><label><input type="checkbox" name="subNotifications" v-model="$localData.settings['subNotifications']" @click="toggleSetting('subNotifications')">Show minor notifications</label></dt>
+          <dd class="settingDesc">Also show notifications for minor updates like news announcements.</dd>
+          </div>
         </dl>
       </div>
       <div class="settings application">
@@ -624,7 +628,12 @@ export default {
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
-        this.$popNotif('notif_enabled')
+        this.$pushNotif({
+          title: 'NOTIFICATIONS ENABLED',
+          desc: 'You can click me to visit whatever you just unlocked!',
+          url: '/',
+          thumb: '/archive/collection/archive_news.png'
+        })
       }
       if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
         this.queueArchiveReload()
@@ -703,9 +712,22 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+    },
+    scrollToSec(sectionClass) {
+      this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
+    }
+  },
+  mounted(){
+    if (this.routeParams.sec) {
+      this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
   },
   watch: {
+    'tab.history': function (to, from) {
+      if (this.routeParams.sec) {
+        this.scrollToSec(this.routeParams.sec)
+      }
+    },
     newReaderPage(to, from) {
       if (this.$localData.settings.mspaMode)
         this.newReaderPage = Number(to).pad(6)
@@ -788,6 +810,10 @@ export default {
         .settingDesc {
           color: var(--page-nav-meta);
           font-weight: normal;
+        }
+
+        div.subOption {
+          margin-left: 40px;
         }
 
         > dd.settingDesc {

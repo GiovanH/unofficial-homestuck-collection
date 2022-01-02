@@ -45,6 +45,7 @@ class LocalData {
         limit: false
       },
       notifications: true,
+      subNotifications: false,
 
       showAddressBar: false,
       urlTooltip: false,
