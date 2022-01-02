@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     posts() {
-      let filteredPosts = this.$isNewReader ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp) : [...this.$archive.social.tumblr]
+      let filteredPosts = this.$isNewReader ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$newReaderCurrent].timestamp) : [...this.$archive.social.tumblr]
       return this.reverse ? filteredPosts.reverse() : filteredPosts
     },
     filteredPostCount() {

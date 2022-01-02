@@ -6,10 +6,10 @@
         <h2>New Reader Mode</h2>
         <div class="newReaderInput" v-if="$isNewReader">
           <p>New reader mode enabled.<br>Currently up to page 
-            <!-- <strong>{{$mspaOrVizNumber(this.$localData.settings.newReader.current)}}</strong>. -->
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $localData.settings.newReader.current}" v-model="newReaderPage">
+            <!-- <strong>{{$mspaOrVizNumber(this.$newReaderCurrent)}}</strong>. -->
+          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $newReaderCurrent}" v-model="newReaderPage">
           </p><br>
-          <button v-if="newReaderValidation && (newReaderPage != $localData.settings.newReader.current)" @click="changeNewReader()">Set adjusted page</button>
+          <button v-if="newReaderValidation && (newReaderPage != $newReaderCurrent)" @click="changeNewReader()">Set adjusted page</button>
           <br />
           <button @click="clearNewReader()">Switch off new reader mode</button>
         </div>
@@ -26,7 +26,7 @@
             <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live.<br>Stories will be presented approximately as they were at the time of publication (your most recent page) (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
+          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
 
           <dt>
             <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
@@ -100,12 +100,19 @@
               </template>
             </dd>
           </template>
-          <dt v-else>
+          <dt > 
+            <!-- v-else -->
             <label>
               <input type="checkbox" name="forceThemeOverrideUIMSPA"
               :checked.prop="forceThemeOverrideUINewReaderChecked === true"
               :indeterminate.prop="forceThemeOverrideUINewReaderChecked === undefined"
               @click="forceThemeOverrideUINewReader()"> Never style UI
+            </label>
+            <label>
+              <input type="checkbox" name="toggleDarkMode"
+              :checked.prop="darkModeChecked === true"
+              :indeterminate.prop="darkModeChecked === undefined"
+              @click="toggleDarkMode()"> Dark Mode
             </label>
           </dt>
 
@@ -166,18 +173,19 @@
               <input type="checkbox" 
                 :name="retcon.model" 
                 v-model="$localData.settings[retcon.model]" 
+                :disabled="$localData.settings.fastForward"
                 @click="toggleSetting(retcon.model)"
               >{{retcon.label}}</label></dt>
             <dd class="settingDesc">
               Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
             </dd>
           </template>
-
         </dl>
+        <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
       </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
-        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited. The inclusion of this content is in no way an endorsement of its quality.</p>
+        <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited.</p>
 
         <div v-if="$isNewReader">
           
@@ -230,7 +238,7 @@
           <dd class="settingDesc">
           Under this box, you can see the specific changes that were made and enable and disable them to taste.</dd>
 
-          <SpoilerBox kind="Controversial Content">
+          <SpoilerBox kind="Controversial Content" :start-open="controversialAny">
 
             <template v-for="cc in controversialList">
               <dt><label>
@@ -358,7 +366,7 @@ export default {
       settingListBoolean: [
         {
           model: "showAddressBar",
-          label: "Always show jump box",
+          label: "Show address bar",
           desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
           model: "mspaMode",
@@ -402,7 +410,7 @@ export default {
         }, {
           model: "openLogs",
           label: "Automatically open logs",
-          desc: "Text logs begin open on each page, instead of requiring you to click them."
+          desc: "Collapsed text logs begin open on each page, instead of requiring you to click them."
         }, {
           model: "hqAudio",
           label: "Enable high quality Flash audio",
@@ -500,7 +508,7 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
-      newReaderPage: this.$localData.settings.newReader.current || 
+      newReaderPage: this.$newReaderCurrent || 
         (this.$localData.settings.mspaMode ? '001901' : '1'),
       newReaderValidation: true,
       allControversial: [
@@ -509,7 +517,9 @@ export default {
         'pxsTavros',
         'cursedHistory'
       ],
+      enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
+      clearThemesForNewReader: false,
       needReload: false,
       modsDir: Mods.modsDir
     }
@@ -532,13 +542,18 @@ export default {
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
-      if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == true) {
+      if (this.$localData.settings.themeOverrideUI == "mspa" && this.$localData.settings.forceThemeOverrideUI == true) {
         return true
-      } else if (this.$localData.settings.themeOverrideUI == "" && this.$localData.settings.forceThemeOverrideUI == false) {
+      } else if (this.$localData.settings.themeOverrideUI == "default" && this.$localData.settings.forceThemeOverrideUI == false) {
         return false
       } else {
         return undefined
       }
+    },
+    darkModeChecked(){
+      if (this.$localData.settings.themeOverride == "cascade") return true
+      else if (this.$localData.settings.themeOverride == "default") return false
+      return undefined
     }
   },
   methods: {
@@ -558,7 +573,7 @@ export default {
           if (answer === true)
             this.$updateNewReader(pageId, true)
           else
-            this.newReaderPage = this.$localData.settings.newReader.current
+            this.newReaderPage = this.$newReaderCurrent
         })
       }
     },
@@ -566,9 +581,15 @@ export default {
       this.validateNewReader() 
       const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
       if (this.newReaderValidation) {
-        this.$localData.settings.themeOverride = "default"
         // eslint-disable-next-line no-return-assign
         this.allControversial.forEach(key => this.$localData.settings[key] = false)
+
+        if (this.clearThemesForNewReader) {
+          this.$localData.settings.themeOverride = "default"
+          this.$localData.settings.themeOverrideUI = "default"
+          this.$localData.settings.forceThemeOverride = false
+          this.$localData.settings.forceThemeOverrideUI = false
+        }
 
         this.$updateNewReader(pageId, true)
       }
@@ -580,7 +601,7 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          this.newReaderPage = this.$mspaOrVizNumber(this.$localData.settings.newReader.current)
+          this.newReaderPage = this.$mspaOrVizNumber(this.$newReaderCurrent)
           this.$localData.root.NEW_READER_CLEAR()
         }
       })
@@ -589,6 +610,16 @@ export default {
       // Disable override of the "forced" theme is default
       if (this.$localData.settings.themeOverride == "default")
         this.$localData.settings.forceThemeOverride = false
+      this.$localData.root.saveLocalStorage()
+    },
+    toggleDarkMode(){
+      if (this.darkModeChecked) {
+        // Uncheck "dark mode"
+        this.$localData.settings.themeOverride = "default"
+      } else {
+        // Check "dark mode style"
+        this.$localData.settings.themeOverride = "cascade"
+      }
       this.$localData.root.saveLocalStorage()
     },
     forceThemeOverrideUINewReader(){
@@ -614,7 +645,7 @@ export default {
       } else {
         const args = {
           title: "Are you sure?",
-          message: "This option restores all the controversial material without including spoilers or detailed content warnings. The material includes racism and body horror.\n\nMore granular settings are available when New Reader mode is disabled, so you may wish to finish Homestuck before you come back and view this content selectively.\n\n Are you sure you want to enable this option now?"
+          message: this.enableAllControversialConfirmMsg
         }
         ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
           if (answer === true) {
@@ -729,6 +760,10 @@ export default {
     }
   },
   watch: {
+    "$localData.settings.newReader.current"(to, from){
+      if (!this.$parent.tabIsActive)
+        this.newReaderPage = to
+    },
     'tab.history': function (to, from) {
       if (this.routeParams.sec) {
         this.scrollToSec(this.routeParams.sec)
@@ -878,6 +913,13 @@ export default {
         }
         .themeSelector + dt {
           display: inline;
+        }
+        // Little ones
+        &.retcons dl {
+          column-count: 2;
+          dt:first-child {
+            margin-top: 0;
+          }
         }
         .textOverrideSettings {
           margin-top: 16px;

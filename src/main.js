@@ -4,19 +4,25 @@ import router from './router'
 import localData from './store/localData'
 // import path from 'path'
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import Memoization from '@/memoization.js'
+
 const Store = require('electron-store')
 const store = new Store()
 
 const log = require('electron-log');
 log.transports.console.format = '[{level}] {text}';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-import Memoization from '@/memoization.js'
-
-library.add([faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock])
+library.add([
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faRedo
+])
 
 Vue.component('fa-icon', FontAwesomeIcon)
 
@@ -65,7 +71,10 @@ Vue.mixin({
     $localhost: () => `http://127.0.0.1:${port}/`,
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return this.$localData.settings.newReader.current && this.$localData.settings.newReader.limit
+      return this.$newReaderCurrent && this.$localData.settings.newReader.limit
+    },
+    $newReaderCurrent() {
+      return this.$localData.settings.newReader.current
     },
     $modChoices: Mods.getModChoices,
     $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
@@ -301,7 +310,8 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const isInRange = '000219' <= thisPageId && thisPageId <= this.$archive.tweaks.endOfHSPage // in the "keep track of spoilers" range
+      const endOfHSPage = this.$archive ? this.$archive.tweaks.endOfHSPage : '010030' // archive may not be loaded in setup mode
+      const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
@@ -340,12 +350,12 @@ Vue.mixin({
         // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
-        if (thisPageId == this.$archive.tweaks.endOfHSPage) {
+        if (thisPageId == endOfHSPage) {
           // Finished Homestuck.
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
         } else {
-          const resultCurrent = (forceOverride || !this.$localData.settings.newReader.current || this.$localData.settings.newReader.current < thisPageId) ? thisPageId : false
+          const resultCurrent = (forceOverride || !this.$newReaderCurrent || this.$newReaderCurrent < thisPageId) ? thisPageId : false
           const resultLimit = (forceOverride || !this.$localData.settings.newReader.limit || this.$localData.settings.newReader.limit < nextLimit) ? nextLimit :  false
 
           // If you've reached that page where a retcon happened, mark the flag.
@@ -383,10 +393,10 @@ Vue.mixin({
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
-      const latestTimestamp = this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+      const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
       let nextTimestamp
       try {
-        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$localData.settings.newReader.current].next[0]].timestamp
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$newReaderCurrent].next[0]].timestamp
       } catch {
         this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
         nextTimestamp = latestTimestamp
@@ -455,7 +465,7 @@ Vue.mixin({
 
         else date = new Date(this.$archive.music.albums[ref].date).getTime()/1000
         this.$logger.debug(ref, this.$archive.mspa.story['006716'].timestamp)
-        return date > this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp
+        return date > this.$archive.mspa.story[this.$newReaderCurrent].timestamp
       } else return false
     }
   } 

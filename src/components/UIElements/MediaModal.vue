@@ -6,7 +6,7 @@
 					<MediaEmbed :url="url"/>
 				</div>
 				<div class="modalLinks">
-					<span v-text="splitPath[0]" @click.prevent="openItemInFolder()" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem()" />
+					<span v-text="splitPath[0]" @click.prevent="openItemInFolder" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem" />
 				</div>
 				<FlashCredit :pageId="this.contentId"/>
 			</div>

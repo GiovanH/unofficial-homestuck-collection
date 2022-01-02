@@ -88,7 +88,7 @@ export default {
         try {
           return this.DateTime.fromSeconds(Number(this.thisPage.timestamp))
             .setZone("America/New_York")
-            .toFormat("MM/dd/yyyy, ttt")
+            .toFormat("MM/dd/yyyy, t ZZZZ")
         } catch {
           return "Invalid Date"
         }
