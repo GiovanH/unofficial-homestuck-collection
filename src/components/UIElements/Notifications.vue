@@ -114,7 +114,7 @@ export default {
       const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
 
       return {
-        title: 'New news post',
+        title: 'News posted',
         desc: desc,
         url: `/news/${newspost.id}`,
         thumb: '/archive/collection/archive_news.png'
