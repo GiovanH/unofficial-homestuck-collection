@@ -361,6 +361,7 @@ export default {
     PageText, SpoilerBox, StoryPageLink, 
     draggable
   },
+  title: () => "Settings",
   data: function() {
     return {
       settingListBoolean: [

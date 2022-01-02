@@ -131,6 +131,12 @@ if (ipcMain) {
       ipcRenderer.invoke('reload')
     }
 
+    function sanitizeHTML(str) {
+      var temp = document.createElement('div')
+      temp.textContent = str
+      return temp.innerHTML
+    };
+
     document.body.innerHTML = `
     <style>
     div {
@@ -147,11 +153,11 @@ if (ipcMain) {
       <div>
         <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
         These have been disabled for safety.</p>
-        <pre>${e}</pre>
+        <pre>${sanitizeHTML(e)}</pre>
         <input type="button" value="Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
         <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
         <p>Stacktrace:</p>
-        <pre>${e.stack}</pre>
+        <pre>${sanitizeHTML(e.stack)}</pre>
       </div>
     </div>`
   }
@@ -301,6 +307,10 @@ function buildApi(mod) {
       onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
       clear: () => store.clear(getModStoreKey(mod._id, null))
     }, 
+    readFile(asset_path) {
+      let data = readFileSyncLocal(asset_path, "readJson")
+      return data
+    },
     readJson(asset_path) {
       return JSON.parse(readFileSyncLocal(asset_path, "readJson"))
     },
@@ -365,7 +375,9 @@ function getModJs(mod_dir, options={}) {
 
     // TODO: Do computed properties automatically require a reload?
     // eslint-disable-next-line no-prototype-builtins
-    mod._needsreload = ['styles', 'vueHooks', 'themes'].some(k => mod.hasOwnProperty(k))
+    mod._needsreload = ['styles', 'vueHooks', 'themes',
+     'browserPages', 'browserActions', 'browserToolbars'
+    ].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
@@ -416,7 +428,8 @@ function editArchive(archive) {
     logger.info("No asset directory set, probably in new reader setup mode. Not editing the archive.")
     return
   }
-  getEnabledModsJs().reverse().forEach((js) => {
+  const enabledModsJs = getEnabledModsJs()
+  enabledModsJs.reverse().forEach((js) => {
     try {
       const editfn = js.edit
       if (editfn) {        
@@ -442,7 +455,7 @@ function editArchive(archive) {
     archive.footnotes[category] = []
   })
 
-  getEnabledModsJs().reverse().forEach((js) => {
+  enabledModsJs.reverse().forEach((js) => {
     try {
       if (js.footnotes) {
         if (typeof js.footnotes == "string") {
@@ -508,6 +521,9 @@ function getMainMixin(){
     mounted() {
       getEnabledModsJs().forEach(js => {
         const modstyles = js.styles || []
+        if (!Array.isArray(modstyles)) {
+          throw Error(`${js._id} styles object is not a list`)
+        }
         modstyles.forEach((customstyle, i) => {
           const style_id = `style-${js._id}-${i}`
           
@@ -557,10 +573,12 @@ function getMixins(){
 
   const nop = () => undefined
 
-  var mixables = getEnabledModsJs().reverse()
+  const enabledModsJs = getEnabledModsJs()
+
+  var mixables = enabledModsJs.reverse()
 
   // Custom themes
-  var newThemes = getEnabledModsJs().reverse().reduce((themes, js) => {
+  var newThemes = enabledModsJs.reverse().reduce((themes, js) => {
     if (!js.themes) return themes
     return themes.concat(js.themes.map((theme, i) => 
         ({text: theme.label, value: `theme-${js._id}-${i}`})
@@ -571,6 +589,72 @@ function getMixins(){
       vueHooks: [{
         matchName: "settings",
         data: {themes($super) {return $super.concat(newThemes)}}
+      }]
+    })
+  }
+
+  var newPages = enabledModsJs.reverse().reduce((pages, js) => {
+    if (!js.browserPages) return pages
+    return {...js.browserPages, ...pages}
+  }, {})
+  if (newPages) {
+    var pageComponents = {}
+    for (let k in newPages)
+      pageComponents[k] = newPages[k].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "TabFrame",
+        data: {modBrowserPages($super) {return {...newPages, ...$super}}},
+        created(){
+          this.$options.components = Object.assign(this.$options.components, pageComponents)
+        }
+      }]
+    })
+  }
+
+  var newBrowserActions = enabledModsJs.reverse().reduce((actions, js) => {
+    if (js.browserActions) {
+      for (let k in js.browserActions) {
+        const componentkey = `${js._id}-${k}`
+        actions[componentkey] = js.browserActions[k]
+      }
+    }
+    return actions
+  }, {})
+  if (newBrowserActions) {
+    var actionComponents = {}
+    for (let ck in newBrowserActions)
+      actionComponents[ck] = newBrowserActions[ck].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "addressBar",
+        // browserActions are raw components
+        data: {browserActions($super) {return {...actionComponents, ...$super}}}
+      }]
+    })
+  }
+
+  var newBrowserToolbars = enabledModsJs.reverse().reduce((toolbars, js) => {
+    if (js.browserToolbars) {
+      for (let k in js.browserToolbars) {
+        const componentkey = `${js._id}-${k}`
+        toolbars[componentkey] = js.browserToolbars[k]
+      }
+    }
+    return toolbars
+  }, {})
+  if (newBrowserToolbars) {
+    var toolbarComponents = {}
+    for (let ck in newBrowserToolbars)
+      toolbarComponents[ck] = newBrowserToolbars[ck].component
+
+    mixables.push({
+      vueHooks: [{
+        matchName: "tabBar",
+        // browserToolbars are raw components
+        data: {browserToolbars($super) {return {...toolbarComponents, ...$super}}}
       }]
     })
   }
@@ -588,7 +672,7 @@ function getMixins(){
         hook.match = (c) => (c.$options.name == hook.matchName)
     })
 
-    return {
+    const mixin =  {
       created() {
         const vueComponent = this
 
@@ -596,8 +680,9 @@ function getMixins(){
         // We need to do the opposite of that, so we hook `created`
         vueHooks.forEach((hook) => {          
           if (hook.match(this)) {
-            // Data w/ optional compute function
-            this.$logger.debug(this.$options.name, "matched against vuehook in", js._id)
+            // Literal created hook
+            if (hook.created)
+              hook.created.bind(this)()
 
             for (const dname in (hook.data || {})) {
               const value = hook.data[dname]
@@ -627,8 +712,17 @@ function getMixins(){
             hook.updated.bind(this)()
           }
         })
+      },
+      mounted() {
+        vueHooks.forEach((hook) => {
+          if (hook.mounted && hook.match(this)) {
+            hook.mounted.bind(this)()
+          }
+        })
       }
     }
+
+    return mixin
   }).filter(Boolean)
 
   return mixins
@@ -654,6 +748,9 @@ function jsToChoice(js, dir){
       routes: Boolean(js.routes || js.treeroute || js.trees),
       edits: Boolean(js.edit),
       hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+      browserPages: js.browserPages ? Object.keys(js.browserPages) : false,
+      toolbars: Boolean(js.browserToolbars),
+      browserActions: Boolean(js.browserActions),
       styles: Boolean(js.styles),
       footnotes: Boolean(js.footnotes),
       themes: Boolean(js.themes)
@@ -685,7 +782,9 @@ if (ipcMain) {
         acc[dir] = jsToChoice(js, dir)
       } catch (e) {
         // Catch import-time mod-level errors
-        logger.error("Couldn't load mod choice")
+        logger.error("Couldn't load mod choice", e)
+        // Can't fail here: haven't loaded enough main to even show a dialog.
+        // onModLoadFail([dir], e)
       }
       return acc
     }, {})

@@ -48,6 +48,7 @@ import SETTINGS from '@/components/SystemPages/Settings.vue'
 import CREDITS from '@/components/SystemPages/Credits.vue'
 
 import PAGE from '@/components/Page/Page.vue'
+import SINGLEPAGE from '@/components/Page/SinglePage.vue'
 import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
 import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
 import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
@@ -81,6 +82,8 @@ import SNAPS from '@/components/Comics/Snaps.vue'
 
 import TESTS from '@/components/Extras/tests.vue'
 
+import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
+
 export default {
     name: 'TabFrame',
     props: [
@@ -110,6 +113,7 @@ export default {
         TZPASSWORD,
         ECHIDNA,
         ENDOFHS,
+        SINGLEPAGE,
         
         UNLOCK,
         DECODE,
@@ -140,7 +144,18 @@ export default {
     data() {
         return {
             forceLoad: false,
-            gameOverThemeOverride: false
+            gameOverThemeOverride: false,
+            modBrowserPages: {}
+        }
+    },
+    created(){
+        this.$logger.info("Tabframe created")
+        for (const COM in this.modBrowserPages) {
+            let mixins = this.modBrowserPages[COM].component.mixins || []
+            if (!mixins.includes(ModBrowserPageMixin)) {
+                mixins.push(ModBrowserPageMixin)
+                this.modBrowserPages[COM].component.mixins = mixins
+            }
         }
     },
     computed: {
@@ -152,7 +167,7 @@ export default {
             return  {
                 base: base || '', 
                 ...this.$router.resolve(this.tab.url).route.params
-                }
+            }
         },
         tabIsActive() {
             return this.tab.key == this.$localData.tabData.activeTabKey
@@ -182,10 +197,12 @@ export default {
                 'waywardvagabond': 'ExtrasPage',
                 'sweetbroandhellajeff': 'SBAHJ',
                 'faqs': 'ExtrasPage',
-                'oilretcon': 'ExtrasPage'
+                'oilretcon': 'ExtrasPage',
+                'page': 'SinglePage'
             }
     
-            let component = (this.routeParams.base in mapRoute ? mapRoute[this.routeParams.base] : this.routeParams.base).toUpperCase()
+            const base = this.routeParams.base.toLowerCase()
+            let component = (base in mapRoute ? mapRoute[base] : base).toUpperCase()
             if (!this.routeParams.base) component = 'Homepage'
             switch (component) {
                 case 'PAGE': {
@@ -194,7 +211,7 @@ export default {
                     if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
                     else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
-                        //If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
+                        // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
                         if (this.$isNewReader) this.$updateNewReader(p)
                         
                         let flag = this.$archive.mspa.story[p].flag
@@ -333,39 +350,28 @@ export default {
                 }
             }
             
-            let result = component.toUpperCase() in this.$options.components ? component.toUpperCase() : 'ERROR404'
+            let result = 
+                (component.toUpperCase() in this.$options.components)
+                || (component.toUpperCase() in this.modBrowserPages)
+                ? component.toUpperCase() 
+                : 'ERROR404'
             this.setTitle(result)
             return result
         },
         contentTheme() {
             // Get the expected theme for this page, based on the content
             let theme = 'default'
-            if (this.resolveComponent == 'PAGE'){
-                let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-                if (this.routeParams.base !== 'ryanquest' && this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
+            const component = this.resolveComponent
+
+            // if (this.gameOverThemeOverride) return this.gameOverThemeOverride
+
+            const componentObj = this.$options.components[component]
+            if (componentObj && componentObj.theme) {
+                const context = this
+                theme = componentObj.theme(context) || theme
             }
-            else if (this.resolveComponent == 'FULLSCREENFLASH') {
-                if (this.gameOverThemeOverride) theme = this.gameOverThemeOverride
-            }
-            else if (this.resolveComponent == 'ENDOFHS') {
-                let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-                if (this.$archive.mspa.story[p].theme) theme = this.$archive.mspa.story[p].theme
-            }
-            else if (this.resolveComponent == 'SBAHJ'){
-                theme = 'sbahj'
-            }
-            else if (this.resolveComponent == 'PXS'){
-                theme = 'pxs'
-            }
-            else if (this.resolveComponent == 'TSO'){
-                theme = 'tso'
-            }
-            else if (this.resolveComponent == 'EXTRASPAGE') {
-                if (this.routeParams.p in this.$archive.mspa.psExtras) theme = 'retro'
-            }
-            else if (this.resolveComponent == "UNLOCK" || this.resolveComponent == "PS_TITLESCREEN") theme = 'retro'
+
             return theme
-            
         },
         theme() {
             // Get the actual displayed theme, factoring in settings.
@@ -425,172 +431,34 @@ export default {
             this.$refs.modal.open(url)
         },
         setTitle(component = this.resolveComponent){
-            //Nothing pains me more than having to set this here, but it's the only real way to title pages that haven't loaded yet
-            let title, adventureTitle
-            switch(component){
-                case "HOMEPAGE": 
-                    title = "The Unofficial Homestuck Collection"
-                    break
-                case "PAGE":
-                case "X2COMBO":
-                case "TZPASSWORD":
-                case "FULLSCREENFLASH":
-                case "ECHIDNA":
-                case "ENDOFHS":
-                    let p = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+            // you would not believe how bad this used to be
+            let title
 
-                    if (this.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
-                    else if (this.routeParams.base === 'ryanquest' && p in this.$archive.mspa.ryanquest) {
-                        title = `${this.$archive.mspa.ryanquest[p].title} - Ryanquest`
-                    }
-                    else {
-                        let exceptions = {
-                            '006715': 'DOTA',
-                            '008801': 'GAME OVER',
-                            '009305': 'shes8ack',
-                            '009987': "ACT 6 ACT 6 ACT 6",
-                            '010027': 'ACT 7',
-                            '010030': 'Credits'
-                        }
-                        if (p in exceptions) {
-                            title = exceptions[p]
-                        }
-                        else {
-                            adventureTitle = [
-                                " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-                            ][this.$getStory(p) - 1]
-                            title = this.$archive.mspa.story[p].title + adventureTitle
-                        }
-                    }
-                    break
-                case 'MUSIC': 
-                    if (this.routeParams.mode == 'tracks') title = `All tracks - Homestuck Music`
-                    else if (this.routeParams.mode == 'artists') title = `All artists - Homestuck Music`
-                    else if (this.routeParams.mode == 'features') title = `All features - Homestuck Music`
-                    else if (this.routeParams.mode == 'album') title = `${this.$archive.music.albums[this.routeParams.id].name} - Homestuck Music`
-                    else if (this.routeParams.mode == 'track') title = `${this.$archive.music.tracks[this.routeParams.id].name} - Homestuck Music`
-                    else if (this.routeParams.mode == 'artist') title = `${this.$archive.music.artists[this.routeParams.id].name} - Homestuck Music`
-                    else title = 'Homestuck Music'
-                    break
-                case "SBAHJ":
-                    title = "sweet bro and hella jeff"
-                    break
-                case "PXS":
-                    if (!this.routeParams.cid)
-                        title = 'Paradox Space' 
-                    else {
-                        let comic = this.$archive.comics.pxs.comics[this.routeParams.cid].name
-                        title = `${comic} - Paradox Space`
-                    }
-                    break
-                case "UNLOCK":
-                case "EXTRASPAGE":
-                    if (this.routeParams.base == 'oilretcon') title = 'Oil Retcon'
-                    else if (this.routeParams.base == 'waywardvagabond' && this.routeParams.p in this.$archive.mspa.wv) title = "Homestuck"
-                    else title = 'Extra Content'
-                    break
-                case "DECODE":
-                    if (this.routeParams.mode) {
-                        if (this.routeParams.mode === 'morse') title = "Morse Decoder"
-                        else if (this.routeParams.mode === 'alternian') title = "Alternian Cheatsheet"
-                        else if (this.routeParams.mode === 'damaramegido') title = "Damara Megido Translated Dialogue"
-                    }
-                    else title = "Tools for Decodin'"
-                    break
-                case "PS_TITLESCREEN":
-                    title = "Problem Sleuth"
-                    break
-                case "TSO":
-                    if (this.routeParams.cid) title = `${this.$archive.comics.tso.comics[this.routeParams.cid].name} - Team Special Olympics`
-                    else title = "Team Special Olympics"
-                    break
-                case "NEWS":
-                    title = "MSPA Newsposts"
-                    break
-                case "BLOGSPOT":
-                    title = "Andrew's Blog"
-                    break
-                case "MAGICALJOURNEY":
-                    title = "Come With Me on a Magical Journey Through the Internet"
-                    break
-                case "OFFERYOUCANTREFUSE":
-                    title = "An Offer You Can't Refuse"
-                    break
-                case "FORMSPRING":
-                    title = "Andrew Hussie | Formspring"
-                    break
-                case "TUMBLR":
-                    title = ":o"
-                    break
-                case "DSTRIDER":
-                    title = 'the blog of dave strider'
-                    break
-                case "TBIY":
-                    title = "The Baby Is You: A Rock Opera by Toby Fox"
-                    break
-                case "NAMCOHIGH":
-                    title = "Namco High"
-                    break
-                case "VIGILPRINCE":
-                    title = "The Vigil Prince"
-                    break
-                case "SKAIANET":
-                    title = "Skaianet Systems"
-                    break
-                case "SNAPS":
-                    title = "Snapchat Memories"
-                    break
-                case "LOG":
-                    let adventure = this.routeParams.mode ? this.routeParams.mode[0] - 1 : undefined
-                    adventureTitle = [
-                        " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-                    ][adventure]
-                    title = "Adventure Log" + (adventureTitle || '')
-                    break
-                case "MAP":
-                    adventureTitle = [
-                        " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-                    ][this.routeParams.mode - 1]
-                    title = "Adventure Map" + (adventureTitle || '')
-                    break
-                case "SEARCH":
-                    title = "Search"
-                    break
-                case "SETTINGS":
-                    title = "Settings"
-                    break
-                case "CREDITS":
-                    title = this.routeParams.mode == 'artcredits' ? "Art Credits" : "Credits"
-                    break
-                case "NEWREADER": 
-                    title = "New reader tips"
-                    break
-                case "USERGUIDE": 
-                    title = "Navigation tips"
-                    break
-                case "ERROR404": 
-                    title = "Page not found"
-                    break
-                case "SPOILER": 
-                    title = "Spoilers!"
-                    break
-                default:
-                    // title = "The Unofficial Homestuck Collection"
-                    title = this.tab.url
+            const componentObj = this.$options.components[component]
+            if (componentObj && componentObj.title) {
+                const context = this
+                title = componentObj.title(context)
+            } else {
+                title = this.tab.url
             }
-            // title = this.tab.url
+            
             this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
         }
+    },
+    updated(){
+      this.$nextTick(function () {
+        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video, audio`).length > 0))
+      })
     },
     watch: {
         'tabIsActive'(to, from) {
             if (to)
                 this.$root.tabTheme = this.theme
-            //Prevents tab from unloading if there's anything that might need to run in the background
+            // Prevents tab from unloading if there's anything that might need to run in the background
             if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
             else if (this.forceLoad) {
-                //Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
-                //Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
+                // Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
+                // Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
                 this.$el.style.borderTop = 'solid 1px #000000FF'
                 setTimeout(() =>{
                     this.$el.style.borderTop = ''

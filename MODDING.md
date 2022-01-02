@@ -419,7 +419,7 @@ Ways to hook Vue data, in order from most to least recommended:
 - `data` (optional): The `data` object is a collection of **values and functions**. Objects in `data` are merged with the `data` function of the vue page, overriding any previous data. Functions in the `data` object take a `$super` argument that contains any previous data from that name, and should return a modified or replaced version of that object.
 - `computed` (optional): The `computed` object is a collection of **functions** that are used to override the page's existing `computed` values. **Unlike `vue`'s computed**, these functions are given a `$super` argument that contains the *previous* **result** of the computation. 
 - `methods` (optional): The `methods` object is a collection of **functions** that are used to override the page's existing `methods`. **Unlike `vue`'s computed**, these functions are passed an additional `$super` argument at the end of the arguments list that contains the *overwritten* **method**. 
-- `updated` (optional): Called every time the component updates. See [vue documentation](https://vuejs.org/v2/api/#updated). If you absolutely have to do arbitrary userjs-style DOM modifications, this is the place to do it.
+- `updated`/`mounted` (optional): Called every time the component updates/mounts. See [vue documentation](https://vuejs.org/v2/api/#updated). If you absolutely have to do arbitrary userjs-style DOM modifications, this is the place to do it.
 
 Examples of VueHooks:
 
@@ -473,6 +473,59 @@ It replaces the underlying `url` object with a new one, discarding any data that
 All functions within vuehooks have `this` bound to the component element, so syntax should be parallel to `.vue` files.
 
 Note that within all vue hooks you have access to the `this` element, and thus `this.$logger` as a namespaced logger for the element in context. Use this logger if a logger is needed.
+
+### Custom vue components
+
+`browserPages`: `Map<Name: PageDefinition>`
+
+`Name`s **must be all-caps** and represent the base URL of the page.
+
+Each `PageDefinition` has the following properties:
+
+- `component` (object): The object defining the vue component. See [documentation](https://vuejs.org/v2/guide/components.html).
+- `scss` (string): Page-specific css. Note that this will be scoped to the page instance. You should *not* include root-level specifiers like `.pageBody`.
+
+Good SCSS and good `scss`:
+
+```scss
+& {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
+Good `scss`:
+
+```scss
+background: black;
+
+.navBanner {
+margin: 0 auto;
+background: black;
+}
+```
+
+Overscoped (won't work!):
+
+```scss
+.pageBody {
+  background: black;
+
+  .navBanner {
+    margin: 0 auto;
+    background: black;
+  }
+}
+```
+
+Note that the `component` object has two special page functions that take, as their argument, the context state of the *tabframe* element, as the page itself will usually be unloaded.
+
+- `title` (`function(ctx)`): A function that should return the tab title of the page.
+- `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
 
 ### Misc
 

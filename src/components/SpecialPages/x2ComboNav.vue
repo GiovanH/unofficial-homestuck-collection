@@ -55,19 +55,19 @@ export default {
         backUrl() {
             let previousPage = this.isLeftPage ? this.thisPage.previous : this.$archive.mspa.story[this.thisPage.previous].previous
 
-            if (this.$localData.settings.mspaMode){ //mspa mode
+            if (this.$localData.settings.mspaMode){ // mspa mode
                 return `${this.base}/${previousPage}`
             }
-            else { //viz mode
+            else { // viz mode
                 let id = this.$mspaToViz(previousPage)
                 return `${id.s}/${id.p}`
             }
         },
         startOverUrl() {
-            if (this.$localData.settings.mspaMode){ //mspa mode
+            if (this.$localData.settings.mspaMode){ // mspa mode
                 return `${this.base}/${this.$getStory(this.thisPage.pageId)}`
             }
-            else { //viz mode
+            else { // viz mode
                 return this.pageNumber.s
             }
         },
@@ -75,11 +75,11 @@ export default {
             return this.$mspaToViz(this.thisPage.pageId)
         },
         pageIdText() {
-            if (this.$localData.settings.mspaMode){ //mspa mode
+            if (this.$localData.settings.mspaMode){ // mspa mode
                 let id = this.thisPage.pageId
                 return `${this.$getStory(id)}/${id}`
             }
-            else { //viz mode
+            else { // viz mode
                 let id = this.pageNumber
                 return `${id.s}/${id.p}`
             }         
@@ -100,10 +100,10 @@ export default {
             document.getElementById(key).scrollLeft = document.getElementById(key).scrollWidth
         },
         nextUrl(page) {
-            if (this.$localData.settings.mspaMode){ //mspa mode
+            if (this.$localData.settings.mspaMode){ // mspa mode
                 return `${this.base}/${page.pageId}`
             }
-            else { //viz mode
+            else { // viz mode
                 let id = this.$mspaToViz(page.pageId)
                 return `${id.s}/${id.p}`
             }

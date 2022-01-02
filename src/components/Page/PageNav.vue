@@ -9,7 +9,7 @@
     </div>
     <div class="footerNav" >
       <ul class="navOptions">
-        <li v-if="pageNumber.p !== '1'">
+        <li v-if="pageNumber && pageNumber.p !== '1'">
           <a :href="startOverUrl" class="startOver">Start Over</a>
         </li>
         <li v-if="'previous' in thisPage">
@@ -56,12 +56,14 @@ export default {
       else return this.$mspaToViz(this.thisPage.pageId)
     },
     pageIdText() {
+      if (!this.thisPage.pageId) return
       let id = this.thisPage.pageId
       let story = this.mspaBase // this.thisPage.storyId
       return this.$resolvePath(`${story}/${id}`)    
     },
     vizLink() {
       let story 
+      if (!this.pageNumber) return
       if (this.pageNumber.s == 'homestuck') story = 'story/'
       else story = this.pageNumber.s + '/'
       return `https://homestuck.com/${story + this.pageNumber.p}` 

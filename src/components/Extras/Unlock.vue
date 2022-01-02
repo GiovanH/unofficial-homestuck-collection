@@ -17,7 +17,7 @@
               <li v-if="keepReading">Keep reading to unlock more extras!</li>
             </ol>
           </div>
-          <MediaEmbed url="images/unlock_codemachine.gif" />
+          <MediaEmbed url="images/unlock_codemachine.gif" ref="codemachine" />
           <div class="text">
             <p> The CODE MACHINE awaits additional GAME CODES to unlock more mysterious secrets! </p>
           </div>
@@ -41,6 +41,8 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Extra Content",
+  theme: () => 'retro',
   data: function() {
     return {
     }

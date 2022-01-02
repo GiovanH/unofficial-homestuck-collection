@@ -205,8 +205,8 @@ export default {
           box.style.display = 'block'
 
           let page = document.body
-          let boxX = e.clientX //mouse X
-          let boxY = e.clientY //mouse Y
+          let boxX = e.clientX // mouse X
+          let boxY = e.clientY // mouse Y
           let boxWidth = box.clientWidth
           let boxHeight = box.clientHeight
 

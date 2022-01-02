@@ -295,6 +295,13 @@
     font-weight: bolder;
     overflow-wrap: break-word;
   }
+  .tabFrame {
+    input, img {
+      &:focus {
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+      }
+    }
+  }
   #app {
     display: flex;
     flex-flow: column;
@@ -327,7 +334,7 @@
     &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href$=".pdf"],
-    &[href$=".html"] {
+    &[href$=".html"]:not([href*="assets://"]) {
       &::after{
         @extend %fa-icon;
         @extend .fas;

@@ -1,6 +1,12 @@
 module.exports = {
     configureWebpack: {
-        devtool: "source-map"
+        devtool: "source-map",
+        resolve: {
+            alias: {
+                // Include the vue compiler so mods can use templates
+                "vue$": "vue/dist/vue.esm.js"
+            }
+        }
     },
     pluginOptions: {
         electronBuilder: {

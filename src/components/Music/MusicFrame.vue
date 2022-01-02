@@ -57,6 +57,16 @@ export default {
     Discography, 
     Track
   },
+  title: function(ctx) {
+    var title = 'Homestuck Music'
+    if (ctx.routeParams.mode == 'tracks') title = `All tracks - Homestuck Music`
+    else if (ctx.routeParams.mode == 'artists') title = `All artists - Homestuck Music`
+    else if (ctx.routeParams.mode == 'features') title = `All features - Homestuck Music`
+    else if (ctx.routeParams.mode == 'album') title = `${ctx.$archive.music.albums[ctx.routeParams.id].name} - Homestuck Music`
+    else if (ctx.routeParams.mode == 'track') title = `${ctx.$archive.music.tracks[ctx.routeParams.id].name} - Homestuck Music`
+    else if (ctx.routeParams.mode == 'artist') title = `${ctx.$archive.music.artists[ctx.routeParams.id].name} - Homestuck Music`
+    return title
+  },
   data: function() {
     return {
     }
@@ -76,7 +86,7 @@ export default {
       return (this.routeParams.mode == 'artist' && key in this.$archive.music.artists) ? this.$archive.music.artists[key] : undefined
     }
   },
-  methods:{
+  methods: {
   }
 }
 </script>

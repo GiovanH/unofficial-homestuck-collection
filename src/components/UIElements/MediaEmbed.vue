@@ -3,9 +3,11 @@
   <video  v-else-if="getExt(url) ==='vid'" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
   <iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
-  <iframe v-else-if="getExt(url) === 'html'" 
+  <component v-else-if="getExt(url) === 'html'" 
+  :is="frameType"
   :src='resolveFrameUrl(url)' 
-  width="650px" height="450px" class="sburb" seamless />
+  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
+  class="sburb"  @did-finish-load="initHtmlFrame" seamless />
   <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
   <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
@@ -16,6 +18,7 @@ import path from 'path'
 import Resources from "@/resources.js"
 
 export default {
+  name: "MediaEmbed",
   props: ['url'],
   data() {
     return {
@@ -135,7 +138,10 @@ export default {
         // TRICKSTER BANNER
         "menu": {width: 950, height: 20},
         // TRICKSTER BANNER
-        "echidna": {width: 30, height: 30}
+        "echidna": {width: 30, height: 30},
+        "Cheerfulbear%20-%20PLAY%20ME": {width: 1120, height: 750},
+        "Dear%20Andrew": {width: 1120, height: 750},
+        "SBaHJ%20Origins": {width: 1120, height: 750}
       },
       gameOver: {
         count: 0,
@@ -217,6 +223,9 @@ export default {
     }
   },
   computed: {
+    frameType() {
+      return 'iframe'
+    },
     videoWidth() {
       const filename = path.parse(this.url).name
       let width = 950
@@ -250,7 +259,7 @@ export default {
     },
     audioTracks() {
       const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
-      this.$logger.info("Getting audio tracks for", this.url.replace("_hq.swf", ".swf"), ret)
+      this.$logger.info("Getting audio tracks for", this.url, this.url.replace("_hq.swf", ".swf"), ret)
       return ret
     },
     flashSrc() {
@@ -262,8 +271,8 @@ export default {
           object{${this.flashProps.rawStyle}}
         </style>
         <script>
-          //JS Enhancements: ${this.$localData.settings.jsFlashes}
-          //HQ Audio: ${this.$localData.settings.hqAudio}
+          // JS Enhancements: ${this.$localData.settings.jsFlashes}
+          // HQ Audio: ${this.$localData.settings.hqAudio}
           window.onhashchange = (e) => {
             if (window.location.hash != '#unset') {
               let hash = window.location.hash.substr(1).split('&')
@@ -294,6 +303,9 @@ export default {
     }
   },
   methods: {
+    initHtmlFrame(event) {
+      // stub
+    },
     initIframe() {
       this.$el.contentWindow.vm = this
     },

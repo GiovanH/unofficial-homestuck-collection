@@ -11,8 +11,13 @@
               <li v-if="modopt.includes.styles">Styles</li>
               <li v-if="modopt.includes.themes">Themes</li>
               <li v-if="modopt.includes.footnotes">Footnotes</li>
+              <li v-if="modopt.includes.toolbars">Toolbars</li>
+              <li v-if="modopt.includes.browserActions">Browser Actions</li>
               <template v-if="modopt.includes.hooks">
-                <li v-for="hook in modopt.includes.hooks" v-text="hook" />
+                <li v-for="hook in modopt.includes.hooks" v-text="hook" :key="hook" />
+              </template>
+              <template v-if="modopt.includes.browserPages">
+                <li v-for="baseurl in modopt.includes.browserPages" v-text="'/' + baseurl.toLowerCase()"  :key="baseurl" />
               </template>
             </ul>
           </div>

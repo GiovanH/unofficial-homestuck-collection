@@ -132,8 +132,8 @@ export default {
       else return false
     }
   },
-  methods:{
-    //thnks florrie 👍
+  methods: {
+    // thnks florrie 👍
     joinNoOxford(array, plural = 'and') {
       if (array.length === 0) {
           return ''

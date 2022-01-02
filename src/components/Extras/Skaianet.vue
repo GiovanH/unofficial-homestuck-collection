@@ -630,6 +630,7 @@ export default {
   components: {
     NavBanner, MediaEmbed
   },
+  title: () => "Skaianet Systems",
   data: function() {
     return {
       marqueeInterval: undefined,
@@ -677,7 +678,7 @@ export default {
   },
   computed: {
   },
-  methods:{
+  methods: {
     setApophis() {
       // Get todays date and time
       let now = new Date().getTime()

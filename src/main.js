@@ -8,7 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar
+  faRedo, faStar, faRandom, faMousePointer
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -23,7 +23,7 @@ log.transports.console.format = '[{level}] {text}';
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar
+  faRedo, faStar, faRandom, faMousePointer
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -85,7 +85,7 @@ Vue.mixin({
     $resolvePath(to){
       // Resolves a logical path within the vue router
       // Currently just clamps story URLS to the user specified mspamode setting
-      const route = this.$router.resolve(to.toLowerCase()).route
+      const route = this.$router.resolve(to).route
       const base = route.path.split("/")[1]
 
       let resolvedUrl = route.path
@@ -313,7 +313,7 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const endOfHSPage = this.$archive ? this.$archive.tweaks.endOfHSPage : '010030' // archive may not be loaded in setup mode
+      const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
       const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {

@@ -16,9 +16,9 @@
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav v-if="pageNum in pageCollection" :thisPage="thisPage" 
+              <PageNav :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
-                :class="(hideNav ? 'hidden' : '')" />
+                :class="{'hidden': hideNav}" />
           </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
@@ -57,6 +57,38 @@ export default {
       showMetadata: false
     }
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) 
+      return ctx.$archive.mspa.story[p].theme
+  },
+  title: function(ctx) {
+    var title
+    
+    const exceptions = {
+      '006715': 'DOTA',
+      '008801': 'GAME OVER',
+      '009305': 'shes8ack',
+      '009987': "ACT 6 ACT 6 ACT 6",
+      '010027': 'ACT 7',
+      '010030': 'Credits'
+    }
+    const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+
+    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
+      title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
+    } else {
+      if (p in exceptions) {
+        title = exceptions[p]
+      } else {
+        title = ctx.$archive.mspa.story[p].title + [
+          " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+        ][ctx.$getStory(p) - 1]
+      }
+    }
+    return title
+  },
   computed: {
     isRyanquest(){
       return (this.routeParams.base === 'ryanquest')
@@ -83,16 +115,26 @@ export default {
         isRyanquest: this.isRyanquest
       }
     },
-    pageMedia() {
+    audioData(){
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
+      return this.$archive.audioData[media[0]]
+    },
+    pageMedia() {
+      const media = Array.from(this.thisPage.media)
+      this.deretcon(media)
+      var mediakey = media[0]
 
-      if (this.$archive.audioData[media[0]]) {
-        let flashPath = media[0].substring(0, media[0].length-4)
-        this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
-        media[0] = `${flashPath}_hq.swf`
+      if (this.audioData) {
+        let flashPath = mediakey.substring(0, mediakey.length-4)
+        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+        mediakey = `${flashPath}_hq.swf`
+      } else if (mediakey.includes(".swf")) {
+        this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
 
+      // TODO: This doesn't seem to be used anywhere or do anything.
+      // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
       this.nextPagesArray.forEach(page => {
         page.media.forEach(media => {
@@ -105,9 +147,6 @@ export default {
       })
 
       return media
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)

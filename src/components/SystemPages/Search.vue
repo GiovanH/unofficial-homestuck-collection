@@ -46,6 +46,7 @@ export default {
   components: {
     NavBanner, PageFooter, StoryPageLink
   },
+  title: () => "Search",
   data: function() {
     return {
       results: [],

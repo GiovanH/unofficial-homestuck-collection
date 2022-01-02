@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     showButtons() {
-      //Only show buttons if the navigator doesn't report a mac system
+      // Only show buttons if the navigator doesn't report a mac system
       return navigator.appVersion.indexOf('Macintosh') == -1
     },
     activeTabTitle() {

@@ -58,6 +58,7 @@ export default {
   components: {
     Media, NavBanner
   },
+  title: () => ":o",
   data() {
     return {
       reverse: true
@@ -72,7 +73,7 @@ export default {
       return this.$archive.social.tumblr.length - this.posts.length
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },

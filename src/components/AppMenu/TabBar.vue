@@ -7,19 +7,29 @@
     </div>
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>
+      <!-- Toolbars go here -->
+      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
       <div class="lineBreak"/>
     </template>
-    <!-- Toolbars go here -->
+
     <div id="tabSection">
       <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
         <div class="tabTitle" :class="{dragTitleFade}"></div>
         <div class="systemButton closeTabButton">✕</div>
       </div>
       <transition-group name="tab-list" tag="ul" id="tabs">
-        <Tab v-for="key in sortedTabList" :key="key" :tab="tabs[key]" :ref="'tab_' + key" @mousedown.left.native="initDrag()" />
+        <Tab v-for="key in sortedTabList" 
+          :key="key" :tab="tabs[key]" 
+          :ref="'tab_' + key" 
+          @mousedown.left.native="initDrag()" />
       </transition-group>
       <div class="systemButton newTabButton" @click="newTab()">＋</div>
     </div>
+
+    <template v-if="!$localData.settings.showAddressBar">
+      <!-- Toolbars go here too (compact layout) -->
+      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
+    </template>
     <div />
   </div>
 </template>
@@ -27,6 +37,8 @@
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
 import AddressBar from '@/components/AppMenu/AddressBar.vue'
+
+import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
 const { ipcRenderer } = require('electron')
 
@@ -43,8 +55,19 @@ export default {
       clickAnchor: undefined,
       dragTarget: undefined,
       showDragTab: false,
-      dragTitleFade: false
+      dragTitleFade: false,
+      browserToolbars: {}
     }
+  },  
+  created(){
+    for (const COM in this.browserToolbars) {
+        let mixins = this.browserToolbars[COM].mixins || []
+        if (!mixins.includes(ModBrowserToolbarMixin)) {
+            mixins.push(ModBrowserToolbarMixin)
+            this.browserToolbars[COM].mixins = mixins
+        }
+    }
+    Object.assign(this.$options.components, this.browserToolbars)
   },
   computed: {
     sortedTabList() {
@@ -233,10 +256,6 @@ export default {
 
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
     }
-  },
-  created(){
-  },
-  updated(){
   }
 }
 </script>
@@ -267,6 +286,9 @@ export default {
       flex-basis: 100%;
       height: 3px;
     }
+    .toolbar {
+      flex-basis: 100%;
+    }
     #tabSection {
       background: var(--header-tabSection);
       width: 1px; // Grow to fit
@@ -281,7 +303,7 @@ export default {
 
         background: var(--header-bg);
 
-        //tab css copied
+        // tab css copied
         display: inline-flex;
         justify-content: space-between;
         align-items: center;

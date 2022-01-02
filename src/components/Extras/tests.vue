@@ -3,6 +3,60 @@
     <NavBanner />
     <div class="pageFrame">
       <div class="pageContent">
+        <div class="logItems" v-if="otherComponents.length">
+          <h2>Overview</h2>
+          <div v-for="ikey in intersectionKeys" class="flexbox">
+            <h3 v-text="ikey" /><br />
+            <div v-for="COMP in otherComponents" class="column">
+              <h4 v-text="COMP.name" />
+              <ul class="intersectionOverview">
+                <li v-for='(__, k) in COMP[ikey]'>
+                  <span class="match" v-if="COMP[ikey][k] == otherComponents['PAGE'][ikey][k]" v-text="k" :data-value="COMP[ikey][k]"/>
+                  <span class="notmatch" v-else-if="k in otherComponents['PAGE'][ikey]" v-text="k" />
+                  <span class="new" v-else v-text="k" />
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- <h2>Intersections</h2>
+          <select v-model="intersectionKeySelected">
+            <option v-for="k in intersectionKeys" :value="k" :key="k" v-text="k" />
+          </select>
+          <ul>
+            <li v-for='c in Object.keys(otherComponents)' :key='c'>
+              <label><input type="checkbox" v-model="selectedIntersections[c]" />{{ c }}</label>
+            </li>
+          </ul>
+          <hr />
+          <ul>
+            <li v-for='r in intersectResults' :key='r' v-text="r">
+              
+            </li>
+          </ul> -->
+        </div>
+        <div class="logItems">
+          <h2>Vue template compiler</h2>
+          <textarea v-model="compileTemplate" style="width: 100%;" />
+          <pre v-text="compiledResult" style="white-space: pre-wrap;"/>
+        </div>
+        <div class="logItems">
+          <h2>Conversations</h2>
+          <ul>
+            <li  v-for="__, color in speakerColorData.pagesByColor" :key="color">
+              <label>
+                <input type="checkbox" v-model="selectedConvoColors[color]" />
+                <span :style="`color: #${color}`">
+                  #{{color}} {{speakerColorData.speakersByColor[color]}}</span>
+              </label>
+            </li>
+          </ul>
+          <ul v-if="Object.values(selectedConvoColors).some(Boolean)">
+            <hr />
+            <li v-for='idc in convoResults' :key='idc[0]'>
+              <StoryPageLink long :mspaId='idc[0]'></StoryPageLink> {{idc[1]}}
+            </li>
+          </ul>
+        </div>
         <div class="logItems">
           <h2>Media Lookup</h2>
           <input type="text" v-model="swfLookup">
@@ -90,6 +144,27 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
+// import PAGE from '@/components/Page/Page.vue'
+// import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
+// import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
+// import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
+// import ECHIDNA from '@/components/SpecialPages/Echidna.vue'
+// import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
+
+import Vue from 'vue'
+const prettier = require("prettier");
+
+// function intersect(...sets) {
+//     if (!sets.length) return new Set();
+//     const i = sets.reduce((m, s, i) => s.size < sets[m].size ? i : m, 0);
+//     const [smallest] = sets.splice(i, 1);
+//     const res = new Set();
+//     for (let val of smallest)
+//         if (sets.every(s => s.has(val)))
+//              res.add(val);
+//     return res;
+// }
+
 export default {
   name: 'tests',
   props: [
@@ -100,21 +175,93 @@ export default {
   },
   data: function() {
     return {
-      swfLookup: "",
-      flagLookup: ""
+      swfLookup: "04812.swf",
+      flagLookup: "",
+      otherComponents: {}, // {PAGE, FULLSCREENFLASH, X2COMBO, TZPASSWORD, ECHIDNA, ENDOFHS},
+      selectedIntersections: {},
+      // intersectionKeySelected: "computed",
+      intersectionKeys: ["computed", "methods"],
+      compileTemplate: "",
+      selectedConvoColors: {}
     }
   },
   computed: {
+    storyPages(){
+      return Object.values(this.$archive.mspa.story)
+    },
+    compiledResult(){
+      try {
+        const compiled = Vue.compile(this.compileTemplate)
+        const code = compiled.render.toString()
+        return prettier.format(code, { semi: false })
+      } catch (e) {
+        return e.stack
+      }
+    },
+    allConversations(){
+      let re = /<span style="color: #([^>]+?)">(\S+?):/g
+      return this.storyPages.filter(
+          page => re.exec(page.content)
+        ).reduce((acc, page) => {
+          // Output 'color:nickname' strings and remove duplicates 
+          // Strings are the only way to automatically remove duplicates :(
+          acc[page.pageId] = [...new Set([...page.content.matchAll(re)].map(s => s[1] + ':' + s[2]))]
+          return acc
+      }, {})
+    },
+    speakerColorData(){
+      // Compute color: list<page> and color: set<nickname> mappings
+      const {pagesByColor, speakersByColor} = Object.keys(this.allConversations).reduce((acc, pageId) => {
+          this.allConversations[pageId].forEach(pair => {
+              const [color, nickname] = pair.split(":")
+              acc.pagesByColor[color] = acc.pagesByColor[color] || []
+              acc.pagesByColor[color].push(pageId)
+              acc.speakersByColor[color] = acc.speakersByColor[color] || []
+              acc.speakersByColor[color].push(nickname)
+          })
+          return acc
+      }, {pagesByColor: {}, speakersByColor: {}})
+      return {
+        pagesByColor,
+        speakersByColor: Object.keys(speakersByColor).reduce((acc, k) => {
+          acc[k] = [...new Set(speakersByColor[k])]
+          return acc
+        }, {})
+      }
+    },
+    convoResults(){
+      return Object.entries(this.allConversations).filter(a => {
+        // Conversations in which all selected colors are participants
+        const [pageId, pairs] = a
+        const selectedConvoColors = Object.keys(this.selectedConvoColors).filter(k => this.selectedConvoColors[k])
+        return selectedConvoColors.every(
+          c => [...pairs].some(p => p.includes(c))
+      )}).map(
+        // Just get the nicknames
+        a => {a[1] = a[1].map(pair => pair.split(':')[1]); return a}
+      )
+    },    
+    // intersectResults() {
+    //   return intersect(
+    //     ...Object.keys(this.selectedIntersections).filter(
+    //         k => this.selectedIntersections[k]
+    //       ).map(k => new Set(
+    //         Object.keys(this.otherComponents[k][this.intersectionKeySelected])
+    //       )
+    //     )
+    //   )
+    // },
     swfResults() {
-      if (!this.swfLookup || this.swfLookup.length < 4)
+      if (!this.swfLookup || this.swfLookup.length < 4) {
         return []
+      }
 
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.media.some(url => url.includes(this.swfLookup))
       ).map(page => page.pageId)
     },
     allFlags() {
-      return Object.values(this.$archive.mspa.story).filter(
+      return this.storyPages.filter(
         page => page.flag.length > 0
       ).reduce((acc, page) => {
         for (const i in page.flag){
@@ -136,17 +283,17 @@ export default {
       return this.pagesFlagResults
     },
     pagesNoNextSwf() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         (page.next.length == 0) && (page.media[0].endsWith(".swf"))
       ).map(page => page.pageId)
     },
     pagesNoNext() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.next.length == 0
       ).map(page => page.pageId)
     },
     pagesFlagResults() {
-      return Object.values(this.$archive.mspa.story).filter(page => 
+      return this.storyPages.filter(page => 
         page.flag.includes(this.flagLookup.toUpperCase())
       ).map(page => page.pageId)
     },
@@ -216,14 +363,26 @@ export default {
             font-size: 18px;
           }
         }
-        .switchOrder {
-          padding-left: 30px;
-        }
         .logItems {
           padding: 30px;
 
           font-family: Verdana, Geneva, Tahoma, sans-serif;
           font-size: 12px;
+        }
+        .flexbox {
+          display: flex;
+          flex-flow: row wrap;
+          h3, h4 {
+            flex-basis: 100%
+          }
+          .column {
+            flex: 1;
+          }
+        }
+        .intersectionOverview {
+          .match {color: green;}
+          .new {color: orange;}
+          .notmatch {color: darkred;}
         }
       }
     }
