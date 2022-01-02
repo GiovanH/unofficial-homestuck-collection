@@ -87,9 +87,9 @@ import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.
 export default {
     name: 'TabFrame',
     props: [
-        'tab'
+        'tabKey'
     ],
-    components: {
+    components : {
         Bookmarks,
         FindBox,
         JumpBox,
@@ -205,7 +205,7 @@ export default {
                 case 'PAGE': {
                     let convertedPage = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p) : this.routeParams
                     let p = convertedPage.p ? convertedPage.p : undefined
-                    if (this.$pageIsSpoiler(p, true)) component = 'Spoiler'
+                    if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
                     else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
@@ -462,24 +462,6 @@ export default {
                 }, 10)
             }
         },
-        // When the tab changes or the tab changes theme,
-        // update the global variable right away
-        'isLoaded'(to, from){
-            if (this.tabIsActive)
-                this.$root.tabTheme = this.theme
-        },
-        '$localData.settings.themeOverride'(to, from){
-            if (this.tabIsActive)
-                this.$root.tabTheme = this.theme
-        },
-        '$localData.settings.forceThemeOverride'(to, from){
-            if (this.tabIsActive)
-                this.$root.tabTheme = this.theme
-        },
-        'theme'(to, from) {
-            if (this.tabIsActive)
-                this.$root.tabTheme = to
-        },
         '$localData.settings.hqAudio'() {
             this.forceLoad = false
         },
@@ -492,6 +474,13 @@ export default {
     },
     mounted(){
         this.setTitle()
+        if (this.tabIsActive) {
+            this.$nextTick(() => {
+                // This fixes the "first loaded tab is unthemed"
+                // bug and does nothing else. Really.
+                this.$root.$refs['App'].checkTheme()
+            })
+        }
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up

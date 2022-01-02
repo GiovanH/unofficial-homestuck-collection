@@ -168,6 +168,10 @@ if (ipcMain) {
 
 function bakeRoutes() {
   const enabled_mods = getEnabledMods()
+  if (!assetDir) {
+    logger.info("No asset directory set, not baking any routes")
+    return
+  }
   logger.info("Baking routes for", enabled_mods)
   let all_mod_routes = {}
   // Start with least-priority so they're overwritten
@@ -251,6 +255,10 @@ function getEnabledMods() {
 }
 
 function getEnabledModsJs() {
+  if (!modsDir) {
+    logger.info("No asset directory set, can't load any mods.")
+    return []
+  }
   try {
     return getEnabledMods().map((dir) => getModJs(dir))
   } catch (e) {
@@ -416,6 +424,10 @@ const footnote_categories = ['story']
 // Interface
 
 function editArchive(archive) {
+  if (!assetDir) {
+    logger.info("No asset directory set, probably in new reader setup mode. Not editing the archive.")
+    return
+  }
   const enabledModsJs = getEnabledModsJs()
   enabledModsJs.reverse().forEach((js) => {
     try {
@@ -819,6 +831,7 @@ export default {
   getModStoreKey,
   giveWindow,
   modChoices,
+  modsDir,
 
   doFullRouteCheck
 }

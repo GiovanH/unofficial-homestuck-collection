@@ -1,5 +1,5 @@
 <template>
-  <div class="pageBody customStyles">
+  <div class="pageBody customStyles" :class="{pixelated: $localData.settings.pixelScaling}">
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
       <div class="pageContent">

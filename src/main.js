@@ -86,7 +86,7 @@ Vue.mixin({
       // Resolves a logical path within the vue router
       // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to).route
-      const base = route.path.slice(1).split("/")[0]
+      const base = route.path.split("/")[1]
 
       let resolvedUrl = route.path
 
@@ -387,9 +387,6 @@ Vue.mixin({
       // Else, only if the flag is set.
       return this.$localData.settings[retcon_id]
     },
-    $popNotif(id) {
-      this.$root.$children[0].$refs.notifications.queueNotif(id)
-    },
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
@@ -402,7 +399,7 @@ Vue.mixin({
       const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
       let nextTimestamp
       try {
-        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$localData.settings.newReader.current].next[0]].timestamp
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$newReaderCurrent].next[0]].timestamp
       } catch {
         this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
         nextTimestamp = latestTimestamp
@@ -480,13 +477,11 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default',
-      tabTheme: 'default',
       archive: undefined
     }
   },
   router,
-  render: function (h) { return h(App) },
+  render: function (h) { return h(App, {ref: 'App'}) },
   watch: {
     '$localData.settings.devMode'(to, from){
       const is_dev = to

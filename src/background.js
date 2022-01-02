@@ -632,6 +632,9 @@ ipcMain.on('ondragstart', (event, filePath) => {
   })
 })
 
+let openedWithUrl
+const OPENWITH_PROTOCOL = 'mspa'
+
 async function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
@@ -721,7 +724,7 @@ async function createWindow () {
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
-    win.loadURL('app://./index.html')
+    await win.loadURL('app://./index.html')
   }
 
   win.on('closed', () => {
@@ -730,6 +733,55 @@ async function createWindow () {
 
   // Give mods a reference to the window object so it can reload 
   Mods.giveWindow(win);
+
+  if (openedWithUrl)
+    win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))
+}
+
+app.removeAsDefaultProtocolClient(OPENWITH_PROTOCOL)
+if (isDevelopment && process.platform === 'win32') {
+  // Set the path of electron.exe and your app.
+  // These two additional parameters are only available on windows.
+  // Setting this is required to get this working in dev mode.
+  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL, process.execPath, [
+    path.resolve(process.argv[1])
+  ])
+} else {
+  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL)
+}
+
+app.on('open-url', function (event, url) {
+  event.preventDefault()
+  openedWithUrl = url
+})
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+
+    if (process.platform !== 'darwin') {
+      // Find the arg that is our custom protocol url and store it
+      openedWithUrl = commandLine.find((arg) => arg.startsWith(OPENWITH_PROTOCOL + '://'))
+    }
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+      if (openedWithUrl)
+        win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))
+    }
+  })
+  app.whenReady().then(async () => {
+    if (isDevelopment && !process.env.IS_TEST) {
+      try {
+        await installExtension(VUEJS_DEVTOOLS)
+      } catch (e) {
+        logger.error('Vue Devtools failed to install:', e.toString())
+      }
+    }
+    await createWindow()
+  })
 }
 
 app.on('window-all-closed', () => {
@@ -743,28 +795,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (win) {
-      if (win.isMinimized()) win.restore()
-      win.focus()
-    }
-  })
-  app.whenReady().then(async () => {
-    if (isDevelopment && !process.env.IS_TEST) {
-      try {
-        await installExtension(VUEJS_DEVTOOLS)
-      } catch (e) {
-        logger.error('Vue Devtools failed to install:', e.toString())
-      }
-    }
-    createWindow()
-  })
-}
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

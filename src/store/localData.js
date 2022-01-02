@@ -46,11 +46,13 @@ class LocalData {
         limit: false
       },
       notifications: true,
+      subNotifications: false,
 
       showAddressBar: false,
       urlTooltip: false,
       switchToNewTabs: false,
       forceScrollBar: true,
+      hideFullscreenHeader: false,
       smoothScrolling: true,
       pixelScaling: true,
       mspaMode: false,

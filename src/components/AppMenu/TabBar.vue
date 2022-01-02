@@ -131,7 +131,11 @@ export default {
       this.$localData.root.TABS_DUPLICATE(this.$localData.tabData.activeTabKey, true, 'forward')
     },
     reloadTab(e) {
-      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+      try {
+        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+      } catch (e) {
+        this.$logger.warn("Couldn't reload tab (no page?)", e)
+      }
     },
     forceReload(e) {
       ipcRenderer.sendSync('MODS_FORCE_RELOAD')
