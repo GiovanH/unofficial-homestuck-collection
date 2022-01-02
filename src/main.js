@@ -43,6 +43,8 @@ Resources.init({
 // Must init resources first.
 import Mods from "./mods.js"
 
+window.doFullRouteCheck = Mods.doFullRouteCheck
+
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
 
@@ -82,7 +84,7 @@ Vue.mixin({
       // Resolves a logical path within the vue router
       // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to.toLowerCase()).route
-      const base = route.path.slice(1).split("/")[0]
+      const base = route.path.split("/")[1]
 
       let resolvedUrl = route.path
 
@@ -371,7 +373,7 @@ Vue.mixin({
             if (!isSetupMode) this.$popNotifFromPageId(resultCurrent)
           }
         }
-      } else this.$logger.warn("Invalid page ID, not updating progress")
+      } else this.$logger.warn(`Invalid page ID '${thisPageId}', not updating progress`)
     },
     $shouldRetcon(retcon_id){
       console.assert(/retcon\d/.test(retcon_id), retcon_id, "isn't a retcon ID! Should be something like 'retcon4'")
@@ -382,18 +384,25 @@ Vue.mixin({
       // Else, only if the flag is set.
       return this.$localData.settings[retcon_id]
     },
-    $popNotif(id) {
-      this.$root.$children[0].$refs.notifications.queueNotif(id)
-    },
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
+    },
+    $pushNotif(notif) {
+      this.$root.$children[0].$refs.notifications.queueNotif(notif)
     },
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
 
       const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
+      let nextTimestamp
+      try {
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$newReaderCurrent].next[0]].timestamp
+      } catch {
+        this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
+        nextTimestamp = latestTimestamp
+      }
 
-      if (timestamp > latestTimestamp) {
+      if (timestamp > nextTimestamp) {
         // this.$logger.info(`Checked timestamp ${timestamp} is later than ${latestTimestamp}, spoilering`)
         // const { DateTime } = require('luxon');
         // let time_zone = "America/New_York"
@@ -465,13 +474,11 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default',
-      tabTheme: 'default',
       archive: undefined
     }
   },
   router,
-  render: function (h) { return h(App) },
+  render: function (h) { return h(App, {ref: 'App'}) },
   watch: {
     '$localData.settings.devMode'(to, from){
       const is_dev = to

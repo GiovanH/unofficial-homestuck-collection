@@ -26,7 +26,7 @@
             <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
             <label for="fast_forward=false">Replay</label>
           </dt>
-          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page.</dd>
+          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
 
           <dt>
             <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
@@ -38,6 +38,10 @@
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
+          <div class="subOption" v-if="$localData.settings['notifications']">
+            <dt><label><input type="checkbox" name="subNotifications" v-model="$localData.settings['subNotifications']" @click="toggleSetting('subNotifications')">Show minor notifications</label></dt>
+          <dd class="settingDesc">Also show notifications for minor updates like news announcements.</dd>
+          </div>
         </dl>
       </div>
       <div class="settings application">
@@ -111,7 +115,6 @@
               @click="toggleDarkMode()"> Dark Mode
             </label>
           </dt>
-
 
           <dt>Text Override</dt>
           <dd>
@@ -248,7 +251,7 @@
                 <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
                 <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
               </dt>
-              <dd class="settingDesc" v-html="cc.desc"></dd>
+              <dd class="settingDesc" v-html="cc.desc" />
             </template>
 
           </SpoilerBox>
@@ -258,7 +261,10 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <p class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</p>
+        <p class="settingDesc">
+          Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>. </p>
+          
+        <p class="settingDesc">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
 
         <button v-if="$localData.settings.devMode" @click="reloadModList">Dev: Reload Choices</button> 
         <section class="group sortable row">
@@ -269,7 +275,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <label class="modButton"
                   v-if="option.hasmeta"
                   @click="openSubModel(option, 'INFO_ONLY')"
@@ -286,7 +293,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <!-- n.b. hasmeta should always be true if settings exists -->
                 <label class="modButton"
                   v-if="option.hasmeta || option.settingsmodel"
@@ -339,6 +347,7 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import draggable from "vuedraggable"
+import Mods from "@/mods.js"
 
 const { ipcRenderer } = require('electron')
 
@@ -371,6 +380,10 @@ export default {
           model: "forceScrollBar",
           label: "Always display scroll bar",
           desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
+        }, {
+          model: 'hideFullscreenHeader', 
+          label: "Hide fullscreen header", 
+          desc: "Hide header content (such as the jump box, title and tab bars) in fullscreen mode (F11)."
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
@@ -507,7 +520,8 @@ export default {
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
       clearThemesForNewReader: false,
-      needReload: false
+      needReload: false,
+      modsDir: Mods.modsDir
     }
   },
   computed: {
@@ -651,7 +665,12 @@ export default {
       else this.$localData.settings[setting] = !this.$localData.settings[setting]
 
       if (setting == 'notifications' && this.$localData.settings[setting]) {
-        this.$popNotif('notif_enabled')
+        this.$pushNotif({
+          title: 'NOTIFICATIONS ENABLED',
+          desc: 'You can click me to visit whatever you just unlocked!',
+          url: '/',
+          thumb: '/archive/collection/archive_news.png'
+        })
       }
       if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
         this.queueArchiveReload()
@@ -730,12 +749,25 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+    },
+    scrollToSec(sectionClass) {
+      this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
+    }
+  },
+  mounted(){
+    if (this.routeParams.sec) {
+      this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
   },
   watch: {
     "$localData.settings.newReader.current"(to, from){
       if (!this.$parent.tabIsActive)
         this.newReaderPage = to
+    },
+    'tab.history': function (to, from) {
+      if (this.routeParams.sec) {
+        this.scrollToSec(this.routeParams.sec)
+      }
     },
     newReaderPage(to, from) {
       if (this.$localData.settings.mspaMode)
@@ -819,6 +851,10 @@ export default {
         .settingDesc {
           color: var(--page-nav-meta);
           font-weight: normal;
+        }
+
+        div.subOption {
+          margin-left: 40px;
         }
 
         > dd.settingDesc {
@@ -970,6 +1006,9 @@ export default {
           border: 1px solid rgba(0,0,0,.125);
           margin-bottom: -1px;
           padding: .2em;
+          .summary:before {
+            content: ' - '
+          }
       }
 
       ul li {

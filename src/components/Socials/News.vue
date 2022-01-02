@@ -84,39 +84,40 @@ export default {
   methods: {
     toggleYear(year) {
       this.activeYear = this.activeYear != year ? year : undefined
-      if (this.activeYear) this.$nextTick(() => {this.jumpToClass(year)})
+      if (this.activeYear && !this.routeParams.id) this.$nextTick(() => {this.jumpToClass(year)})
     },
     jumpToClass(id){
       const className = id || ""
-      const el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
+      const el = this.$el.getElementsByClassName(className)[0]
+      this.$logger.info(`Now jumping ${id}`, el)
       if (el) {
         el.scrollIntoView(true)
       } else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
+    },
+    jumpFromUrl(){
+      if (this.routeParams.id) {
+        const year = /\d+$/.exec(this.routeParams.id)[0]
+        if (year in this.newsposts) {
+          this.activeYear = year
+          this.$nextTick(()=>{
+            this.jumpToClass(this.routeParams.id)
+          })
+        }
+      }
     }
   },
   watch: {
     'tab.history': function (to, from) {
-      if (this.routeParams.id) {
-        const year = this.routeParams.id.slice(5, 7)
-        if (year in this.newsposts) this.activeYear = year
-      }
-      // $nextTick doesn't work for some reason, so we're hacking the shit out of it
-      // the timeout basically just hangs until the dom is ready
-      setTimeout(() => {this.jumpToClass(this.routeParams.id)}, 0)
+      this.jumpFromUrl()
     }
   },
   updated(){
     this.filterLinksAndImages()
   },
   mounted(){
-    // Try to jump to a specific point if the URL contains that info. TODO document this better
-    if (this.routeParams.id) {
-      const year = this.routeParams.id.slice(5, 7)
-      if (year in this.newsposts) this.activeYear = year
-    }
-    setTimeout(() => {this.jumpToClass(this.routeParams.id)}, 0)
+    this.jumpFromUrl()
     this.filterLinksAndImages()
   }
 }
