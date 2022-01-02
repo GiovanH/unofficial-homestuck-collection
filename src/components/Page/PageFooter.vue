@@ -1,5 +1,5 @@
 <template>
-    <div :class="['footer', $root.theme, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
+    <div :class="['footer', $root.$refs['App'].theme, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
         <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" />
         <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" />
     </div>

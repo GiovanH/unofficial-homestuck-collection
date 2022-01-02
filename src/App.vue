@@ -4,10 +4,11 @@
     $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
     <AppHeader :class="theme" />
-    <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tab="tabObject(key)"/>
+    <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
     <Notifications :class="theme" ref="notifications" />
     <ContextMenu :class="theme" ref="contextMenu" />
     <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+    <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
   </div>
   <div id="app" class="mspa"  v-else>
     <Setup />
@@ -36,32 +37,39 @@
     },
     data() {
       return {
-        zoomLevel: 0
+        zoomLevel: 0,
+        needCheckTheme: false,
+        stylesheets: [] // Mod optimization
       }
     },
     computed: {
       tabList() {
         return this.$localData.tabData.tabList
       },
-      tabTheme() {
-        let page_theme
+      activeTabComponent() {
+        this.needCheckTheme; // what a truly awful hack. vue's fault
+        // (it's because $refs isn't reactive)
         const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
-
         if (tab_components) {
-          // Get theme from inner tab
-          page_theme = {
-            defined: tab_components[0].contentTheme, 
-            rendered: tab_components[0].theme
-          }
-        } else {
-          // There are no tabs at all yet
-          this.$logger.warn("No tabs! Using default")
-          page_theme = {defined: 'default', rendered: 'default'}
+          return tab_components[0]
         }
-        return page_theme
+        return undefined
+      },
+      tabTheme() {
+        if (this.activeTabComponent) {
+          // Get theme from inner tab
+          const page_theme = {
+            defined: this.activeTabComponent.contentTheme, 
+            rendered: this.activeTabComponent.theme
+          }
+          return page_theme
+        } else {
+          this.$logger.warn("No tabs! Using default")
+          return {defined: 'default', rendered: 'default'}
+        }
       },
       theme() {
-        let set_theme = this.$localData.settings.themeOverrideUI
+        const set_theme = this.$localData.settings.themeOverrideUI
         // Default UI theme should be whatever the page is using
 
         // If there is a theme override and a UI theme override,
@@ -88,12 +96,12 @@
       }
     },
     methods: {
-      tabObject(key) {
-        return this.$localData.tabData.tabs[key]
-      },
       resetZoom() {
         this.zoomLevel = 0
         electron.webFrame.setZoomLevel(this.zoomLevel)
+      },
+      checkTheme() {
+        this.needCheckTheme = !this.needCheckTheme;
       },
       zoomIn() {
         if (this.zoomLevel < 5) {

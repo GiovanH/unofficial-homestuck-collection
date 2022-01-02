@@ -109,7 +109,6 @@
             </label>
           </dt>
 
-
           <dt>Text Override</dt>
           <dd>
             <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
@@ -244,7 +243,7 @@
                 <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
                 <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
               </dt>
-              <dd class="settingDesc" v-html="cc.desc"></dd>
+              <dd class="settingDesc" v-html="cc.desc" />
             </template>
 
           </SpoilerBox>
@@ -254,7 +253,10 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <p class="settingDesc">Mods, patches, and localization. See more [here]. Drag mods from the pool on the left to the list on the right to enable them. In the case of conflicts, higher mods take priority.</p>
+        <p class="settingDesc">
+          Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>. </p>
+          
+        <p class="settingDesc">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
 
         <button v-if="$localData.settings.devMode" @click="reloadModList">Dev: Reload Choices</button> 
         <section class="group sortable row">
@@ -265,7 +267,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <label class="modButton"
                   v-if="option.hasmeta"
                   @click="openSubModel(option, 'INFO_ONLY')"
@@ -282,7 +285,8 @@
                 :key="option.key"
                 :data-value="option.key"
               >
-                <b>{{option.label}}</b> - {{option.summary}}
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
                 <!-- n.b. hasmeta should always be true if settings exists -->
                 <label class="modButton"
                   v-if="option.hasmeta || option.settingsmodel"
@@ -335,6 +339,7 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import draggable from "vuedraggable"
+import Mods from "@/mods.js"
 
 const { ipcRenderer } = require('electron')
 
@@ -505,7 +510,8 @@ export default {
         'cursedHistory'
       ],
       debounce: false,
-      needReload: false
+      needReload: false,
+      modsDir: Mods.modsDir
     }
   },
   computed: {
@@ -958,6 +964,9 @@ export default {
           border: 1px solid rgba(0,0,0,.125);
           margin-bottom: -1px;
           padding: .2em;
+          .summary:before {
+            content: ' - '
+          }
       }
 
       ul li {
