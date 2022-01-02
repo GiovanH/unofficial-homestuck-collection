@@ -3,7 +3,7 @@
     // $root.loadState != 'DONE' ? 'busy' : '',
     $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
-    <AppHeader :class="theme" />
+    <AppHeader :class="theme" ref="appheader" />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
     <Notifications :class="theme" ref="notifications" />
     <ContextMenu :class="theme" ref="contextMenu" />
@@ -122,6 +122,26 @@
           this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
         }
       }
+    },
+    watch: {
+      'theme'(to, from) {
+        this.$nextTick(() => {
+          let app_icon_var = window.getComputedStyle(this.$refs["appheader"].$el).getPropertyValue('--app-icon')
+          let match
+          // eslint-disable-next-line no-cond-assign
+          if (match = / url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
+            app_icon_var = this.$mspaFileStream(match[1].replace(/\\/g, ''))
+          // eslint-disable-next-line no-cond-assign
+          } else if (match = / "(.+)"/.exec(app_icon_var)) {
+            app_icon_var = match[1]
+          } else {
+            this.$logger.info(`Couldn't match '${app_icon_var}'`)
+            return
+          }
+          this.$logger.info("Requesting icon change to", app_icon_var)
+          electron.ipcRenderer.send('set-sys-icon', app_icon_var)
+        })
+      } 
     },
     mounted () {
       this.$localData.root.TABS_SWITCH_TO()

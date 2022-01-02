@@ -1,5 +1,7 @@
 #app > *, .tabFrame > div {
 
+	--app-icon: "build/icons/icon.ico";
+
 	--font-default: #000000;
 	--font-header: #000000;
 	--font-ctx: #000000;
@@ -51,6 +53,8 @@
 	}
 
 	&.retro {
+		--app-icon: "build/icons/default.ico";
+		
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
 
@@ -72,6 +76,8 @@
 	}
 
 	&.scratch {
+		--app-icon: "build/icons/scratch.ico";
+
 		--font-default: #ffffff;
 		--font-header: #ffffff;
 		--font-ctx: #ffffff;
@@ -116,6 +122,8 @@
 	}
 
 	&.sbahj {
+		--app-icon: "build/icons/sbahj.ico";
+
 		--font-disabled: #00000060;
 		--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
 
@@ -261,6 +269,7 @@
 	}
 
 	&.trickster {
+		--app-icon: "build/icons/sucker.ico";
 		--font-default: #f9fd6b;
 		--font-header: #f9fd6b;
 		--font-highlight: #000000;
@@ -313,6 +322,7 @@
 	}
 
 	&.A6A6 {
+		--app-icon: "build/icons/cherub.ico";
 		--font-default: #2ed73a;
 		--font-header: #ffffff;
 		--font-highlight: #000000;
@@ -360,6 +370,8 @@
 	}
 
 	&.pxs {
+		--app-icon: "build/icons/pxs.ico";
+
 		--font-default: #ffffff;
 		--font-header: #ffffff;
 		--font-ctx: #ffffff;
