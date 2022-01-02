@@ -4,6 +4,7 @@
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
+      <Metadata v-if="showMetadata == true" :thisPage="thisPage" />
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
@@ -35,6 +36,7 @@ import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
 
 import Firefly from '@/components/SpecialPages/Firefly.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
@@ -45,13 +47,14 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes, Metadata
   },
   data: function() {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
-      forceKeyboardEnable: false // overridden by oddities
+      forceKeyboardEnable: false, // overridden by oddities
+      showMetadata: false
     }
   },
   computed: {
@@ -252,6 +255,7 @@ export default {
       padding-top: 7px;
       padding-bottom: 23px;
       margin: 0 auto;
+      position: relative; // Allow things to align to the page
 
       flex: 0 1 auto;
       display: flex;
