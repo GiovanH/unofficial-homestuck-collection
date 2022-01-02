@@ -37,6 +37,7 @@ export default {
       notifDuration: 10000,
       activeNotifs: [],
       queue: [],
+      maxActiveNotifs: 3,
       allowEOH: false,
       DateTime: require('luxon').DateTime
     }
@@ -51,7 +52,7 @@ export default {
       })
     },
     sortedNewspostTimestamps() {
-      return Object.keys(this.newspostsByTimestamp).sort()
+      return Object.keys(this.newspostsByTimestamp).map(Number).sort()
     }    
   },
   methods: {
@@ -75,11 +76,29 @@ export default {
 
       if (time2 <= time1) return []
 
+      function fuzzyBinarySearch(arr, val) {
+        let start = 0
+        let end = arr.length - 1
+        let mid
+        do {
+          mid = Math.floor((start + end) / 2)
+
+          if (arr[mid] === val) return mid
+
+          if (val < arr[mid]) {
+            end = mid - 1
+          } else {
+            start = mid + 1
+          }
+        } while (start <= end)
+        return mid // Near where to start. (Should be mid-1?)
+      }
+
       // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
 
       let ret = []
       let newst = -1
-      for (let i = 0; newst <= time2; newst = corpus[i++]) {
+      for (let i = fuzzyBinarySearch(corpus, time1); newst <= time2; newst = corpus[i++]) {
         if (newst > time1) {
           ret.push(newst)
           // this.$logger.info("Found", this.formatTimestamp(newst))
@@ -95,7 +114,7 @@ export default {
       const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
 
       return {
-        title: 'New news post',
+        title: 'News posted',
         desc: desc,
         url: `/news/${newspost.id}`,
         thumb: '/archive/collection/archive_news.png'
@@ -133,18 +152,30 @@ export default {
           // See also $timestampIsSpoiler
           // but we can't reuse that logic because we're passing an explicit time point here
           const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
-          const nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[pageId].next[0]].timestamp
+          const nextTimestamp = Math.min(...this.$archive.mspa.story[pageId].next.map(
+            npageid => this.$archive.mspa.story[npageid].timestamp
+          ))
 
           // Newsposts
           const news_between = this.timestampsBetween(
             latestTimestamp, nextTimestamp, 
             this.sortedNewspostTimestamps
           )
-          news_between.forEach(newst => {
-            this.$logger.info(nextTimestamp, newst, nextTimestamp)
-
-            this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
-          })
+          // Group newsposts if too many
+          if (news_between.length <= this.maxActiveNotifs) { 
+            news_between.forEach(newst => {
+              this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
+            })
+          } else {
+            const newspost_0 = this.newspostsByTimestamp[news_between[0]]
+            this.$logger.info(newspost_0)
+            this.queueNotif({
+              title: 'New news posts',
+              desc: `${news_between.length} new news posts`,
+              url: `/news/${newspost_0.id}`,
+              thumb: '/archive/collection/archive_news.png'
+            })
+          }
         } catch (e) {
           this.$logger.warn("Couldn't compute timestamp", e)
         }
@@ -155,7 +186,7 @@ export default {
       let key = Math.random().toString(36).substring(2, 5) + Date.now()
       const notifEntry = {...notif, key} // Add key to notif object
 
-      if (this.activeNotifs.length < 3) this.fireNotif(notifEntry)
+      if (this.activeNotifs.length < this.maxActiveNotifs) this.fireNotif(notifEntry)
       else this.queue.push(notifEntry)
     },
     fireNotif(queuedNotif) {

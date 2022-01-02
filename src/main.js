@@ -45,6 +45,8 @@ Resources.init({
 // Must init resources first.
 import Mods from "./mods.js"
 
+window.doFullRouteCheck = Mods.doFullRouteCheck
+
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
 
@@ -84,7 +86,7 @@ Vue.mixin({
       // Resolves a logical path within the vue router
       // Currently just clamps story URLS to the user specified mspamode setting
       const route = this.$router.resolve(to.toLowerCase()).route
-      const base = route.path.slice(1).split("/")[0]
+      const base = route.path.split("/")[1]
 
       let resolvedUrl = route.path
 
@@ -140,6 +142,7 @@ Vue.mixin({
       }
     },
     $getResourceURL: Resources.getResourceURL,
+    $getChapter: Resources.getChapter,
     $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       const url = this.$resolvePath(to)
@@ -310,7 +313,8 @@ Vue.mixin({
     $updateNewReader(thisPageId, forceOverride = false) {
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
-      const isInRange = '000219' <= thisPageId && thisPageId <= this.$archive.tweaks.endOfHSPage // in the "keep track of spoilers" range
+      const endOfHSPage = this.$archive ? this.$archive.tweaks.endOfHSPage : '010030' // archive may not be loaded in setup mode
+      const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
       if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
@@ -349,7 +353,7 @@ Vue.mixin({
         // Safeguard to catch an unset nextLimit
         if (isSetupMode || !nextLimit) nextLimit = thisPageId
 
-        if (thisPageId == this.$archive.tweaks.endOfHSPage) {
+        if (thisPageId == endOfHSPage) {
           // Finished Homestuck.
           this.$localData.root.NEW_READER_CLEAR()
           this.$root.$children[0].$refs.notifications.allowEndOfHomestuck()
@@ -383,9 +387,6 @@ Vue.mixin({
       // Else, only if the flag is set.
       return this.$localData.settings[retcon_id]
     },
-    $popNotif(id) {
-      this.$root.$children[0].$refs.notifications.queueNotif(id)
-    },
     $popNotifFromPageId(pageId) {
       this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
     },
@@ -398,7 +399,7 @@ Vue.mixin({
       const latestTimestamp = this.$archive.mspa.story[this.$newReaderCurrent].timestamp
       let nextTimestamp
       try {
-        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$localData.settings.newReader.current].next[0]].timestamp
+        nextTimestamp = this.$archive.mspa.story[this.$archive.mspa.story[this.$newReaderCurrent].next[0]].timestamp
       } catch {
         this.$logger.warn("Couldn't get 'next page' for timestampIsSpoiler")
         nextTimestamp = latestTimestamp
@@ -476,13 +477,11 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      theme: 'default',
-      tabTheme: 'default',
       archive: undefined
     }
   },
   router,
-  render: function (h) { return h(App) },
+  render: function (h) { return h(App, {ref: 'App'}) },
   watch: {
     '$localData.settings.devMode'(to, from){
       const is_dev = to

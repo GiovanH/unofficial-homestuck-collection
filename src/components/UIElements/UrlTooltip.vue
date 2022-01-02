@@ -37,8 +37,8 @@ export default {
 <style lang="scss" scoped>
   span {
     position: absolute;
-    left: 2px;
-    bottom: 2px;
+    left: 0px;
+    bottom: 0px;
     padding: 2px;
 
     background-color: var(--ctx-bg);
