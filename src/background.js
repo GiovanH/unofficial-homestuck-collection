@@ -271,8 +271,7 @@ function loadArchiveData(){
   }
 
   chapterIndex = undefined
-
-  chapterIndex = undefined
+  
   return data
 }
 
