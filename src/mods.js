@@ -4,6 +4,8 @@ import yaml from 'js-yaml'
 
 const {ipcMain, ipcRenderer, dialog, app} = require('electron')
 const sass = require('sass')
+const unzipper = require("unzipper")
+const Tar = require('tar');
 
 const Store = require('electron-store')
 const store = new Store()
@@ -25,7 +27,6 @@ const store_modlist_key = 'localData.settings.modListEnabled'
 const store_devmode_key = 'localData.settings.devMode'
 
 let win = null
-
 function giveWindow(new_win) {
   win = new_win
   logger.info("Got window")
@@ -71,7 +72,26 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
-var onModLoadFail;
+function extractimods(){
+  // eslint-disable-next-line import/no-webpack-loader-syntax
+  const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
+  let tar_buffer = Buffer.from(base64, 'base64')
+
+  const outpath = path.join(assetDir, "archive")
+  console.log("Extracting imods to ", outpath)
+  // sorry! this is very silly but javascript refuses to let me
+  // wait for a promise before returning, so here we are
+  fs.writeFileSync('_imods.tar', tar_buffer)
+  Tar.extract({
+    file: '_imods.tar',
+    sync: true,
+    cwd: outpath
+  })
+  fs.unlink('_imods.tar', err => {
+    if (err) console.log(err)
+  })
+  console.log("Extracting imods to ", outpath)
+}
 
 function removeModsFromEnabledList(responsible_mods) {
   // Clear enabled mods
@@ -86,7 +106,8 @@ function removeModsFromEnabledList(responsible_mods) {
     if (win) {
       win.webContents.send('RELOAD_LOCALDATA')
     } else {
-      logger.error("Don't have win!")
+      // probably pre-window, don't need to worry here
+      logger.warn("Don't have win!")
     }
   } else {
     logger.info("Changing modlist from vm")
@@ -96,10 +117,14 @@ function removeModsFromEnabledList(responsible_mods) {
   }
 }
 
+var onModLoadFail;
+
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
+
+    store.set("needsRecovery", true)
 
     if (win) {
       win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
@@ -122,6 +147,8 @@ if (ipcMain) {
     if (modsDir == undefined)
       return // Pre-setup, we're probably fine ignoring this.
 
+    store.set("needsRecovery", true)
+
     logger.info("RENDER: Mod load failure with modlist", responsible_mods)
     logger.error(e)
 
@@ -130,6 +157,8 @@ if (ipcMain) {
       // Have to invoke reload because we probably don't even have the VM at this point
       ipcRenderer.invoke('reload')
     }
+    window.doReloadNoRecover = () => ipcRenderer.invoke('reload')
+    window.doFullRestart = () => ipcRenderer.invoke('restart')
 
     function sanitizeHTML(str) {
       var temp = document.createElement('div')
@@ -154,7 +183,9 @@ if (ipcMain) {
         <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
         These have been disabled for safety.</p>
         <pre>${sanitizeHTML(e)}</pre>
-        <input type="button" value="Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
+        <input type="button" value="1. Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
+        <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
+        <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
         <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
         <p>Stacktrace:</p>
         <pre>${sanitizeHTML(e.stack)}</pre>
@@ -251,6 +282,9 @@ function getEnabledMods() {
   if (store.get('localData.settings.hqAudio'))
     list.push("_hqAudio")
 
+  if (!store.get('localData.settings.newReader.limit'))
+    list.push("_secret")
+
   return list
 }
 
@@ -341,7 +375,10 @@ function getModJs(mod_dir, options={}) {
     let thisModsDir = modsDir
     let thisModsAssetRoot = modsAssetsRoot
 
+    let use_webpack_require = false
+
     if (mod_dir.startsWith("_")) {
+      // use_webpack_require = true
       thisModsDir = imodsDir
       thisModsAssetRoot = imodsAssetsRoot
     } 
@@ -352,12 +389,25 @@ function getModJs(mod_dir, options={}) {
       modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
     }
 
-    // eslint-disable-next-line no-undef
-    if (__non_webpack_require__.cache[modjs_path])
-      // eslint-disable-next-line no-undef
-      delete __non_webpack_require__.cache[modjs_path]
-    // eslint-disable-next-line no-undef
-    mod = __non_webpack_require__(modjs_path)
+    if (use_webpack_require) {
+      console.log(modjs_path)
+      mod = require(modjs_path)
+    } else {
+      if (__non_webpack_require__.cache[modjs_path])
+        delete __non_webpack_require__.cache[modjs_path]
+
+      try {
+        mod = __non_webpack_require__(modjs_path)
+      } catch (e) {
+        // imod AND this is the second attempt at importing it
+        if (mod_dir.startsWith("_")) {
+          console.log(e)
+          console.log("Couldn't load imod, trying re-extract")
+          extractimods()
+          mod = __non_webpack_require__(modjs_path)
+        } else throw e
+      }
+    }
 
     mod._id = mod_dir
     mod._singlefile = options.singlefile
@@ -445,6 +495,7 @@ function editArchive(archive) {
       }
     } catch (e) {
       onModLoadFail([js._id], e)
+      throw e
     }
   })
 
@@ -765,8 +816,29 @@ if (ipcMain) {
     var mod_folders
     try {
       const tree = crawlFileTree(modsDir, false)
+
+      // Extract zips
+      const outpath = path.join(assetDir, "mods")
+      const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
+      zip_archives.forEach(zip_name => {
+        const zip_path = path.join(modsDir, zip_name)
+        console.log(`Extracting ${zip_path} to ${outpath}`)
+        fs.createReadStream(zip_path).pipe(
+          unzipper.Extract({
+            path: outpath, 
+            concurrency: 5
+          })
+        ).on('finish', function() {
+          setTimeout(() => fs.unlink(zip_path, err => {
+            if (err) console.log(err)
+          }), 200) // OS doesn't release it right away even after finish
+        })
+      })
+
       // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p))
+      mod_folders = Object.keys(tree).filter(p => 
+        /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p)
+      )
     } catch (e) {
       // No mod folder at all. That's okay.
       logger.error(e)
@@ -820,18 +892,19 @@ function getModChoices() {
 }
 
 export default {
-  getEnabledModsJs,  // probably shouldn't use
+  getEnabledModsJs,  // bg
   getEnabledMods,
-  getModChoices,
-  getMixins,
-  getMainMixin,
-  editArchive,
-  bakeRoutes,
-  getAssetRoute,
-  getModStoreKey,
-  giveWindow,
+  getModChoices, // fg
+  getMixins, // fg
+  getMainMixin, // fg
+  editArchive, // bg
+  bakeRoutes, // bg
+  getAssetRoute, // bg, fg
+  getModStoreKey, // fg
+  giveWindow, // bg
   modChoices,
-  modsDir,
+  modsDir, // fg
+  extractimods, // bg
 
-  doFullRouteCheck
+  doFullRouteCheck // fg
 }

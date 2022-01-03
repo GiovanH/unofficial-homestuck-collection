@@ -14,24 +14,19 @@ This application runs entirely in Electron + Vue, with very little else going on
 
 So what I'm saying is this: You're welcome to peruse the codebase, fork it, make and suggest changes, or use it in any way you see fit. Just uh... don't expect it to be well formed or documented in any of the ways that really count. If you want to make some changes and my code is causing you physical discomfort, hit me up on Discord at `Bambosh#1025`. I'll do my best to help talk it through with you!
           
-## Project setup
-```
-yarn install
-```
-
 ### Compiles and hot-reloads for development
 ```
-yarn electron:serve (or 'yarn dev' for short)
+make test
 ```
 
 ### Compiles and minifies for production
 ```
-yarn electron:build
+make publish
 ```
 
 ### Lints and fixes files
 ```
-yarn lint
+make lint
 ```
 
 ### Customize configuration

@@ -9,6 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const APP_VERSION = '2.0.0'
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -243,6 +244,7 @@ function loadArchiveData(){
     // This is probably due to a poorly written mod, somehow.
     // specifically $localdata can be in an invalid state
     logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
 
     dialog.showMessageBoxSync({
       type: 'error',
@@ -269,7 +271,7 @@ function loadArchiveData(){
   }
 
   chapterIndex = undefined
-
+  
   return data
 }
 
@@ -377,6 +379,23 @@ try {
 ipcMain.on('STARTUP_GET_PORT', (event) => {
   event.returnValue = port
 })
+
+if (assetDir) {
+  // App version checks
+  const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+
+  const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
+  if (semverGreater(APP_VERSION, last_app_version)) {
+    console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
+    Mods.extractimods()
+  } else {
+    console.log(`last version ${last_app_version} gte current version ${APP_VERSION}`)
+  }
+
+  store.set("appVersion", APP_VERSION)
+} else {
+  console.log("Deferring app version checks until initial configuration is complete.")
+}
 
 // Speed hack, try to preload the first copy of the archive
 var first_archive

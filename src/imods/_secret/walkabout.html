@@ -1,0 +1,87 @@
+﻿<meta charset=utf-8><meta content="IE=edge"http-equiv=X-UA-Compatible><title>PICO-8 Cartridge</title><meta content=""name=description><meta content="initial-scale=1,maximum-scale=1,user-scalable=no"name=viewport><style>.pico8_el{box-sizing:border-box;float:center;width:19.3%;display:inline-block;padding:4px;text-align:center;color:#fff1e8;background-color:#83769c;font-family:verdana;font-size:11px;cursor:pointer;cursor:hand;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}.pico8_el:hover{background-color:#ff77a8}.center{text-align:center;display:-webkit-box;-webkit-box-pack:center;-webkit-box-align:center;display:-moz-box;-moz-box-pack:center;-moz-box-align:center;display:-ms-flexbox;-ms-flex-pack:center;-ms-flex-align:center;margin:0 0;border:0}.plate{visibility:hidden;background-color:#000;border:4px solid #000;box-sizing:content-box;box-shadow:0 0 20px #000;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;user-drag:none;-webkit-user-drag:none}canvas{cursor:none;outline:0}.menubar{box-sizing:border-box;background-color:#000;border-style:solid;border-width:4px 0 0 0;border-color:#000;visibility:hidden;display:flex;align-items:stretch;justify-content:space-between;width:100%;margin:0;padding:0}.startbutton{position:absolute;left:0;right:0;top:0;bottom:0;margin-left:auto;margin-right:auto;margin-top:auto;margin-bottom:auto;width:96px;height:96px;cursor:pointer;cursor:hand}.pixels{image-rendering:optimizeSpeed;image-rendering:-moz-crisp-edges;image-rendering:-webkit-optimize-contrast;image-rendering:optimize-contrast;image-rendering:pixelated;-ms-interpolation-mode:nearest-neighbor}</style><body bgcolor=#5F574F class=center leftmargin=0 style=height:100%;border:0;overflow:hidden topmargin=0><div class=plate id=plate oncontextmenu=return!1><canvas id=dummy4itchapp style=position:absolute;visibility:hidden;width:0;height:0></canvas><div class=center id=frame style=visibility:hidden><canvas id=canvas class="pixels emscripten"oncontextmenu=event.preventDefault() tabindex=1></canvas></div><div class="pixels startbutton"onclick=loadCart() id=start><img alt=START height=72 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAaklEQVR4Ae2dOwoAMQhE15A+rfc/3bZ7AlMnQfywCkKsfcgMM9ZP+QHtIn0vLeBAFduiFdQ/0DmvtR5LXJ6CPSXe2ZXcFNlTxFbemKrbZPs35XogeS9xeQr+anT6LzoOwEDwZJ7jwhXUnwkTTiDQ2Ja34AAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></div><center><div class=menubar id=menubar><div class=pico8_el onclick=Module.pico8Reset()><img alt=Reset height=12 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAaklEQVR4Ae2dOwoAMQhE15A+rfc/3bZ7AlMnQfywCkKsfcgMM9ZP+QHtIn0vLeBAFduiFdQ/0DmvtR5LXJ6CPSXe2ZXcFNlTxFbemKrbZPs35XogeS9xeQr+anT6LzoOwEDwZJ7jwhXUnwkTTiDQ2Ja34AAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></div><div class=pico8_el onclick=Module.pico8TogglePaused()><img alt=Pause height=12 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAPUlEQVR4Ae3doQ0AIAxEUWABLPtPh2WCq26DwFSU/JPNT166QSu/Hg86W9dwLte+diP7AwAAAAAAgD+A+jM2ZAgo84I0PgAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></div><div class=pico8_el onclick=toggleFullscreen()><img alt=Fullscreen height=12 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAaklEQVR4Ae2dsQ1AIQhExfze1v2ns3UCrfgFhmgUUAoGgHscp21wX9BqaZoDojbB96OkDJKNcTN2BHTyYNYmoT2BlPL7BKgcPfHjAVXKKadkHOn9K1r16N0czN6a95N8mnA7Aq2fTZ3Af3UKmCSMazL8HwAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></div><div class=pico8_el onclick=Module.pico8ToggleSound()><img alt="Toggle Sound"height=12 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAXklEQVR4Ae2doQ4AIQxD4YLH8v9fh+ULhjpxxSwLg2uyapr1JRu1iV5Z+1BGl4+xNpX38SYo2uRvYiT5LwEmt+ocgXVLrhPEgBiw8Q5w7/kueSkK+D2tJO4E/I3GrwkqQCBabEj/4QAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></div><a class=pico8_el href="http://www.lexaloffle.com/bbs/?cat=7&sub=2"target=_new><img alt="More Carts"height=12 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAlElEQVR4Ae2dMQ5FQBCGh6jcwAkkateg3DiAa+iQUGqVKi95FQfAJRQOoHeBUf8JyQqKjZ1uMzuz2e/LTE3KhyF7kSlgLOykas23f6D+A9Yp84aAOYU15pcJnfji0Il2ID8HzC4y38ZrnfIBGxeRoR3c3EWrACdsV5BOsx7OSRnrOXh4F5HzA6bevwUn8wlz7eCDsQM99B3ks0s/4QAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII="></a></div></center></div><script>
+  var getP8Gpio;
+  (function() {
+    getP8Gpio = _getP8Gpio;
+  // constants
+  var size = 128;
+  // variables
+  var initialized = false;
+    // extends Array prototype
+    function PicoGpioArray() {
+      Array.call(this, size);
+      this._data = Array(size);
+      this._listeners = [];
+      this._pending = {};
+      this._pendingNew = {};
+      this._pendingTimeout = null;
+      this.dispatchPending = this.dispatchPending.bind(this);
+      Object.seal(this);
+    }
+    PicoGpioArray.prototype = Object.create(Array.prototype, {
+    // we must custom-specify length since we override the index setters
+    length: {
+      value: size,
+      writable: false
+    }
+  });
+    PicoGpioArray.prototype.constructor = PicoGpioArray;
+    // listener callback is required. second argument (verbose) is a boolean
+  // and assumed to be false if not provided.
+  PicoGpioArray.prototype.subscribe = function subscribe(listener, verbose) {
+    listener.verbose = Boolean(verbose);
+    this._listeners.push(listener);
+    return (function unsubscribe() {
+      this._listeners.splice(this._listeners.indexOf(listener), 1);
+    }).bind(this);
+  };
+    // alert listeners of all values changed during the last call stack
+    PicoGpioArray.prototype.dispatchPending = function dispatchPending() {
+      var pendingIndices = Object.keys(this._pending).map(Number);
+      var pendingNewIndices = Object.keys(this._pendingNew).map(Number);
+      for (var i = 0; i < size; i++) {
+        delete this._pending[i];
+        delete this._pendingNew[i];
+      }
+      if (!pendingIndices.length) {
+        return;
+      }
+      for (var l = 0; l < this._listeners.length; l++) {
+        var indices = this._listeners[l].verbose
+        ? pendingIndices
+        : pendingNewIndices;
+        if (indices.length) {
+          this._listeners[l](indices);
+        }
+      }
+    };
+    // intercept assignments to each GPIO pin to notify listeners
+    for (var i = 0; i < size; i++) {
+      (function(index) {
+        Object.defineProperty(PicoGpioArray.prototype, index, {
+          get: function() {
+            return this._data[index];
+          },
+          set: function(value) {
+            clearTimeout(this._pendingTimeout);
+            this._pending[index] = true;
+            if (this._data[index] !== value) {
+              this._pendingNew[index] = true;
+            }
+            this._data[index] = value;
+            this._pendingTimeout = setTimeout(this.dispatchPending);
+          }
+        });
+      })(i);
+    }
+    function _getP8Gpio() {
+      if (!initialized) {
+        window.pico8_gpio = new PicoGpioArray();
+        initialized = true;
+      }
+      return window.pico8_gpio;
+    }
+  })();
+  if (typeof module !== 'undefined' && module) {
+    module.exports = getP8Gpio;
+  }
+    var autoresize=!1,autoplay=!0,canvas=document.getElementById("canvas"),plate=document.getElementById("plate"),Module={};function onKeyDown_blocker(e){e=e||window.event;var t=document.activeElement;t&&t!=document.body&&"canvas"!=t.tagName&&"CANVAS"!=t.tagName||-1<[9,32,37,38,39,40].indexOf(e.keyCode)&&e.preventDefault&&e.preventDefault()}function resizeCanvas(){var e=512,t=window.innerWidth,n=window.innerHeight,a=document.fullscreenElement||document.mozFullScreenElement||document.webkitIsFullScreen||document.msFullscreenElement;(autoresize||a)&&(a||(n-=32),e=Math.max(128,Math.min(128*Math.floor(t/128),128*Math.floor(n/128)))),plate.style.visibility="visible",plate.style.width=e,canvas.style.width=e,canvas.style.height=e,window.focus()}function toggleFullscreen(){var e=document.getElementById("frame");document.fullscreenElement||document.mozFullScreenElement||document.webkitIsFullScreen||document.msFullscreenElement?(e.cancelFullscreen=e.cancelFullscreen||e.mozCancelFullScreen||e.webkitCancelFullScreen,e.cancelFullscreen()):(e.requestFullscreen=e.requestFullscreen||e.mozRequestFullScreen||e.webkitRequestFullScreen,e.requestFullscreen())}Module.canvas=canvas,document.addEventListener("keydown",onKeyDown_blocker,!1),window.addEventListener("load",resizeCanvas,!1),window.addEventListener("resize",resizeCanvas,!1),window.addEventListener("orientationchange",resizeCanvas,!1),window.addEventListener("fullscreenchange",resizeCanvas,!1),window.addEventListener("webkitfullscreenchange",resizeCanvas,!1);var supportedPlayers=2,mapFaceButtons=!0,mapShoulderButtons=!0,mapTriggerButtons=!1,mapStickButtons=!1,stickDeadzone=.4,pico8_buttons=[0,0,0,0,0,0,0,0];function updateGamepads(){for(var e=navigator.getGamepads?navigator.getGamepads():[],t=0;t<supportedPlayers;t++)pico8_buttons[t]=0;for(var n=0;n<e.length;n++){var a=e[n];if(a&&a.connected){var s=n%supportedPlayers,o=0;o|=axis(a,0)<-stickDeadzone||axis(a,2)<-stickDeadzone||btn(a,14)?1:0,o|=axis(a,0)>+stickDeadzone||axis(a,2)>+stickDeadzone||btn(a,15)?2:0,o|=axis(a,1)<-stickDeadzone||axis(a,3)<-stickDeadzone||btn(a,12)?4:0,o|=axis(a,1)>+stickDeadzone||axis(a,3)>+stickDeadzone||btn(a,13)?8:0,o|=mapFaceButtons&&(btn(a,0)||btn(a,2))||mapShoulderButtons&&btn(a,5)||mapTriggerButtons&&btn(a,7)||mapStickButtons&&btn(a,11)?16:0,o|=mapFaceButtons&&(btn(a,1)||btn(a,3))||mapShoulderButtons&&btn(a,4)||mapTriggerButtons&&btn(a,6)||mapStickButtons&&btn(a,10)?32:0,pico8_buttons[s]|=o,pico8_buttons[0]|=btn(a,8)||btn(a,9)?64:0}}requestAnimationFrame(updateGamepads)}function axis(e,t){return e.axes[t]||0}function btn(e,t){return!!e.buttons[t]&&e.buttons[t].pressed}navigator.getGamepads&&requestAnimationFrame(updateGamepads);var cartLoaded=!1;function loadCart(){if(!cartLoaded){document.getElementById("start").style.visibility="hidden",document.getElementById("frame").style.visibility="visible";var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="walkabout.js";var t=function(){cartLoaded=!0,document.getElementById("menubar").style.visibility="visible",resizeCanvas()};e.onload=t,e.onreadystatechange=t;var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)}}if(autoplay){var context=new AudioContext;context.onstatechange=function(){"running"==context.state&&(loadCart(),context.close())}}</script>
