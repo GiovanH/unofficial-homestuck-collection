@@ -22,6 +22,9 @@
           </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
+      <div class="hidden">
+        <Media v-for="url in nextPagesMedia" :key="url" :url="url" class="panel"/>
+      </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
   </div>
@@ -133,19 +136,6 @@ export default {
         this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
 
-      // TODO: This doesn't seem to be used anywhere or do anything.
-      // Also it's a side-effect in a computed statement for no good reason.
-      this.preload = []
-      this.nextPagesArray.forEach(page => {
-        page.media.forEach(media => {
-          if (/(gif|png)$/i.test(media)) {
-            const img = new Image()
-            img.src = this.$getResourceURL(media)
-            this.preload.push(img)
-          }
-        })
-      })
-
       return media
     },
     nextPagesArray() {
@@ -157,6 +147,11 @@ export default {
         nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
+    },
+    nextPagesMedia(){
+      return this.nextPagesArray.reduce((acc, page) => {
+        return [...acc, ...page.media.filter(x => /(gif|png)$/i.test(x))]
+      }, []).map(this.$getResourceURL)
     },
     pixelated() {
       return this.$localData.settings.pixelScaling
