@@ -6,18 +6,24 @@ install: package.json
 
 clean:
 	rm -r src/imods.tar
-	
+
 lint: install 
-	yarn lint
+	yarn run vue-cli-service lint
+	# yarn lint
+	
+test: install src/imods.tar
+	yarn run vue-cli-service electron:serve
+	# yarn dev
+
+publish: install src/imods.tar
+	yarn run vue-cli-service electron:build
+	# yarn electron:build
+	
+vuebuild: install 
+	yarn run vue-cli-service build
 
 src/imods.tar: $(wildcard src/imods/*)
 	cd src && tar -czf imods.tar imods/
-	
-test: install src/imods.tar
-	yarn dev
-
-publish: install src/imods.tar
-	yarn electron:build
 
 	
 help:
