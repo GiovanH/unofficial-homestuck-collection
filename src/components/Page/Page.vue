@@ -129,9 +129,9 @@ export default {
       var mediakey = media[0]
 
       if (this.audioData) {
-        let flashPath = mediakey.substring(0, mediakey.length-4)
+        const flashPath = mediakey.substring(0, mediakey.length - 4)
         this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
-        mediakey = `${flashPath}_hq.swf`
+        media[0] = `${flashPath}_hq.swf`
       } else if (mediakey.includes(".swf")) {
         this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
