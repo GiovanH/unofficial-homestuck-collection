@@ -2,7 +2,11 @@
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
     <div class="card Logo">
-      <a href="/" class="topLogo cardContent"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a href="/" class="topLogo cardContent">
+        <!-- <Media url="assets://archive/collection/logo_v2_static.png" /> -->
+        <!-- <Media url="assets://archive/collection/logo_v2_static.png" /> -->
+        <video autoplay="true" muted="true" src="assets://archive/collection/logo_v2_full.webm" type="video/webm" loop></video>
+      </a>
       <div class="cardContent collection">
         <div class="links">
           <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
@@ -449,8 +453,8 @@ export default {
     }
 
     .topLogo {
-      img {
-        width: 700px;
+      img, video {
+        width: 1050px;
       }
     }
     .navBanner {
