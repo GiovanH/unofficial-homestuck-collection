@@ -60,20 +60,20 @@
               <dl v-for="ratioSetting in settingListRadio">
                 <dt v-text="ratioSetting.label" :key="ratioSetting.model + '-label'"></dt>
                 <dd v-html="ratioSetting.desc" :key="ratioSetting.model + '-desc'"></dd>
-                <template v-for="option in ratioSetting.options">
-                  <dt :key="ratioSetting.model + '-' + option.value">
+                <template v-for="option, i in ratioSetting.options">
+                  <dt :key="ratioSetting.model + '-' + slugifyOptionValue(option.value, i)">
                     <input type="radio" 
-                      :name="`${ratioSetting.model}=${option.value}`" 
-                      :id="`${ratioSetting.model}=${option.value}`" 
+                      :name="`${ratioSetting.model}=${slugifyOptionValue(option.value, i)}`" 
+                      :id="`${ratioSetting.model}=${slugifyOptionValue(option.value, i)}`" 
                       :value="option.value"
                       v-model="buffer[ratioSetting.model]"
                       :disabled="info_only"
                     >
                     <label 
-                      :for="`${ratioSetting.model}=${option.value}`"
+                      :for="`${ratioSetting.model}=${slugifyOptionValue(option.value, i)}`"
                       v-text="option.label" />
                   </dt> 
-                  <dd class="settingDesc" v-if="option.desc" v-html="option.desc" :key="ratioSetting.model + '-' + option.value + '-desc'"></dd>
+                  <dd class="settingDesc" v-if="option.desc" v-html="option.desc" :key="ratioSetting.model + '-' + slugifyOptionValue(option.value, i) + '-desc'"></dd>
                 </template>
               </dl>
             </div>
@@ -128,6 +128,10 @@ export default {
     }
   },
   methods: { 
+    slugifyOptionValue(obj, i) {
+      if (obj instanceof Object) return i
+      else return obj
+    },
     openMod(modopt, info_only) {
       this.settingsModel = modopt.settingsmodel || {}
       this.modopt = modopt
