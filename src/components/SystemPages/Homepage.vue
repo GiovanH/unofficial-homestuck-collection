@@ -3,9 +3,7 @@
     <NavBanner useCustomStyles="true" />
     <div class="card Logo">
       <a href="/" class="topLogo cardContent">
-        <!-- <Media url="assets://archive/collection/logo_v2_static.png" /> -->
-        <!-- <Media url="assets://archive/collection/logo_v2_static.png" /> -->
-        <video autoplay="true" muted="true" src="assets://archive/collection/logo_v2_full.webm" type="video/webm" loop></video>
+        <Media :url="logo_src" gifmode />
       </a>
       <div class="cardContent collection">
         <div class="links">
@@ -422,6 +420,7 @@ export default {
   },
   data: function() {
     return {
+      logo_src: "assets://archive/collection/logo_v2_full.webm"
     }
   },
   title: function(ctx) {

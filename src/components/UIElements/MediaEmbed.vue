@@ -1,15 +1,16 @@
 <template>
-  <img    v-if="getExt(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
-  <video  v-else-if="getExt(url) ==='vid'" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
-  <iframe v-else-if="getExt(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
+  <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
+  <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
+  <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
+  <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
-  <component v-else-if="getExt(url) === 'html'" 
+  <component v-else-if="getMediaType(url) === 'html'" 
   :is="frameType"
   :src='resolveFrameUrl(url)' 
   :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
   class="sburb"  @did-finish-load="initHtmlFrame" seamless />
-  <div v-else-if="getExt(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
-  <audio v-else-if="getExt(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
+  <div v-else-if="getMediaType(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
+  <audio v-else-if="getMediaType(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
 
 <script>
@@ -19,7 +20,7 @@ import Resources from "@/resources.js"
 
 export default {
   name: "MediaEmbed",
-  props: ['url'],
+  props: ['url', 'gifmode'],
   data() {
     return {
       indexedFlashProps: {
@@ -570,7 +571,7 @@ export default {
     getFile(url) {
       return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
     },
-    getExt (url) {
+    getMediaType (url) {
       url = url.toLowerCase()
       const ext = path.extname(url)
       switch (ext) {
