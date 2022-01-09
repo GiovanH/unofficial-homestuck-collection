@@ -1,8 +1,8 @@
 <template>
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
-    <div class="card Logo">
-      <a href="/" class="topLogo cardContent">
+    <div class="card topLogo">
+      <a href="/" class="cardContent">
         <Media :url="logo_src" gifmode />
       </a>
       <div class="cardContent collection">
@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="card">
-      <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" />
+      <!-- <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" /> -->
       <div class="cardContent cardEntry hsCard">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
@@ -451,9 +451,10 @@ export default {
       color: var(--page-links);
     }
 
-    .topLogo {
+    .card.topLogo {
+      margin-bottom: 25px;
       img, video {
-        width: 1050px;
+        width: 800px;
       }
     }
     .navBanner {
