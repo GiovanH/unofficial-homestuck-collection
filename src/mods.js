@@ -400,7 +400,7 @@ function getModJs(mod_dir, options={}) {
         mod = __non_webpack_require__(modjs_path)
       } catch (e) {
         // imod AND this is the second attempt at importing it
-        if (mod_dir.startsWith("_")) {
+        if (mod_dir.startsWith("_") && options.singlefile) {
           console.log(e)
           console.log("Couldn't load imod, trying re-extract")
           extractimods()
