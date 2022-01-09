@@ -14,7 +14,7 @@ module.exports = {
             builderOptions: {
                 appId: "com.bambosh.unofficialhomestuckcollection",
                 productName: "The Unofficial Homestuck Collection",
-                copyright: "Copyright © 2020-2021 Bambosh",
+                copyright: "Copyright © 2020-2022 Bambosh",
                 directories: {
                     buildResources: "build"
                 },
