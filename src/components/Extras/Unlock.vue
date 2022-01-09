@@ -59,7 +59,7 @@ export default {
       })
     },
     keepReading(){
-      return !(this.fan_commands == this.filteredCommands)
+      return (this.fan_commands.length > this.filteredCommands.length)
     }
   },
   methods: {
