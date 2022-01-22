@@ -243,17 +243,17 @@ export default {
                     let num = parseInt(this.routeParams.cid)
                     if (!num || num < 0 || num > 54 || num == 39) component = 'Error404'
                     break
-                }
-                case 'PXS': {
-                    if (this.$pageIsSpoiler('008753')) component = 'Spoiler'
-                    else if (this.routeParams.cid) {
-                        let p = parseInt(this.routeParams.pid)
-                        let data = this.$archive.comics.pxs.comics[this.routeParams.cid]
-                        if (this.routeParams.cid && (!this.$archive.comics.pxs.list.includes(this.routeParams.cid) || !data || !Number.isInteger(p) || data.pages.length < p || p < 1)) component = 'Error404'
-                    }
-                    break
-                }
-                case 'TSO': {
+				}
+				case 'PXS': {
+					if (this.$pageIsSpoiler('008753')) component = 'Spoiler'
+					// else if (this.routeParams.cid) {
+					// 	let p = parseInt(this.routeParams.pid)
+					// 	let data = this.$archive.comics.pxs.comics[this.routeParams.cid]
+					// 	if (this.routeParams.cid && (!this.$archive.comics.pxs.list.includes(this.routeParams.cid) || !data || !Number.isInteger(p) || data.pages.length < p || p < 1)) component = 'Error404'
+					// }
+					break
+				}
+				case 'TSO': {
                     if (this.routeParams.cid) {
                         let p = parseInt(this.routeParams.pid)
                         let validComics = this.$archive.comics.tso.list.map(x => typeof(x) === 'object' ? x.list : x).flat()

@@ -7,7 +7,7 @@
         <div class="logo">
           <a href="/pxs"><Media url="/archive/comics/pxs/logo.png" /></a>
         </div>
-        <div class="nav topNav">
+        <div class="nav topNav" v-if="!is404">
           <div class="back">
             <a :href="prevComic" :class="{disabled: !prevComic}">
               <Media url="/archive/comics/pxs/comnavFirst.png" />
@@ -28,10 +28,10 @@
         </div>
         <div class="mediaContent" >
           <a :href="nextPage || false">
-            <Media :url="comicPage" :title="comic.titleText[routeParams.pid]" :key="comicPage" />
+            <Media :url="comicPage" :title="titleText[routeParams.pid]" :key="comicPage" />
           </a>
         </div>
-        <div class="nav bottomNav">
+        <div class="nav bottomNav" v-if="!is404">
           <div class="back">
             <a :href="prevComic || false" :class="{disabled: !prevComic}">
               <Media url="/archive/comics/pxs/comnavFirst.png" />
@@ -66,6 +66,10 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PXSHome from '@/components/Comics/pxshome.vue'
 
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
 export default {
   name: 'ParadoxSpace',
   props: [
@@ -78,29 +82,63 @@ export default {
     if (!ctx.routeParams.cid)
       return 'Paradox Space' 
     else {
-      let comic = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
-      return `${comic} - Paradox Space`
+      try {
+        const name = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
+        return `${name} - Paradox Space`
+      } catch {
+        return 'Paradox Space?' 
+      }
     }
   },
   theme: () => 'pxs',
   data: function() {
     return {
+      pages404: [
+        "/archive/comics/pxs/404.png",
+        "/archive/comics/pxs/404-1.png",
+        "/archive/comics/pxs/404-2.png",
+        "/archive/comics/pxs/404-3.png",
+        "/archive/comics/pxs/404-4.png",
+        "/archive/comics/pxs/sitedown.png"
+      ]
     }
   },
   computed: {
+    is404() {
+      return this.comic != this.$archive.comics.pxs.comics[this.routeParams.cid]
+    },
     comic() {
       if (!this.routeParams.cid) return false
+      let comic = this.$archive.comics.pxs.comics[this.routeParams.cid]
 
-      return this.$archive.comics.pxs.comics[this.routeParams.cid]
+      this.$logger.info(comic)
+      if (comic && comic.pages[this.page_num - 1]) return comic
+
+      else {
+        comic = {
+          name: "404",
+          credit: "KC Green",
+          desc: "there ISN'T one",
+          pages: [
+            randomChoice(this.pages404)
+          ]
+        }
+        // Set the current (zero-index) page to be a 404 image.
+        comic.pages[this.routeParams.pid - 1] = randomChoice(this.pages404)
+        this.$logger.info(comic)
+        return comic
+      }
     },
     page_num(){
       return this.routeParams.pid
     },
     comicPage() {
-      return this.comic.pages[this.page_num-1]
+      return this.comic.pages[this.page_num - 1]
     },
     titleText() {
-      return this.comic.titleText[this.page_num]
+      return this.comic.titleText 
+        ? this.comic.titleText[this.page_num] || {} 
+        : {}
     },
     pageTags() {
       if (this.comic.tags) return (this.comic.tags[this.page_num] || [])
