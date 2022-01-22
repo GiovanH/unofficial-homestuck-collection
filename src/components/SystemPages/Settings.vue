@@ -466,6 +466,13 @@ export default {
           label: "Homestuck - Bill Bolin music",
           desc: "A decent number of Flash animations in the first year of Homestuck had music provided by <a href=\"/music/artist/bill-bolin\" target=\"_blank\">Bill Bolin</a>. When he left the team on less-than-favourable circumstances, he requested his music be removed from the comic, and the flashes he worked on were rescored."
         }, {
+          model: "soluslunes",
+          cws: {
+            minor: ["ip"], severe: []
+          },
+          label: "Homestuck - SolusLunes music",
+          desc: "A <a href='/mspa/003620'>single flash animation</a> (actually, a replacement for a removed Bill Bolin flash) featuring music by SolusLunes (Jared Micks) after one of the songs he submitted to Homestuck Volume 5, <em>Endless Heart</em>, turned out to be a cover of <a href=\"https://www.youtube.com/watch?v=K3-NZHCnyf4\"><em>Heart of the Creator</em></a>. (Note that this option does override a Bolin flash, even if you have the Bolin restoration enabled.)"
+        }, {
           model: "unpeachy",
           cws: {
             minor: [], severe: ["race"]
@@ -514,6 +521,7 @@ export default {
       newReaderValidation: true,
       allControversial: [
         'bolin',
+        'soluslunes',
         'unpeachy',
         'pxsTavros',
         'cursedHistory'
@@ -673,7 +681,7 @@ export default {
           thumb: '/archive/collection/archive_news.png'
         })
       }
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio'].includes(setting)) {
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
         this.queueArchiveReload()
       }
 

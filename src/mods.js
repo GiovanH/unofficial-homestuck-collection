@@ -275,6 +275,10 @@ function getEnabledMods() {
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
 
+  // Soluslunes must load after bolin
+  if (store.get('localData.settings.soluslunes'))
+    list.push("_soluslunes")
+
   // Bolin must come before hqaudio in the stack so it loads after it.
   if (store.get('localData.settings.bolin'))
     list.push("_bolin")

@@ -87,6 +87,7 @@ class LocalData {
       retcon6: true,
 
       bolin: false,
+      soluslunes: false,
       unpeachy: false,
       pxsTavros: false,
       cursedHistory: false,
