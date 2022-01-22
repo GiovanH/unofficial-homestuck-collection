@@ -311,7 +311,7 @@
         <div class="system">
           <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <!-- v-if="$localData.settings.devMode || needReload"  -->
-          <button @click="forceReload">Reload</button>
+          <button @click="forceReload">Reload Application</button>
         </div>
       </div>
 
@@ -713,10 +713,13 @@ export default {
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
       if (diff.some(key => this.$modChoices[key].needsreload)) {
-        this.$logger.info("List change requires reload", diff)
+        this.$logger.info("List change requires hard reload", diff)
         this.needReload = true
       }
-      this.queueArchiveReload()
+      if (diff.some(key => this.$modChoices[key].needsreload)) {
+        this.$logger.info("List change requires archive reload", diff)
+        this.queueArchiveReload()
+      }
     },
     queueArchiveReload(){
       if (this.debounce) clearTimeout(this.debounce)
@@ -779,7 +782,10 @@ export default {
       this.validateNewReader()
     },
     '$localData.tabData.activeTabKey'(to, from) {
-      if (this.debounce) {
+      if (this.needReload) {
+        this.forceReload()
+        // forceReload includes archiveReload
+      } else if (this.debounce) {
         clearTimeout(this.debounce)
         this.debounce = false
         this.archiveReload()

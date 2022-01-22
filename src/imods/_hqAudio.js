@@ -25,8 +25,6 @@ var hq_baked_in = [
     "03722", "04817", "04822", "04824", "06397", "07445"
 ]
 
-// TODO: What is up with 00253 00338 ???
-
 module.exports = {
     hidden: true,
     

@@ -393,10 +393,13 @@ function getModJs(mod_dir, options={}) {
       console.log(modjs_path)
       mod = require(modjs_path)
     } else {
+      // eslint-disable-next-line no-undef
       if (__non_webpack_require__.cache[modjs_path])
+        // eslint-disable-next-line no-undef
         delete __non_webpack_require__.cache[modjs_path]
 
       try {
+        // eslint-disable-next-line no-undef
         mod = __non_webpack_require__(modjs_path)
       } catch (e) {
         // imod AND this is the second attempt at importing it
@@ -404,6 +407,7 @@ function getModJs(mod_dir, options={}) {
           console.log(e)
           console.log("Couldn't load imod, trying re-extract")
           extractimods()
+          // eslint-disable-next-line no-undef
           mod = __non_webpack_require__(modjs_path)
         } else throw e
       }
@@ -423,10 +427,12 @@ function getModJs(mod_dir, options={}) {
       Object.assign(mod, mod.computed(api))
     }
 
-    // TODO: Do computed properties automatically require a reload?
+    // Computed properties don't automatically require a reload because
+    // the object has been assigned any computed properties by now.
+    mod._needsreload = [
+      'styles', 'vueHooks', 'themes',
+      'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
-    mod._needsreload = ['styles', 'vueHooks', 'themes',
-     'browserPages', 'browserActions', 'browserToolbars'
     ].some(k => mod.hasOwnProperty(k))
 
     return mod
