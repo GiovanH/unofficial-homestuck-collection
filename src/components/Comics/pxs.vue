@@ -111,7 +111,6 @@ export default {
       if (!this.routeParams.cid) return false
       let comic = this.$archive.comics.pxs.comics[this.routeParams.cid]
 
-      this.$logger.info(comic)
       if (comic && comic.pages[this.page_num - 1]) return comic
 
       else {
@@ -125,7 +124,6 @@ export default {
         }
         // Set the current (zero-index) page to be a 404 image.
         comic.pages[this.routeParams.pid - 1] = randomChoice(this.pages404)
-        this.$logger.info(comic)
         return comic
       }
     },
