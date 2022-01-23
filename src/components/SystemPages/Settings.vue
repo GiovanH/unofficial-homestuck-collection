@@ -4,36 +4,12 @@
     <div class="card">
       <div class="settings newReader">
         <h2>New Reader Mode</h2>
-        <div class="newReaderInput" v-if="$isNewReader">
-          <p>New reader mode enabled.<br>Currently up to page 
-            <!-- <strong>{{$mspaOrVizNumber(this.$newReaderCurrent)}}</strong>. -->
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $newReaderCurrent}" v-model="newReaderPage">
-          </p><br>
-          <button v-if="newReaderValidation && (newReaderPage != $newReaderCurrent)" @click="changeNewReader()">Set adjusted page</button>
-          <br />
-          <button @click="clearNewReader()">Switch off new reader mode</button>
-        </div>
-        <div class="newReaderInput" v-else>
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
-          <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
-          <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
-        </div>
-
-        <h3>Reading Experience</h3>
-        <dl class="fastForwardSelection">
-          <dt>
-            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
-            <label for="fast_forward=false">Replay</label>
-          </dt>
-          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
-
-          <dt>
-            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
-            <label for="fast_forward=true">Archival</label>
-          </dt>
-          <dd>Read as an archival reader.<br>Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
-        </dl>
+        
+        <NewReaderControls 
+          :handleEnable="onNewReaderEnable"
+          :handleDisable="onNewReaderDisable"
+          :handleChange="onNewReaderChange"
+        />
 
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
@@ -346,6 +322,7 @@ import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
+import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
@@ -359,7 +336,7 @@ export default {
   components: {
     NavBanner, SubSettingsModal, 
     PageText, SpoilerBox, StoryPageLink, 
-    draggable
+    draggable, NewReaderControls
   },
   title: () => "Settings",
   data: function() {
@@ -516,9 +493,6 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
-      newReaderPage: this.$newReaderCurrent || 
-        (this.$localData.settings.mspaMode ? '001901' : '1'),
-      newReaderValidation: true,
       allControversial: [
         'bolin',
         'soluslunes',
@@ -566,44 +540,32 @@ export default {
     }
   },
   methods: {
-    validateNewReader() {
-      const pageId = this.$parseMspaOrViz(this.newReaderPage)
-      this.newReaderValidation = pageId in this.$archive.mspa.story && pageId >= '000219' && pageId <= '010029' && !/\D/.test(pageId)
-    },
-    changeNewReader(){
-      this.validateNewReader() 
-      const pageId = this.$parseMspaOrViz(this.newReaderPage)
-      if (this.newReaderValidation) {
-        const args = {
-          title: "Are you sure?",
-          message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
-        }
-        ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
-          if (answer === true)
-            this.$updateNewReader(pageId, true)
-          else
-            this.newReaderPage = this.$newReaderCurrent
-        })
+    onNewReaderChange(pageId){
+      const args = {
+        title: "Are you sure?",
+        message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
       }
+      ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
+        if (answer === true)
+          this.$updateNewReader(pageId, true)
+        else
+          this.newReaderPage = this.$newReaderCurrent
+      })
     },
-    setNewReader() {
-      this.validateNewReader() 
-      const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
-      if (this.newReaderValidation) {
+    onNewReaderEnable(pageId) {
         // eslint-disable-next-line no-return-assign
-        this.allControversial.forEach(key => this.$localData.settings[key] = false)
+      this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
-        if (this.clearThemesForNewReader) {
-          this.$localData.settings.themeOverride = "default"
-          this.$localData.settings.themeOverrideUI = "default"
-          this.$localData.settings.forceThemeOverride = false
-          this.$localData.settings.forceThemeOverrideUI = false
-        }
-
-        this.$updateNewReader(pageId, true)
+      if (this.clearThemesForNewReader) {
+        this.$localData.settings.themeOverride = "default"
+        this.$localData.settings.themeOverrideUI = "default"
+        this.$localData.settings.forceThemeOverride = false
+        this.$localData.settings.forceThemeOverrideUI = false
       }
+
+      this.$updateNewReader(pageId, true)
     },
-    clearNewReader() {
+    onNewReaderDisable() {
       const args = {
         title: "Are you sure?",
         message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
@@ -772,22 +734,10 @@ export default {
     }
   },
   watch: {
-    "$localData.settings.newReader.current"(to, from){
-      if (!this.$parent.tabIsActive)
-        this.newReaderPage = to
-    },
     'tab.history': function (to, from) {
       if (this.routeParams.sec) {
         this.scrollToSec(this.routeParams.sec)
       }
-    },
-    newReaderPage(to, from) {
-      if (this.$localData.settings.mspaMode)
-        this.newReaderPage = Number(to).pad(6)
-      this.validateNewReader()
-    },
-    '$localData.settings.mspaMode'() {
-      this.validateNewReader()
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (this.needReload) {
@@ -881,39 +831,6 @@ export default {
           margin-top: 20px;
           text-align: center;
           font-weight: normal;
-        }
-
-        .newReaderInput {
-          margin-top: 20px;
-          text-align: center;
-
-          button {
-              margin-bottom: 1em;
-          }
-          input {
-            border: 1px solid #777;
-            width: 70px;
-            font-size: 110%;
-            border-radius: 2px;
-            padding: 2px 3px;
-            margin: 5px;
-
-            &.invalid:not(:disabled):not(.empty) {
-              background: pink;
-              border-color: rgb(187, 0, 37);
-              box-shadow: 0 0 3px 1px red;
-            }
-            &.changed {
-              border-color: #ffaa00;
-              box-shadow: 0 0 3px 1px red;
-            }
-          }
-        }
-
-        .fastForwardSelection {
-          dd {
-            font-weight: normal;
-          }
         }
 
         button {

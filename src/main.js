@@ -297,7 +297,9 @@ Vue.mixin({
       return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck', 'ryanquest'].includes(base)
     },
     $mspaOrVizNumber(mspaId){
-      return !(mspaId in this.$archive.mspa.story) || this.$localData.settings.mspaMode ? mspaId : this.$mspaToViz(mspaId).p
+      return this.$localData.settings.mspaMode || !(mspaId in this.$archive.mspa.story)
+        ? mspaId 
+        : this.$mspaToViz(mspaId).p
     },
     $parseMspaOrViz(userInput, story = 'homestuck') {
       // Takes a user-formatted string and returns a MSPA page number.
