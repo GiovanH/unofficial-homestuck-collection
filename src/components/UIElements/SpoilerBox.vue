@@ -1,6 +1,6 @@
 <template>
-  <div class="spoilerbox" :class="{logHidden: logHidden}">
-    <button class="logButton" @click="loggle">
+  <div class="spoilerbox" :class="{logHidden: (logHidden && !alwaysOpen)}">
+    <button v-if="!alwaysOpen" class="logButton" @click="loggle">
       {{ logButtonText }}
     </button>
     <div class="logContent">
@@ -14,13 +14,15 @@
 export default {
   name: 'SpoilerBox',
   props: [
-    'kind', 'start-open'
+    'kind', // Thing to 'show' or 'hide', i.e. 'Spoiler'
+    'start-open', // Start open, but include a button to close/toggle.
+    'always-open' // Do not include a button at all, only the frame.
   ],
   components: {
   },
   data: function() {
     return {
-      logHidden: true,
+      logHidden: true
     }
   },
   mounted(){
@@ -31,11 +33,11 @@ export default {
   methods: {
     loggle() {
       this.logHidden = !this.logHidden
-    },
+    }
   },
   computed: {
     logButtonText(){
-      let action = this.logHidden ? "Show" : "Hide"
+      const action = this.logHidden ? "Show" : "Hide"
       if (this.kind)
         return `${action} ${this.kind}`
       else if (this.kind == "")

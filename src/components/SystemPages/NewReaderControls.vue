@@ -1,79 +1,84 @@
 <template>
   <div class="newReaderControls">
-    <span v-if="$localData.settings['devMode']" v-text="newReaderPage" />
-    <div class="newReaderInput" v-if="$isNewReader">
-      <!-- Settings for adjusting new reader mode -->
-      <p>New reader mode enabled.<br>
-        Currently up to page 
-        <input type="number" size="1" maxlength="6" v-model="newReaderPageInput"
-          :class="{
-            invalid: !isValidPageSet, 
-            empty: !newReaderPage.length, 
-            changed: newReaderPage != $newReaderCurrent
-          }" >
-      </p>
-      <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
-      <button v-if="isValidPageSet && (newReaderPage != $newReaderCurrent)" 
-        @click="changeNewReader()">Set adjusted page</button>
-      <br />
-      <button @click="clearNewReader()">Switch off new reader mode</button>
-    </div>
-    <div class="newReaderInput" v-else>
-      <!-- Settings for turning on new reader mode -->
-      <input type="number" size="1" maxlength="6" 
-        v-model="newReaderPageInput" @keydown.enter="setNewReader()"
-        :class="{invalid: !isValidPageSet, empty: !newReaderPage.length}">
-        
-      <button :disabled="!isValidPageSet || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-      <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
-      <p class="hint" v-if="$localData.settings.mspaMode">
-        Enter an <strong>MS Paint Adventures</strong> page number<br>
-        e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>
-        Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
-      <p class="hint" v-else>
-        Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
-        e.g. www.homestuck.com/story/<strong>413</strong></p>
-    </div>
+    <template v-if="featureList.includes('pagenumber')">
+      <!-- <span v-if="$localData.settings['devMode']" v-text="newReaderPage" /> -->
+      <div class="newReaderInput" v-if="$isNewReader">
+        <!-- Settings for adjusting new reader mode -->
+        <p>New reader mode enabled.<br>
+          Currently up to page 
+          <input type="number" size="1" maxlength="6" v-model="newReaderPageInput"
+            :class="{
+              invalid: !isValidPageSet, 
+              empty: !newReaderPage.length, 
+              changed: newReaderPage != $newReaderCurrent
+            }" >
+        </p>
+        <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
+        <button v-if="isValidPageSet && (newReaderPage != $newReaderCurrent)" 
+          @click="changeNewReader()">Set adjusted page</button>
+        <br />
+        <button @click="clearNewReader()">Switch off new reader mode</button>
+      </div>
+      <div class="newReaderInput" v-else>
+        <!-- Settings for turning on new reader mode -->
+        <input type="number" size="1" maxlength="6" 
+          v-model="newReaderPageInput" @keydown.enter="setNewReader()"
+          :class="{invalid: !isValidPageSet, empty: !newReaderPage.length}">
+          
+        <button :disabled="!isValidPageSet || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
+        <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
+        <p class="hint" v-if="$localData.settings.mspaMode">
+          Enter an <strong>MS Paint Adventures</strong> page number<br>
+          e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>
+          Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
+        <p class="hint" v-else>
+          Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
+          e.g. www.homestuck.com/story/<strong>413</strong></p>
+      </div>
 
-    <div class="settings application" v-if="promptMspaMode">
-      <dl>
-        <template v-for="boolSetting in settingListBoolean">
-          <dt :key="boolSetting.model"><label>
-            <input type="checkbox" 
-              :name="boolSetting.model" 
-              v-model="$localData.settings[boolSetting.model]"
-            >{{boolSetting.label}}</label></dt> 
-            <!-- the spacing here is made of glass -->
-          <dd class="settingDesc" v-html="boolSetting.desc" />
-        </template>
+      <div v-if="promptMspaMode" class="settings application" >
+        <dl>
+          <template v-for="boolSetting in settingListBoolean">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass -->
+            <dd class="settingDesc" v-html="boolSetting.desc" />
+          </template>
+        </dl>
+      </div>
+    </template>
+
+    <div v-if="featureList.includes('fastforward')" class="settings application" >
+      <h3>Reading Experience</h3>
+      <dl class="fastForwardSelection">
+        <dt>
+          <input type="radio" id="fast_forward=false" :value="false" 
+            v-model="$localData.settings['fastForward']"/>
+          <label for="fast_forward=false">Replay</label>
+        </dt>
+        <dd>Read as if you were reading it live.<br>
+          All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see 
+          <!-- Don't link to CC in setup mode (no settings page yet!) -->
+          <template v-if="false && $localData.assetDir">
+            <a href='/settings/controversial'>controversial content</a>).
+          </template>
+          <template v-else>
+            "controversial content" in Settings).
+          </template>
+        </dd>
+
+        <dt>
+          <input type="radio" id="fast_forward=true" :value="true" 
+            v-model="$localData.settings['fastForward']"/>
+          <label for="fast_forward=true">Archival</label>
+        </dt>
+        <dd>Read as an archival reader.<br>
+          Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
       </dl>
     </div>
-
-    <h3>Reading Experience</h3>
-    <dl class="fastForwardSelection">
-      <dt>
-        <input type="radio" id="fast_forward=false" :value="false" 
-          v-model="$localData.settings['fastForward']"/>
-        <label for="fast_forward=false">Replay</label>
-      </dt>
-      <dd>Read as if you were reading it live.<br>
-        All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see 
-        <template v-if="$localData.assetDir">
-          <a href='/settings/controversial'>controversial content</a>.
-        </template>
-        <template v-else>
-          "controversial content" in Settings.
-        </template>
-      </dd>
-
-      <dt>
-        <input type="radio" id="fast_forward=true" :value="true" 
-          v-model="$localData.settings['fastForward']"/>
-        <label for="fast_forward=true">Archival</label>
-      </dt>
-      <dd>Read as an archival reader.<br>
-        Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
-    </dl>
   </div>
 </template>
 
@@ -89,11 +94,18 @@ export default {
       type: Boolean,
       default: true
     },
+    features: {
+      type: String,
+      default: "pagenumber fastforward"
+    },
     handleEnable: {},
     handleDisable: {},
     handleChange: {}
   },
   computed: {
+    featureList(){
+      return this.features.toLowerCase().split(" ")
+    },
     newReaderPage() {
       // The actual MSPA number corresponding to the inpupt box. Immutable. May be invalid.
       if (!this.newReaderPageInput) {
@@ -106,7 +118,8 @@ export default {
     },
     isValidPageSet(){
       const pageId = this.newReaderPage
-      return pageId in this.$archive.mspa.story && 
+      const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
+      return pageInStory && 
         pageId >= '000219' && 
         pageId <= '010029' && 
         !/\D/.test(pageId)
@@ -181,6 +194,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .newReaderControls {
+    font-size: 14px;
+    font-weight: bolder;
+    overflow-wrap: break-word;
+  }
   .newReaderInput {
     margin-top: 20px;
     text-align: center;
@@ -193,7 +211,7 @@ export default {
     input {
       border: 1px solid #777;
       width: 70px;
-      font-size: 110%;
+      font-size: 16px;
       border-radius: 2px;
       padding: 2px 3px;
       margin: 5px;
@@ -212,6 +230,7 @@ export default {
   .hint {
     font-size: 13px;
     color: var(--page-nav-meta);
+    font-weight: normal;
   }
   .settings {
     p {

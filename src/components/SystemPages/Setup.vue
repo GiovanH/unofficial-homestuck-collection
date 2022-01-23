@@ -21,49 +21,50 @@
           <div class="wizardBody">
 
           <div class="intro" v-if="newReaderCard == 0">
-            <h2>Introduction</h2><br>
-            <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p><br>
+            <h2>Introduction</h2>
+            <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p>
 
-            <p>However, with Flash finally being phased out at the end of 2020, <em>Homestuck</em> is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published <em>Homestuck</em> since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve <em>Homestuck's</em> one-of-a-kind presentation and flair, for both returning readers and those new to the story.</p><br>
+            <p>However, with Flash finally being phased out at the end of 2020, <em>Homestuck</em> is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published <em>Homestuck</em> since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve <em>Homestuck's</em> one-of-a-kind presentation and flair, for both returning readers and those new to the story.</p>
 
             <p>This self-contained collection contains <em>Homestuck</em> (with Flash elements fully intact), the other MS Paint Adventures, official <em>Homestuck</em> side-stories, and a variety of goodies for the enquiring reader, as well as a variety of unintrusive enhancements to the overall presentation, both for quality and convenience. Hopefully, this collection should be the best way to read <em>Homestuck</em>, and preserve what made it so special.</p>
           </div>
           <div class="newReader" v-if="newReaderCard == 1">
-            <h2>New Readers</h2><br>
-            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br> -->
-            <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p><br>
-            <p>For this reason, <em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode.</strong> It will automatically track your progress in the story, and strategically lock off such content until your dear, sweet, precious eyes are ready to handle it. Furthermore, <strong>New Reader Mode</strong> will also adjust <em>Homestuck</em> itself in minor ways that keep it somewhat in line with the state of the comic as it was written.</p><br>
-            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> <span class="tiny">(You can always switch it off later if it ends up being too much.)</span></p><br>
-            <br>
-            <div class="center">
-              <label><input type="checkbox" v-model="newReaderToggle" />Enable New Reader Mode, starting from page </label><input type="text" :class="{invalid: !newReaderValidation}" v-model="newReaderPage" size="1" maxlength="4" :disabled="!newReaderToggle" /><br>
-              <p class="hint" v-show="newReaderToggle">Enter a <em>Homestuck</em> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
-            </div>
+            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
+            <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p>
+            <p>For this reason, <em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode.</strong> It will automatically track your progress in the story, and strategically lock off such content until your dear, sweet, precious eyes are ready to handle it. Furthermore, <strong>New Reader Mode</strong> will also adjust <em>Homestuck</em> itself in minor ways that keep it somewhat in line with the state of the comic as it was written.</p>
+            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> <span class="tiny">(You can always switch it off later if it ends up being too much.)</span></p>
+            <h2>New Readers</h2>
+
+            <NewReaderControls features="pagenumber" />
+
             <p>If you enable New Reader Mode, you should probably also pop into Settings once the collection loads so you can configure your reading style and how the collection handles certain spoilers.</p>
           </div>
-          <div class="getStarted" v-if="newReaderCard == 2">
-            <h2>Getting Started</h2><br>
-            <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p><br>
+          <div class="fastForward" v-if="newReaderCard == 2">
+            <h2>Reading Experience</h2>
+          </div>
+          <div class="getStarted" v-if="newReaderCard == 3">
+            <h2>Getting Started</h2>
+            <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
-              <li>The application itself. (You’re running it now!)</li><br>
+              <li>The application itself. (You’re running it now!)</li>
               <li>The asset pack, a 4gb folder you should have downloaded separately. This version of the application is tuned for <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack.</li>
-            </ol><br>
+            </ol>
             <p>To finish setting up the collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
-            <br>
+            
             <div class="center">
-              <button @click="locateAssets()">Locate Assets</button><br>
+              <button @click="locateAssets()">Locate Assets</button>
               <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
             </div>
-            <br>
+            
             <div class="center">
-              <button :disabled="!validatePage" @click="validateAndRestart()">All done. Let's roll!</button>
+              <button class="letsroll" :disabled="!validatePage" @click="validateAndRestart()">All done. Let's roll!</button>
             </div>
           </div>
 
           </div>
           <div class="wizardNavigation">
-            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1">Previous</button>
-            <button v-if="newReaderCard < lastNewReaderCard" @click="newReaderCard += 1">Next</button>
+            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1">&lt; Previous</button>
+            <button v-if="newReaderCard < lastNewReaderCard" @click="newReaderCard += 1">Next &gt;</button>
             <!--<button v-if="newReaderCard == lastNewReaderCard" @click="">Finish</button>-->
           </div>
           
@@ -102,7 +103,6 @@
             <div class="center">
               <button @click="clearEnabledMods()">Disable all and reload</button><br>
             </div>
-            <br>
             <span class="hint">If this issue persists when you re-enable a mod, please contact the mod author!</span>
           </div>
           <div class="getStarted" v-else>
@@ -131,21 +131,25 @@
 
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
+import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+
 // import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
 
 export default {
   name: 'setup',
   components: {
-    TitleBar
+    TitleBar, NewReaderControls, SpoilerBox
   },
   data: function() {
     return {
       newReaderCard: 0,
-      lastNewReaderCard: 2,
+      lastNewReaderCard: 3,
       newReaderCardNames: [
         "Intro",
         "New Readers",
+        "Reading Experience",
         "Getting Started"
       ],
       newReaderToggle: true,
@@ -279,7 +283,7 @@ export default {
       }
       .card {
         position: relative;
-        margin: 50px 0;
+        margin: 50px 0 0 0;
         padding: 0 50px;
         border: solid 5px #c6c6c6;
         box-sizing: border-box;
@@ -326,6 +330,24 @@ export default {
           .wizardBody {
             display: grid;
             margin: 25px;
+            min-height: 640px; // Measured value
+            // CSS reset is a lie that hurts people.
+            p {
+              margin-block-start: 1em;
+              margin-block-end: 1em;
+              margin-inline-start: 0px;
+              margin-inline-end: 0px;
+            }
+            h2 {
+              margin-block-end: 0.83em;
+            }
+            ::v-deep .spoilerbox .logContent {
+              padding: 0 1em;
+            }
+            .letsroll {
+              font-size: 200% !important;
+              margin: 1rem;
+            }
           }
           .wizardNavigation {
             text-align: right;
@@ -350,6 +372,7 @@ export default {
                 font-size: 11px;
               }
               .hint {
+                display: block;
                 font-size: 13px;
                 color: #888888;
               }
