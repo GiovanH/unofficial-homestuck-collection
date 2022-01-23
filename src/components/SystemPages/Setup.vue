@@ -238,39 +238,6 @@ export default {
   flex-flow: column;
   height: 100%;
 
-  .wizardSidebar {
-    width: 200px;
-    float: left;
-    height: 100%;
-    margin: 25px 25px 25px 0;
-    .wizardProgress {
-      li {
-        &.previous {
-          list-style: disc;
-          font-weight: bold;
-        }
-        &.current {
-          list-style: circle;
-          font-weight: bold;
-          color: orangered;
-        }
-        &.future {
-          list-style: circle;
-        }
-      }
-    }
-  }
-  .wizardBody {
-    display: grid;
-    margin: 25px;
-  }
-  .wizardNavigation {
-    text-align: right;
-    button {
-      margin: 0 2px;
-    }
-  }
-
   .header{
     display: grid;
     background: var(--header-bg);
@@ -333,6 +300,39 @@ export default {
         .cardContent {
           width: 100%;
           padding-bottom: 25px;
+
+          .wizardSidebar {
+            width: 200px;
+            float: left;
+            height: 100%;
+            margin: 25px 25px 25px 0;
+            .wizardProgress {
+              li {
+                &.previous {
+                  list-style: disc;
+                  font-weight: bold;
+                }
+                &.current {
+                  list-style: circle;
+                  font-weight: bold;
+                  color: orangered;
+                }
+                &.future {
+                  list-style: circle;
+                }
+              }
+            }
+          }
+          .wizardBody {
+            display: grid;
+            margin: 25px;
+          }
+          .wizardNavigation {
+            text-align: right;
+            button {
+              margin: 0 2px;
+            }
+          }
           
           &.card_intro .wizardBody {
             h1, h2 {
