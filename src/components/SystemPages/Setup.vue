@@ -8,16 +8,27 @@
       <div class="card" v-if="isNewUser">
         <!-- First-run app setup, no error -->
         <div class="cardContent card_intro">
-          <div class="intro">
-            <img class="logo" src="@/assets/collection_logo.png"><br>
+
+          <div class="wizardSidebar">
+            <img class="logo" src="@/assets/collection_logo.png"> <br />
+            <ol class="wizardProgress">
+              <li v-for="name, i in newReaderCardNames" 
+                v-text="name" 
+                :class="{current: i==newReaderCard, previous: i < newReaderCard, future: i > newReaderCard}"
+                :key="`wizardProgress${i}`" />
+            </ol>
+          </div>
+          <div class="wizardBody">
+
+          <div class="intro" v-if="newReaderCard == 0">
+            <h2>Introduction</h2><br>
             <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p><br>
 
             <p>However, with Flash finally being phased out at the end of 2020, <em>Homestuck</em> is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published <em>Homestuck</em> since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve <em>Homestuck's</em> one-of-a-kind presentation and flair, for both returning readers and those new to the story.</p><br>
 
             <p>This self-contained collection contains <em>Homestuck</em> (with Flash elements fully intact), the other MS Paint Adventures, official <em>Homestuck</em> side-stories, and a variety of goodies for the enquiring reader, as well as a variety of unintrusive enhancements to the overall presentation, both for quality and convenience. Hopefully, this collection should be the best way to read <em>Homestuck</em>, and preserve what made it so special.</p>
           </div>
-          <hr />
-          <div class="newReader">
+          <div class="newReader" v-if="newReaderCard == 1">
             <h2>New Readers</h2><br>
             <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p><br> -->
             <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p><br>
@@ -30,8 +41,7 @@
             </div>
             <p>If you enable New Reader Mode, you should probably also pop into Settings once the collection loads so you can configure your reading style and how the collection handles certain spoilers.</p>
           </div>
-          <hr />
-          <div class="getStarted">
+          <div class="getStarted" v-if="newReaderCard == 2">
             <h2>Getting Started</h2><br>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p><br>
             <ol>
@@ -49,6 +59,14 @@
               <button :disabled="!validatePage" @click="validateAndRestart()">All done. Let's roll!</button>
             </div>
           </div>
+
+          </div>
+          <div class="wizardNavigation">
+            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1">Previous</button>
+            <button v-if="newReaderCard < lastNewReaderCard" @click="newReaderCard += 1">Next</button>
+            <!--<button v-if="newReaderCard == lastNewReaderCard" @click="">Finish</button>-->
+          </div>
+          
         </div>
       </div>
 
@@ -123,6 +141,13 @@ export default {
   },
   data: function() {
     return {
+      newReaderCard: 0,
+      lastNewReaderCard: 2,
+      newReaderCardNames: [
+        "Intro",
+        "New Readers",
+        "Getting Started"
+      ],
       newReaderToggle: true,
       timeout: false,
       newReaderPage: "1",
@@ -213,6 +238,39 @@ export default {
   flex-flow: column;
   height: 100%;
 
+  .wizardSidebar {
+    width: 200px;
+    float: left;
+    height: 100%;
+    margin: 25px 25px 25px 0;
+    .wizardProgress {
+      li {
+        &.previous {
+          list-style: disc;
+          font-weight: bold;
+        }
+        &.current {
+          list-style: circle;
+          font-weight: bold;
+          color: orangered;
+        }
+        &.future {
+          list-style: circle;
+        }
+      }
+    }
+  }
+  .wizardBody {
+    display: grid;
+    margin: 25px;
+  }
+  .wizardNavigation {
+    text-align: right;
+    button {
+      margin: 0 2px;
+    }
+  }
+
   .header{
     display: grid;
     background: var(--header-bg);
@@ -276,12 +334,12 @@ export default {
           width: 100%;
           padding-bottom: 25px;
           
-          &.card_intro {
+          &.card_intro .wizardBody {
             h1, h2 {
               text-align: center;
             }
             > div {
-              margin: 25px;
+              // margin: 25px;
               text-align: justify;
 
               .sans {
