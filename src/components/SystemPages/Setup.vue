@@ -30,17 +30,29 @@
           </div>
           <div class="newReader" v-if="newReaderCard == 1">
             <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
-            <p><em>The Unofficial Homestuck Collection</em> contains truckloads of bonus content, a significant amount of which recklessly brandishes major spoilers for the main story.</p>
-            <p>For this reason, <em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode.</strong> It will automatically track your progress in the story, and strategically lock off such content until your dear, sweet, precious eyes are ready to handle it. Furthermore, <strong>New Reader Mode</strong> will also adjust <em>Homestuck</em> itself in minor ways that keep it somewhat in line with the state of the comic as it was written.</p>
-            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> <span class="tiny">(You can always switch it off later if it ends up being too much.)</span></p>
             <h2>New Readers</h2>
+            <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
+            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong></p>
+            <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span>
 
             <NewReaderControls features="pagenumber" />
 
-            <p>If you enable New Reader Mode, you should probably also pop into Settings once the collection loads so you can configure your reading style and how the collection handles certain spoilers.</p>
+            <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. If New Reader Mode is on, the Settings page will be spoiler-free too.</p>
           </div>
           <div class="fastForward" v-if="newReaderCard == 2">
             <h2>Reading Experience</h2>
+
+            <p>Okay, one last choice we're going to force you to make before you jump in:</p>
+
+            <NewReaderControls features="fastforward" />
+
+            <SpoilerBox v-if="!$isNewReader" :always-open="true" style="font-size: 14px;">
+              <p>Since you did not enable new reader mode on the previous page, here's an explanation of how this works:</p>
+              <p>As you progress through the story in New Reader Mode, the archive of course keeps track of your current page. If you choose the <b>Replay</b> experience, image retcons will appear as they did at the time of publication. But once you get to the point where the images changed, you can go back and see the changes in the text.</p>
+              <p>The <b>Archival</b> experience simply disables this behavior, and always shows the most recent version of every image in all cases, so you see post-retcon images even on your first readthrough.</p>
+              <p>So, all that to say, you probably don't care about this. But you're in on the secret! Also, if you want to adjust what you see, you have more granular timeline controls in Settings.</p>
+            </SpoilerBox>
+
           </div>
           <div class="getStarted" v-if="newReaderCard == 3">
             <h2>Getting Started</h2>
@@ -181,6 +193,7 @@ export default {
       return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
     },
     isNewUser() {
+      return true;
       return !this.$localData.assetDir
     },
     modsEnabled() {
