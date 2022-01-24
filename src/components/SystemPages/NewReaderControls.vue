@@ -9,12 +9,12 @@
           <input type="number" size="1" maxlength="6" v-model="newReaderPageInput"
             :class="{
               invalid: !isValidPageSet, 
-              empty: !newReaderPage.length, 
-              changed: newReaderPage != $newReaderCurrent
+              empty: !newReaderPageInput || !newReaderPageInput.length, 
+              changed: newReaderPageChanged
             }" >
         </p>
         <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
-        <button v-if="isValidPageSet && (newReaderPage != $newReaderCurrent)" 
+        <button v-if="isValidPageSet && newReaderPageChanged" 
           @click="changeNewReader()">Set adjusted page</button>
         <br />
         <button @click="clearNewReader()">Switch off new reader mode</button>
@@ -146,38 +146,45 @@ export default {
         pageId >= '000219' && 
         pageId <= '010029' && 
         !/\D/.test(pageId)
+    },
+    newReaderPageChanged(){
+      if (!this.$newReaderCurrent) return false
+      return this.newReaderPage != this.$newReaderCurrent
     }
   },
   methods: {
     changeNewReader(){
       if (this.isValidPageSet) {
-        const pageId = this.$parseMspaOrViz(this.newReaderPage)
-        // this.$emit('change', pageId) 
+        this.$emit('change', this.newReaderPage) 
         if (this.handleChange) {
-          this.handleChange(pageId)
+          this.handleChange(this.newReaderPage)
         } else {
-          this.$updateNewReader(pageId, true)
+          this.$updateNewReader(this.newReaderPage, true)
         }
       }
     },
     setNewReader() {
       if (this.isValidPageSet) {
-        const pageId = this.$parseMspaOrViz(this.newReaderPage)
-        this.$emit('enable', pageId) 
+        this.$emit('enable', this.newReaderPage) 
         if (this.handleEnable) {
-          this.handleEnable(pageId)
+          this.handleEnable(this.newReaderPage)
         } else {
-          this.$updateNewReader(pageId, true)
+          this.$updateNewReader(this.newReaderPage, true)
         }
       }
     },
     clearNewReader() {
       this.$emit('disable')
-        if (this.handleDisable) {
-          this.handleDisable()
-        } else {
-          this.$localData.root.NEW_READER_CLEAR()
-        }
+      if (this.handleDisable) {
+        this.handleDisable()
+      } else {
+        const prev_input = this.newReaderPageInput
+        this.$localData.root.NEW_READER_CLEAR()
+        this.$nextTick(() => {
+          this.newReaderPageInput = prev_input
+          this.$logger.info("resetting input to", prev_input, this.newReaderPageInput)
+        })
+      }
     }
   },
   watch: {
