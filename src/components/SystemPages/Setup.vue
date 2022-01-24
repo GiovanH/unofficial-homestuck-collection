@@ -7,8 +7,7 @@
     <div class="pageBody">
       <div class="card" v-if="isNewUser">
         <!-- First-run app setup, no error -->
-        <div class="cardContent card_intro">
-
+        <div class="cardContent newUserSetup wizard">
           <div class="wizardSidebar">
             <img class="logo" src="@/assets/collection_logo.png"> <br />
             <ol class="wizardProgress">
@@ -21,7 +20,7 @@
           <div class="wizardBody">
 
           <div class="intro" :class="{hidden: newReaderCard != 0}">
-            <h2>Introduction</h2>
+            <h2>Hello!</h2>
             <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p>
 
             <p>However, with Flash finally being phased out at the end of 2020, <em>Homestuck</em> is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published <em>Homestuck</em> since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve <em>Homestuck's</em> one-of-a-kind presentation and flair, for both returning readers and those new to the story.</p>
@@ -107,12 +106,13 @@
 
       <div class="card" v-else>
         <!-- Something went wrong. -->
-        <div class="cardContent card_intro">
-          <div class="getStarted" v-if="modsEnabled.length">
+        <div class="cardContent">
+          <div class="errorWithMods" v-if="modsEnabled.length">
+            <br>
             <img class="logo" src="@/assets/collection_logo.png"><br>
             <p>Sorry! Something went critically wrong loading the program.</p><br>
             <p>You currently have mods enabled:</p><br>
-            <ol>
+            <ol class="modlist">
               <li
                 v-for="option in modsEnabled"
                 :key="option.key"
@@ -128,9 +128,10 @@
             <div class="center">
               <button @click="clearEnabledMods()">Disable all and reload</button><br>
             </div>
-            <span class="hint">If this issue persists when you re-enable a mod, please contact the mod author!</span>
+            <span class="hint">If this issue persists when you re-enable a specific mod, please contact the mod's author!</span>
           </div>
-          <div class="getStarted" v-else>
+
+          <div class="errorWithoutMods" v-else>
             <img class="logo" src="@/assets/collection_logo.png"><br>
             <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
             <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
@@ -275,7 +276,7 @@ export default {
   flex-flow: column;
   height: 100%;
 
-  .header{
+  .header {
     display: grid;
     background: var(--header-bg);
     border-bottom: solid 1px #a0a0a0;
@@ -296,162 +297,172 @@ export default {
       overflow: auto;
       height: 100%;
 
-      background: url(../../assets/homebg_right.png) repeat-y, url(../../assets/homebg_left.png) repeat-y;
+      background: url(../../assets/homebg_right.png) repeat-y,
+        url(../../assets/homebg_left.png) repeat-y;
       background-position: left top, right top;
       background-color: #35bfff;
       background-attachment: fixed;
-
-      .pageFrame {
-        width: 950px;
-        padding-top: 7px;
-        padding-bottom: 23px;
-        margin: 0 auto;
-
-        flex: 0 1 auto;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-        align-content: center;
-      }
-      .card {
-        position: relative;
-        margin: 50px 0 0 0;
-        padding: 0 50px;
-        border: solid 5px #c6c6c6;
-        box-sizing: border-box;
-        width: 950px;
-        background: #eeeeee;
-
-        flex: 0 1 auto;
-        display: flex;
-        flex-flow: column nowrap;
-        align-items: center;
-        align-content: center;
-
-        .logo {
-          max-width: 100%;
-          padding-bottom: 25px;
-          pointer-events: none;
-        }
-        .cardContent {
-          width: 100%;
-          padding-bottom: 25px;
-
-          .wizardSidebar {
-            width: 200px;
-            float: left;
-            height: 100%;
-            margin: 25px 25px 25px 0;
-            .wizardProgress {
-              li {
-                &.previous {
-                  list-style: disc;
-                  font-weight: bold;
-                }
-                &.current {
-                  list-style: circle;
-                  font-weight: bold;
-                  color: orangered;
-                }
-                &.future {
-                  list-style: circle;
-                }
-              }
-            }
+    }
+  }
+  .wizard {
+    .wizardSidebar {
+      width: 200px;
+      float: left;
+      height: 100%;
+      margin: 25px 25px 25px 0;
+      .wizardProgress {
+        li {
+          &.previous {
+            list-style: inside disc;
+            font-weight: bold;
           }
-          .wizardBody {
-            position: relative;
-            display: grid;
-            margin: 25px;
-            min-height: 640px; // Measured value
-            .wizardFooter {
-              position: absolute; 
-              bottom: 0;
-            }
-            // CSS reset is a lie that hurts people.
-            p {
-              margin-block-start: 1em;
-              margin-block-end: 1em;
-              margin-inline-start: 0px;
-              margin-inline-end: 0px;
-            }
-            h2 {
-              margin-block-end: 0.83em;
-            }
-            ::v-deep .spoilerbox .logContent {
-              padding: 0 1em;
-            }
-            .letsroll {
-              font-size: 200% !important;
-              padding: 0.2em;
-              margin: 1rem;
-            }
+          &.current {
+            list-style: inside circle;
+            font-weight: bold;
+            color: orangered;
           }
-          .wizardNavigation {
-            position: relative;
-            min-height: 1em;
-            text-align: right;
-            button { 
-              font-size: 16px;
-              position: absolute; 
-              margin: 0 2px;
-            }
-          }
-          
-          &.card_intro .wizardBody {
-            h1, h2 {
-              text-align: center;
-            }
-            > div {
-              // margin: 25px;
-              text-align: justify;
-
-              .sans {
-                font-family: "Comic Sans MS", "Comic Sans", cursive;
-                font-weight: bold;
-              }
-              .tiny {
-                font-size: 11px;
-              }
-              .hint {
-                display: block;
-                font-size: 13px;
-                color: #888888;
-              }
-              .center {
-                text-align: center;
-              }
-            }
-            hr {
-              border-top: 3px solid #c6c6c6;
-            }
-            ol {
-              list-style-position: inside;
-            }
-            input {
-              &[type="text"] {
-                border: 1px solid #777;
-                min-width: 35px;
-                border-radius: 2px;
-                padding: 2px 3px;
-
-                &.invalid:not(:disabled) {
-                  background: pink;
-                  border-color: rgb(187, 0, 37);
-                  box-shadow: 0 0 3px 1px red;
-                }
-              }
-            }
-            button {
-              font-size: 110%;
-            }
+          &.future {
+            list-style: inside circle;
           }
         }
       }
     }
+    .wizardBody {
+      h1,
+      h2 {
+        text-align: center;
+      }
+      > div {
+        // margin: 25px;
+        text-align: justify;
+
+        .sans {
+          font-family: "Comic Sans MS", "Comic Sans", cursive;
+          font-weight: bold;
+        }
+        .tiny {
+          font-size: 11px;
+        }
+        .hint {
+          display: block;
+          font-size: 13px;
+          color: #888888;
+        }
+        .center {
+          text-align: center;
+        }
+      }
+      hr {
+        border-top: 3px solid #c6c6c6;
+      }
+      ol {
+        list-style-position: inside;
+      }
+      input {
+        &[type="text"] {
+          border: 1px solid #777;
+          min-width: 35px;
+          border-radius: 2px;
+          padding: 2px 3px;
+
+          &.invalid:not(:disabled) {
+            background: pink;
+            border-color: rgb(187, 0, 37);
+            box-shadow: 0 0 3px 1px red;
+          }
+        }
+      }
+      button {
+        font-size: 110%;
+      }
+      position: relative;
+      display: grid;
+      margin: 25px;
+      min-height: 640px; // Measured value
+      .wizardFooter {
+        position: absolute;
+        bottom: 0;
+      }
+      // CSS reset is a lie that hurts people.
+      p {
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0px;
+        margin-inline-end: 0px;
+      }
+      h2 {
+        margin-block-end: 0.83em;
+      }
+      ::v-deep .spoilerbox .logContent {
+        padding: 0 1em;
+      }
+      .letsroll {
+        font-size: 200% !important;
+        padding: 0.2em;
+        margin: 1rem;
+      }
+    }
+    .wizardNavigation {
+      position: relative;
+      min-height: 1em;
+      text-align: right;
+      button {
+        font-size: 16px;
+        position: absolute;
+        margin: 0 2px;
+      }
+    }
   }
-} 
+  // .pageFrame {
+  //   width: 950px;
+  //   padding-top: 7px;
+  //   padding-bottom: 23px;
+  //   margin: 0 auto;
+
+  //   flex: 0 1 auto;
+  //   display: flex;
+  //   flex-flow: column nowrap;
+  //   justify-content: center;
+  //   align-items: center;
+  //   align-content: center;
+  // }
+  .card {
+    position: relative;
+    margin: 50px 0 0 0;
+    padding: 0 25px;
+    border: solid 5px #c6c6c6;
+    box-sizing: border-box;
+    width: 950px;
+    background: #eeeeee;
+
+    flex: 0 1 auto;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    align-content: center;
+
+    .logo {
+      max-width: 100%;
+      padding-bottom: 25px;
+      pointer-events: none;
+    }
+    .cardContent {
+      width: 100%;
+      padding-bottom: 25px;
+
+      .modlist li {
+        /*list-style-position: inside;*/
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        margin-bottom: -1px;
+        padding: 0.2em;
+        .summary:before {
+          content: " - ";
+        }
+      }
+    }
+  }
+}
 
 .loadcard {
   margin: auto;
@@ -548,7 +559,6 @@ export default {
     }
   }
 }
-
 
 </style>
 
