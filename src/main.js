@@ -300,7 +300,11 @@ Vue.mixin({
       return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck', 'ryanquest'].includes(base)
     },
     $mspaOrVizNumber(mspaId){
-      return this.$localData.settings.mspaMode || !(mspaId in this.$archive.mspa.story)
+      // Formates a mspaId as either an mspaId or viz number, depending on user settings.
+      // Future Gio: This used to be here:
+      // || !(mspaId in this.$archive.mspa.story)
+      // We shouldn't need that, but if something breaks, that's why.
+      return this.$localData.settings.mspaMode 
         ? mspaId 
         : this.$mspaToViz(mspaId).p
     },
