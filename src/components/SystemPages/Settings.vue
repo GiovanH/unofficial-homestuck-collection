@@ -31,7 +31,9 @@
                 @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-            <dd class="settingDesc" v-html="boolSetting.desc" />
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
           </template>
         </dl>
       </div>

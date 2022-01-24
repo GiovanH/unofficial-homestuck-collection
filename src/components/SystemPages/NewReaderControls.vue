@@ -42,10 +42,13 @@
             <dt :key="boolSetting.model"><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
+                :id="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-            <dd class="settingDesc" v-html="boolSetting.desc" />
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
           </template>
         </dl>
       </div>
@@ -59,7 +62,7 @@
             v-model="$localData.settings['fastForward']"/>
           <label for="fast_forward=false">Replay</label>
         </dt>
-        <dd>Read as if you were reading it live.<br>
+        <dd><label for="fast_forward=false">Read as if you were reading it live.<br>
           All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see 
           <!-- Don't link to CC in setup mode (no settings page yet!) -->
           <template v-if="false && $localData.assetDir">
@@ -68,15 +71,15 @@
           <template v-else>
             "controversial content" in Settings).
           </template>
-        </dd>
+        </label></dd>
 
         <dt>
           <input type="radio" id="fast_forward=true" :value="true" 
             v-model="$localData.settings['fastForward']"/>
           <label for="fast_forward=true">Archival</label>
         </dt>
-        <dd>Read as an archival reader.<br>
-          Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
+        <dd><label for="fast_forward=true">Read as an archival reader.<br>
+          Stories will be presented approximately as they were at the time they were finished (or abandoned).</label></dd>
       </dl>
     </div>
   </div>
