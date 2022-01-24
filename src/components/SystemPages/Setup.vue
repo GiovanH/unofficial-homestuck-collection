@@ -95,12 +95,41 @@
         </div>
       </div>
 
-      <div class="loadcard" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
-        <div class="lds-spinner">
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
+      <div class="loadcard" v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
+
+        <!-- <iframe src="http://localhost:8000/frames.html" width="500" height="500"></iframe> -->
+
+        <!-- <img src="@/assets/cross.png"/> -->
+
+        <div class="spirobox">
+        <div class="spiro" style="
+        position: relative;
+    left: -42px;
+    transform: scaleY(-1);
+    transform: scaleX(-1);
+">
+          <!-- <img v-for="n in 10" src="@/assets/morphshapes/42.svg"  -->
+          <!-- <img v-for="n in 2" src="@/assets/58.svg"  -->
+          <img v-for="n in 10" src="@/assets/morphshapes/42.svg" 
+            :style="{transform: `rotate(${(n - 1) * (360/10)}deg)`} "/>
+          <!-- <img src="@/assets/morphshapes/42.svg" style="
+          transform: rotate(30deg)"/> -->
         </div>
+        <div class="spiro" style="
+        position: relative;
+">
+          <!-- <img v-for="n in 2" src="@/assets/58.svg"  -->
+          <img v-for="n in 10" src="@/assets/morphshapes/42.svg" 
+            :style="{transform: `rotate(${(n - 1) * (360/10)}deg)`} "/>
+          <!-- <img src="@/assets/morphshapes/42.svg" style="
+          transform: rotate(30deg)"/> -->
+        </div>
+      </div>
+        <!-- <div class="lds-spinner">
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+          <div></div><div></div><div></div><div></div>
+        </div> -->
         <p v-text="loadText"></p>
       </div>
 
@@ -179,7 +208,7 @@ export default {
         "Getting Started"
       ],
       newReaderToggle: true,
-      timeout: false,
+      loadingTooLongTimeout: false,
       newReaderPage: "1",
       newReaderValidation: true,
       assetDir: undefined,
@@ -206,6 +235,7 @@ export default {
       return this.newReaderValidation && this.assetDir
     },
     isLoading() {
+      return true;
       return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
     },
     loadText() {
@@ -224,7 +254,7 @@ export default {
   },
   mounted() {
     setTimeout(function() {
-      this.timeout = true
+      // this.loadingTooLongTimeout = true
     }.bind(this), 8000)
   },
   methods: {
@@ -237,7 +267,7 @@ export default {
       this.$localData.settings["modListEnabled"] = []
       this.$localData.VM.saveLocalStorage()
 
-      this.timeout = false
+      this.loadingTooLongTimeout = false
 
       this.modSoftRestart()
     },
@@ -471,6 +501,22 @@ export default {
     font-weight: initial;
     font-size: 16px;
     color: white;
+  }
+
+  .spirobox {
+    position: absolute;
+    top: 302px;
+    left: 50%;
+
+  }
+
+  .spiro {
+    // transform: translateX(-43.19px) translateY(-17.97px);
+    img {
+      position: absolute;
+    transform-origin: -11% 52%;
+    mix-blend-mode: exclusion;
+    }
   }
 
   // adapted from https://loading.io/css/
