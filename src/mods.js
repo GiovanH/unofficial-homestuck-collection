@@ -825,6 +825,10 @@ if (ipcMain) {
 
       // Extract zips
       const outpath = path.join(assetDir, "mods")
+
+      if (!fs.existsSync(outpath))
+        fs.mkdirSync(outpath)
+
       const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
       zip_archives.forEach(zip_name => {
         const zip_path = path.join(modsDir, zip_name)
