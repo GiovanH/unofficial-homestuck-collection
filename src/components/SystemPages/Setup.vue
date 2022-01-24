@@ -193,7 +193,6 @@ export default {
       return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
     },
     isNewUser() {
-      return true;
       return !this.$localData.assetDir
     },
     modsEnabled() {
