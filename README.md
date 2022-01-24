@@ -13,6 +13,12 @@ To run The Unofficial Homestuck Collection, you need to pair this application wi
 This application runs entirely in Electron + Vue, with very little else going on. Although it functions in a manner very similar to a web browser, everything is running in what I would charitably describe as a "creative" fashion. I am by no means an expert, and while I'd love to say I always had good practices in mind while developing this, I largely didn't even know what a good practice *was* for a decent chunk of it.
 
 So what I'm saying is this: You're welcome to peruse the codebase, fork it, make and suggest changes, or use it in any way you see fit. Just uh... don't expect it to be well formed or documented in any of the ways that really count. If you want to make some changes and my code is causing you physical discomfort, hit me up on Discord at `Bambosh#1025`. I'll do my best to help talk it through with you!
+
+Building a development version of TUHC requires NPM, Yarn, `make`, and `tar`.
+
+- NPM is the node package manager, used for developing with Node.js.
+- [Yarn](https://www.npmjs.com/package/yarn) is a npm-like package manager that is itself distributed as an NPM package.
+- `tar` and `make` are basic GNU utilities used extremely commonly in software development. If you don't already have them on your system (you can maintain robust CLI environments using tools like [cygwin](https://www.cygwin.com) or [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)), you can download [`tar`](http://gnuwin32.sourceforge.net/packages/gtar.htm) and [`make`](https://www.gnu.org/software/make/) individually directly from GNU.
           
 ### Compiles and hot-reloads for development
 ```
