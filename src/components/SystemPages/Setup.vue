@@ -20,31 +20,42 @@
           </div>
           <div class="wizardBody">
 
-          <div class="intro" v-if="newReaderCard == 0">
+          <div class="intro" :class="{hidden: newReaderCard != 0}">
             <h2>Introduction</h2>
             <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p>
 
             <p>However, with Flash finally being phased out at the end of 2020, <em>Homestuck</em> is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published <em>Homestuck</em> since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve <em>Homestuck's</em> one-of-a-kind presentation and flair, for both returning readers and those new to the story.</p>
 
             <p>This self-contained collection contains <em>Homestuck</em> (with Flash elements fully intact), the other MS Paint Adventures, official <em>Homestuck</em> side-stories, and a variety of goodies for the enquiring reader, as well as a variety of unintrusive enhancements to the overall presentation, both for quality and convenience. Hopefully, this collection should be the best way to read <em>Homestuck</em>, and preserve what made it so special.</p>
+
+            <div class="hint wizardFooter">
+              <!-- <p>WARNING: This program is protected by copyright law and international treaties.</p> -->
+              <!-- I want to. I really want to. -->
+              <p>This application is open source (<a href="https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/LICENSE">GPL-3.0</a>). Check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection/">GitHub page</a> for resources like information on how you can contribute and the issue tracker so you can send us any bug reports. 
+            </p>
+            </div>
           </div>
-          <div class="newReader" v-if="newReaderCard == 1">
+          <div class="newReader" :class="{hidden: newReaderCard != 1}">
             <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
             <h2>New Readers</h2>
             <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
             <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong></p>
             <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span>
 
+            <!-- Note: this is on by default via localData, not fancy interface hacks. -->
+            <!-- We can't do that with fastforward because we need v1.1 users to be able to migrate settings. -->
             <NewReaderControls features="pagenumber" />
+
+            <hr />
 
             <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. If New Reader Mode is on, the Settings page will be spoiler-free too.</p>
           </div>
-          <div class="fastForward" v-if="newReaderCard == 2">
+          <div class="fastForward" :class="{hidden: newReaderCard != 2}">
             <h2>Reading Experience</h2>
 
             <p>Okay, one last choice we're going to force you to make before you jump in:</p>
 
-            <NewReaderControls features="fastforward" />
+            <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
 
             <SpoilerBox v-if="!$isNewReader" :always-open="true" style="font-size: 14px;">
               <p>Since you did not enable new reader mode on the previous page, here's an explanation of how this works:</p>
@@ -54,7 +65,7 @@
             </SpoilerBox>
 
           </div>
-          <div class="getStarted" v-if="newReaderCard == 3">
+          <div class="getStarted" :class="{hidden: newReaderCard != 3}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
@@ -75,8 +86,10 @@
 
           </div>
           <div class="wizardNavigation">
-            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1">&lt; Previous</button>
-            <button v-if="newReaderCard < lastNewReaderCard" @click="newReaderCard += 1">Next &gt;</button>
+            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1" style="right: 94px;">&lt; Previous</button>
+            <button v-if="newReaderCard < lastNewReaderCard" 
+              @click="newReaderCard += 1" style="right: 20px;"
+              :disabled="wizardForwardButtonDisabled">Next &gt;</button>
             <!--<button v-if="newReaderCard == lastNewReaderCard" @click="">Finish</button>-->
           </div>
           
@@ -180,6 +193,14 @@ export default {
     }
   },
   computed: {
+    wizardForwardButtonDisabled(){
+      if (this.newReaderCard == 2) {
+        if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
+          return true
+        else return false
+      }
+      return false
+    },
     validatePage() {
       return this.newReaderValidation && this.assetDir
     },
@@ -340,9 +361,14 @@ export default {
             }
           }
           .wizardBody {
+            position: relative;
             display: grid;
             margin: 25px;
             min-height: 640px; // Measured value
+            .wizardFooter {
+              position: absolute; 
+              bottom: 0;
+            }
             // CSS reset is a lie that hurts people.
             p {
               margin-block-start: 1em;
@@ -358,12 +384,17 @@ export default {
             }
             .letsroll {
               font-size: 200% !important;
+              padding: 0.2em;
               margin: 1rem;
             }
           }
           .wizardNavigation {
+            position: relative;
+            min-height: 1em;
             text-align: right;
-            button {
+            button { 
+              font-size: 16px;
+              position: absolute; 
               margin: 0 2px;
             }
           }

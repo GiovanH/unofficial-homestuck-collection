@@ -59,7 +59,7 @@
       <dl class="fastForwardSelection">
         <dt>
           <input type="radio" id="fast_forward=false" :value="false" 
-            v-model="$localData.settings['fastForward']"/>
+            v-model="myFastForward"/>
           <label for="fast_forward=false">Replay</label>
         </dt>
         <dd><label for="fast_forward=false">Read as if you were reading it live.<br>
@@ -75,7 +75,7 @@
 
         <dt>
           <input type="radio" id="fast_forward=true" :value="true" 
-            v-model="$localData.settings['fastForward']"/>
+            v-model="myFastForward"/>
           <label for="fast_forward=true">Archival</label>
         </dt>
         <dd><label for="fast_forward=true">Read as an archival reader.<br>
@@ -90,7 +90,7 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 export default {
   name: 'NewReaderControls',
-  emits: ['enable', 'disable', 'change', 'test'],
+  emits: ['enable', 'disable', 'change', 'test', 'ffchange'],
   components: {StoryPageLink},
   props: {
     promptMspaMode: {
@@ -101,9 +101,29 @@ export default {
       type: String,
       default: "pagenumber fastforward"
     },
+    forceGateChoice: {
+      default: false
+    },
     handleEnable: {},
     handleDisable: {},
     handleChange: {}
+  },
+  data: function() {
+    return {
+      // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
+      newReaderPageInput: this.$newReaderCurrent,
+      // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
+      myFastForward: this.forceGateChoice 
+        ? (console.log("gating ff, undefined") && undefined)
+        : (console.log("not gating ff") && this.$localData.settings['fastForward']),
+      settingListBoolean: [
+        {
+          model: "mspaMode",
+          label: "Use MSPA page numbers",
+          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        }
+      ]
+    }
   },
   computed: {
     featureList(){
@@ -126,19 +146,6 @@ export default {
         pageId >= '000219' && 
         pageId <= '010029' && 
         !/\D/.test(pageId)
-    }
-  },
-  data: function() {
-    return {
-      // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
-      newReaderPageInput: this.$newReaderCurrent,
-      settingListBoolean: [
-        {
-          model: "mspaMode",
-          label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
-        }
-      ]
     }
   },
   methods: {
@@ -174,6 +181,11 @@ export default {
     }
   },
   watch: {
+    // Any change to myFastForward should write to the actual setting.
+    myFastForward(to, from){
+      this.$emit('ffchange', to)
+      this.$localData.settings['fastForward'] = to
+    },
     "$localData.settings.newReader.current"(to, from){
       if (!this.$parent.tabIsActive)
         this.newReaderPageInput = this.$mspaOrVizNumber(to)
