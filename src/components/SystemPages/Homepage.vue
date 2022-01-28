@@ -86,7 +86,7 @@
         </div>
 
         <div class="rowItem squiddles" v-if="!$pageIsSpoiler('004432')">
-          <a class="thumbnail" href="/dstrider"><Media url="/archive/notifications/notif_squiddles.png"/></a>
+          <a class="thumbnail" href="/squiddles"><Media url="/archive/collection/archive_squiddles.png"/></a>
           <div class="description">
             <h2><a href="/squiddles">Squiddles! Sing-Along</a></h2>
             <p class="date">Aug 2010</p>
