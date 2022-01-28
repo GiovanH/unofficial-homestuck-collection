@@ -25,7 +25,7 @@
           <div>
             <b><a href="/music/album/squiddles">Album Credits:</a></b>
             <ul>
-              <li>Alexander Rosetti</li>
+              <li>Alex Rosetti</li>
               <li>David Ko</li>
               <li>Ian Taylor</li>
               <li>Clark "Plazmataz" Powell</li>
