@@ -5,9 +5,11 @@
       <a href="/music/album/squiddles">
         <MediaEmbed url="assets://archive/squiddles/squiddles_banner.jpg" />
       </a>
-      <ul class="wpnav">
-        <li><a href="/music/album/squiddles">the album</a></li>
-      </ul>
+      <!--
+        <ul class="wpnav">
+          <li><a href="/music/album/squiddles">the album</a></li>
+        </ul>
+      -->
       <NavBanner />
     </div>
     <div class="pageBody">
@@ -21,7 +23,7 @@
         </p>
         <div class="columns">
           <div>
-            <b>Album Credits:</b>
+            <b><a href="/music/album/squiddles">Album Credits:</a></b>
             <ul>
               <li>Alexander Rosetti</li>
               <li>David Ko</li>
@@ -43,63 +45,11 @@
           <div>
             <b>Animation Credits:</b>
             <ul>
-              <li><a href="https://www.deviantart.com/paigetart">Paige Turner</a> (lead animator)
-                <span class="social">
-                  <a href="https://twitter.com/Xer0_Paige"></a>
-                  <a href="https://www.deviantart.com/paigetart"></a>
-                </span>
-              </li>
-              <li><a href="https://web.archive.org/web/20100914204435/http://www.iwantyoutofeelthepressure.com/">M Thomas Harding</a>
-              </li>
-              <li><a href="https://web.archive.org/web/20100906104314/http://thebrainseed.com/">Brett Muller</a>
-                <span class="social">
-                  <a href="https://twitter.com/brettmuller"></a>
-                  <a href="https://www.deviantart.com/randomartist"></a>
-                </span>
-              </li>
-              <li><a href="https://jessicaallison.carbonmade.com">Jessica Allison</a>
-                <span class="social">
-                  <a href="https://twitter.com/PurgatoryRose"></a>
-                </span>
-              </li>
-              <li><a href="http://www.firmanproductions.com/">Michael Firman</a>
-                <span class="social">
-                  <a href="https://twitter.com/michaelfirman"></a>
-                  <a href="https://michaelfirman.tumblr.com/"></a>
-                </span>
-              </li>
-              <li><a href="https://mspaintadventures.fandom.com/wiki/Cindy_Dominguez">Cindy Dominguez</a>
-                <span class="social">
-                  <a href="https://www.linkedin.com/in/cindy-dominguez-519a7a105/"></a>
-                </span>
-              </li>
-              <li><a href="https://hannibrosh.com/">Hanni Brosh (SaffronScarf)</a>
-                <span class="social">
-                  <a href="https://www.deviantart.com/saffronscarf"></a>
-                </span>
-              </li>
-              <li><a href="http://www.notenoughink.com/">Richard Gung</a>
-                <span class="social">
-                  <a href="https://twitter.com/ink_REDULOUS"></a>
-                  <a href="https://ink-redulous.tumblr.com/"></a>
-                </span>
-              </li>
-              <li><a href="http://niccarey.com/">Nic Carey</a>
-                <span class="social">
-                  <a href="https://twitter.com/tynic"></a>
-                  <a href="https://niccarey.tumblr.com/"></a>
-                </span>
-              </li>
-              <li><a href="https://cargocollective.com/viivus-draws">Killian Ng (Vivus)</a>
-                <span class="social">
-                  <a href="https://twitter.com/KLLiiNNG"></a>
-                  <a href="https://viivus.tumblr.com/"></a>
-                </span>
-              </li>
-              <li><a href="http://www.metroidhat.com/">Eyes5 (metroidhat)</a>
-                <span class="social">
-                  <a href="https://twitter.com/metroidhat"></a>
-                  <a href="https://www.deviantart.com/eyes5"></a>
+              <li v-for="credit in AnimationCredits" :key="credit.name">
+                <a :href="credit.link" v-text="credit.name" /> 
+                <span v-if="credit.note" v-text="credit.note" />
+                <span class="social" v-if="credit.socials">
+                  <a v-for="link in credit.socials" :href="link" :key="link"/>
                 </span>
               </li>
             </ul>
@@ -125,7 +75,101 @@ export default {
   },
   title: () => "Squiddles!",
   data: function() {
-    return {}
+    return {
+      AnimationCredits: [
+        {
+          name: "Paige Turner",
+          link: "https://www.deviantart.com/paigetart",
+          note: " (lead animator)",
+          socials: [
+            "https://twitter.com/Xer0_Paige",
+            "https://www.deviantart.com/paigetart"
+          ]
+        },
+        {
+          name: "M Thomas Harding",
+          link: "https://web.archive.org/web/20100914204435/http://www.iwantyoutofeelthepressure.com/"
+        },
+        {
+          name: "Brett Muller",
+          link: "https://web.archive.org/web/20100906104314/http://thebrainseed.com/",
+
+          socials: [
+            "https://twitter.com/brettmuller",
+            "https://www.deviantart.com/randomartist"
+          ]
+        },
+        {
+          name: "Jessica Allison",
+          link: "https://jessicaallison.carbonmade.com",
+
+          socials: [
+            "https://twitter.com/PurgatoryRose"
+          ]
+        },
+        {
+          name: "Michael Firman",
+          link: "http://www.firmanproductions.com/",
+
+          socials: [
+            "https://twitter.com/michaelfirman",
+            "https://michaelfirman.tumblr.com/"
+          ]
+        },
+        {
+          name: "Cindy Dominguez",
+          link: "https://mspaintadventures.fandom.com/wiki/Cindy_Dominguez",
+
+          socials: [
+            "https://www.linkedin.com/in/cindy-dominguez-519a7a105/"
+          ]
+        },
+        {
+          name: "Hanni Brosh (SaffronScarf)",
+          link: "https://hannibrosh.com/",
+
+          socials: [
+            "https://www.deviantart.com/saffronscarf"
+          ]
+        },
+        {
+          name: "Richard Gung",
+          link: "http://www.notenoughink.com/",
+
+          socials: [
+            "https://twitter.com/ink_REDULOUS",
+            "https://ink-redulous.tumblr.com/"
+          ]
+        },
+        {
+          name: "Nic Carey",
+          link: "http://niccarey.com/",
+
+          socials: [
+            "https://twitter.com/tynic",
+            "https://niccarey.tumblr.com/"
+          ]
+        },
+        {
+          name: "Killian Ng (Vivus)",
+          link: "https://cargocollective.com/viivus-draws",
+
+          socials: [
+            "https://twitter.com/KLLiiNNG",
+            "https://viivus.tumblr.com/"
+          ]
+        },
+        {
+          name: "Eyes5 (metroidhat)",
+          link: "http://www.metroidhat.com/",
+
+          socials: [
+            "https://twitter.com/metroidhat",
+            "https://www.deviantart.com/eyes5"
+          ]
+        }
+      ]
+    }
   },
   computed: {},
   methods: {}
@@ -150,6 +194,9 @@ export default {
     background: #666666;
     max-width: 100%;
   }
+  .navBanner {
+    height: 48px;
+  }
   .wpnav {
     font-size: 16px;
     padding: 10px;
@@ -169,6 +216,7 @@ export default {
   .credits {
     li {
       list-style: none;
+      padding: 4px 0;
     }
     .social {
       display: block;
