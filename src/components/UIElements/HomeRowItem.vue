@@ -38,5 +38,36 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.rowItem {
+  border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
+  width: 50%;
+  padding: 10px 5px;
+  flex: 1 0 400px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  
+  .thumbnail {
+    img {
+      display: block;
+    }
+    &:after {
+      display: none;
+    }
+  }
 
+  .description {
+    padding: 0 10px;
+    // height: 80px;
+    h2 {
+      font-size: 18px;
+    }
+    .date {
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+      font-size: 10px;
+      font-weight: normal;
+      color: var(--page-nav-meta);
+    }
+  }
+}
 </style>
