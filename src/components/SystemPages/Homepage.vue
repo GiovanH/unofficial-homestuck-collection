@@ -41,22 +41,24 @@
         </div>
       </div>
       <div class="cardContent cardRows">
-        <div class="rowItem beta">
-          <a class="thumbnail" href="/mspa/5"><Media url="/archive/collection/archive_beta.png"/></a>
-          <div class="description">
-            <h2><a href="/mspa/5">Homestuck BETA</a></h2>
-            <p class="date">Apr 2009</p>
-            <p>Homestuck was initially intended to be made exclusively in Flash. It lasted about three days.</p>
-          </div>
-        </div>
-        <div class="rowItem music">
-          <a class="thumbnail" href="/music"><Media url="/archive/collection/archive_music.png"/></a>
-          <div class="description">
-            <h2><a href="/music">Music</a></h2>
-            <p class="date">Aug 2009 - Apr 2020</p>
-            <p>Explore the entire discography of official Homestuck music.</p>
-          </div>
-        </div>
+        <HomeRowItem
+          class="rowItem"
+          href="/mspa/5" 
+          thumbsrc="/archive/collection/archive_beta.png"
+          :afterpage="null"
+          date="Apr 2009">
+          <template v-slot:title>Homestuck BETA</template>
+          <p>Homestuck was initially intended to be made exclusively in Flash. It lasted about three days.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/music"
+          thumbsrc="/archive/collection/archive_music.png"
+          :afterpage="null"
+          date="Aug 2009 - Apr 2020">
+          <template v-slot:title>Music</template>
+          <p>Explore the entire discography of official Homestuck music.</p>
+        </HomeRowItem>
 
         <div class="rowItem sbahj">
           <a class="thumbnail" href="/sbahj"><Media url="/archive/collection/archive_sbahj.png"/></a>
@@ -404,13 +406,14 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
 export default {
   name: 'homepage',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, HomeRowItem
   },
   data: function() {
     return {
@@ -559,7 +562,7 @@ export default {
         display: flex;
         flex-flow: row wrap;
 
-        .rowItem {
+        ::v-deep .rowItem {
           border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
           width: 50%;
           padding: 10px 5px;
