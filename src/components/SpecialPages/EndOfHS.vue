@@ -58,6 +58,7 @@ export default {
   computed: {
     pageNum: PAGE.computed.pageNum,
     storyId: PAGE.computed.storyId,
+    pageCollection: PAGE.computed.pageCollection,
     thisPage: PAGE.computed.thisPage,
     nextPagesArray: PAGE.computed.nextPagesArray,
     bgClass() {
