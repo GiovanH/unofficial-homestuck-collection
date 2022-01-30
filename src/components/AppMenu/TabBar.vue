@@ -3,6 +3,7 @@
     <div id="tabNavigation">
       <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
       <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
+
       <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 22px;"><fa-icon icon="redo"></fa-icon></div>
     </div>
     <template v-if="$localData.settings.showAddressBar">
@@ -25,6 +26,15 @@
       </transition-group>
       <div class="systemButton newTabButton" @click="newTab()">＋</div>
     </div>
+
+    <div id="tabNavigation">
+      <div class="systemButton sysActionButton" 
+       v-if="!$localData.settings.showAddressBar" 
+       @click="toggleJumpBox">
+        <fa-icon icon="sitemap"></fa-icon></div>
+      <div class="systemButton sysActionButton" @click="toggleBookmarks">
+        <fa-icon icon="bookmark"></fa-icon></div>
+      </div>
 
     <template v-if="!$localData.settings.showAddressBar">
       <!-- Toolbars go here too (compact layout) -->
@@ -116,6 +126,13 @@ export default {
     }
   },
   methods: {
+    toggleBookmarks(){
+      const tabComponent = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      tabComponent.$refs.bookmarks.toggle()
+    },
+    toggleJumpBox(){
+      this.$root.$children[0].openJumpbox()
+    },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
     },
@@ -279,6 +296,15 @@ export default {
         font-size: 24px;
         text-decoration: none;
         text-align: center;
+      }
+      .sysActionButton {
+        height: 24px;
+        width: 28px;
+        padding: 2px;
+        line-height: 30px;
+        font-size: 21px;
+        text-decoration: none;
+        text-align: center;        
       }
     }
     
