@@ -2,7 +2,7 @@
   <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="card">
-      <a class="logo" href="/"><Logo /></a>
+      <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent">
         <section>
           <h2>Welcome! Wondering where to begin?</h2> 
@@ -45,15 +45,13 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import Logo from '@/components/UIElements/Logo.vue'
-
 export default {
   name: 'newReader',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Logo
+    NavBanner, Media
   },
   title: () => "New reader tips",
   data: function() {
