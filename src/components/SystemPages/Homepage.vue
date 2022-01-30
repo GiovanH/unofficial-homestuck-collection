@@ -27,15 +27,15 @@
           <p>One-upping Problem Sleuth's action-packed GIFs, Homestuck spiced up pivotal moments with Flash animations scored by a lively team of composers. Over time, the music team produced dozens of albums across a variety of genres.</p>
           <div class="links">
             <div class="left bigLink">
-              > <a href="/mspa/6" >Begin Adventure</a>
+              &gt; <a href="/mspa/6" >Begin Adventure</a>
             </div>
             <div class="center">
-              > <a href="/log/6" >Adventure Log</a><br>
-              > <a href="/map/6" >Adventure Map</a>
+              &gt; <a href="/log/6" >Adventure Log</a><br>
+              &gt; <a href="/map/6" >Adventure Map</a>
             </div>
             <div class="right">
-              > <a href='/decode'>Decoding Tools</a><br>
-              > <a href="/credits" >Credits</a>
+              &gt; <a href='/decode'>Decoding Tools</a><br>
+              &gt; <a href="/credits" >Credits</a>
             </div>
           </div>
         </div>
@@ -173,15 +173,15 @@
           <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
           <div class="links">
             <div class="left bigLink">
-              > <a href="/unlock/ps_titlescreen" >Title screen</a>
+              &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
             </div>
             <div class="center">
-              > <a href="/log/4" >Adventure Log</a><br>
-              > <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
+              &gt; <a href="/log/4" >Adventure Log</a><br>
+              &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
             </div>
             <div class="right">
-              > <a href="/unlock" >Unlockable Content</a><br>
-              > <a href="/faqs/science" v-if="!$timestampIsSpoiler(1236384000)">Science FAQ</a><a disabled v-else>??????</a>
+              &gt; <a href="/unlock" >Unlockable Content</a><br>
+              &gt; <a href="/faqs/science" v-if="!$timestampIsSpoiler(1236384000)">Science FAQ</a><a disabled v-else>??????</a>
             </div>
           </div>
         </div>
