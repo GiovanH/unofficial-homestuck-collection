@@ -45,7 +45,6 @@
           class="rowItem"
           href="/mspa/5" 
           thumbsrc="/archive/collection/archive_beta.png"
-          :afterpage="null"
           date="Apr 2009">
           <template v-slot:title>Homestuck BETA</template>
           <p>Homestuck was initially intended to be made exclusively in Flash. It lasted about three days.</p>
@@ -54,7 +53,6 @@
           class="rowItem"
           href="/music"
           thumbsrc="/archive/collection/archive_music.png"
-          :afterpage="null"
           date="Aug 2009 - Apr 2020">
           <template v-slot:title>Music</template>
           <p>Explore the entire discography of official Homestuck music.</p>
@@ -63,9 +61,8 @@
           class="rowItem"
           href="/sbahj"
           thumbsrc="/archive/collection/archive_sbahj.png"
-          :afterpage="null"
           date="Mar 2009 - Nov 2017">
-          <template v-slot:title>Music</template>
+          <template v-slot:title>Sweet Bro & Hella Jeff</template>
           <p class="comicsans">it keeps happening</p>
           <p>&gt; <a href="assets://archive/forum/SBaHJ Origins.html">The origin story.</a></p>
         </HomeRowItem>
@@ -177,14 +174,31 @@
             </div>
             <div class="center">
               &gt; <a href="/log/4" >Adventure Log</a><br>
-              &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
             </div>
             <div class="right">
-              &gt; <a href="/unlock" >Unlockable Content</a><br>
-              &gt; <a href="/faqs/science" v-if="!$timestampIsSpoiler(1236384000)">Science FAQ</a><a disabled v-else>??????</a>
+              &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
             </div>
           </div>
         </div>
+      </div>
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          class="rowItem"
+          href="/unlock" 
+          thumbsrc="/archive/collection/archive_unlocks.png"
+          date="Apr 2009">
+          <template v-slot:title>Unlockable Content</template>
+          <p>Fan-requested commands drawn for fans who made donations. But he is no longer doing them. Sorry!</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/faqs/science" 
+          thumbsrc="/archive/collection/archive_science.png"
+          :aftertimestamp="1236384000"
+          date="Apr 2009">
+          <template v-slot:title>Science FAQ</template>
+          <p>An explanation of some of the science works in Problem Sleuth. Is physics real? Sorta!</p>
+        </HomeRowItem>
       </div>
     </div>
 
@@ -206,7 +220,6 @@
           class="rowItem"
           href="/offeryoucantrefuse"
           thumbsrc="/archive/collection/archive_offeryoucantrefuse.png"
-          :afterpage="null"
           date="Jun 2006">
           <template v-slot:title>An Offer You Can't Refuse</template>
           <p>Answer one simple question for a FREE* Dinner for Two at Olive Garden®!</p>
@@ -215,7 +228,6 @@
           class="rowItem"
           href="/magicaljourney"
           thumbsrc="/archive/collection/archive_magicaljourney.png"
-          :afterpage="null"
           date="Nov 2007">
           <template v-slot:title>Come With Me on a Magical Journey Through the Internet!</template>
           <p>Diving deep into Olive Garden®'s hole.</p>
@@ -225,7 +237,6 @@
           class="rowItem cheerfulbear"
           href="assets://archive/forum/Cheerfulbear - PLAY ME.html"
           thumbsrc="/archive/collection/archive_cheerfulbear.png"
-          :afterpage="null"
           date="Jan 2008">
           <template v-slot:title>Cheerfulbear - PLAY ME</template>
           <p>HELLO CHEERFULBEAR I WOULD LIKE TO PLAY A GAME HELLO CHEERFULBEAR I WOULD</p>
@@ -235,7 +246,6 @@
           class="rowItem"
           href="assets://archive/forum/Dear Andrew.html"
           thumbsrc="/archive/collection/archive_suckoff.png"
-          :afterpage="null"
           date="Jun 2008 - May 2009">
           <template v-slot:title>The Man-On-Man Suckoff Challenge</template>
           <p>Gaze deep into the uncanny valley.</p>
@@ -249,7 +259,6 @@
           class="rowItem"
           href="/news"
           thumbsrc="/archive/collection/archive_news.png"
-          :afterpage="null"
           date="Jun 2007 - Apr 2018">
           <template v-slot:title>MSPA Newsposts</template>
           <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
@@ -303,7 +312,6 @@
           class="rowItem"
           href="/vigilprince"
           thumbsrc="/archive/collection/archive_vigilprince.png"
-          :afterpage="null"
           date="Jun 2009">
           <template v-slot:title>The Vigil Prince</template>
           <p>Laugh, and the world laughs with you;<p>
@@ -314,7 +322,6 @@
           class="rowItem"
           href="/ryanquest"
           thumbsrc="/archive/collection/archive_ryanquest.png"
-          :afterpage="null"
           date="Oct 2010">
           <template v-slot:title>Ryanquest</template>
           <p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>
@@ -482,6 +489,7 @@ export default {
         margin-bottom: -10px;
         display: flex;
         flex-flow: row wrap;
+        width: 100%;
 
         ::v-deep .comicsans {
           font-family: "Comic Sans MS", "Comic Sans", cursive;

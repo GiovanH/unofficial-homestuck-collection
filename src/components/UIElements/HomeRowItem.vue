@@ -1,5 +1,5 @@
 <template>
-  <div class="rowItem" v-if="!afterpage || !$pageIsSpoiler(afterpage)">
+  <div class="rowItem" v-if="!isSpoiler">
     <a class="thumbnail" :href="href"><Media :url="thumbsrc"/></a>
     <div class="description">
       <h2><a :href="href">
@@ -27,12 +27,24 @@ export default {
   // functional: true,
   props: [
     'afterpage',
+    'aftertimestamp',
     'href',
     'thumbsrc',
     'date'
   ],
   components: {
     Media
+  },
+  computed: {
+    isSpoiler(){
+      if (this.afterpage) {
+        return this.$pageIsSpoiler(this.afterpage)
+      }
+      if (this.aftertimestamp) {
+        return this.$timestampIsSpoiler(this.aftertimestamp)
+      }
+      return false
+    }
   }
 }
 </script>
@@ -40,7 +52,7 @@ export default {
 <style scoped lang="scss">
 .rowItem {
   border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-  width: 50%;
+  // width: 50%;
   padding: 10px 5px;
   flex: 1 0 400px;
   display: flex;
