@@ -70,6 +70,7 @@ export default {
 
   .description {
     padding: 0 10px;
+    width: 100%;
     // height: 80px;
     h2 {
       font-size: 18px;

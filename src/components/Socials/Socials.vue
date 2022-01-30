@@ -4,39 +4,45 @@
     <div class="card">
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent">
-        <section>
-          <h2>Welcome! Wondering where to begin?</h2> 
-          <p>
-            If you've come this far and are just wondering where to start, you almost certainly want to go to <a href="/mspa/6">Homestuck</a> and take it from there! Feeling a bit more adventurous? Then try starting with Homestuck's cult classic predecessor, <a href="/mspa/4">Problem Sleuth</a>.
-          </p>
-          <p>
-            To progress through the story, click on the 'commands' below each page, to which the characters will respond on the next page. These used to be picked from reader suggestions on the original site, MS Paint Adventures. 
-          </p>
-          <p>
-            The rest of the content in this collection can be considered supplementary material. Peruse it in your downtime, or when your story progress unlocks new content.
-          </p>
-        </section>
-
-        <section>
-          <h2>Still here?</h2>
-          <p>
-            Maybe you're hesitating. <em>"Isn't there something I need to know or do in order to read Homestuck?"</em> Not at all! Just start at the beginning, take it one page at a time, and stick with it until it gets its hooks into you. 
-          </p>
-          <p>
-            New reader mode will protect you from everything in the collection that could possibly be considered a spoiler. What I don't recommend is trying to look stuff up online, at least for a while. (This includes external links within the collection, marked like <a href="https://bambosh.github.io/unofficial-homestuck-collection/">this</a>, which go to the Real Internet!)<br />
-            Late-arrival spoilers will slap you in the face. Try asking a friend! 
-          </p>
-          <p>
-            Failing that, <a href="/evenmore">Homestuck fan communities</a> are often happy to help newcomers and will answer your questions, although they're not set up to provide spoiler-free experiences.
-          </p>
-        </section>
-
-        <section>
-          <h2><em>"Ok, but I still want some context."</em></h2>
-          <p>There's a fair chunk of history behind the format of Homestuck and the other MS Paint Adventures, which is probably best left explained by the big man himself. <a href="/faqs/new">If you're curious, check out the original introduction page by Homestuck's author, Andrew Hussie.</a></p>
-        </section>
-
-        <Media url="assets://images/newreaders_sig.gif" />
+      </div>
+        
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          class="rowItem"
+          href="/news"
+          thumbsrc="/archive/collection/archive_news.png"
+          date="Jun 2007 - Apr 2018">
+          <template v-slot:title>MSPA Newsposts</template>
+          <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/blogspot"
+          thumbsrc="/archive/collection/archive_blogspot.png"
+          afterpage="002821"
+          date="Dec 2008 - Jul 2010">
+          <template v-slot:title>Blogspot</template>
+          <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/formspring"
+          thumbsrc="/archive/collection/archive_formspring.png"
+          afterpage="003478"
+          date="Feb 2010 - Aug 2011">
+          <template v-slot:title>Formspring</template>
+          <p>Q&As with Andrew Hussie, providing context and commentary on Homestuck until it was dropped in mid-2011.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/tumblr"
+          thumbsrc="/archive/collection/archive_tumblr.png"
+          afterpage="006010"
+          date="Oct 2011 -  Mar 2013">
+          <template v-slot:title>Tumblr</template>
+          <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
+        </HomeRowItem>
+      </div>
       </div>
     </div>
   </div>
@@ -45,15 +51,16 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
 export default {
   name: 'newReader',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, HomeRowItem
   },
-  title: () => "New reader tips",
+  title: () => "Socials",
   data: function() {
     return {
     }
@@ -87,7 +94,7 @@ export default {
   }
   .card {
     position: relative;
-    margin-bottom: 75px;
+    margin-bottom: 25px;
     padding: 0 50px;
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
@@ -134,6 +141,21 @@ export default {
     }
     .tiny {
       font-size: x-small;
+    }
+  }
+  ::v-deep .rowItem {
+    h2, p.date {
+      display: inline-block;
+    }
+    p.date {
+      font-size: 16px;
+      &:before {
+        content: ' (';
+        margin-left: 8px;
+      }
+      &:after {
+        content: ')';
+      }
     }
   }
 </style>

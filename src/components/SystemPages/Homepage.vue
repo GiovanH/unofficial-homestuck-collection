@@ -21,6 +21,7 @@
       <div class="cardContent cardEntry hsCard">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
+          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 167px;" v-if="$root.tabTheme === 'A6A6'" >
           <p class="date">Apr 2009 - Apr 2016</p>
           <p class="date">8,130 pages</p>
         </div>
@@ -60,6 +61,7 @@
           <template v-slot:title>Music</template>
           <p>Explore the entire discography of official Homestuck music.</p>
         </HomeRowItem>
+        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 399px;" v-if="$root.tabTheme === 'A6A6'" >
         <HomeRowItem
           class="rowItem"
           href="/sbahj"
@@ -206,6 +208,55 @@
     </div>
 
     <div class="card">
+      <div class="logo newsLogo cardContent">
+        <Media url="assets://archive/collection/news_logo.png" />
+        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
+      </div>
+      <div class="cardContent">
+        <div class="description">
+          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while other social media was cycled through at different times.</p>
+        </div>
+      </div>
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          class="rowItem"
+          href="/news"
+          thumbsrc="/archive/collection/archive_news.png"
+          date="Jun 2007 - Apr 2018">
+          <template v-slot:title>MSPA Newsposts</template>
+          <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/blogspot"
+          thumbsrc="/archive/collection/archive_blogspot.png"
+          afterpage="002821"
+          date="Dec 2008 - Jul 2010">
+          <template v-slot:title>Blogspot</template>
+          <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/formspring"
+          thumbsrc="/archive/collection/archive_formspring.png"
+          afterpage="003478"
+          date="Feb 2010 - Aug 2011">
+          <template v-slot:title>Formspring</template>
+          <p>Q&As with Andrew Hussie, providing context and commentary on Homestuck until it was dropped in mid-2011.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/tumblr"
+          thumbsrc="/archive/collection/archive_tumblr.png"
+          afterpage="006010"
+          date="Oct 2011 -  Mar 2013">
+          <template v-slot:title>Tumblr</template>
+          <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
+        </HomeRowItem>
+      </div>
+    </div>
+
+    <div class="card">
       <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo cardContent" />
       <div class="cardContent cardEntry tsoCard">
         <div class="icon">
@@ -258,41 +309,6 @@
 
     <div class="card noHeaderCard">
       <div class="cardContent cardRows">
-        <HomeRowItem
-          class="rowItem"
-          href="/news"
-          thumbsrc="/archive/collection/archive_news.png"
-          date="Jun 2007 - Apr 2018">
-          <template v-slot:title>MSPA Newsposts</template>
-          <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/blogspot"
-          thumbsrc="/archive/collection/archive_blogspot.png"
-          afterpage="002821"
-          date="Dec 2008 - Jul 2010">
-          <template v-slot:title>Blogspot</template>
-          <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/formspring"
-          thumbsrc="/archive/collection/archive_formspring.png"
-          afterpage="003478"
-          date="Feb 2010 - Aug 2011">
-          <template v-slot:title>Formspring</template>
-          <p>Q&As with Andrew Hussie, providing context and commentary on Homestuck until it was dropped in mid-2011.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/tumblr"
-          thumbsrc="/archive/collection/archive_tumblr.png"
-          afterpage="006010"
-          date="Oct 2011 -  Mar 2013">
-          <template v-slot:title>Tumblr</template>
-          <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
-        </HomeRowItem>
         <HomeRowItem
           class="rowItem"
           href="/desktops"
@@ -376,7 +392,7 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
-    a:not([disabled]) {
+    ::v-deep a:not([disabled]) {
       color: var(--page-links);
     }
   }
@@ -387,6 +403,9 @@ export default {
   .card {
     position: relative;
     margin-bottom: 75px;
+    & + .card.tight {
+      margin-bottom: 20px;
+    }
     padding: 25px 50px;
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
@@ -399,7 +418,14 @@ export default {
     align-items: center;
     align-content: center;
 
+    .a6a6graffiti {
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      top: 0;
+    }
     .logo {
+      position: relative;
       max-width: 920px;
       // position: absolute;
       &.hsLogo {
@@ -408,6 +434,10 @@ export default {
       }
       &.mspaLogo {
         margin-top: -65px;
+      }
+      &.newsLogo {
+        margin-top: -64px;
+        .a6a6graffiti {margin: -30px -86px;}
       }
       &.tsoLogo {
         margin-top: -105px;
