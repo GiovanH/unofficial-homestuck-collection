@@ -173,8 +173,10 @@ const UrlFilterMixin = {
       document.querySelectorAll("A").forEach((link) => {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
-          logger.debug("[filterL]", "looking up", pseudLinkHref)
           link.href = getResourceURL(pseudLinkHref)
+          if (link.href != pseudLinkHref) {
+            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+          }
         }
       })
 
@@ -187,10 +189,12 @@ const UrlFilterMixin = {
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
-        logger.debug("[fltrSrc]", "looking up", pseudMediaSrc)
         media[i].src = resolveURL(pseudMediaSrc)
+        if (media[i].src != pseudMediaSrc) {
+          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+        }
 
-        if (media[i].tagName == 'IMG') {  
+        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  
           media[i].ondragstart = (e) => {
             e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'
