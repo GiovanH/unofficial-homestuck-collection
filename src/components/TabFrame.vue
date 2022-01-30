@@ -279,8 +279,7 @@ export default {
                     break
                 }
                 case 'SQUIDDLES': {
-                    // TODO: Spoiler unlock
-                    if (this.$isNewReader) component = 'Spoiler'
+                    if (this.$pageIsSpoiler('004432')) component = 'Spoiler'
                 }
                 case 'UNLOCK': {
                     if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'
