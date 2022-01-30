@@ -64,6 +64,7 @@ import TBIY from '@/components/Extras/theBabyIs.vue'
 import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
 import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
+import SQUIDDLES from '@/components/Extras/Squiddles.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
@@ -124,6 +125,7 @@ export default {
         NAMCOHIGH,
         VIGILPRINCE,
         SKAIANET,
+        SQUIDDLES,
 
         MUSIC,
         DSTRIDER,
@@ -275,6 +277,10 @@ export default {
                     if (this.$isNewReader) component = 'Spoiler'
                     else if (this.routeParams.cursed_history && (this.routeParams.cursed_history != 'cursed_history' || !this.$localData.settings.cursedHistory)) component = 'Error404'
                     break
+                }
+                case 'SQUIDDLES': {
+                    // TODO: Spoiler unlock
+                    if (this.$isNewReader) component = 'Spoiler'
                 }
                 case 'UNLOCK': {
                     if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'

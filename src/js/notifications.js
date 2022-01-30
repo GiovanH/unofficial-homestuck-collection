@@ -91,9 +91,9 @@ module.exports = {
     },
 
     notif_squiddles: {
-      title: 'UNLOCKED ALBUM: SQUIDDLES!',
+      title: 'UNLOCKED BONUS: SQUIDDLES!',
       desc: 'Click here to check it out!',
-      url: '/music/album/squiddles',
+      url: '/squiddles',
       thumb: '/archive/notifications/notif_squiddles.png'
     },
 
