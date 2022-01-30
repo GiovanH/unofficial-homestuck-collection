@@ -3,7 +3,7 @@
     <div id="tabNavigation">
       <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
       <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
-      <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 21px;"><fa-icon icon="redo"></fa-icon></div>
+      <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 22px;"><fa-icon icon="redo"></fa-icon></div>
     </div>
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>

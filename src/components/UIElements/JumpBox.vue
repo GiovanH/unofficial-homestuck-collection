@@ -13,8 +13,7 @@
             :filter-by-query="true"
             :max-suggestions="15"
             ref="suggest" 
-          >f="suggest" 
-        >
+          >
           <input 
             class="jumpBoxInput"
             ref="input"
