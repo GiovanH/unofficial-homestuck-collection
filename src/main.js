@@ -475,7 +475,9 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      archive: undefined
+      archive: undefined,
+      tabTheme: undefined,
+      loadState: undefined
     }
   },
   router,
