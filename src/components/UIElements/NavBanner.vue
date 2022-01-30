@@ -2,7 +2,7 @@
   <nav class="navBanner" :class="{customNavBanner: useCustomStyles, pixelated: $localData.settings.pixelScaling}">
     <div class="navList">
       <template v-for="(group, gi) in urls">
-        <ul :class="'nav' + (gi+1)">
+        <ul :class="'nav' + (gi+1)" :key="'nav' + (gi+1)">
           <li v-for="href in group">
             <a v-if="href == 'toggleJumpBox'" @click.prevent="toggleJumpBox()">{{getLabel(href)}}</a>
             <a v-else-if="href == 'toggleBookmarks'" @click.prevent="toggleBookmarks()">{{getLabel(href)}}</a>
@@ -26,13 +26,18 @@ export default {
   ],
   data: function() {
     return {
+      // MS PAINT ADVENTURES
+      // ARCHIVE | NEW READER?
+      // MAP | LOG | SEARCH
+      // SHOP | MUSIC
+      // FORUMS | SECRETS | CREDITS
       urls: [
         [
-          "https://www.homestuck.com"
+          "/"
         ],
         [
-          "/",
-          "toggleJumpBox"
+          "/news",
+          "/newreader"
         ],
         [
           "/map",
@@ -40,9 +45,10 @@ export default {
           "/search"
         ],
         [
-          "toggleBookmarks"
+          "/music"
         ],
         [
+          "/evenmore",
           "/settings",
           "/credits"
         ]
@@ -50,27 +56,42 @@ export default {
       labels: {
         // list<theme => list<href => label>>
         // default theme in settings is the empty string
-        "": {
-          "https://www.homestuck.com": "HOMESTUCK.COM",
+        mspa: {
+          // "https://www.homestuck.com": "HOMESTUCK.COM",
           "/": "HOME",
-          "toggleJumpBox": "JUMP",
+
+          // "toggleJumpBox": "JUMP",
+          "/news": "NEWS",
+          "/newreader": "NEW READERS",
+
           "/map": "MAP",
           "/log": "LOG",
           "/search": "SEARCH",
-          "toggleBookmarks": "SAVE/LOAD",
+
+          "/music": "MUSIC",
+          // "toggleBookmarks": "SAVE/LOAD",
+
+          "/evenmore": "EVEN MORE",
           "/settings": "SETTINGS",
           "/credits": "CREDITS"
         },
         A6A6: {
-          "https://www.homestuck.com": "WORTHLESS GARBAGE.",
-          "/": "STUPID.",
+          "/": "WORTHLESS GARBAGE.",
+
+          "/newreader": "STUPID.",
           "toggleJumpBox": "WHO CARES?",
+
           "/map": "WOW.",
           "/log": "NO.",
           "/search": "BORING.",
-          "toggleBookmarks": "DUMB NOISE.",
-          "/settings": "BULLSHIT.",
-          "/credits": "WHATEVER."
+
+          "/news": "BULLSHIT.",
+          "/music": "DUMB NOISE.",
+          "toggleBookmarks": "TRASH.",
+          
+          "/evenmore": "SHIT.",
+          "/credits": "MORONS.",
+          "/settings": "WHATEVER."
         }
       }
     }
@@ -84,14 +105,17 @@ export default {
     },
     getLabel(href){
       // Tries to get a themed label, otherwise just prints the URL
-      return (this.labels[this.$root.tabTheme] || this.labels[''])[href] || href
+      return this.labelDict[href] || href
     }
   },
   computed: {
     tabComponent() {
       return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+    },
+    labelDict() {
+      return this.labels[this.$root.tabTheme] || this.labels['mspa']
     }
-  },
+  }
 }
 </script>
 
