@@ -191,9 +191,10 @@
           class="rowItem"
           href="/unlock" 
           thumbsrc="/archive/collection/archive_unlocks.png"
+          :aftertimestamp="1226966400"
           date="Apr 2009">
           <template v-slot:title>Unlockable Content</template>
-          <p>Fan-requested commands drawn for fans who made donations. But he is no longer doing them. Sorry!</p>
+          <p>Fan-requested commands drawn for fans who made donations. But Andrew is no longer doing them. Sorry!</p>
         </HomeRowItem>
         <HomeRowItem
           class="rowItem"
