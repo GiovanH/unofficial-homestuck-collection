@@ -5,38 +5,25 @@
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent">
         <section>
-          <h2>Welcome! Wondering where to begin?</h2> 
+          <h2>Looking for more?</h2> 
           <p>
-            If you've come this far and are just wondering where to start, you almost certainly want to go to <a href="/mspa/6">Homestuck</a> and take it from there! Feeling a bit more adventurous? Then try starting with Homestuck's cult classic predecessor, <a href="/mspa/4">Problem Sleuth</a>.
+            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore. Here are a few.
           </p>
           <p>
-            To progress through the story, click on the 'commands' below each page, to which the characters will respond on the next page. These used to be picked from reader suggestions on the original site, MS Paint Adventures. 
-          </p>
-          <p>
-            The rest of the content in this collection can be considered supplementary material. Peruse it in your downtime, or when your story progress unlocks new content.
+            (As with all external links, <em>we recommend staying away from these sits</em> until you've finished the comic, as spoilers abound!)
           </p>
         </section>
 
         <section>
-          <h2>Still here?</h2>
-          <p>
-            Maybe you're hesitating. <em>"Isn't there something I need to know or do in order to read Homestuck?"</em> Not at all! Just start at the beginning, take it one page at a time, and stick with it until it gets its hooks into you. 
-          </p>
-          <p>
-            New reader mode will protect you from everything in the collection that could possibly be considered a spoiler. What I don't recommend is trying to look stuff up online, at least for a while. (This includes external links within the collection, marked like <a href="https://bambosh.github.io/unofficial-homestuck-collection/">this</a>, which go to the Real Internet!)<br />
-            Late-arrival spoilers will slap you in the face. Try asking a friend! 
-          </p>
-          <p>
-            Failing that, <a href="/evenmore">Homestuck fan communities</a> are often happy to help newcomers and will answer your questions, although they're not set up to provide spoiler-free experiences.
-          </p>
+          <HomeRowItem v-for="site in extSites"
+            :key="site.id"
+            class="rowItem"
+            :href="site.url"
+            :thumbsrc="`/archive/collection/external/${site.id}.png`">
+            <template v-slot:title>{{site.name}}</template>
+            <p v-html="site.desc" />
+          </HomeRowItem>
         </section>
-
-        <section>
-          <h2><em>"Ok, but I still want some context."</em></h2>
-          <p>There's a fair chunk of history behind the format of Homestuck and the other MS Paint Adventures, which is probably best left explained by the big man himself. <a href="/faqs/new">If you're curious, check out the original introduction page by Homestuck's author, Andrew Hussie.</a></p>
-        </section>
-
-        <Media url="assets://images/newreaders_sig.gif" />
       </div>
     </div>
   </div>
@@ -45,17 +32,104 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
+
 export default {
   name: 'newReader',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, HomeRowItem
   },
   title: () => "New reader tips",
   data: function() {
     return {
+      // hsmusic, reddit, archive, mspa wiki
+      extSites: [
+        {
+          id: 'hsmusic',
+          url: 'https://hsmusic.wiki',
+          name: 'HSMusic',
+          desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most assocoited music and has tons of information and supplementary material. It's where the collection sources most of its music info!"
+        },
+        {
+          id: 'readmspa',
+          url: 'http://readmspa.org',
+          name: 'readmspa',
+          desc: "Readmspa has an enormous amount of data about Homestuck including stats, visualizations, transcripts, and storyboards."
+        },
+        {
+          id: 'MSPFA',
+          url: '',
+          name: 'MS Paint Fan Adventures',
+          desc: `Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>`
+        },
+        {
+          id: 'reddit',
+          url: 'https://www.reddit.com/r/homestuck/',
+          name: 'r/Homestuck',
+          desc: "The Homestuck fan subreddit. Art, discussion, chat."
+        },
+        {
+          id: 'homestuck_net',
+          url: 'https://homestuck.net',
+          name: 'HOMESTUCK.net',
+          desc: "A massive \"fandom archive\", with an extensive listing of fan projects, crafts, cosplay resources, games, software, sheet music, liveblogs, and more."
+        },
+        {
+          id: 'wiki',
+          url: 'https://mspa.wikia.com/',
+          name: 'MSPA WIKI',
+          desc: "The MSPA Wiki. A great database of character information and summaries. (Caution: hosted by fandom.com)"
+        },
+        {
+          id: 'hs2',
+          url: 'https://homestuck2.com',
+          name: 'Homestuck^2',
+          desc: "A semi-official continuation of the Homestuck comic, picking up after the epilogues. Abandoned, as of time of writing."
+        },
+        {
+          id: 'ezodiac',
+          url: 'http://hs.hiveswap.com/ezodiac/index.php',
+          name: 'Hiveswap Extended Zodiac',
+          desc: "An official personality quiz that assigns you a zodiac symbol based on your quiz answers. Promotional material for the Hiveswap games."
+        },
+        {
+          id: 'rafe',
+          url: 'http://rafe.name/homestuck/',
+          name: 'The Acts and Pages of Homestuck',
+          desc: "A map of Homestuck, with information and summaries of each act and section of the comic."
+        },
+        {
+          id: 'voxus',
+          url: 'https://www.youtube.com/playlist?list=PLHO1rc05qiGtAidSBy_8jsEOlHXR6x4cd',
+          name: "Voxus: Let's Read Homestuck",
+          desc: "An extensive voice-acting readthrough of Homestuck. "
+        }
+      ],
+      othercats: [
+        // {
+        //   name: "Liveblogs",
+        //   desc: "",
+        //   items: [
+        //     {
+        //       label: "Minda",
+        //       href: ""
+        //     }
+        //   ]
+        // },
+        {
+          name: "Acting",
+          desc: "",
+          items: [
+            {
+              label: "Voxus: Let's Read Homestuck",
+              href: "https://www.youtube.com/c/Voxus/playlists?view=50&sort=dd&shelf_id=2"
+            }
+          ]
+        }
+      ]
     }
   }
 }
@@ -64,6 +138,16 @@ export default {
 <style scoped lang="scss">
   .navBanner {
     margin-bottom: 25px;
+  }
+  ::v-deep .rowItem {
+    .thumbnail img {
+      width: 65px;
+      height: 65px;
+      image-rendering: pixelated;
+    }
+    a.thumbnail::after {
+      display: none !important;
+    }
   }
   .pageBody {
     margin: 0;
