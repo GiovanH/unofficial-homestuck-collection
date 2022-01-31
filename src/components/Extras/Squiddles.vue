@@ -87,7 +87,7 @@ export default {
           ]
         },
         {
-          name: "M Thomas Harding",
+          name: "Rebecca Harding",
           link: "https://web.archive.org/web/20100914204435/http://www.iwantyoutofeelthepressure.com/"
         },
         {
