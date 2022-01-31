@@ -135,7 +135,7 @@
           } else if (match = / "(.+)"/.exec(app_icon_var)) {
             app_icon_var = match[1]
           } else {
-            this.$logger.info(`Couldn't match '${app_icon_var}'`)
+            this.$logger.error(`Couldn't match '${app_icon_var}'`)
             return
           }
           this.$logger.info("Requesting icon change to", app_icon_var)
