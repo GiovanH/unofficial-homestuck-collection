@@ -8,8 +8,6 @@
 </template>
 
 <script>
-// TODO: We could probably optimize here by using draggable, since we already import it
-
 const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
 
 export default {
