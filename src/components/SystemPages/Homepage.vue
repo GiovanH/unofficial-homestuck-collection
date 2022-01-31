@@ -3,7 +3,7 @@
     <NavBanner useCustomStyles="true" />
     <div class="card topLogo">
       <a href="/" class="cardContent">
-        <Media :url="logo_src" gifmode />
+        <Logo />
       </a>
       <div class="cardContent collection">
         <div class="links">
@@ -336,18 +336,19 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
 import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
+
 export default {
   name: 'homepage',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, HomeRowItem
+    NavBanner, Media, HomeRowItem, Logo
   },
   data: function() {
     return {
-      logo_src: "assets://archive/collection/logo_v2_full.webm"
     }
   },
   title: function(ctx) {
@@ -379,12 +380,6 @@ export default {
     }
   }
 
-  .card.topLogo {
-    margin-bottom: 25px;
-    img, video {
-      width: 800px;
-    }
-  }
   .navBanner {
     margin-bottom: 25px;
   }
