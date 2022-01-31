@@ -1,6 +1,6 @@
 <template>
-  <div class="banner app" v-if="ghHasUpdate && !dismissed">
-    <p><a :href="latestRelease.html_url">There is a new version of the app available!<br />Click here to see the release notes and update from {{appVersionCurrent}} to {{latestReleaseSemver}}</a></p>
+  <div class="banner app" v-if="appHasUpdate && !dismissed">
+    <p><a :href="appLatestRelease.html_url">There is a new version of the app available!<br />Click here to see the release notes and update from {{appVersionCurrent}} to {{appLatestReleaseSemver}}</a></p>
     <span class="dismiss" @click="dismissed = true">
       later
     </span>
@@ -25,24 +25,24 @@ export default {
   },
   computed: {
     appVersionCurrent(){
-      return "0.0.0" // this.$data.$appVersion
+      return this.$data.$appVersion
+    },
+    appLatestRelease(){
+      if (!this.ghReleases) return undefined
+      return this.ghReleases[0]
+    },
+    appLatestReleaseSemver(){
+      if (!this.ghReleases) return undefined
+      const tag_name = this.appLatestRelease.tag_name
+      return tag_name.replace(/^[Vv]/, '')
+    },
+    appHasUpdate(){
+      if (!this.ghReleases) return undefined
+      return semverGreater(this.appLatestReleaseSemver, this.appVersionCurrent)
     },
     assetVersionCurrent(){
       return this.$archive.version
       // Note: this is not this.$expectedAssetVersion
-    },
-    latestRelease(){
-      if (!this.ghReleases) return undefined
-      return this.ghReleases[0]
-    },
-    latestReleaseSemver(){
-      if (!this.ghReleases) return undefined
-      const tag_name = this.latestRelease.tag_name
-      return tag_name.replace(/^[Vv]/, '')
-    },
-    ghHasUpdate(){
-      if (!this.ghReleases) return undefined
-      return semverGreater(this.latestReleaseSemver, this.appVersionCurrent)
     }
   },
   methods: {
