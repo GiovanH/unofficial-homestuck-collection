@@ -39,7 +39,7 @@
             <h2>New Readers</h2>
             <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
             <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> And, if you're already partway in, you can adjust your current page here.</p>
-            <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span>
+            <!-- <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span> -->
 
             <!-- Note: this is on by default via localData, not fancy interface hacks. -->
             <!-- We can't do that with fastforward because we need v1.1 users to be able to migrate settings. -->
@@ -49,7 +49,33 @@
 
             <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. Don't worry: if New Reader Mode is on, the Settings page will be spoiler-free too.</p>
           </div>
-          <div class="fastForward" :class="{hidden: newReaderCard != 2}">
+
+          <div class="contentWarnings" :class="{hidden: newReaderCard != 2}">
+            <h2>Content Warnings</h2>
+            <p>
+              Homestuck was written for teenagers but contains adult topics as well as a laundry list of potential triggers. Here is a fairly thorough list:
+            </p>
+            <div class="scrollbox">
+              <p>
+                <ul>
+                  <!-- extend/sort this list -->
+                  <li>slurs</li>
+                  <li>gruesome depictions of death</li>
+                  <li>body horror</li>
+                  <li>animal death</li>
+                  <li>war crimes</li>
+                  <li>mind control</li>
+                  <li>implied nonconsensual sexual relationships</li>
+                  <li>graphic mpreg</li>
+                </ul>
+              </p>
+            </div>
+            <p>
+              Most of the particularly harsh examples are either briefly touched on or buried away in corners (TSO, etc).
+            </p>
+          </div>
+
+          <div class="fastForward" :class="{hidden: newReaderCard != 3}">
             <h2>Reading Experience</h2>
 
             <p>Okay, one last choice we're going to force you to make before you jump in:</p>
@@ -64,7 +90,7 @@
             </SpoilerBox>
 
           </div>
-          <div class="getStarted" :class="{hidden: newReaderCard != 3}">
+          <div class="getStarted" :class="{hidden: newReaderCard != 4}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
@@ -171,10 +197,11 @@ export default {
   data: function() {
     return {
       newReaderCard: 0,
-      lastNewReaderCard: 3,
+      lastNewReaderCard: 4,
       newReaderCardNames: [
         "Intro",
         "New Readers",
+        "Content Warnings",
         "Reading Experience",
         "Getting Started"
       ],
@@ -198,7 +225,7 @@ export default {
           return true
         else return false
       }
-      if (this.newReaderCard == 2) {
+      if (this.newReaderCard == 3) {
         if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
           return true
         else return false
@@ -297,6 +324,14 @@ export default {
       background-color: #35bfff;
       background-attachment: fixed;
     }
+  }
+  div.scrollbox {
+    background: #fff;
+    box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+    display: block;
+    margin: 0;
+    padding: 12px 8px;
+    overflow-y: scroll;
   }
   .wizard {
     .wizardSidebar {

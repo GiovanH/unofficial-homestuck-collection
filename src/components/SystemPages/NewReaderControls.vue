@@ -113,9 +113,7 @@ export default {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
       newReaderPageInput: this.$newReaderCurrent,
       // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
-      myFastForward: this.forceGateChoice 
-        ? (console.log("gating ff, undefined") && undefined)
-        : (console.log("not gating ff") && this.$localData.settings['fastForward']),
+      myFastForward: this.forceGateChoice ? undefined : this.$localData.settings['fastForward'],
       settingListBoolean: [
         {
           model: "mspaMode",
