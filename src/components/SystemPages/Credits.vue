@@ -57,12 +57,18 @@
             <div class="legal">
               Legal:
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020, 2021 Bambosh et al.
+Copyright (C) 2020-2022 Bambosh et al.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+In addition, as per section 7, the author attributions above must 
+be preserved in all covered works. Modified versions may optionally
+extend this list as applicable, but modifications that remove 
+attributions or otherwise misrepresent the origin of the material 
+are not permitted.
 </pre>
               <p>
                 In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
