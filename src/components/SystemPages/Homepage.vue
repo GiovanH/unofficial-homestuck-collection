@@ -212,7 +212,7 @@
       </div>
       <div class="cardContent">
         <div class="description">
-          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while other social media was cycled through at different times.</p>
+          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while others ran at different times.</p>
         </div>
       </div>
       <div class="cardContent cardRows">
@@ -388,9 +388,6 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
-    ::v-deep a:not([disabled]) {
-      color: var(--page-links);
-    }
   }
 
   .topLogo {
@@ -418,6 +415,10 @@ export default {
     flex-flow: column nowrap;
     align-items: center;
     align-content: center;
+
+    ::v-deep a:not([disabled]) {
+      color: var(--page-links);
+    }
 
     .a6a6graffiti {
       position: absolute;
