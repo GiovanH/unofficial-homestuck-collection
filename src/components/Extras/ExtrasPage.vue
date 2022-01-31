@@ -36,7 +36,11 @@ export default {
       return 'Oil Retcon'
     else if (ctx.routeParams.base == 'waywardvagabond' && ctx.routeParams.p in ctx.$archive.mspa.wv) 
       return "Homestuck"
-    else 
+    if (ctx.routeParams.base == 'faqs') {
+      if (ctx.routeParams.p == 'science') 
+        return 'Science FAQ'
+      return 'FAQ'
+    } else 
       return 'Extra Content'
   },
   data: function() {

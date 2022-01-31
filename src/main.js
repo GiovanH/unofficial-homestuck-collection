@@ -116,9 +116,7 @@ Vue.mixin({
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
-
-      // TODO: Some of this could go in Resources?
-
+      
       // Else, tests
       let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
@@ -477,7 +475,9 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      archive: undefined
+      archive: undefined,
+      tabTheme: undefined,
+      loadState: undefined
     }
   },
   router,

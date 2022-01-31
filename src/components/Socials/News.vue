@@ -8,13 +8,17 @@
       
       <div class="newsYear" v-for="newsYear in filteredSortedPosts" :key="newsYear.yearNo">
         <h2 class="yearTitle" :class="[newsYear.yearNo]" v-text="'20'+newsYear.yearNo" @click="toggleYear(newsYear.yearNo)" />
-        <ul v-if="activeYear == newsYear.yearNo">
+        <ul v-if="activeYear == newsYear.yearNo || showAllYears">
           <li v-for="post in newsYear.posts" class="post" v-html="post.html" :key="post.id" />
 
           <li v-if="newsYear.posts.length < newsposts[newsYear.yearNo].length" class="post notice">
             {{newsposts[newsYear.yearNo].length - newsYear.posts.length}} posts remain in 20{{newsYear.yearNo}}.
           </li>
         </ul>
+      </div>
+
+      <div class="newsYear" v-if="!showAllYears">
+        <h2 class="yearTitle" @click="activeYear = 'ALL'">Show All</h2>
       </div>
       
       <p v-if="isCutoff" class="cutoff">Keep reading Homestuck to unlock more posts!</p>
@@ -49,6 +53,9 @@ export default {
     }
   },
   computed: {
+    showAllYears() {
+      return this.activeYear == "ALL";
+    },
     newsLogo() {
       return this.$root.tabTheme === 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
     },
@@ -56,7 +63,7 @@ export default {
       return this.$archive.news
     },
     filteredPosts(){
-      // Returns {yearNo: postList} for all years with visible news.
+      // Returns {yearNo: postList} for all years with unlocked news.
       if (!this.$isNewReader)
         return this.newsposts
       

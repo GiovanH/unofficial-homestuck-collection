@@ -64,7 +64,7 @@ export default {
   }
   .preface {
     width: calc(100% - 50px);
-    margin: 1em 0;
+    margin: 1em auto;
 
     border-style: dashed;
     border-width: 1px;

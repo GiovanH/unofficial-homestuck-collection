@@ -73,6 +73,8 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function extractimods(){
+  // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
+
   // eslint-disable-next-line import/no-webpack-loader-syntax
   const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
   let tar_buffer = Buffer.from(base64, 'base64')
@@ -275,6 +277,10 @@ function getEnabledMods() {
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
 
+  // Soluslunes must load after bolin
+  if (store.get('localData.settings.soluslunes'))
+    list.push("_soluslunes")
+
   // Bolin must come before hqaudio in the stack so it loads after it.
   if (store.get('localData.settings.bolin'))
     list.push("_bolin")
@@ -393,10 +399,13 @@ function getModJs(mod_dir, options={}) {
       console.log(modjs_path)
       mod = require(modjs_path)
     } else {
+      // eslint-disable-next-line no-undef
       if (__non_webpack_require__.cache[modjs_path])
+        // eslint-disable-next-line no-undef
         delete __non_webpack_require__.cache[modjs_path]
 
       try {
+        // eslint-disable-next-line no-undef
         mod = __non_webpack_require__(modjs_path)
       } catch (e) {
         // imod AND this is the second attempt at importing it
@@ -404,6 +413,7 @@ function getModJs(mod_dir, options={}) {
           console.log(e)
           console.log("Couldn't load imod, trying re-extract")
           extractimods()
+          // eslint-disable-next-line no-undef
           mod = __non_webpack_require__(modjs_path)
         } else throw e
       }
@@ -423,10 +433,12 @@ function getModJs(mod_dir, options={}) {
       Object.assign(mod, mod.computed(api))
     }
 
-    // TODO: Do computed properties automatically require a reload?
+    // Computed properties don't automatically require a reload because
+    // the object has been assigned any computed properties by now.
+    mod._needsreload = [
+      'styles', 'vueHooks', 'themes',
+      'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
-    mod._needsreload = ['styles', 'vueHooks', 'themes',
-     'browserPages', 'browserActions', 'browserToolbars'
     ].some(k => mod.hasOwnProperty(k))
 
     return mod
@@ -821,6 +833,10 @@ if (ipcMain) {
 
       // Extract zips
       const outpath = path.join(assetDir, "mods")
+
+      if (!fs.existsSync(outpath))
+        fs.mkdirSync(outpath)
+
       const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
       zip_archives.forEach(zip_name => {
         const zip_path = path.join(modsDir, zip_name)
