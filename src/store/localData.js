@@ -57,6 +57,7 @@ class LocalData {
       pixelScaling: true,
       mspaMode: false,
       bandcampEmbed: true,
+      allowSysUpdateNotifs: true,
       devMode: false,
 
       themeOverride: "default",
