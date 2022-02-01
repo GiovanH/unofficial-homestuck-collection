@@ -2,7 +2,7 @@
   <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="card">
-      <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a class="logo" href="/"><Logo /></a>
       <div class="cardContent pageMenu">
         <span v-for="(label, key) in {newreader: 'New Reader', usage: 'Usage'}" 
           :key="key"
@@ -86,6 +86,8 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
+
 export default {
   name: 'help',
   props: [
