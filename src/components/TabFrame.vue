@@ -39,8 +39,7 @@ import ERROR404 from '@/components/SystemPages/Error404.vue'
 import SPOILER from '@/components/SystemPages/Spoiler.vue'
 
 import HOMEPAGE from '@/components/SystemPages/Homepage.vue'
-import NEWREADER from '@/components/SystemPages/NewReader.vue'
-import USERGUIDE from '@/components/SystemPages/UserGuide.vue'
+import HELP from '@/components/SystemPages/Help.vue'
 import MAP from '@/components/SystemPages/Map.vue'
 import LOG from '@/components/SystemPages/Log.vue'
 import SEARCH from '@/components/SystemPages/Search.vue'
@@ -92,7 +91,7 @@ export default {
     props: [
         'tabKey'
     ],
-    components : {
+    components: {
         Bookmarks,
         FindBox,
         JumpBox,
@@ -102,8 +101,7 @@ export default {
         SPOILER,
 
         HOMEPAGE,
-        NEWREADER,
-        USERGUIDE,
+        HELP,
         MAP,
         LOG,
         SEARCH,
