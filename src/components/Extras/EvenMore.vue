@@ -42,7 +42,7 @@ export default {
   components: {
     NavBanner, Media
   },
-  title: () => "New reader tips",
+  title: () => "Even more content",
   data: function() {
     return {
       // hsmusic, reddit, archive, mspa wiki
@@ -118,7 +118,25 @@ export default {
           url: 'https://www.youtube.com/playlist?list=PLHO1rc05qiGtAidSBy_8jsEOlHXR6x4cd',
           name: "Voxus: Let's Read Homestuck",
           desc: "An extensive voice-acting readthrough of Homestuck. "
-        }
+        },
+        {
+          id: 'omega',
+          url: 'https://omegaupdate.freeforums.net',
+          name: "Omegaupdate Forums",
+          desc: "One of several MSPA Forums replacements. This sprung up around the <a href='https://mspfa.com/?s=16414&p=1'>Act Omega</a> and continues to act as a suggestion box for several fan adventures."
+        },
+        {
+          id: 'xyz',
+          url: 'https://forum.homestuck.xyz',
+          name: "homestuck.xyz MSPA Forums",
+          desc: "One of several MSPA Forums replacements. This is intended as a direct replacement of the classic MSPA Forums rather than as a forum for any particular adventure."
+        },
+        {
+          id: 'mozai',
+          url: 'https://nepeta.mozai.com',
+          name: "nepeta.mozai.com",
+          desc: "<a href='https://mozai.com'>Mozai's</a> Homestuck fansite, with an archive of old fandom resources."
+        },
       ],
       othercats: [
         // {
@@ -170,7 +188,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .siteItem {
-      width: 50%;
+      flex: 1 0 50%;
     }
     img {
       margin: 0 0;
