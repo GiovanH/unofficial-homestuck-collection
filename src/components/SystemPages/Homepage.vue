@@ -1,14 +1,14 @@
 <template>
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
-    <div class="card topLogo">
+    <div class="card tight">
       <a href="/" class="cardContent">
         <Logo />
       </a>
       <div class="cardContent collection">
-        <div class="links">
+        <!-- <div class="links">
           <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
-        </div>
+        </div> -->
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
           Things <em>may</em> still work, but you should probably update<br />
@@ -401,9 +401,8 @@ export default {
   .card {
     position: relative;
     margin-bottom: 75px;
-    & + .card.tight {
-      margin-bottom: 20px;
-    }
+    &.tight { margin-bottom: 20px; }
+
     padding: 25px 50px;
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
