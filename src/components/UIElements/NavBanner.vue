@@ -37,7 +37,7 @@ export default {
         ],
         [
           "/news",
-          "/newreader"
+          "/help"
         ],
         [
           "/map",
@@ -62,7 +62,7 @@ export default {
 
           // "toggleJumpBox": "JUMP",
           "/news": "NEWS",
-          "/newreader": "NEW READERS",
+          "/help": "HELP",
 
           "/map": "MAP",
           "/log": "LOG",
@@ -71,7 +71,7 @@ export default {
           "/music": "MUSIC",
           // "toggleBookmarks": "SAVE/LOAD",
 
-          "/evenmore": "EVEN MORE",
+          "/evenmore": "MORE",
           "/settings": "SETTINGS",
           "/credits": "CREDITS"
         },
