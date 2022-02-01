@@ -78,7 +78,7 @@ export default {
         A6A6: {
           "/": "WORTHLESS GARBAGE.",
 
-          "/newreader": "STUPID.",
+          "/help": "STUPID.",
           "toggleJumpBox": "WHO CARES?",
 
           "/map": "WOW.",
