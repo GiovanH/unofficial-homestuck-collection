@@ -65,9 +65,11 @@ import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
 import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
 import SQUIDDLES from '@/components/Extras/Squiddles.vue'
+import EVENMORE from '@/components/Extras/EvenMore.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
+import SOCIALS from '@/components/Socials/Socials.vue'
 import DSTRIDER from '@/components/Socials/DStrider.vue'
 import BLOGSPOT from '@/components/Socials/Blogspot.vue'
 import MAGICALJOURNEY from '@/components/Socials/MagicalJourney.vue'
@@ -126,8 +128,10 @@ export default {
         VIGILPRINCE,
         SKAIANET,
         SQUIDDLES,
+        EVENMORE,
 
         MUSIC,
+        SOCIALS,
         DSTRIDER,
         BLOGSPOT,
         MAGICALJOURNEY,
