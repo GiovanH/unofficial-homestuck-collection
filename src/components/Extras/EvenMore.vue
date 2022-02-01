@@ -7,22 +7,23 @@
         <section>
           <h2>Looking for more?</h2> 
           <p>
-            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore. Here are a few.
+            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore. Here are a few, in no particular order.
           </p>
           <p>
-            (As with all external links, <em>we recommend staying away from these sits</em> until you've finished the comic, as spoilers abound!)
+            (As with all external links, <em>we recommend staying away from these sites</em> until you've finished the comic, as spoilers abound!)
           </p>
         </section>
 
-        <section>
-          <HomeRowItem v-for="site in extSites"
-            :key="site.id"
-            class="rowItem"
-            :href="site.url"
-            :thumbsrc="`/archive/collection/external/${site.id}.png`">
-            <template v-slot:title>{{site.name}}</template>
-            <p v-html="site.desc" />
-          </HomeRowItem>
+        <section class="list">
+          <div v-for="site in extSites" class="siteItem" :key="site.id">
+            <a class="icon" :href="site.url">
+              <Media :url="`/archive/collection/external/${site.id}.png`" />
+            </a>
+            <div class="text">
+              <h2><a :href="site.url" v-text="site.name" /></h2>
+              <p class="desc" v-html="site.desc" />
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -32,7 +33,6 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
 
 export default {
   name: 'newReader',
@@ -40,7 +40,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, HomeRowItem
+    NavBanner, Media
   },
   title: () => "New reader tips",
   data: function() {
@@ -51,7 +51,7 @@ export default {
           id: 'hsmusic',
           url: 'https://hsmusic.wiki',
           name: 'HSMusic',
-          desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most assocoited music and has tons of information and supplementary material. It's where the collection sources most of its music info!"
+          desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most assocoited music and has tons of information and supplementary material."
         },
         {
           id: 'readmspa',
@@ -61,9 +61,9 @@ export default {
         },
         {
           id: 'MSPFA',
-          url: '',
+          url: 'https://mspfa.com',
           name: 'MS Paint Fan Adventures',
-          desc: `Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>`
+          desc: `A hub for fans to write and share their own MSPA-styled adventures.`
         },
         {
           id: 'reddit',
@@ -92,7 +92,7 @@ export default {
         {
           id: 'ezodiac',
           url: 'http://hs.hiveswap.com/ezodiac/index.php',
-          name: 'Hiveswap Extended Zodiac',
+          name: 'Extended Zodiac',
           desc: "An official personality quiz that assigns you a zodiac symbol based on your quiz answers. Promotional material for the Hiveswap games."
         },
         {
@@ -100,6 +100,18 @@ export default {
           url: 'http://rafe.name/homestuck/',
           name: 'The Acts and Pages of Homestuck',
           desc: "A map of Homestuck, with information and summaries of each act and section of the comic."
+        },
+        {
+          id: 'mrcheeze',
+          url: 'https://mrcheeze.github.io/andrewhussie/',
+          name: 'The Works of Andrew Hussie',
+          desc: "A collection including some of Andrew Hussie's early works that didn't make it into the collection, including Barty's Brew-Ha-Ha, art tutorials, and more."
+        },
+        {
+          id: 'wheals',
+          url: 'http://wheals.github.io/',
+          name: 'wheals.github.io',
+          desc: "wheals' Homestuck archive of social media, including various news interviews with Andrew."
         },
         {
           id: 'voxus',
@@ -131,7 +143,21 @@ export default {
         }
       ]
     }
-  }
+  },
+  methods: {
+    shuffle(){
+      this.extSites = this.extSites
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+    }
+  },
+  mounted() {
+    this.shuffle()
+  },
+  // updated() {
+  //   this.shuffle()
+  // }
 }
 </script>
 
@@ -139,14 +165,40 @@ export default {
   .navBanner {
     margin-bottom: 25px;
   }
-  ::v-deep .rowItem {
-    .thumbnail img {
-      width: 65px;
-      height: 65px;
-      image-rendering: pixelated;
+  section.list {
+    text-align: left;
+    display: flex;
+    flex-wrap: wrap;
+    .siteItem {
+      width: 50%;
     }
-    a.thumbnail::after {
-      display: none !important;
+    img {
+      margin: 0 0;
+    }
+  }
+  .siteItem {
+    display: flex;
+    padding: 1em 0;
+    border-top: solid 2px var(--page-pageBorder, var(--page-pageFrame));
+    .icon {
+      img {
+        object-fit: contain;
+        height: 150px;
+        width: 150px;
+        display: block;
+      }
+      &::after {
+        content: '' !important;
+      }
+    }
+    div.text {
+      padding: 0 1em;
+      h2 {
+
+      }
+      p.desc {
+
+      }
     }
   }
   .pageBody {
