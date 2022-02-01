@@ -154,7 +154,7 @@
 
       // Sets up listener for the main process
       electron.ipcRenderer.on('TABS_NEW', (event, payload) => {
-        this.$localData.root.TABS_NEW(payload.url, payload.adjacent)
+        this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
       })
       electron.ipcRenderer.on('TABS_CLOSE', (event, key) => {
         this.$localData.root.TABS_CLOSE(key)
