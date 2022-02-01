@@ -94,7 +94,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, Logo
   },
   title: () => "Help",
   data: function() {
