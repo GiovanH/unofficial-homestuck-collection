@@ -96,28 +96,12 @@ export default {
           url.includes('twitter.com') ? 'Twitter' :
           url.includes('deviantart.com') ? 'DeviantArt' :
           url.includes('wikipedia.org') ? 'Wikipedia' : url}</a>`)
-        return this.joinNoOxford(sources, 'or')
+        return (new Intl.ListFormat('en', { style: 'long', type: 'disjunction' }).format(sources))
       }
       else return false
     }
   },
   methods: {
-    // thnks florrie 👍
-    joinNoOxford(array, plural = 'and') {
-      if (array.length === 0) {
-          return ''
-      }
-
-      if (array.length === 1) {
-          return array[0]
-      }
-
-      if (array.length === 2) {
-          return `${array[0]} ${plural} ${array[1]}`
-      }
-
-      return `${array.slice(0, -1).join(', ')} ${plural} ${array[array.length - 1]}`
-    },
     groupIsSpoiler(group) {
       return this.$isNewReader && !group.find(track => !(track).includes('>??????<'))
     },
@@ -137,7 +121,7 @@ export default {
         if (typeof artist == 'string') return `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`
         else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${!!artist.what ? ` (${artist.what})` : ''}`
       })
-      return this.joinNoOxford(artists)
+      return (new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(artists))
     },
     secondsToMinutes(time) {
       if (Number.isInteger(time)){
