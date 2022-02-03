@@ -7,7 +7,11 @@
         <section>
           <h2>Looking for more?</h2> 
           <p>
-            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore. Here are a few, in no particular order.
+            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore. Here are a few, sorted by 
+            <select class="sortBy" 
+              v-model="sortBy">
+              <option v-for="fn, label in sortByChoices" :value="label" :key="label" v-text="label" />
+            </select>
           </p>
           <p>
             (As with all external links, <em>we recommend staying away from these sites</em> until you've finished the comic, as spoilers abound!)
@@ -15,7 +19,7 @@
         </section>
 
         <section class="list">
-          <div v-for="site in extSites" class="siteItem" :key="site.id">
+          <div v-for="site in extSitesSorted" class="siteItem" :key="site.id">
             <a class="icon" :href="site.url">
               <Media :url="`/archive/collection/external/${site.id}.png`" />
             </a>
@@ -34,6 +38,45 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 
+function shuffle(obj){
+  return obj
+    .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value)
+}
+
+function sortByField(fieldName, modifier=1) {
+  return function(obj) {
+    obj.sort(function (p1, p2) {
+      if (p1[fieldName] < p2[fieldName]) return -1 * modifier
+      if (p1[fieldName] > p2[fieldName]) return 1 * modifier
+      return 0
+    })
+    return obj
+  }
+}
+
+const collator = new Intl.Collator('en', {
+  ignorePunctuation: true
+})
+
+function sortByFieldIntl(fieldName, modifier=1) {
+  function noArticles(str) {
+    const articles = ['a', 'an', 'the']
+    const re = new RegExp('^(?:(' + articles.join('|') + ') )(.*)$', 'i')
+    return str.replace(re, ($0, $1, $2) => $2 + ', ' + $1)
+  }
+  return function(list) {
+    list.sort(function (p1, p2) {
+      return collator.compare(
+        noArticles(p1[fieldName]), 
+        noArticles(p2[fieldName])
+      ) * modifier
+    })
+    return list
+  }
+}
+
 export default {
   name: 'newReader',
   props: [
@@ -42,122 +85,137 @@ export default {
   components: {
     NavBanner, Media
   },
-  title: () => "New reader tips",
+  title: () => "Even more content",
   data: function() {
     return {
-      // hsmusic, reddit, archive, mspa wiki
+      sortBy: "Random",
+      sortByChoices: {
+        "Random": shuffle,
+        "Alphabetical (desc)": sortByFieldIntl('name'),
+        "Alphabetical (asc)": sortByFieldIntl('name', -1),
+        "Type": sortByField('type'),
+      },
       extSites: [
         {
           id: 'hsmusic',
+          type: 'info',
           url: 'https://hsmusic.wiki',
           name: 'HSMusic',
           desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most assocoited music and has tons of information and supplementary material."
         },
         {
           id: 'readmspa',
+          type: 'info',
           url: 'http://readmspa.org',
           name: 'readmspa',
           desc: "Readmspa has an enormous amount of data about Homestuck including stats, visualizations, transcripts, and storyboards."
         },
         {
           id: 'MSPFA',
+          type: 'social',
           url: 'https://mspfa.com',
           name: 'MS Paint Fan Adventures',
           desc: `A hub for fans to write and share their own MSPA-styled adventures.`
         },
         {
           id: 'reddit',
+          type: 'social',
           url: 'https://www.reddit.com/r/homestuck/',
           name: 'r/Homestuck',
           desc: "The Homestuck fan subreddit. Art, discussion, chat."
         },
         {
           id: 'homestuck_net',
+          type: 'info',
           url: 'https://homestuck.net',
           name: 'HOMESTUCK.net',
           desc: "A massive \"fandom archive\", with an extensive listing of fan projects, crafts, cosplay resources, games, software, sheet music, liveblogs, and more."
         },
         {
           id: 'wiki',
+          type: 'info',
           url: 'https://mspa.wikia.com/',
           name: 'MSPA WIKI',
           desc: "The MSPA Wiki. A great database of character information and summaries. (Caution: hosted by fandom.com)"
         },
         {
           id: 'hs2',
+          type: 'work',
           url: 'https://homestuck2.com',
           name: 'Homestuck^2',
           desc: "A semi-official continuation of the Homestuck comic, picking up after the epilogues. Abandoned, as of time of writing."
         },
         {
           id: 'ezodiac',
+          type: 'work',
           url: 'http://hs.hiveswap.com/ezodiac/index.php',
           name: 'Extended Zodiac',
           desc: "An official personality quiz that assigns you a zodiac symbol based on your quiz answers. Promotional material for the Hiveswap games."
         },
         {
           id: 'rafe',
+          type: 'info',
           url: 'http://rafe.name/homestuck/',
           name: 'The Acts and Pages of Homestuck',
           desc: "A map of Homestuck, with information and summaries of each act and section of the comic."
         },
         {
           id: 'mrcheeze',
+          type: 'info',
           url: 'https://mrcheeze.github.io/andrewhussie/',
           name: 'The Works of Andrew Hussie',
           desc: "A collection including some of Andrew Hussie's early works that didn't make it into the collection, including Barty's Brew-Ha-Ha, art tutorials, and more."
         },
         {
           id: 'wheals',
+          type: 'info',
           url: 'http://wheals.github.io/',
           name: 'wheals.github.io',
           desc: "wheals' Homestuck archive of social media, including various news interviews with Andrew."
         },
         {
           id: 'voxus',
+          type: 'work',
           url: 'https://www.youtube.com/playlist?list=PLHO1rc05qiGtAidSBy_8jsEOlHXR6x4cd',
           name: "Voxus: Let's Read Homestuck",
           desc: "An extensive voice-acting readthrough of Homestuck. "
-        }
-      ],
-      othercats: [
-        // {
-        //   name: "Liveblogs",
-        //   desc: "",
-        //   items: [
-        //     {
-        //       label: "Minda",
-        //       href: ""
-        //     }
-        //   ]
-        // },
+        },
         {
-          name: "Acting",
-          desc: "",
-          items: [
-            {
-              label: "Voxus: Let's Read Homestuck",
-              href: "https://www.youtube.com/c/Voxus/playlists?view=50&sort=dd&shelf_id=2"
-            }
-          ]
+          id: 'omega',
+          type: 'social',
+          url: 'https://omegaupdate.freeforums.net',
+          name: "Omegaupdate Forums",
+          desc: "One of several MSPA Forums replacements. This sprung up around the <a href='https://mspfa.com/?s=16414&p=1'>Act Omega</a> and continues to act as a suggestion box for several fan adventures."
+        },
+        {
+          id: 'xyz',
+          type: 'social',
+          url: 'https://forum.homestuck.xyz',
+          name: "homestuck.xyz MSPA Forums",
+          desc: "One of several MSPA Forums replacements. This is intended as a direct replacement of the classic MSPA Forums rather than as a forum for any particular adventure."
+        },
+        {
+          id: 'mozai',
+          type: 'info',
+          url: 'https://nepeta.mozai.com',
+          name: "nepeta.mozai.com",
+          desc: "<a href='https://mozai.com'>Mozai's</a> Homestuck fansite, with an archive of old fandom resources."
+        },
+        {
+          id: 'viz',
+          type: 'work',
+          url: 'https://www.homestuck.com',
+          name: "homestuck.com",
+          desc: "The current version of the MSPA website. More mobile-friendly, but with a number of issues. Hence this archive. Also has links to get official Homestuck merch."
         }
       ]
     }
   },
-  methods: {
-    shuffle(){
-      this.extSites = this.extSites
-        .map(value => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value)
+  computed: {
+    extSitesSorted(){
+      return this.sortByChoices[this.sortBy](this.extSites)
     }
-  },
-  mounted() {
-    this.shuffle()
-  },
-  // updated() {
-  //   this.shuffle()
-  // }
+  }
 }
 </script>
 
@@ -170,7 +228,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .siteItem {
-      width: 50%;
+      flex: 1 0 50%;
     }
     img {
       margin: 0 0;
