@@ -1,8 +1,8 @@
 <template>
-  <div class="banner app" v-if="appHasUpdate && !dismissed">
-    <p><a :href="appLatestRelease.html_url">There is a new version of the app available!<br />Click here to see the release notes and update from {{appVersionCurrent}} to {{appLatestReleaseSemver}}</a></p>
+  <div class="banner app" v-if="!appHasUpdate && !dismissed">
+    <p><a :href="appLatestRelease.html_url">Version {{appLatestReleaseSemver}} is now available!<br />Click here to check it out.</a></p>
     <span class="dismiss" @click="dismissed = true">
-      later
+      ✕
     </span>
   </div>
 </template>
@@ -61,23 +61,31 @@ export default {
 
 <style lang="scss" scoped>
  .banner {
-    position: relative;
-    // height: 32px;
-    // min-height: 32px;
-    border: 4px solid yellow;
-    padding: 2px;
+    position: absolute;
+    width: 480px;
+    bottom: 20px;
+    left: 0;
+    right: 16px;
+    margin: 0 auto;
+    padding: 4px;
+
+    border: 2px solid yellow;
+    box-shadow: 0 0 0 4px #ff9000;
 
     background: black;
     color: white;
 
     text-align: center;
     vertical-align: middle;
+
     .dismiss {
       position: absolute;
-      top: 4px;
-      right: 4px;
+      cursor: pointer;
+      top: 3px;
+      right: 8px;
+      font-size: 16px;
 
-      color: #696969;
+      // color: #696969;
     }
     p {
       font-size: 22px;
