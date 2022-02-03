@@ -3,7 +3,6 @@
     <div class="jumpBoxWrapper">
       <a :href="jumpboxText" class="jumpboxLink" ref="link" />
       <vue-simple-suggest
-        v-model="jumpboxText" 
         :list="allUrlSuggestions"
         display-attribute="title"
         value-attribute="url"
@@ -152,11 +151,23 @@ export default {
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
     },
     onSuggestSelect(event){
-      this.jumpboxText = event.url
+      if (!event) return
+      const url = this.$resolvePath(event.url)
+      this.jumpboxText = url
       // this.$nextTick(this.focusLink)
-      this.$localData.root.TABS_PUSH_URL(event.url) // avoids some weird focus cases
+      this.$localData.root.TABS_PUSH_URL(url) // avoids some weird focus cases
       this.$refs.suggest.hideList()
       document.activeElement.blur()
+
+      // Very icky way to force the displayed input value correct
+      // without it showing the label text as the url value.
+      // TODO: Keep the input value correct without using $nextTick
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.$logger.info("Suggestion: forcing input value from", this.$refs.input.value)
+          this.$refs.input.value = url
+        })
+      })
     },
     resetJumpbox() {
       this.jumpboxText = this.$localData.root.activeTabObject.url

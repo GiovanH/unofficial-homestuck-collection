@@ -335,35 +335,35 @@ export default {
 
       // getURL "about:srcdoc#gameOver" "" <- Get ready for some bullshit
 
-      this.$logger.info(func)
+      this.$logger.debug(func)
       const [funcName, param] = func.split('?')
       switch (funcName) {
         case 'audioInit':
-          this.$logger.info(`Creating audio`)
+          this.$logger.debug(`Creating audio`)
           this.audioInit(param)
           break
         case 'audioStart':
-          this.$logger.info(`Playing audio (${param})`)
+          this.$logger.debug(`Playing audio (${param})`)
           this.audioStart(param)
           break
         case 'audioPause':
-          this.$logger.info(`Pausing audio`)
+          this.$logger.debug(`Pausing audio`)
           this.audioPause()
           break
         case 'audioResume':
-          this.$logger.info(`Resuming audio`)
+          this.$logger.debug(`Resuming audio`)
           this.audioResume()
           break
         case 'audioReset':
-          this.$logger.info(`Resetting audio`)
+          this.$logger.debug(`Resetting audio`)
           this.audioReset()
           break
         case 'audioSeek': 
-          this.$logger.info(`Seeking audio to ${param}`)
+          this.$logger.debug(`Seeking audio to ${param}`)
           this.audioSeek(param)
           break
         case 'vol': 
-          this.$logger.info(`Setting volume to ${param}`)
+          this.$logger.debug(`Setting volume to ${param}`)
           this.audioVolume(param)
           break
         case 'link':
@@ -371,19 +371,19 @@ export default {
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
-            this.$logger.info(`Starting height (${param})`)
+            this.$logger.debug(`Starting height (${param})`)
             this.heightStart(param)
           }
           break
         case 'heightPause':
           if (this.$localData.settings.jsFlashes) {
-            this.$logger.info(`Pausing height (${param})`)
+            this.$logger.debug(`Pausing height (${param})`)
             this.pauseTimer()
           }
           break
         case 'heightResume':
           if (this.$localData.settings.jsFlashes) {
-            this.$logger.info(`Resuming height (${param})`)
+            this.$logger.debug(`Resuming height (${param})`)
             this.resumeTimer()
           }
           break

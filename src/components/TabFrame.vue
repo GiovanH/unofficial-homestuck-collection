@@ -153,7 +153,6 @@ export default {
         }
     },
     created(){
-        this.$logger.info("Tabframe created")
         for (const COM in this.modBrowserPages) {
             let mixins = this.modBrowserPages[COM].component.mixins || []
             if (!mixins.includes(ModBrowserPageMixin)) {
