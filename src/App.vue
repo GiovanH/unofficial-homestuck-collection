@@ -1,7 +1,8 @@
 <template>
   <div id="app" :class="[
     // $root.loadState != 'DONE' ? 'busy' : '',
-    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
+    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+      theme
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
     <AppHeader :class="theme" ref="appheader" />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
@@ -293,13 +294,6 @@
 
   #app.busy {
     cursor: progress;
-  }
-
-  .addressBar {
-    --headerHeight: 79px;
-  }
-  .noAddressBar {
-    --headerHeight: 51px;
   }
 
   html, body {

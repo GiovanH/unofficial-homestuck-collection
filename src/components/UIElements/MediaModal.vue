@@ -76,7 +76,7 @@ export default {
   position: fixed;
 
   width: 100%;
-  height: calc(100% - var(--headerHeight));
+  height: 100%;
   overflow: hidden;
 
   display: flex;

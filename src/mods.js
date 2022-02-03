@@ -618,7 +618,7 @@ function getMainMixin(){
 
           let body = fs.readFileSync(path.resolve(js._mod_root_dir, theme.source))
           body = sass.renderSync({
-            data: `#app.${theme_class} {\n${body}\n}`,
+            data: `#app.${theme_class}, #app > .${theme_class} {\n${body}\n}`,
             sourceComments: true
           }).css.toString()
 
