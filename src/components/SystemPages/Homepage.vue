@@ -9,7 +9,8 @@
         </div>
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
-          Nothing's <em>guaranteed</em> to break, but things might get a little weird.
+          Things <em>may</em> still work, but you should probably update<br />
+          to asset pack <strong>v{{$archive.version}}</strong> as soon as possible.
         </p>
       </div>
     </div>

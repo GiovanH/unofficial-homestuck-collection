@@ -1,5 +1,5 @@
 <template>
-  <div class="banner app" v-if="!appHasUpdate && !dismissed">
+  <div class="banner app" v-if="appHasUpdate && !dismissed">
     <p><a :href="appLatestRelease.html_url">Version {{appLatestReleaseSemver}} is now available!<br />Click here to check it out.</a></p>
     <span class="dismiss" @click="dismissed = true">
       ✕
