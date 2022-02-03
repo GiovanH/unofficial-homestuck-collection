@@ -47,12 +47,12 @@ export default {
   * {
     user-select: none;
   }
+
+  --address-bar-height: 28px;
+  --tab-height: 28px;
 }
 .systemButton {
-  &.historyButton[disabled] {
-    color: var(--font-disabled);
-  }
-  &:not([disabled]):not(#closeButton) {
+  &:not([disabled]) {
     &:hover {
       background: var(--header-buttonHoverState);
     }

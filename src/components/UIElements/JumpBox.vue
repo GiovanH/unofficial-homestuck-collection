@@ -126,7 +126,7 @@ export default {
     
     position: fixed;
     width: 100%;
-    top: calc(var(--headerHeight) + 50px);
+    top: 80px;
     z-index: 4;
 
     .wrapper {
