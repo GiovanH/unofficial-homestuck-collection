@@ -9,7 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
-const APP_VERSION = '2.0.0'
+const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -376,8 +376,8 @@ try {
 }
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
-ipcMain.on('STARTUP_GET_PORT', (event) => {
-  event.returnValue = port
+ipcMain.on('STARTUP_GET_INFO', (event) => {
+  event.returnValue = {port: port, appVersion: APP_VERSION}
 })
 
 if (assetDir) {

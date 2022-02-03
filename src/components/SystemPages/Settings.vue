@@ -428,6 +428,10 @@ export default {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
           desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+        }, {
+          model: "allowSysUpdateNotifs",
+          label: "Enable update notifications",
+          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is."
         }
       ],
       retconList: [
