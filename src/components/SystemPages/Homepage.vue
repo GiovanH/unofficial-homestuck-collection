@@ -1,20 +1,23 @@
 <template>
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
-    <div class="card Logo">
-      <a href="/" class="topLogo cardContent"><Media url="/archive/collection/collection_logo.png" /></a>
+    <div class="card topLogo">
+      <a href="/" class="cardContent">
+        <Logo />
+      </a>
       <div class="cardContent collection">
         <div class="links">
           <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
         </div>
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
-          Nothing's <em>guaranteed</em> to break, but things might get a little weird.
+          Things <em>may</em> still work, but you should probably update<br />
+          to asset pack <strong>v{{$archive.version}}</strong> as soon as possible.
         </p>
       </div>
     </div>
     <div class="card">
-      <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" />
+      <!-- <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" /> -->
       <div class="cardContent cardEntry hsCard">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
@@ -334,14 +337,16 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
 import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
+
 export default {
   name: 'homepage',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, HomeRowItem
+    NavBanner, Media, HomeRowItem, Logo
   },
   data: function() {
     return {
@@ -376,11 +381,6 @@ export default {
     }
   }
 
-  .topLogo {
-    img {
-      width: 700px;
-    }
-  }
   .navBanner {
     margin-bottom: 25px;
   }

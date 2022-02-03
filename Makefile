@@ -1,6 +1,6 @@
 default: test
 
-install: package.json
+install: package.json yarn.lock
 	yarn install
 	touch install
 
