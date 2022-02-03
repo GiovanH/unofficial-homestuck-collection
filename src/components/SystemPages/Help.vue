@@ -113,6 +113,9 @@ export default {
     span {
       color: var(--page-links);
       font-size: 24px; 
+      &:hover {
+        cursor: pointer;
+      }
       &:hover, &.selected {
         text-decoration: underline;
       }

@@ -174,7 +174,7 @@
           <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
           <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
           <div class="links">
-            <div class="left bigLink">
+            <div class="left">
               &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
             </div>
             <div class="center">
