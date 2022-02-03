@@ -810,7 +810,9 @@ function jsToChoice(js, dir){
     includes: {
       routes: Boolean(js.routes || js.treeroute || js.trees),
       edits: Boolean(js.edit),
-      hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+      hooks: (js.vueHooks 
+        ? Array.from(new Set(js.vueHooks.map(h => (h.matchName || "[complex]")))) 
+        : false),
       browserPages: js.browserPages ? Object.keys(js.browserPages) : false,
       toolbars: Boolean(js.browserToolbars),
       browserActions: Boolean(js.browserActions),
