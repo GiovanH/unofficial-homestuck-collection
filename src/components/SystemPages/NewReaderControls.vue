@@ -6,7 +6,9 @@
         <!-- Settings for adjusting new reader mode -->
         <p>New reader mode enabled.<br>
           Currently up to page 
-          <input type="number" size="1" maxlength="6" v-model="newReaderPageInput"
+          <input type="number" size="1" maxlength="6" 
+            v-model="newReaderPageInput"
+            @keydown.enter="changeNewReader()"
             :class="{
               invalid: !isValidPageSet, 
               empty: !newReaderPageInput || !newReaderPageInput.length, 
@@ -22,10 +24,14 @@
       <div class="newReaderInput" v-else>
         <!-- Settings for turning on new reader mode -->
         <input type="number" size="1" maxlength="6" 
-          v-model="newReaderPageInput" @keydown.enter="setNewReader()"
-          :class="{invalid: !isValidPageSet, empty: !newReaderPage.length}">
-          
-        <button :disabled="!isValidPageSet || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
+          v-model="newReaderPageInput"
+          @keydown.enter="setNewReader()"
+          :class="{
+            invalid: !isValidPageSet, 
+            empty: !newReaderPageInput || !newReaderPageInput.length, 
+            changed: newReaderPageChanged
+          }" >
+        <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" @click="setNewReader()">Activate</button>
         <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number<br>
@@ -204,9 +210,10 @@ export default {
         this.newReaderPageInput = this.$mspaToViz(this.newReaderPageInput).p
       }
     },
-    newReaderPage(to, from) {
-      if (this.$localData.settings.mspaMode)
-        this.newReaderPageInput = this.$mspaOrVizNumber(to)
+    newReaderPageInput(to, from){
+      if (to && this.$localData.settings.mspaMode){
+        this.newReaderPageInput = this.$mspaOrVizNumber(this.$parseMspaOrViz(to))
+      }
     }
   }
 }

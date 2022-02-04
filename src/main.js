@@ -219,16 +219,16 @@ Vue.mixin({
     $vizToMspa(vizStory, vizPage) {
       let mspaPage
       const vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
-      const pageNotInStory = this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
+      const pageNotInStory = (mspaPage) => this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
 
       switch (vizStory) {
         case 'jailbreak':
           mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 135 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 135 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
         case 'bard-quest':
           mspaPage = (vizNum == 1) ? "000136" : (vizNum + 169).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 47 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 47 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
         case 'blood-spade':
           if (vizNum == 1) mspaPage = "mc0001"
@@ -236,19 +236,19 @@ Vue.mixin({
           break
         case 'problem-sleuth':
           mspaPage = (vizNum + 218).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 1674 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 1674 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
         case 'beta':
           mspaPage = (vizNum + 1892).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 8 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 8 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
         case 'homestuck':
           mspaPage = vizNum ? (vizNum + 1900).toString().padStart(6, '0') : vizPage
-          if (1 > vizNum || vizNum > 8130 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 8130 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
         case 'ryanquest':
           mspaPage = vizNum.toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 15 || pageNotInStory) return {s: undefined, p: undefined}
+          if (1 > vizNum || vizNum > 15 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
           break
       }
       return {s: vizStory == 'ryanquest' ? 'ryanquest' : this.$getStory(mspaPage), p: mspaPage}
@@ -311,8 +311,12 @@ Vue.mixin({
     $parseMspaOrViz(userInput, story = 'homestuck') {
       // Takes a user-formatted string and returns a MSPA page number.
       // The output page number may not be real!
+      if (Number.isInteger(userInput)) {
+        this.$logger.waring("parseMspaOrViz got int, not string: ", userInput)
+        userInput = String(userInput)
+      }
       if (this.$localData.settings.mspaMode) {
-        return userInput.padStart(6, '0')
+        return userInput.replace(/^0+/, '').padStart(6, '0')
       } else {
         return this.$vizToMspa(story, userInput).p
       }
