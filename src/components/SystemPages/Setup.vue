@@ -13,13 +13,13 @@
             <ol class="wizardProgress">
               <li v-for="name, i in newReaderCardNames" 
                 v-text="name" 
-                :class="{current: i==newReaderCard, previous: i < newReaderCard, future: i > newReaderCard}"
+                :class="{current: i==newReaderCardIndex, previous: i < newReaderCardIndex, future: i > newReaderCardIndex}"
                 :key="`wizardProgress${i}`" />
             </ol>
           </div>
           <div class="wizardBody">
 
-          <div class="intro" :class="{hidden: newReaderCard != 0}">
+          <div class="intro" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Intro'}">
             <h2>Hello!</h2>
             <p>Let me tell you a story about a webcomic called <em>Homestuck</em>. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2006 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.</p>
 
@@ -34,7 +34,7 @@
             </p>
             </div>
           </div>
-          <div class="newReader" :class="{hidden: newReaderCard != 1}">
+          <div class="newReader" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'New Readers'}">
             <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
             <h2>New Readers</h2>
             <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
@@ -50,37 +50,30 @@
             <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. Don't worry: if New Reader Mode is on, the Settings page will be spoiler-free too.</p>
           </div>
 
-          <div class="contentWarnings" :class="{hidden: newReaderCard != 2}">
+          <div class="contentWarnings" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Content Warnings'}">
             <h2>Content Warnings</h2>
             <p>
-              Homestuck was written for teenagers but contains adult topics as well as a laundry list of potential triggers. Here is a fairly thorough list:
+              Homestuck was written for teenagers but contains adult topics as well as a laundry list of potential triggers. Here are some of the topics that come up:
             </p>
-            <div class="scrollbox">
-              <p>
+            <SpoilerBox>
+              <div class="scrollbox" style="max-height: 18em; margin: 1em 0;">
                 <ul>
-                  <!-- extend/sort this list -->
-                  <li>slurs</li>
-                  <li>gruesome depictions of death</li>
-                  <li>body horror</li>
-                  <li>animal death</li>
-                  <li>war crimes</li>
-                  <li>mind control</li>
-                  <li>implied nonconsensual sexual relationships</li>
-                  <li>graphic mpreg</li>
+                  <li v-for="cw in contentWarnings" v-text="cw" :key="cw" />
                 </ul>
-              </p>
-            </div>
+              </div>
+            </SpoilerBox>
             <p>
-              Most of the particularly harsh examples are either briefly touched on or buried away in corners (TSO, etc).
+              Mainly your general slew of 2010s edgy stuff.
+            </p>
+            <p>
+              Most of the particularly harsh examples are either briefly touched on or buried away in corners (older comics, beyond canon, etc).
             </p>
           </div>
 
-          <div class="fastForward" :class="{hidden: newReaderCard != 3}">
+          <div class="fastForward" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Reading Experience'}">
             <h2>Reading Experience</h2>
 
             <p>Okay, one last choice we're going to force you to make before you jump in:</p>
-
-            <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
 
             <SpoilerBox v-if="!$isNewReader" :always-open="true" style="font-size: 14px;">
               <p>Since you did not enable new reader mode on the previous page, here's an explanation of how this works:</p>
@@ -89,8 +82,10 @@
               <p>So, all that to say, you probably don't care about this. But you're in on the secret! Also, if you want to adjust what you see, you have more granular timeline controls in Settings.</p>
             </SpoilerBox>
 
+            <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
+
           </div>
-          <div class="getStarted" :class="{hidden: newReaderCard != 4}">
+          <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
@@ -111,11 +106,11 @@
 
           </div>
           <div class="wizardNavigation">
-            <button v-if="newReaderCard > 0" @click="newReaderCard -= 1" style="right: 94px;">&lt; Previous</button>
-            <button v-if="newReaderCard < lastNewReaderCard" 
-              @click="newReaderCard += 1" style="right: 20px;"
+            <button v-if="newReaderCardIndex > 0" @click="newReaderCardIndex -= 1" style="right: 94px;">&lt; Previous</button>
+            <button v-if="newReaderCardIndex < lastNewReaderCard" 
+              @click="newReaderCardIndex += 1" style="right: 20px;"
               :disabled="wizardForwardButtonDisabled">Next &gt;</button>
-            <!--<button v-if="newReaderCard == lastNewReaderCard" @click="">Finish</button>-->
+            <!--<button v-if="newReaderCardIndex == lastNewReaderCard" @click="">Finish</button>-->
           </div>
           
         </div>
@@ -196,7 +191,7 @@ export default {
   },
   data: function() {
     return {
-      newReaderCard: 0,
+      newReaderCardIndex: 0,
       lastNewReaderCard: 4,
       newReaderCardNames: [
         "Intro",
@@ -208,24 +203,43 @@ export default {
       newReaderToggle: true,
       timeout: false,
       assetDir: undefined,
+      contentWarnings: [
+        'Alcohol use',
+        'Animal death',
+        'Body horror',
+        'Graphic depictions of gruesome deaths',
+        'Graphic depictions of violence',
+        'Imperialist empires',
+        'Incest (mentioned)',
+        'Major character death',
+        'Male pregnancy',
+        'Mind control',
+        'Misogyny, sexism',
+        'Nonconsensual sexual relationships (implied)',
+        'Possession',
+        'Slurs',
+        'Unhealthy relationships',
+        'War crimes'
+      ],
       loadStages: {
         "": "Awaiting reactivity",
         "MOUNTED": "Entangling connections",
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
-        "PATCHES": "Applying spackle",
+        "PATCHES": "Applying spackle"
       }
     }
   },
   computed: {
     wizardForwardButtonDisabled(){
-      if (this.newReaderCard == 1) {
+      const pagename = this.newReaderCardNames[this.newReaderCardIndex]
+      if (pagename == 'New Readers') {
         // missing controls, invalid, or unsaved
         if (!this.$refs.newReaderControls || !this.$refs.newReaderControls.isValidPageSet || this.$refs.newReaderControls.newReaderPageChanged)
           return true
         else return false
       }
-      if (this.newReaderCard == 3) {
+      if (pagename == 'Reading Experience') {
         if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
           return true
         else return false
@@ -340,18 +354,48 @@ export default {
       height: 100%;
       margin: 25px 25px 25px 0;
       .wizardProgress {
+
         li {
+          position: relative;
+          margin-left: 1em;
+
+          &:before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: -19px;
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+            background: linear-gradient(135deg,#dcdcd7,#fff);
+            border-radius: 50%;
+            border: 1px solid #1d5281;
+          }
           &.previous {
-            list-style: inside disc;
+            list-style: none;
             font-weight: bold;
+            &:after {
+              content: "";
+              display: block;
+              width: 5px;
+              height: 5px;
+              top: 8px;
+              left: -14px;
+              position: absolute;
+              background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -0.5 5 5' shape-rendering='crispEdges'%3E%3Cpath stroke='%23a9dca6' d='M1 0h1M0 1h1'/%3E%3Cpath stroke='%234dbf4a' d='M2 0h1M0 2h1'/%3E%3Cpath stroke='%23a0d29e' d='M3 0h1M0 3h1'/%3E%3Cpath stroke='%2355d551' d='M1 1h1'/%3E%3Cpath stroke='%2343c33f' d='M2 1h1'/%3E%3Cpath stroke='%2329a826' d='M3 1h1'/%3E%3Cpath stroke='%239acc98' d='M4 1h1M1 4h1'/%3E%3Cpath stroke='%2342c33f' d='M1 2h1'/%3E%3Cpath stroke='%2338b935' d='M2 2h1'/%3E%3Cpath stroke='%2321a121' d='M3 2h1'/%3E%3Cpath stroke='%23269623' d='M4 2h1'/%3E%3Cpath stroke='%232aa827' d='M1 3h1'/%3E%3Cpath stroke='%2322a220' d='M2 3h1'/%3E%3Cpath stroke='%23139210' d='M3 3h1'/%3E%3Cpath stroke='%2398c897' d='M4 3h1'/%3E%3Cpath stroke='%23249624' d='M2 4h1'/%3E%3Cpath stroke='%2398c997' d='M3 4h1'/%3E%3C/svg%3E")
+            }
           }
           &.current {
-            list-style: inside circle;
+            list-style: none;
             font-weight: bold;
             color: orangered;
+            &:before {
+              box-shadow: inset -2px -2px #f8b636, inset 2px 2px #fedf9c;
+            }
           }
           &.future {
-            list-style: inside circle;
+            list-style: none;
           }
         }
       }
