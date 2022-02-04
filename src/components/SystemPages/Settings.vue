@@ -129,10 +129,11 @@
                     </option>
                   </select>
                 </label>
-                <span v-if="$localData.settings.textOverride.fontFamily">
-                  <br><br>
-                  <label ><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                </span>
+                <div class="textOptions">
+                  <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                  <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
+                  <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+                </div>
                 <br><br>
                 <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
                 <br><br>
@@ -943,6 +944,10 @@ export default {
         .textOverrideSettings {
           margin-top: 16px;
           text-align: center;
+          
+          .textOptions label {
+            display: block;
+          }
 
           .textpreviews {
             border: 6px solid var(--page-pageFrame);

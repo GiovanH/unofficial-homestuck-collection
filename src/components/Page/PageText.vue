@@ -2,6 +2,7 @@
     <p class="prattle text" :class="fontFamily" :style="fontScale" v-html="filteredPrattle" v-if="textType == 'prattle' && !!content"></p>
 
     <div class="log" :class="{logHidden: logHidden}" v-else-if="textType == 'log'">
+        <div class="bgshade" v-if="$localData.settings.textOverride.highContrast"/>
 		<button class="logButton" @click="loggle()">
             {{ logButtonText }}
 		</button>
@@ -53,7 +54,8 @@ export default {
             let lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
             return {
                 fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
-                lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight]
+                lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight],
+                filter: this.$localData.settings.textOverride.highContrast ? "brightness(0.7)" : "none"
             }
         },
         textType() {
@@ -211,24 +213,40 @@ export default {
         padding: 1px;
         text-align: center;
         align-self: center;
+        position: relative;
         
         &.highContrast {
             background: #ffffff;
         }
         button {
             text-transform: capitalize;
+            position: inherit;
+            z-index: 10;
         }
         
         .logContent{
             color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
+            z-index: 5;
         }
 
         &.logHidden {
-            .logContent {
+            .logContent, .bgshade {
                 display: none; 
             }
+
+        }
+
+        .bgshade {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: #FFFFFFAA;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            z-index: 0;
         }
     }
 </style>
