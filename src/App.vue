@@ -10,12 +10,6 @@
     <Updater ref="Updater" />
     <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
     <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
-    <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-      .log .logContent span {
-        padding-bottom: 0.5em;
-        display: inline-block;
-      }
-    </component>
   </div>
   <div id="app" class="mspa"  v-else>
     <Setup />

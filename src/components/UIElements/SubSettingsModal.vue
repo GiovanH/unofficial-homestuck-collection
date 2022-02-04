@@ -312,9 +312,10 @@ export default {
       background: #008C45;
     }
     ul {
-      padding: 0 0.5em;;
+      padding: 0 0.5em;
       list-style: inside;
       background: white;
+      color: black;
     }
   }
 

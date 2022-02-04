@@ -825,7 +825,7 @@ export default {
     background-color: #35bfff;
     background-attachment: fixed;
     
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
 
@@ -1019,15 +1019,15 @@ export default {
       
       ul, ol {  
         text-align: left;
-        border: solid #c6c6c6;
-        border-width: 7px 7px 0 0;
+        border: solid var(--page-pageBorder, var(--page-pageFrame));
+        border-width: 5px 5px 0 0;
         padding-bottom: 6em;
         height: 100%;
       }
 
       li {
           /*list-style-position: inside;*/
-          background-color: #fff;
+          background-color: var(--page-log-bg);
           border: 1px solid rgba(0,0,0,.125);
           margin-bottom: -1px;
           padding: .2em;
@@ -1052,10 +1052,10 @@ export default {
         float: right;
         width: 18px;
         height: 18px;
-        background: #EEE;
+        background: var(--saves-tab);
         text-align: center;
         &:hover {
-          background: #c6c6c6
+          background: var(--saves-tabHover)
         }
       }
     }

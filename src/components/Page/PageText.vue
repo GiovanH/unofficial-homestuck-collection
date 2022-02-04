@@ -1,21 +1,39 @@
 <template>
-    <p class="prattle text" :class="fontFamily" :style="fontScale" v-html="filteredPrattle" v-if="textType == 'prattle' && !!content"></p>
+    <p class="prattle text" :class="fontFamily" :style="fontStyle" 
+        v-html="filteredPrattle" v-if="textType == 'prattle' && !!content" />
 
     <div class="log" :class="{logHidden: logHidden}" v-else-if="textType == 'log'">
-        <div class="bgshade" v-if="$localData.settings.textOverride.highContrast" :style="{background: isDarkMode ? '#000A' : '#FFFA'}"/>
+        <div class="bgshade" v-if="$localData.settings.textOverride.highContrast" :style="{background: isDarkBackground ? '#000A' : '#FFFA'}"/>
 		<button class="logButton" @click="loggle()">
             {{ logButtonText }}
 		</button>
-		<p class="logContent text" :class="fontFamily" :style="fontScale" v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
+		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
+         v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
+        <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
+          .log .logContent span:not(:last-child) {
+            padding-bottom: 0.5em;
+            display: inline-block;
+          }
+        </component>
 	</div>
 
     <div class="authorlog" v-else-if="textType == 'authorlog'">
-		<p class="logContent text" :class="fontFamily" :style="fontScale" v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
+		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
+            v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
+        <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
+          .authorlog .logContent span:not(:last-child) {
+            padding-bottom: 0.5em;
+            display: inline-block;
+          }
+        </component>
 	</div>
 
 </template>
 
 <script>
+
+var Color = require('ts-color-class')
+
 export default {
     name: 'pageText',
     props: ['pageId', 'content', 'forcetheme'],
@@ -23,6 +41,8 @@ export default {
         return {
             usePurpleLinks: false,
             logHidden: true,
+            isMounted: false,
+            lightnessOffset: 0.3,
             fullwidthImages: [
                 'andthenightbeforechristmas.jpg',
                 'areyounext.gif',
@@ -52,20 +72,25 @@ export default {
         theme(){
             return this.forcetheme || this.$root.tabTheme
         },
-        isDarkMode() {
-            return ['cascade'].includes(this.theme)
-        },
-        fontScale() {
-            let fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
-            let lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
+        isDarkBackground() {
+            this.theme; this.isMounted;
+            const bgcolor_repr = this.textType == 'log'
+                ? this.getComputedStyle('--page-log-bg')
+                : this.textType == 'prattle'
+                ? this.getComputedStyle('--page-pageContent')
+                : this.textType == 'authorlog'
+                ? 'white'
+                : undefined
 
-            console.log(this.theme)
-            let contrastFilter = this.isDarkMode ? "contrast(0.5) brightness(2)" : "brightness(0.7)"
+            return (new Color(bgcolor_repr || 'white').getLightness() < 0.5)
+        },
+        fontStyle() {
+            const fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
+            const lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
             return {
                 fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
                 lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight],
-                filter: this.$localData.settings.textOverride.highContrast ? contrastFilter : "none",
-                color: this.isDarkMode ? "white" : "var(--font-log)"
+                color: this.isDarkBackground ? "white" : "var(--font-log)"
             }
         },
         textType() {
@@ -73,7 +98,7 @@ export default {
         },
         logButtonText() {
             let text = this.content.match(/\|(.*?)\|/)[1]
-            let state = (this.logHidden) ? 'Show ' : 'Hide '
+            const state = (this.logHidden) ? 'Show ' : 'Hide '
 
             if (/P4SSWORD H1NT/i.test(text)){
                 return text
@@ -134,8 +159,50 @@ export default {
                         require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
                     }
                 }
+                if (this.$localData.settings.textOverride.highContrast) {
+                    this.$el.querySelectorAll("span[style]").forEach(e => {
+                        if (!e.style.color) return
+                        let textcolor = new Color(e.style.color)
+
+                        const lightnessExtrema = 
+                            this.isDarkBackground
+                            ? (1 - this.lightnessOffset)
+                            : this.lightnessOffset
+                        const needClampLightness = 
+                            this.isDarkBackground
+                            ? (textcolor.getLightness() < lightnessExtrema) // Too dark
+                            : (textcolor.getLightness() > lightnessExtrema) // Too light
+
+                        if (needClampLightness) {
+                            e.setAttribute("data-orig-color", textcolor.toString())
+                            textcolor = textcolor.lightness(lightnessExtrema)
+                            e.style.color = textcolor.toString()
+                        }
+
+                        const saturationExtrema = 0.5
+                        const needClampsaturation = (textcolor.getSaturation() < saturationExtrema)
+
+                        if (needClampsaturation) {
+                            e.setAttribute("data-orig-color", textcolor.toString())
+                            textcolor = textcolor.saturation(saturationExtrema)
+                            e.style.color = textcolor.toString()
+                        }
+                    })
+                } else {
+                    this.$el.querySelectorAll("span[data-orig-color]").forEach(e => {
+                        e.style.color = e.getAttribute("data-orig-color")
+                    })
+                }
             }
-        }
+        },
+        getComputedStyle(var_name, default_){
+            this.theme; this.isMounted;
+            try {
+                return getComputedStyle(this.$el).getPropertyValue(var_name).trim() || default_
+            } catch {
+                return getComputedStyle(document.body).getPropertyValue(var_name).trim() || default_
+            }
+        },
     },
     mounted() {
         if (this.$localData.settings.openLogs) {
@@ -143,12 +210,27 @@ export default {
             this.logHidden = this.pageId == '007326' 
         }
 
-        this.filterDOM()
+        this.$nextTick(() => {
+            this.isMounted = true
+            this.filterDOM()
+        })
     },
     watch: {
         'purpleLinkWatcher'() {
             if (this.usePurpleLinks) this.filterDOM()
-        }
+        },
+        'isDarkBackground'(to, from){
+            this.$logger.info("Background changed, refiltering DOM")
+            this.$nextTick(() => {
+                this.filterDOM()
+            })
+        },
+        '$localData.settings.textOverride.highContrast'(to, from){
+            this.$logger.info("Highcontrast changed, refiltering DOM")
+            this.$nextTick(() => {
+                this.filterDOM()
+            })
+        },
     }
 }
 </script>
@@ -238,6 +320,7 @@ export default {
             color: var(--font-log);
             padding: 15px 5%;
             text-align: left;
+            position: inherit;
             z-index: 5;
         }
 
