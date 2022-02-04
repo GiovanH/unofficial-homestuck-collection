@@ -208,15 +208,14 @@ export default {
           align-content: center;
           align-items: center;
           justify-content: center;
-          &:not(:last-child):after {
-            content: " |";
-            color: #FFFFFF;
-            display: inline-block;
-            margin: 0 0.3em
-          }
+        }
+        li + li:before {
+          content: " | ";
+          color: #FFFFFF;
+          display: inline-block;
+          margin: 0 0.3em
         }
       }
-
     }
   }
 </style>
