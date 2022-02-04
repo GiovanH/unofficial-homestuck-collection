@@ -58,7 +58,7 @@ export default {
         // default theme in settings is the empty string
         mspa: {
           // "https://www.homestuck.com": "HOMESTUCK.COM",
-          "/": "MS PAINT ADVENTURES",
+          "/": "HOMESTUCK COLLECTION",
 
           // "toggleJumpBox": "JUMP",
           "/news": "NEWS",

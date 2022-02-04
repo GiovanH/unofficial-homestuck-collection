@@ -385,7 +385,7 @@ if (assetDir) {
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
-  if (semverGreater(APP_VERSION, last_app_version)) {
+  if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
     Mods.extractimods()
   } else {
