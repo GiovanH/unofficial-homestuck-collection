@@ -41,7 +41,7 @@
         </div>
         <div class="logItems">
           <h2>Conversations</h2>
-          <ul>
+          <ul v-if="loadConversations">
             <li  v-for="__, color in speakerColorData.pagesByColor" :key="color">
               <label>
                 <input type="checkbox" v-model="selectedConvoColors[color]" />
@@ -50,10 +50,11 @@
               </label>
             </li>
           </ul>
+          <button v-else @click="loadConversations = true">Load</button>
           <ul v-if="Object.values(selectedConvoColors).some(Boolean)">
             <hr />
             <li v-for='idc in convoResults' :key='idc[0]'>
-              <StoryPageLink long :mspaId='idc[0]'></StoryPageLink> {{idc[1]}}
+              <StoryPageLink long :mspaId='idc[0]'></StoryPageLink> {{idc[1]}} <span v-text="$archive.mspa.story[idc[0]].content.match(/<span/g).length" /> spans
             </li>
           </ul>
         </div>
@@ -175,6 +176,7 @@ export default {
   },
   data: function() {
     return {
+      loadConversations: false,
       swfLookup: "04812.swf",
       flagLookup: "",
       otherComponents: {}, // {PAGE, FULLSCREENFLASH, X2COMBO, TZPASSWORD, ECHIDNA, ENDOFHS},
