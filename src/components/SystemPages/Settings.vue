@@ -44,6 +44,8 @@
           </div>
         </dl>
       </div>
+    </div>
+    <div class="card">
       <div class="settings application">
         <h2>Application Settings</h2>
         <dl>
@@ -59,6 +61,8 @@
           </template>
         </dl>
       </div>
+    </div>
+    <div class="card">
       <div class="settings enhancements">
         <h2>Enhancements</h2>
         <dl>
@@ -166,6 +170,8 @@
 
         </dl>
       </div>
+    </div>
+    <div class="card">
       <div class="settings retcons" v-if="!$isNewReader">
         <h2>Retcons</h2>
         <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
@@ -259,7 +265,8 @@
           </SpoilerBox>
         </div>
       </div>
-
+    </div>
+    <div class="card">
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
@@ -316,7 +323,8 @@
           <button @click="forceReload">Reload Application</button>
         </div>
       </div>
-
+    </div>
+    <div class="card">
       <div class="settings system">
         <h2>System Settings</h2>
         <div class="system">
@@ -829,249 +837,233 @@ export default {
     ::v-deep a {
       color: var(--page-links);
     }
+  }
 
-    .navBanner {
-      margin-bottom: 25px;
+  .navBanner {
+    margin-bottom: 25px;
+  }
+  .card {
+    position: relative;
+    margin-bottom: 50px;
+    padding: 0 50px;
+    border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
+    box-sizing: border-box;
+    width: 950px;
+    background: var(--page-pageContent);
+
+    flex: 0 1 auto;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    align-content: center;
+
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    
+  }
+  .settings {
+    width: 100%;
+    padding: 25px 0;
+
+    &:not(:last-child) {
+      border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
     }
-    .card {
-      position: relative;
-      margin-bottom: 75px;
-      padding: 0 50px;
-      border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
-      box-sizing: border-box;
-      width: 950px;
-      background: var(--page-pageContent);
-
-      flex: 0 1 auto;
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: center;
-      align-content: center;
-
-      font-family: Verdana,Arial,Helvetica,sans-serif;
-      
-      .settings {
-        width: 100%;
-        padding: 25px 0;
-
-        &:not(:last-child) {
-          border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-        }
-        h2 {
-          text-align: center;
-        }
-        p {
-          font-weight: normal;
-          margin: 10px 0 5px 10px;
-          label {
-            font-weight: bolder;
-          }
-        }
-        dt {
-          margin: 20px 0 5px 10px;
-        }
-        .settingDesc {
-          color: var(--page-nav-meta);
-          font-weight: normal;
-        }
-
-        div.subOption {
-          margin-left: 40px;
-        }
-
-        > dd.settingDesc {
-          // Descriptions of whole sections
-          margin-top: 1em;
-        }
-        
-        .system {
-          margin-top: 20px;
-          text-align: center;
-          font-weight: normal;
-        }
-
-        .newReaderInput {
-          margin-top: 20px;
-          text-align: center;
-
-          button {
-              margin-bottom: 1em;
-          }
-          input {
-            border: 1px solid #777;
-            width: 70px;
-            font-size: 110%;
-            border-radius: 2px;
-            padding: 2px 3px;
-            margin: 5px;
-
-            &.invalid:not(:disabled):not(.empty) {
-              background: pink;
-              border-color: rgb(187, 0, 37);
-              box-shadow: 0 0 3px 1px red;
-            }
-            &.changed {
-              border-color: #ffaa00;
-              box-shadow: 0 0 3px 1px red;
-            }
-          }
-        }
-
-        .fastForwardSelection {
-          dd {
-            font-weight: normal;
-          }
-        }
-
-        button {
-          font-size: 110%;
-        }
-        .hint {
-          font-size: 13px;
-          color: var(--page-nav-meta);
-        }
-        .themeSelector, .fontSelector {
-          font-size: 16px;
-        }
-        .themeSelector + dt {
-          display: inline;
-        }
-        // Little ones
-        &.retcons dl {
-          column-count: 2;
-          dt:first-child {
-            margin-top: 0;
-          }
-        }
-        .textOverrideSettings {
-          margin-top: 16px;
-          text-align: center;
-          
-          .textOptions label {
-            display: block;
-          }
-
-          .textpreviews {
-            border: 6px solid var(--page-pageFrame);
-            padding: 6px;
-            position: relative;
-            left: 0;
-          }
-
-          .knobs {
-            width: 75%;
-            margin: 0 auto 16px;
-            text-align: left;
-            select {
-              margin: 5px 0;
-            }
-            input[type="range"] {
-              width: 100%;
-            }
-          }
-          div.examplePrattle, p.examplePrattle {
-            margin-bottom: 16px;
-          }
-          .examplePrattle {
-            margin: 0 auto;
-
-            ::v-deep .text{
-              // text-align: center;
-            }
-            &.bold {
-              font-weight: bold;
-            }
-          }
-        }
-        .ccPageNos {
-          font-weight: normal;
-          // width: 600px;
-          // margin: 1em auto;
-          h3 {
-            margin-top: .4em;
-          }
-          ol {
-            margin-inline-start: 2em;
-          }
-
-        }
-        span.cw {
-            padding: 0 7px;
-            font-size: 12px;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
-            font-weight: 500;
-            line-height: 18px;
-            border: 1px solid transparent;
-            border-radius: 2em;
-            margin-left: 1em;
-            &.minor {
-              background-color: #fbca04;
-              color: #000000;
-            }
-            &.severe{
-              background-color: #d93f0b;
-              color: #ffffff;
-            }
-        }
-      }
-    }
-    .sortable {
+    h2 { text-align: center; }
+    p {
       font-weight: normal;
-      
-      ul, ol {  
-        text-align: left;
-        border: solid var(--page-pageBorder, var(--page-pageFrame));
-        border-width: 5px 5px 0 0;
-        padding-bottom: 6em;
-        height: 100%;
+      margin: 10px 0 5px 10px;
+      label {
+        font-weight: bolder;
       }
+    }
+    dt { margin: 20px 0 5px 10px; }
+    .settingDesc {
+      color: var(--page-nav-meta);
+      font-weight: normal;
+    }
 
-      li {
-          /*list-style-position: inside;*/
-          background-color: var(--page-log-bg);
-          border: 1px solid rgba(0,0,0,.125);
-          margin-bottom: -1px;
-          padding: .2em;
-          .summary:before {
-            content: ' - '
-          }
-      }
+    div.subOption { margin-left: 40px; }
 
-      ul li {
-          list-style: none;
-      }
+    > dd.settingDesc {
+      // Descriptions of whole sections
+      margin-top: 1em;
+    }
+    
+    .system {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: normal;
+    }
 
-      ol li {
-        list-style: decimal;
-      }
+    .newReaderInput {
+      margin-top: 20px;
+      text-align: center;
 
-      .col {  
-          width: 100%;
-          margin: 0 20px;
+      button {
+          margin-bottom: 1em;
       }
-      .modButton {
-        float: right;
-        width: 18px;
-        height: 18px;
-        background: var(--saves-tab);
-        text-align: center;
-        &:hover {
-          background: var(--saves-tabHover)
+      input {
+        border: 1px solid #777;
+        width: 70px;
+        font-size: 110%;
+        border-radius: 2px;
+        padding: 2px 3px;
+        margin: 5px;
+
+        &.invalid:not(:disabled):not(.empty) {
+          background: pink;
+          border-color: rgb(187, 0, 37);
+          box-shadow: 0 0 3px 1px red;
+        }
+        &.changed {
+          border-color: #ffaa00;
+          box-shadow: 0 0 3px 1px red;
         }
       }
     }
 
-    .col {
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
+
+
+    button {
+      font-size: 110%;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--page-nav-meta);
+    }
+    .themeSelector, .fontSelector {
+      font-size: 16px;
+    }
+    .themeSelector + dt {
+      display: inline;
+    }
+    // Little ones
+    &.retcons dl {
+      column-count: 2;
+      dt:first-child {
+        margin-top: 0;
+      }
+    }
+    .textOverrideSettings {
+      margin-top: 16px;
+      text-align: center;
+          
+      .textOptions label {
+        display: block;
+      }
+
+      .textpreviews {
+        border: 6px solid var(--page-pageFrame);
+        padding: 6px;
+        position: relative;
+        left: 0;
+      }
+
+      .knobs {
+        width: 75%;
+        margin: 0 auto 16px;
+        text-align: left;
+        select {
+          margin: 5px 0;
+        }
+        input[type="range"] {
+          width: 100%;
+        }
+      }
+      div.examplePrattle, p.examplePrattle {
+        margin-bottom: 16px;
+      }
+      .examplePrattle {
+        margin: 0 auto;
+
+        ::v-deep .text{
+          // text-align: center;
+        }
+        &.bold {
+          font-weight: bold;
+        }
+      }
+    }
+    .ccPageNos {
+      font-weight: normal;
+
+      }
+
+    }
+    span.cw {
+      padding: 0 7px;
+      font-size: 12px;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
+      font-weight: 500;
+      line-height: 18px;
+      border: 1px solid transparent;
+      border-radius: 2em;
+      margin-left: 1em;
+      &.minor {
+        background-color: #fbca04;
+        color: #000000;
+      }
+      &.severe{
+        background-color: #d93f0b;
+        color: #ffffff;
+      }
+    }
+  }
+  .sortable {
+    font-weight: normal;
+    
+    ul, ol {  
+      text-align: left;        
+      border: solid var(--page-pageBorder, var(--page-pageFrame));
+      border-width: 5px 5px 0 0;
+      padding-bottom: 6em;
+      height: 100%;
+      max-height: 70vh;
+      overflow: auto;
     }
 
-    .row {
-      display: flex;
+    li {
+        /*list-style-position: inside;*/
+        background-color: var(--page-log-bg);
+        border: 1px solid rgba(0,0,0,.125);
+        margin-bottom: -1px;
+        padding: .2em;
+        .summary:before {
+          content: ' - '
+        }
+    }
 
+    ul li {
+        list-style: none;
+    }
+
+    ol li {
+      list-style: decimal;
+    }
+
+    .col {  
+        width: 100%;
+        margin: 0 20px;
+    }
+    .modButton {
+      float: right;
+      width: 18px;
+      height: 18px;
+      background: var(--saves-tab);
+      text-align: center;
+      &:hover {
+        background: var(--saves-tabHover)
+      }
     }
   }
 
-</style>
+  .col {
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+  }
 
+  .row {
+    display: flex;
+  }
+
+</style>
