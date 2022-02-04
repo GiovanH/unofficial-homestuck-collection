@@ -91,9 +91,9 @@ export default {
       sortBy: "Random",
       sortByChoices: {
         "Random": shuffle,
+        "Type": sortByField('type'),
         "Alphabetical (desc)": sortByFieldIntl('name'),
         "Alphabetical (asc)": sortByFieldIntl('name', -1),
-        "Type": sortByField('type'),
       },
       extSites: [
         {

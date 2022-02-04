@@ -49,6 +49,10 @@
       </div>
       <div class="cardContent" v-if="cardSelection == 'usage'">
         <section>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement" target="_blank" class="anchorButton">Request a feature</a>
+        </section>
+        <section>
           <h2>GENERAL NAVIGATION</h2>
           <p>In The Unofficial Homestuck Collection, <a href="/">the homepage</a> is your main hub for accessing content! You should be able to get a glance of everything the collection contains from here. If you want to quickly navigate to another part of the collection, your first stop should be the homepage.</p>
           <p>Got new reader mode enabled? Wondering about the mysterious question marks plastered everywhere? How do you find out what they are? By reading Homestuck! The goal of new reader mode is to provide a safe place for you to make your way through the story, while reducing the risk of learning anything in advance. This means that as long as certain content is considered a "spoiler", you will be prevented from accessing it.</p>
@@ -107,6 +111,30 @@ export default {
   .navBanner {
     margin-bottom: 25px;
   }
+
+  a.anchorButton {
+    padding: 10px 50px;
+    margin: 0 1em;
+    width: 225px;
+    border-radius: 3px;
+    background-color: #3edd41;
+    display: inline-block;
+    text-decoration: none;
+    font-weight: bold;
+
+    color: white !important;
+
+    &:hover {
+      background-color: #37bc3a;
+    }
+    &.bugreport {
+      background-color: #ff3b22;
+      &:hover {
+        background-color: #e4331c;
+      }
+    }
+  }
+
   .pageMenu {
     display: flex;
     justify-content: space-evenly;
