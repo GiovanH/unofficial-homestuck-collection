@@ -106,23 +106,33 @@ export default {
     return {
       archiveCredits: [
         {
-          // todo bambosh pls put me in here somewhere ~gio
           name: "Bambosh",
-          desc: `Howdy! This archive is a project I've been itching to make since 2016, but was forced to gestate while I figured out exactly how I was going to go about it. I started work proper at the beginning of 2020, and you're finally looking at the end result! If you're an experienced developer who feels like having chuckle, check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection">source code.</a> It's all open source, so feel free to fork it off or suggest improvements! God knows it probably needs some.`
+          link: "https://twitter.com/Bamboshu",
+          desc: `Howdy! I'm the original developer of this collection, which initially took form as a personal lockdown project during the depths of 2020. If you're curious about how everything fits together, check out its <a href="https://github.com/Bambosh/unofficial-homestuck-collection">GitHub page.</a> It's open source, so feel free to fork it off or suggest improvements!`
+        },
+        {
+          name: "GiovanH",
+          link: "https://im.giovanh.com",
+          desc: "After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since."
         },
         {
           name: "Niklink",
           desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages.`
         },
         {
-          name: "Florrie",
-          link: "https://hsmusic.github.io/",
-          desc: `For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.github.io/about/index.html">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.`
+          name: "Quasar Nebula",
+          link: "https://hsmusic.wiki/",
+          desc: `For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.wiki/about/">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.`
         },
         {
           name: "bgreco",
           link: "https://www.bgreco.net/hsflash.html",
           desc: `For providing the original inspiration for the high quality flash audio in this archive. I didn't end up using their edits for the most-part, but the implementation here was very much adapted from their own.`
+        },
+        {
+          name: "Hadron",
+          link: "https://hadronus.com",
+          desc: "For helping to create the fantastic new animated logo."
         },
         {
           name: "SplitSuns",
@@ -142,7 +152,7 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>. Some of the backgrounds from their Snapchat archive made their way in too.`
+          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code!`
         },
         {
           name: "Anthony Bailey",
