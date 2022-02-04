@@ -328,11 +328,11 @@
         <div class="system">
           <span class="hint">Application version:</span> <strong>v{{$data.$appVersion}}</strong>
           <br><br>
-          <span v-if="$archive.version != $data.$expectedAssetVersion">
-            <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
-            <br><br>
-          </span>
           <span class="hint">Asset pack version:</span> <strong>v{{$archive.version}}</strong>
+          <span v-if="$archive.version != $data.$expectedAssetVersion">
+            <br><br>
+            <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
+          </span>
           <br><br>
           <span class="hint">Asset pack directory:</span>
           <br>
