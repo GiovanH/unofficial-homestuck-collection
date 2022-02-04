@@ -503,7 +503,7 @@ export default {
   // }
   .card {
     position: relative;
-    margin: 50px 0 0 0;
+    margin: 50px 0;
     padding: 0 25px;
     border: solid 5px #c6c6c6;
     box-sizing: border-box;
