@@ -2,7 +2,7 @@
     <p class="prattle text" :class="fontFamily" :style="fontScale" v-html="filteredPrattle" v-if="textType == 'prattle' && !!content"></p>
 
     <div class="log" :class="{logHidden: logHidden}" v-else-if="textType == 'log'">
-        <div class="bgshade" v-if="$localData.settings.textOverride.highContrast"/>
+        <div class="bgshade" v-if="$localData.settings.textOverride.highContrast" :style="{background: isDarkMode ? '#000A' : '#FFFA'}"/>
 		<button class="logButton" @click="loggle()">
             {{ logButtonText }}
 		</button>
@@ -18,7 +18,7 @@
 <script>
 export default {
     name: 'pageText',
-    props: ['pageId', 'content'],
+    props: ['pageId', 'content', 'forcetheme'],
     data() {
         return {
             usePurpleLinks: false,
@@ -49,13 +49,23 @@ export default {
             if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
             return result
         },
+        theme(){
+            return this.forcetheme || this.$root.tabTheme
+        },
+        isDarkMode() {
+            return ['cascade'].includes(this.theme)
+        },
         fontScale() {
             let fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
             let lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
+
+            console.log(this.theme)
+            let contrastFilter = this.isDarkMode ? "contrast(0.5) brightness(2)" : "brightness(0.7)"
             return {
                 fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
                 lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight],
-                filter: this.$localData.settings.textOverride.highContrast ? "brightness(0.7)" : "none"
+                filter: this.$localData.settings.textOverride.highContrast ? contrastFilter : "none",
+                color: this.isDarkMode ? "white" : "var(--font-log)"
             }
         },
         textType() {
@@ -242,7 +252,6 @@ export default {
             width: 100%;
             height: 100%;
             position: absolute;
-            background: #FFFFFFAA;
             pointer-events: none;
             top: 0;
             left: 0;
