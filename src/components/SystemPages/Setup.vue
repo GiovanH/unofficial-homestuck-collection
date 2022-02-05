@@ -14,7 +14,8 @@
               <li v-for="name, i in newReaderCardNames" 
                 v-text="name" 
                 :class="{current: i==newReaderCardIndex, previous: i < newReaderCardIndex, future: i > newReaderCardIndex}"
-                :key="`wizardProgress${i}`" />
+                :key="`wizardProgress${i}`"
+                :data-key="name" />
             </ol>
           </div>
           <div class="wizardBody">
@@ -33,21 +34,6 @@
               <p>This application is open source (<a href="https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/LICENSE">GPL-3.0</a>). Check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection/">GitHub page</a> for resources like information on how you can contribute and the issue tracker so you can send us any bug reports. 
             </p>
             </div>
-          </div>
-          <div class="newReader" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'New Readers'}">
-            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
-            <h2>New Readers</h2>
-            <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
-            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> And, if you're already partway in, you can adjust your current page here.</p>
-            <!-- <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span> -->
-
-            <!-- Note: this is on by default via localData, not fancy interface hacks. -->
-            <!-- We can't do that with fastforward because we need v1.1 users to be able to migrate settings. -->
-            <NewReaderControls features="pagenumber" ref="newReaderControls" @change="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()" />
-
-            <hr />
-
-            <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. Don't worry: if New Reader Mode is on, the Settings page will be spoiler-free too.</p>
           </div>
 
           <div class="contentWarnings" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Content Warnings'}">
@@ -70,6 +56,22 @@
             </p>
           </div>
 
+          <div class="newReader" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'New Readers'}">
+            <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
+            <h2>New Readers</h2>
+            <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
+            <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> And, if you're already partway in, you can adjust your current page here.</p>
+            <!-- <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span> -->
+
+            <!-- Note: this is on by default via localData, not fancy interface hacks. -->
+            <!-- We can't do that with fastforward because we need v1.1 users to be able to migrate settings. -->
+            <NewReaderControls features="pagenumber" ref="newReaderControls" @change="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()" />
+
+            <hr />
+
+            <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. If New Reader Mode is on the Settings page will be spoiler-free too.</p>
+          </div>
+
           <div class="fastForward" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Reading Experience'}">
             <h2>Reading Experience</h2>
 
@@ -83,8 +85,8 @@
             </SpoilerBox>
 
             <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
-
           </div>
+
           <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
@@ -106,9 +108,9 @@
 
           </div>
           <div class="wizardNavigation">
-            <button v-if="newReaderCardIndex > 0" @click="newReaderCardIndex -= 1" style="right: 94px;">&lt; Previous</button>
+            <button v-if="newReaderCardIndex > 0" @click="wizardNextPage(-1)" style="right: 94px;">&lt; Previous</button>
             <button v-if="newReaderCardIndex < lastNewReaderCard" 
-              @click="newReaderCardIndex += 1" style="right: 20px;"
+              @click="wizardNextPage(1)" style="right: 20px;"
               :disabled="wizardForwardButtonDisabled">Next &gt;</button>
             <!--<button v-if="newReaderCardIndex == lastNewReaderCard" @click="">Finish</button>-->
           </div>
@@ -195,8 +197,8 @@ export default {
       lastNewReaderCard: 4,
       newReaderCardNames: [
         "Intro",
-        "New Readers",
         "Content Warnings",
+        "New Readers",
         "Reading Experience",
         "Getting Started"
       ],
@@ -272,6 +274,19 @@ export default {
     }.bind(this), 8000)
   },
   methods: {
+    wizardNextPage(direction){
+      let stablepos = false
+      let next_index = this.newReaderCardIndex + direction
+      while (!stablepos) {
+        stablepos = true
+        const pagename = this.newReaderCardNames[next_index]
+        if (pagename == "Reading Experience" && !this.$isNewReader) {
+          next_index += direction
+          stablepos = false
+        }
+      }
+      this.newReaderCardIndex = next_index
+    },
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: false}).then( result => {
         this.assetDir = result || this.assetDir
@@ -349,15 +364,15 @@ export default {
   }
   .wizard {
     .wizardSidebar {
-      width: 200px;
+      width: 210px;
       float: left;
       height: 100%;
-      margin: 25px 25px 25px 0;
+      margin: 25px 15px 0 0;
       .wizardProgress {
-
         li {
           position: relative;
           margin-left: 1em;
+          list-style: none;
 
           &:before {
             content: "";
@@ -373,7 +388,6 @@ export default {
             border: 1px solid #1d5281;
           }
           &.previous {
-            list-style: none;
             font-weight: bold;
             &:after {
               content: "";
@@ -387,16 +401,15 @@ export default {
             }
           }
           &.current {
-            list-style: none;
             font-weight: bold;
             color: orangered;
             &:before {
               box-shadow: inset -2px -2px #f8b636, inset 2px 2px #fedf9c;
             }
           }
-          &.future {
-            list-style: none;
-          }
+        }
+        li[data-key="Reading Experience"] {
+            margin-left: 2em !important;
         }
       }
     }
@@ -424,13 +437,8 @@ export default {
         text-align: center;
       }
       > div {
-        // margin: 25px;
         text-align: justify;
 
-        .sans {
-          font-family: "Comic Sans MS", "Comic Sans", cursive;
-          font-weight: bold;
-        }
         .tiny {
           font-size: 11px;
         }
@@ -446,8 +454,8 @@ export default {
       hr {
         border-top: 3px solid #c6c6c6;
       }
-      ol {
-        list-style-position: inside;
+      ol { 
+        margin-left: 1.5em;
       }
       input {
         &[type="text"] {
@@ -503,7 +511,7 @@ export default {
   // }
   .card {
     position: relative;
-    margin: 50px 0;
+    margin: auto;
     padding: 0 25px;
     border: solid 5px #c6c6c6;
     box-sizing: border-box;

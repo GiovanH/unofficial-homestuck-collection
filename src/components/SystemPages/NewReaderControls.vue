@@ -302,7 +302,8 @@ export default {
       width: 400px;
       margin: auto;
       button {
-        margin: 0 0;
+        margin: 0.5em;
+        padding: 1em;
         min-width: 140px;
       }
     }
