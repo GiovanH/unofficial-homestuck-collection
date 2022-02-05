@@ -49,9 +49,6 @@
               </div>
             </SpoilerBox>
             <p>
-              Mainly your general slew of 2010s edgy stuff.
-            </p>
-            <p>
               Most of the particularly harsh examples are either briefly touched on or buried away in corners (older comics, beyond canon, etc).
             </p>
           </div>
@@ -77,6 +74,7 @@
 
             <p>Okay, one last choice we're going to force you to make before you jump in:</p>
 
+            <!-- this never displays, haha -->
             <SpoilerBox v-if="!$isNewReader" :always-open="true" style="font-size: 14px;">
               <p>Since you did not enable new reader mode on the previous page, here's an explanation of how this works:</p>
               <p>As you progress through the story in New Reader Mode, the archive of course keeps track of your current page. If you choose the <b>Replay</b> experience, image retcons will appear as they did at the time of publication. But once you get to the point where the images changed, you can go back and see the changes in the text.</p>
@@ -209,22 +207,41 @@ export default {
       timeout: false,
       assetDir: undefined,
       contentWarnings: [
-        'Alcohol use',
+        'Slurs',
+        'Misogyny, sexism',
+
+        'Alcohol abuse',
+        'Drug abuse',
+
+        'Major character death',
+        'Minor character death',
+        'Parental death',
         'Animal death',
-        'Body horror',
+        'Child death',
+
+        'Body horror & injury',
+        'Torture',
+        'Eye mutilation',
         'Graphic depictions of gruesome deaths',
         'Graphic depictions of violence',
-        'Imperialist empires',
-        'Incest (mentioned)',
-        'Major character death',
-        'Male pregnancy',
-        'Mind control',
-        'Misogyny, sexism',
-        'Nonconsensual sexual relationships (implied)',
-        'Possession',
-        'Slurs',
+        'Self-harm',
+        'Suicide & suicide threats',
+
+        'Incest',
+        'Insects & Spiders',
+        'Snakes',
+        'Clowns',
+
+        'Nonconsensual sexual relationships',
         'Unhealthy relationships',
-        'War crimes'
+        'Verbal abuse',
+        'Domestic violence',
+        'Possession',
+        'Mind control',
+        'Male pregnancy',
+
+        'War crimes',
+        'Imperialist empires',
       ],
       loadStages: {
         "": "Awaiting reactivity",
