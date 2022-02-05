@@ -209,22 +209,41 @@ export default {
       timeout: false,
       assetDir: undefined,
       contentWarnings: [
-        'Alcohol use',
+        'Slurs',
+        'Misogyny, sexism',
+
+        'Alcohol abuse',
+        'Drug abuse',
+
+        'Major character death',
+        'Minor character death',
+        'Parental death',
         'Animal death',
-        'Body horror',
+        'Child death',
+
+        'Body horror & injury',
+        'Torture',
+        'Eye mutilation',
         'Graphic depictions of gruesome deaths',
         'Graphic depictions of violence',
-        'Imperialist empires',
-        'Incest (mentioned)',
-        'Major character death',
-        'Male pregnancy',
-        'Mind control',
-        'Misogyny, sexism',
-        'Nonconsensual sexual relationships (implied)',
-        'Possession',
-        'Slurs',
+        'Self-harm',
+        'Suicide & suicide threats',
+
+        'Incest',
+        'Insects & Spiders',
+        'Snakes',
+        'Clowns',
+
+        'Nonconsensual sexual relationships',
         'Unhealthy relationships',
-        'War crimes'
+        'Verbal abuse',
+        'Domestic violence',
+        'Possession',
+        'Mind control',
+        'Male pregnancy',
+
+        'War crimes',
+        'Imperialist empires',
       ],
       loadStages: {
         "": "Awaiting reactivity",
