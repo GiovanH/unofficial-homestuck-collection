@@ -14,12 +14,14 @@
               <h2>No results found.</h2>
             </div>
             <div v-if="freshStart"><p>First search may take a few seconds!</p></div>
-            <div v-for="(page, i) in results" :key="'page'+i" class="result">
+            <div v-for="(page, i) in results" :key="page.key" class="result">
               <h2>
-                <StoryPageLink titleOnly :mspaId='page.key'></StoryPageLink>
+                <StoryPageLink titleOnly :mspaId='page.mspa_num'></StoryPageLink>
               </h2>
-              <div class="chapter" v-html="`${$getChapter(page.key)} - ${$mspaOrVizNumber(page.key)}`" />
-              <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="htmlEscape(line)" class="line" />
+              <div class="chapter" v-html="`${$getChapter(page.mspa_num)} - ${$mspaOrVizNumber(page.mspa_num)}`" />
+              <div class="match">
+                <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="htmlEscape(line)" class="line" />
+              </div>
             </div>
           </div>
         </div>
@@ -146,6 +148,10 @@ export default {
     // ipcRenderer.invoke('search') 
   },
   methods: {
+    invokeSearch(params){
+      this.$logger.info(params)
+      return ipcRenderer.invoke('search', params)
+    },
     async search() {
       let input = this.inputText
 
@@ -176,13 +182,14 @@ export default {
         .replace(/=/g, "&#61;")
         .replace(/\[/g, "&#91;")
         .replace(/\]/g, "&#93;")
-      ipcRenderer.invoke('search', {input: this.query, sort, filter}).then(results => {
+      this.invokeSearch({input: this.query, sort, filter}).then(results => {
         this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.key)) : results
         // TODO: Trim long pages to only show relevant context in search
         this.freshStart = false
       })
     },
     htmlEscape(str) {
+      this.$logger.info("escape", str)
       const queries = this.query
         .split(/[^\w&#;]/g)
         .filter(word => word.length > 1)
@@ -289,13 +296,8 @@ export default {
             // font-weight: normal;
           }
 
-          .line {
+          .match {
             padding-top: 10px;
-
-            ::v-deep .match {
-              background: var(--find--highlight);
-              color: var(--font-highlight, var(--font-default));
-            }
 
             &:before {
               border-top: 1px dashed var(--page-pageBorder, var(--page-pageFrame));
@@ -304,7 +306,13 @@ export default {
               display: block;
               width: 400px;
               content: '';
-  
+            }
+          }
+
+          .line {
+            ::v-deep .match {
+              background: var(--find--highlight);
+              color: var(--font-highlight, var(--font-default));
             }
           }
         }

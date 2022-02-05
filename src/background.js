@@ -201,7 +201,6 @@ function loadArchiveData(){
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
-      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8')),
       audioData: {},
       flags: {}
     }
@@ -554,21 +553,37 @@ function buildChapterIndex(){
   chapterIndex = new FlexSearch({
     doc: {
       id: 'key',
-      field: 'content',
+      field: ['mspa_num', 'content'],
       tag: 'chapter'
     }
   })
 
-  chapterIndex.add(archive.search)
-  chapterIndex.add(Object.keys(archive.footnotes.story).map(page_num => {
+  const storytextList = Object.keys(archive.mspa.story).map(page_num => {
+    const page = archive.mspa.story[page_num]
     return {
       key: page_num,
+      mspa_num: page_num,
+      chapter: Resources.getChapter(page_num),
+      content: `${page.title}<br />${page.content}`
+    }
+  })
+
+  logger.info("Populating search index with", storytextList.length, "page documents")
+  chapterIndex.add(storytextList)
+
+  const footnoteList = Object.keys(archive.footnotes.story).map(page_num => {
+    return {
+      key: `${page_num}-notes`, // Duplicate keys are not allowed.
+      mspa_num: page_num,
       chapter: Resources.getChapter(page_num),
       content: archive.footnotes.story[page_num].map(
         note => note.content
       ).join("###")
     }
-  }))
+  })
+
+  logger.info("Populating search index with", footnoteList.length, "footnote documents")
+  chapterIndex.add(footnoteList)
 }
 
 ipcMain.handle('search', async (event, payload) => {
@@ -602,7 +617,12 @@ ipcMain.handle('search', async (event, payload) => {
       return payload.filter.includes(item.chapter)
     })
     limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({doc: {id: 'key', field: 'content'}}).add(items)
+    filteredIndex = new FlexSearch({
+      doc: {
+        id: 'key', 
+        field: ['mspa_num', 'content']
+      }
+    }).add(items)
   } else {
     filteredIndex = chapterIndex
   }
@@ -614,19 +634,27 @@ ipcMain.handle('search', async (event, payload) => {
   const foundText = []
   for (const page of results) {
     const flex = new FlexSearch()
-    const lines = page.content.split('###')
-    for (let i = 0; i < lines.length; i++) {
-      flex.add(i, lines[i])
+    const page_lines = page.content.split('<br />')
+    for (let i = 0; i < page_lines.length; i++) {
+      flex.add(i, page_lines[i])
     }
     const indexes = flex.search(payload.input)
-    const output = []
-    for (let i = 0; i < indexes.length; i++) {
-      output.push(lines[indexes[i]])
-    }
-    if (output.length > 0){
+    const spread_indexes = Array.from(
+      indexes.reduce((acc, i) => {
+        const spread = 2;
+        for (let j = i - spread; j < i + spread; j++) {
+          acc.add(j)
+        }
+        return acc
+      }, new Set())
+    ).sort()
+    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
+
+    if (matching_lines.length > 0){
       foundText.push({
         key: page.key,
-        lines: output
+        mspa_num: page.mspa_num,
+        lines: matching_lines
       })
     }
   }

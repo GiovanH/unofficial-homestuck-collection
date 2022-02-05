@@ -22,6 +22,8 @@
         />
       </vue-simple-suggest>    
       <div id="browserActions">
+        <!-- Browser actions go here -->
+        <component v-for="(__, actionkey) in browserActions" :is="actionkey" :key="actionkey" :data-key="actionkey" />
         <div class="systemButton"
           v-if="$localData.settings.devMode && thisTabPageId" 
           :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
@@ -37,8 +39,6 @@
           <fa-icon 
             :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
         </div>
-        <!-- Browser actions go here -->
-        <component v-for="(__, actionkey) in browserActions" :is="actionkey" :key="actionkey" />
       </div>      
     </div>
   </div>
