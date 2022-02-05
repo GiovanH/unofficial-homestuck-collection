@@ -6,8 +6,13 @@
         <!-- Settings for adjusting new reader mode -->
         <p>New reader mode enabled.<br>
           Currently up to page 
+          <!-- Can't show picker if you're in viz mode. -->
+          <StoryPageLink
+            v-if="isNewReadingPreHS" 
+            :mspaId='$newReaderCurrent'/>
           <input type="number" size="1" maxlength="6" 
             v-model="newReaderPageInput"
+            v-else
             @keydown.enter="changeNewReader()"
             :class="{
               invalid: !isValidPageSet, 
@@ -15,7 +20,6 @@
               changed: newReaderPageChanged
             }" >
         </p>
-        <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
         <button v-if="isValidPageSet && newReaderPageChanged" 
           @click="changeNewReader()">Set adjusted page</button>
         <br />
@@ -23,6 +27,12 @@
       </div>
       <div class="newReaderInput" v-else>
         <!-- Settings for turning on new reader mode -->
+        <p class="hint">Quick Setup</p>
+        <div class="quickset">
+          <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
+          <button @click="setupHomestuck()">Start Homestuck</button>
+        </div>
+        <p class="hint">Or enter a page manually</p>
         <input type="number" size="1" maxlength="6" 
           v-model="newReaderPageInput"
           @keydown.enter="setNewReader()"
@@ -35,12 +45,18 @@
         <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number<br>
-          e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>
-          Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
+          e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
       </div>
+
+      <!-- <pre v-if="$localData.settings.devMode">
+        newReaderPageInput: {{newReaderPageInput}}
+        newReaderPage: {{newReaderPage}}
+        $newReaderCurrent: {{$newReaderCurrent}}
+        isValidPageSet: {{isValidPageSet}}
+      </pre> -->
 
       <div v-if="promptMspaMode" class="settings application" >
         <dl>
@@ -117,7 +133,7 @@ export default {
   data: function() {
     return {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
-      newReaderPageInput: this.$newReaderCurrent,
+      newReaderPageInput: this.$newReaderCurrent || this.$mspaOrVizNumber('001901'),
       // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
       myFastForward: this.forceGateChoice ? undefined : this.$localData.settings['fastForward'],
       settingListBoolean: [
@@ -134,16 +150,17 @@ export default {
       return this.features.toLowerCase().split(" ")
     },
     newReaderPage() {
-      // The actual MSPA number corresponding to the inpupt box. Immutable. May be invalid.
+      // The actual MSPA number corresponding to the inpupt box. Immutable. May be invalid. May be undefined, if there's no validl way to set a page.
       if (!this.newReaderPageInput) {
-        // nya, it's a hack, see
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.newReaderPageInput = this.$mspaOrVizNumber('001901')
+        return undefined
       }
 
       return this.$parseMspaOrViz(this.newReaderPageInput)
     },
     isValidPageSet(){
+      // Can't set a valid PS page in viz mode
+      if (this.isNewReadingPreHS) return false
+      
       const pageId = this.newReaderPage
       const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
       return pageInStory && 
@@ -154,6 +171,9 @@ export default {
     newReaderPageChanged(){
       if (!this.$newReaderCurrent) return false
       return this.newReaderPage != this.$newReaderCurrent
+    },
+    isNewReadingPreHS(){
+      return (!this.$localData.settings.mspaMode && this.$newReaderCurrent && this.$newReaderCurrent < '001901')
     }
   },
   methods: {
@@ -189,6 +209,18 @@ export default {
           this.$logger.info("resetting input to", prev_input, this.newReaderPageInput)
         })
       }
+    },
+    setupHomestuck() {
+      this.newReaderPageInput = this.$mspaOrVizNumber("001901")
+      this.setNewReader()
+    },
+    setupProblemSleuth() {
+      this.$localData.settings.mspaMode = true
+      this.$nextTick(() => {
+        this.$logger.info("Set PS number")
+        this.newReaderPageInput = "000219"
+        this.setNewReader()
+      })
     }
   },
   watch: {
@@ -198,21 +230,32 @@ export default {
       this.$localData.settings['fastForward'] = to
     },
     "$localData.settings.newReader.current"(to, from){
-      if (!this.$parent.tabIsActive)
+      if (to && !this.$parent.tabIsActive)
         this.newReaderPageInput = this.$mspaOrVizNumber(to)
     },
     '$localData.settings.mspaMode'(to, from) {
       if (to == true) {
         // to mspa mode
-        this.newReaderPageInput = this.$vizToMspa('homestuck', this.newReaderPageInput).p
+        const newto = this.$vizToMspa('homestuck', this.newReaderPageInput).p
+        this.$logger.info("to mspa", this.newReaderPageInput, newto)
+        this.newReaderPageInput = newto
       } else {
         // to viz mode
-        this.newReaderPageInput = this.$mspaToViz(this.newReaderPageInput).p
+        const newto = this.$mspaToViz(this.newReaderPageInput)
+        if (newto.s == 'homestuck') {
+          this.$logger.info("to viz", newto.s, from, to, newto.p)
+          this.newReaderPageInput = newto.p
+        } else {
+          this.$logger.info("to viz non-hs", newto.s, this.newReaderPageInput)
+          this.newReaderPageInput = undefined
+        }
       }
     },
     newReaderPageInput(to, from){
       if (to && this.$localData.settings.mspaMode){
-        this.newReaderPageInput = this.$mspaOrVizNumber(this.$parseMspaOrViz(to))
+        const newto = this.$mspaOrVizNumber(this.$parseMspaOrViz(to))
+        this.$logger.info("pageInput", from, to, newto)
+        this.newReaderPageInput = newto
       }
     }
   }
@@ -231,9 +274,9 @@ export default {
     text-align: center;
 
     button {
-      display: block;
+      // display: block;
       margin: 0 auto;
-      margin-bottom: 1em;
+      // margin-bottom: 1em;
     }
     input {
       border: 1px solid #777;
@@ -253,6 +296,16 @@ export default {
         box-shadow: 0 0 3px 1px red;
       }
     }
+    .quickset {
+      display: flex;
+      justify-content: space-evenly;
+      width: 400px;
+      margin: auto;
+      button {
+        margin: 0 0;
+        min-width: 140px;
+      }
+    }
   }
   .hint {
     font-size: 13px;
@@ -262,7 +315,7 @@ export default {
   .settings {
     p {
       font-weight: normal;
-      margin: 10px 0 5px 10px;
+      margin: 0.5em;
       label {
         font-weight: bolder;
       }
