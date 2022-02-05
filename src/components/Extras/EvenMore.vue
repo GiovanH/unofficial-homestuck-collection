@@ -185,7 +185,7 @@ export default {
           type: 'social',
           url: 'https://omegaupdate.freeforums.net',
           name: "Omegaupdate Forums",
-          desc: "One of several MSPA Forums replacements. This sprung up around the <a href='https://mspfa.com/?s=16414&p=1'>Act Omega</a> and continues to act as a suggestion box for several fan adventures."
+          desc: "One of several MSPA Forums replacements. This sprung up after the forums went down and the comic was on the hiatus known as the \"Omegapause\""
         },
         {
           id: 'xyz',
