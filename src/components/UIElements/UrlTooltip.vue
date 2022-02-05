@@ -26,6 +26,8 @@ export default {
     },
     getDisplayUrl(new_url){
       new_url = new_url.replace("http://localhost:8080/", "/")
+      if (new_url.includes('://') && new_url.startsWith("/"))
+        new_url = new_url.slice(1)
       return this.$resolvePath(new_url)
     }
   },

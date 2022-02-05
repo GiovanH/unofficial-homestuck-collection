@@ -14,6 +14,7 @@ export default {
   name: 'singlepage',
   data: function() {
     return {
+      ...VanillaPage.data(),
       shortVer: {
         "title": 'c',
         "pageId": 'id',

@@ -166,7 +166,7 @@ export default {
         routeParams() {
             let base = this.tab.url.split('/').filter(Boolean)[0]
             return  {
-                base: base || '', 
+                base: (base || '').toLowerCase(), 
                 ...this.$router.resolve(this.tab.url).route.params
             }
         },
