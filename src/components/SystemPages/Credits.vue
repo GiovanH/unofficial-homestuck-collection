@@ -113,11 +113,11 @@ export default {
         {
           name: "GiovanH",
           link: "https://im.giovanh.com",
-          desc: "After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since."
+          desc: `After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since.`
         },
         {
           name: "Niklink",
-          desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages.`
+          desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages. Also helped source some obscure material and test changes during development.`
         },
         {
           name: "Quasar Nebula",
@@ -152,7 +152,7 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code!`
+          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
         },
         {
           name: "Anthony Bailey",
@@ -167,7 +167,7 @@ export default {
         },
         {
           "pages": ["003840"],
-          "desc": `Art contributions from <a href=\"http://thebrainseed.com/brightleaf" target="_blank">Brett Muller</a>,  <a href="http://www.metroidhat.com" target="_blank">Eyes5</a>,  <a href="http://rutares.deviantart.com/" target="_blank">Jessica Allison</a>,  <a href="http://www.alexandra-douglass.com/" target="_blank">Lexxy</a>,  <a href="http://www.iwantyoutofeelthepressure.com/" target="_blank">Rebecca Harding</a>,  <a href="http://www.smokinghippo.com/" target="_blank">Nic Carey</a>,  <a href="http://abortedslunk.deviantart.com/" target="_blank">Paige Turner</a>,  <a href="http://www.notenoughink.com" target="_blank">Richard Gung</a>,  <a href="http://saffronscarf.deviantart.com/" target="_blank">SaffronScarf</a>,  <a href="http://viivus.tumblr.com/" target="_blank">Vivus</a>\n<br/><br/>\n<a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank">BUN</a><a href="/scraps2/LONGWAYSBUNPizza.jpg" target="_blank">P</a><a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank"> IT DOWN THE LINE</a>`
+          "desc": `Art contributions from <a href="http://thebrainseed.com/brightleaf" target="_blank">Brett Muller</a>,  <a href="http://www.metroidhat.com" target="_blank">Eyes5</a>,  <a href="http://rutares.deviantart.com/" target="_blank">Jessica Allison</a>,  <a href="http://www.alexandra-douglass.com/" target="_blank">Lexxy</a>,  <a href="http://www.iwantyoutofeelthepressure.com/" target="_blank">Rebecca Harding</a>,  <a href="http://www.smokinghippo.com/" target="_blank">Nic Carey</a>,  <a href="http://abortedslunk.deviantart.com/" target="_blank">Paige Turner</a>,  <a href="http://www.notenoughink.com" target="_blank">Richard Gung</a>,  <a href="http://saffronscarf.deviantart.com/" target="_blank">SaffronScarf</a>,  <a href="http://viivus.tumblr.com/" target="_blank">Vivus</a>\n<br/><br/>\n<a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank">BUN</a><a href="/scraps2/LONGWAYSBUNPizza.jpg" target="_blank">P</a><a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank"> IT DOWN THE LINE</a>`
         },
         {
           "pages": ["004478"],
