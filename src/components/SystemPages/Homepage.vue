@@ -16,9 +16,9 @@
         </p>
       </div>
     </div>
-    <div class="card">
+    <div class="card tight hsCard">
       <!-- <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" /> -->
-      <div class="cardContent cardEntry hsCard">
+      <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
           <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 167px;" v-if="$root.tabTheme === 'A6A6'" >
@@ -129,9 +129,9 @@
       </div>
     </div>
     
-    <div class="card">
+    <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
-      <div class="cardContent cardEntry jbCard">
+      <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
           <p class="date">Sep 2006 - Feb 2007</p>
@@ -206,7 +206,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card newsCard">
       <div class="logo newsLogo cardContent">
         <Media url="assets://archive/collection/news_logo.png" />
         <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
@@ -255,7 +255,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card tsoCard">
       <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo cardContent" />
       <div class="cardContent cardEntry tsoCard">
         <div class="icon">
@@ -306,7 +306,7 @@
       </div>
     </div>
 
-    <div class="card noHeaderCard">
+    <div class="card unsortedCard noHeaderCard">
       <div class="cardContent cardRows">
         <HomeRowItem
           class="rowItem"
@@ -347,7 +347,7 @@
       </div>
     </div>
 
-    <div v-if="modHomeRowItems.length" class="card noHeaderCard">
+    <div v-if="modHomeRowItems.length" class="card unsortedCard noHeaderCard">
       <div class="cardContent cardRows">
         <HomeRowItem
           v-for="item in modHomeRowItems"
@@ -416,6 +416,7 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
+    padding-bottom: 50px;
   }
 
   .navBanner {
@@ -423,8 +424,11 @@ export default {
   }
   .card {
     position: relative;
-    margin-bottom: 75px;
-    &.tight { margin-bottom: 20px; }
+    margin-top: 75px;
+    &.tight, &.unsortedCard { margin-top: 20px; }
+    &.mspaCard { margin-top: 50px; }
+    &.newsCard { margin-top: 50px; }
+    &.tsoCard { margin-top: 75px; }
 
     padding: 25px 50px;
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
