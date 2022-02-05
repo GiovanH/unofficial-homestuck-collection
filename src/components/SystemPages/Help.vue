@@ -60,7 +60,8 @@
         </section>
         <section>
           <h2>THE JUMP BAR</h2>
-          <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! Open it up by clicking the JUMP button at the top of the page, or by hitting <strong>CTRL+L</strong> (that's <strong>⌘+L</strong> if you're on MacOS).</p>
+          <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! Open it up by clicking the JUMP button nexto the tab bar, or by hitting <strong>CTRL+L</strong> (that's <strong>⌘+L</strong> if you're on MacOS).</p>
+          <Media url="/archive/collection/userguide_jumpbtn.png" />
           <Media url="/archive/collection/userguide_jumpbar.png" />
           <p>It functions just like the address bar in your browser, because it pretty much is one! If you really miss having it embedded in the header at all times, there's an option for that at the top of <a href="/settings">the settings page.</a></p>
         </section>
@@ -68,8 +69,9 @@
           <h2>SAVING and LOADING your "game"</h2>
           <p>The official Homestuck website has a cookie-powered "saving" system that keeps track of the latest page you've been to, and returns you to it the next time you visit.</p>
           <p>This application never even has a chance to forget that stuff to begin with! You can close the application at any time, and starting it up again will put things exactly the way they were when you closed it.</p>
-          <p><em>"Wait, but then what's that SAVE/LOAD button up at the top of the page for?"</em></p>
-          <p>Well, I'm so glad I asked! In this collection, SAVING and LOADING is just another word for bookmarks. When you open the "Game Data" tab and hit the + button, a new block of SAVE DATA will be created, automatically filled in with the details of whatever page you're on.</p>
+          <p>There's still a way to save pages on the internet though, and that's called bookmarks. This app has a bookmarks menu, which you can access with the bookmarks button next to the tab bar.</p>
+          <Media url="/archive/collection/userguide_bookmarkbtn.png" />
+          <p>When you open the "Game Data" tab and hit the + button, a new block of SAVE DATA will be created, automatically filled in with the details of whatever page you're on.</p>
           <Media url="/archive/collection/userguide_saves1.png" />
           <p>Dont let a computer tell you what to do though: You can change the title and url to absolutely anything you want! If you make any changes, be sure to hit the button to the right to keep them (or just delete the SAVE DATA entirely). You can have as many SAVES as you want, so go wild!</p>
           <p>And remember, you can edit your SAVES at any time! Just click the pencil that shows up when you hover over the bookmark link.</p>
