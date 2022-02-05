@@ -855,7 +855,9 @@ if (ipcMain) {
 
       // .js file or folder of some sort
       mod_folders = Object.keys(tree).filter(p => 
-        /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p)
+        /\.js$/.test(p) || 
+        (tree[p] === undefined && fs.existsSync(path.join(modsDir, p, "mod.js"))) || 
+        logger.warn("Not a mod:", p, path.join(p, "mod.js"))
       )
     } catch (e) {
       // No mod folder at all. That's okay.
