@@ -191,8 +191,7 @@
           class="rowItem"
           href="/unlock" 
           thumbsrc="/archive/collection/archive_unlocks.png"
-          :aftertimestamp="1226966400"
-          date="Apr 2009">
+          :aftertimestamp="1226966400">
           <template v-slot:title>Unlockable Content</template>
           <p>Fan-requested commands drawn for fans who made donations. But Andrew is no longer doing them. Sorry!</p>
         </HomeRowItem>
@@ -200,8 +199,7 @@
           class="rowItem"
           href="/faqs/science" 
           thumbsrc="/archive/collection/archive_science.png"
-          :aftertimestamp="1236384000"
-          date="Apr 2009">
+          :aftertimestamp="1236384000">
           <template v-slot:title>Science FAQ</template>
           <p>An explanation of some of the science works in Problem Sleuth. Is physics real? Sorta!</p>
         </HomeRowItem>
