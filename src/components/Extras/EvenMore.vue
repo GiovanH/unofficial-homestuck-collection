@@ -3,7 +3,22 @@
     <NavBanner useCustomStyles="true" />
     <div class="card">
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
-      <div class="cardContent">
+      <div class="cardContent" v-if="this.$isNewReader">
+        <h2>Looking for more?</h2> 
+        <section>
+          <p>
+            We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore.
+          </p>
+          <p>
+            They're <em>chalk full</em> of spoilers, though, to the point where it's hard to even describe some of them without spoiling new readers. And thumbnails are right out.
+          </p>
+          <p>
+            Come back once you finish Homestuck!
+          </p>
+          <Media url="assets://images/swampwizard.gif" />
+        </section>
+      </div>
+      <div class="cardContent" v-else>
         <section>
           <h2>Looking for more?</h2> 
           <p>
@@ -13,9 +28,9 @@
               <option v-for="fn, label in sortByChoices" :value="label" :key="label" v-text="label" />
             </select>
           </p>
-          <p>
+          <!-- <p>
             (As with all external links, <em>we recommend staying away from these sites</em> until you've finished the comic, as spoilers abound!)
-          </p>
+          </p> -->
         </section>
 
         <section class="list">
