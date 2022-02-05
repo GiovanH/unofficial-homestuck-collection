@@ -7,6 +7,7 @@
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
     <Notifications :class="theme" ref="notifications" />
     <ContextMenu :class="theme" ref="contextMenu" />
+    <Updater ref="Updater" />
     <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
     <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
   </div>
@@ -21,6 +22,7 @@
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
   import TabFrame from '@/components/TabFrame.vue'
   import Notifications from '@/components/UIElements/Notifications.vue'
+  import Updater from '@/components/UIElements/Updater.vue'
 
   import ContextMenu from '@/components/UIElements/ContextMenu.vue'
   import UrlTooltip from '@/components/UIElements/UrlTooltip.vue'
@@ -33,7 +35,7 @@
     name: 'HomestuckCollection',
     mixins: [Mods.getMainMixin()],
     components: {
-      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip
+      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
     },
     data() {
       return {
@@ -135,7 +137,7 @@
           } else if (match = / "(.+)"/.exec(app_icon_var)) {
             app_icon_var = match[1]
           } else {
-            this.$logger.info(`Couldn't match '${app_icon_var}'`)
+            this.$logger.error(`Couldn't match '${app_icon_var}'`)
             return
           }
           this.$logger.info("Requesting icon change to", app_icon_var)
@@ -154,7 +156,7 @@
 
       // Sets up listener for the main process
       electron.ipcRenderer.on('TABS_NEW', (event, payload) => {
-        this.$localData.root.TABS_NEW(payload.url, payload.adjacent)
+        this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
       })
       electron.ipcRenderer.on('TABS_CLOSE', (event, key) => {
         this.$localData.root.TABS_CLOSE(key)

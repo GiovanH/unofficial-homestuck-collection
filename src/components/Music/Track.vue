@@ -95,6 +95,7 @@ export default {
       return this.joinNoOxford(this.linkArtists(this.track.coverArtists || []))
     },
     linkPages() {
+      // TODO: No. None of this is okay.
       if (this.track.pages && this.track.pages.length > 0) {
         let result = []
         this.track.pages.forEach(page => {
@@ -110,6 +111,7 @@ export default {
             }
           }
           else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/ps_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
+          else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') result.push(`<a href="assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf" target="_blank" >SBAHJthemovie1.swf</a>`)
           else result.push(page)
         })
         return result

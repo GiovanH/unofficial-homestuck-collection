@@ -5,12 +5,7 @@
         <div class="header">
           <Banner :id="tab.key" :page="thisPage"/>
         </div>
-        <div 
-          :class="note.class ? 'preface ' + note.class : 'preface'"
-          v-for="note in prefaces">
-          <p v-html="note.content"/>
-          <span v-if="note.author" class="author" v-text="note.author" />
-        </div>
+        <Footnotes :pageId="thisPage.pageId" preface />
         <div class="vid">
           <Media :url="thisPage.media[0]" />
         </div>      
@@ -18,12 +13,7 @@
           <FlashCredit  :pageId="thisPage.pageId" />
           <PageNav base="mspa" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
         </div>
-        <div 
-          :class="note.class ? 'footnote ' + note.class : 'footnote'"
-          v-for="note in footnotes">
-          <p v-html="note.content"/>
-          <span v-if="note.author" class="author" v-text="note.author" />
-        </div>
+        <Footnotes :pageId="thisPage.pageId" />
       </div>
     </div>
   </div>
@@ -58,6 +48,7 @@ export default {
   computed: {
     pageNum: PAGE.computed.pageNum,
     storyId: PAGE.computed.storyId,
+    pageCollection: PAGE.computed.pageCollection,
     thisPage: PAGE.computed.thisPage,
     nextPagesArray: PAGE.computed.nextPagesArray,
     bgClass() {

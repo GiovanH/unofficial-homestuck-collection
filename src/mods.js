@@ -73,6 +73,8 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function extractimods(){
+  // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
+
   // eslint-disable-next-line import/no-webpack-loader-syntax
   const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
   let tar_buffer = Buffer.from(base64, 'base64')
@@ -274,6 +276,10 @@ function getEnabledMods() {
     list.push("_pxsTavros")
   if (store.get('localData.settings.jsFlashes'))
     list.push("_replaybound")
+
+  // Soluslunes must load after bolin
+  if (store.get('localData.settings.soluslunes'))
+    list.push("_soluslunes")
 
   // Bolin must come before hqaudio in the stack so it loads after it.
   if (store.get('localData.settings.bolin'))
@@ -804,7 +810,9 @@ function jsToChoice(js, dir){
     includes: {
       routes: Boolean(js.routes || js.treeroute || js.trees),
       edits: Boolean(js.edit),
-      hooks: (js.vueHooks ? js.vueHooks.map(h => (h.matchName || "[complex]")) : false),
+      hooks: (js.vueHooks 
+        ? Array.from(new Set(js.vueHooks.map(h => (h.matchName || "[complex]")))) 
+        : false),
       browserPages: js.browserPages ? Object.keys(js.browserPages) : false,
       toolbars: Boolean(js.browserToolbars),
       browserActions: Boolean(js.browserActions),
@@ -825,6 +833,10 @@ if (ipcMain) {
 
       // Extract zips
       const outpath = path.join(assetDir, "mods")
+
+      if (!fs.existsSync(outpath))
+        fs.mkdirSync(outpath)
+
       const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
       zip_archives.forEach(zip_name => {
         const zip_path = path.join(modsDir, zip_name)
@@ -843,7 +855,9 @@ if (ipcMain) {
 
       // .js file or folder of some sort
       mod_folders = Object.keys(tree).filter(p => 
-        /\.js$/.test(p) || tree[p] === undefined || logger.warn("Not a mod:", p)
+        /\.js$/.test(p) || 
+        (tree[p] === undefined && fs.existsSync(path.join(modsDir, p, "mod.js"))) || 
+        logger.warn("Not a mod:", p, path.join(p, "mod.js"))
       )
     } catch (e) {
       // No mod folder at all. That's okay.

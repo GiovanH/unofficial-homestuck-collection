@@ -64,6 +64,7 @@ import TBIY from '@/components/Extras/theBabyIs.vue'
 import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
 import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
+import SQUIDDLES from '@/components/Extras/Squiddles.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
@@ -124,6 +125,7 @@ export default {
         NAMCOHIGH,
         VIGILPRINCE,
         SKAIANET,
+        SQUIDDLES,
 
         MUSIC,
         DSTRIDER,
@@ -149,7 +151,6 @@ export default {
         }
     },
     created(){
-        this.$logger.info("Tabframe created")
         for (const COM in this.modBrowserPages) {
             let mixins = this.modBrowserPages[COM].component.mixins || []
             if (!mixins.includes(ModBrowserPageMixin)) {
@@ -275,6 +276,9 @@ export default {
                     if (this.$isNewReader) component = 'Spoiler'
                     else if (this.routeParams.cursed_history && (this.routeParams.cursed_history != 'cursed_history' || !this.$localData.settings.cursedHistory)) component = 'Error404'
                     break
+                }
+                case 'SQUIDDLES': {
+                    if (this.$pageIsSpoiler('004432')) component = 'Spoiler'
                 }
                 case 'UNLOCK': {
                     if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'
@@ -447,7 +451,7 @@ export default {
     },
     updated(){
       this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video, audio`).length > 0))
+        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
       })
     },
     watch: {

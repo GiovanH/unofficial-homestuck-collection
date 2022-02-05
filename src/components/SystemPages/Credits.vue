@@ -57,7 +57,7 @@
             <div class="legal">
               Legal:
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020, 2021 Bambosh et al.
+Copyright (C) 2020-2022 Bambosh et al.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
@@ -66,6 +66,14 @@ the Free Software Foundation, either version 3 of the License, or
 </pre>
               <p>
                 In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+              </p>
+              <br /> 
+              <p>
+                As per section 7, the author attributions above must 
+                be preserved in all covered works. Modified versions may optionally
+                extend this list as applicable, but modifications that remove 
+                attributions or otherwise misrepresent the origin of the material 
+                are not permitted.
               </p>
             </div>
           </div>
@@ -98,23 +106,33 @@ export default {
     return {
       archiveCredits: [
         {
-          // todo bambosh pls put me in here somewhere ~gio
           name: "Bambosh",
-          desc: `Howdy! This archive is a project I've been itching to make since 2016, but was forced to gestate while I figured out exactly how I was going to go about it. I started work proper at the beginning of 2020, and you're finally looking at the end result! If you're an experienced developer who feels like having chuckle, check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection">source code.</a> It's all open source, so feel free to fork it off or suggest improvements! God knows it probably needs some.`
+          link: "https://twitter.com/Bamboshu",
+          desc: `Howdy! I'm the original developer of this collection, which initially took form as a personal lockdown project during the depths of 2020. If you're curious about how everything fits together, check out its <a href="https://github.com/Bambosh/unofficial-homestuck-collection">GitHub page.</a> It's open source, so feel free to fork it off or suggest improvements!`
+        },
+        {
+          name: "GiovanH",
+          link: "https://im.giovanh.com",
+          desc: `After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since.`
         },
         {
           name: "Niklink",
-          desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages.`
+          desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages. Also helped source some obscure material and test changes during development.`
         },
         {
-          name: "Florrie",
-          link: "https://hsmusic.github.io/",
-          desc: `For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.github.io/about/index.html">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.`
+          name: "Quasar Nebula",
+          link: "https://hsmusic.wiki/",
+          desc: `For putting together the Homestuck Music Wiki, an absolutely phenomenal resource that I ripped the entire music database from. Check out the <a href="https://hsmusic.wiki/about/">wiki's credit page</a> to see just how many people it took to bring it to life! Their contributions have all had an effect on this collection.`
         },
         {
           name: "bgreco",
           link: "https://www.bgreco.net/hsflash.html",
           desc: `For providing the original inspiration for the high quality flash audio in this archive. I didn't end up using their edits for the most-part, but the implementation here was very much adapted from their own.`
+        },
+        {
+          name: "Hadron",
+          link: "https://hadronus.com",
+          desc: "For helping to create the fantastic new animated logo."
         },
         {
           name: "SplitSuns",
@@ -134,7 +152,7 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>. Some of the backgrounds from their Snapchat archive made their way in too.`
+          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
         },
         {
           name: "Anthony Bailey",
@@ -149,27 +167,27 @@ export default {
         },
         {
           "pages": ["003840"],
-          "desc": `Art contributions from <a href=\"http://thebrainseed.com/brightleaf" target="_blank">Brett Muller</a>,  <a href="http://www.metroidhat.com" target="_blank">Eyes5</a>,  <a href="http://rutares.deviantart.com/" target="_blank">Jessica Allison</a>,  <a href="http://www.alexandra-douglass.com/" target="_blank">Lexxy</a>,  <a href="http://www.iwantyoutofeelthepressure.com/" target="_blank">M Thomas Harding</a>,  <a href="http://www.smokinghippo.com/" target="_blank">Nic Carey</a>,  <a href="http://abortedslunk.deviantart.com/" target="_blank">Paige Turner</a>,  <a href="http://www.notenoughink.com" target="_blank">Richard Gung</a>,  <a href="http://saffronscarf.deviantart.com/" target="_blank">SaffronScarf</a>,  <a href="http://viivus.tumblr.com/" target="_blank">Vivus</a>\n<br/><br/>\n<a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank">BUN</a><a href="/scraps2/LONGWAYSBUNPizza.jpg" target="_blank">P</a><a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank"> IT DOWN THE LINE</a>`
+          "desc": `Art contributions from <a href="http://thebrainseed.com/brightleaf" target="_blank">Brett Muller</a>,  <a href="http://www.metroidhat.com" target="_blank">Eyes5</a>,  <a href="http://rutares.deviantart.com/" target="_blank">Jessica Allison</a>,  <a href="http://www.alexandra-douglass.com/" target="_blank">Lexxy</a>,  <a href="http://www.iwantyoutofeelthepressure.com/" target="_blank">Rebecca Harding</a>,  <a href="http://www.smokinghippo.com/" target="_blank">Nic Carey</a>,  <a href="http://abortedslunk.deviantart.com/" target="_blank">Paige Turner</a>,  <a href="http://www.notenoughink.com" target="_blank">Richard Gung</a>,  <a href="http://saffronscarf.deviantart.com/" target="_blank">SaffronScarf</a>,  <a href="http://viivus.tumblr.com/" target="_blank">Vivus</a>\n<br/><br/>\n<a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank">BUN</a><a href="/scraps2/LONGWAYSBUNPizza.jpg" target="_blank">P</a><a href="/scraps2/LONGWAYSBUNP.jpg" target="_blank"> IT DOWN THE LINE</a>`
         },
         {
           "pages": ["004478"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://clorin-spats.deviantart.com/\" target=\"_blank\">clorinspats</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://irrisorie.webs.com/\" target=\"_blank\">FauxMonstur</a>,  <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>,  <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://clorin-spats.deviantart.com/\" target=\"_blank\">clorinspats</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://irrisorie.webs.com/\" target=\"_blank\">FauxMonstur</a>,  <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>,  <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["004692"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["004748"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>, <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,   <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>, <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,   <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>,  <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["004827"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>, <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>, <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["004979"],
-          "desc": "Art contributions from <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>"
+          "desc": "Art contributions from <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>,  <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>"
         },
         {
           "pages": ["004987"],
@@ -177,11 +195,11 @@ export default {
         },
         {
           "pages": ["005221"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["005338"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://rutares.deviantart.com/\" target=\"_blank\">Jessica Allison</a>,  <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["005420"],
@@ -189,7 +207,7 @@ export default {
         },
         {
           "pages": ["005595"],
-          "desc": "Art contributions from <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://saffronscarf.deviantart.com/\" target=\"_blank\">SaffronScarf</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["005596"],
@@ -197,7 +215,7 @@ export default {
         },
         {
           "pages": ["005644"],
-          "desc": "Art contributions from <a href=\"http://clorin-spats.deviantart.com/\" target=\"_blank\">clorinspats</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,   <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
+          "desc": "Art contributions from <a href=\"http://clorin-spats.deviantart.com/\" target=\"_blank\">clorinspats</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,   <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>"
         },
         {
           "pages": ["005682"],
@@ -209,7 +227,7 @@ export default {
         },
         {
           "pages": ["006009"],
-          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://lazylaz.tumblr.com/\" target=\"_blank\">Laz</a>,   <a href=\"http://leppu.tumblr.com/\" target=\"_blank\">Leppu</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">M Thomas Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://whaoanon.tumblr.com/\" target=\"_blank\">Shad</a>, <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>, <a href=\"http://xamag-homestuck.tumblr.com/\" target=\"_blank\">Xamag</a>"
+          "desc": "Art contributions from <a href=\"http://thebrainseed.com\" target=\"_blank\">Brett Muller</a>,  <a href=\"http://www.metroidhat.com\" target=\"_blank\">Eyes5</a>, <a href=\"http://lazylaz.tumblr.com/\" target=\"_blank\">Laz</a>,   <a href=\"http://leppu.tumblr.com/\" target=\"_blank\">Leppu</a>, <a href=\"http://www.alexandra-douglass.com/\" target=\"_blank\">Lexxy</a>, <a href=\"http://www.iwantyoutofeelthepressure.com/\" target=\"_blank\">Rebecca Harding</a>,  <a href=\"http://www.bridgetbougan.com\" target=\"_blank\">myluckyseven</a>, <a href=\"http://www.smokinghippo.com/\" target=\"_blank\">Nic Carey</a>,  <a href=\"http://abortedslunk.deviantart.com/\" target=\"_blank\">Paige Turner</a>,  <a href=\"http://www.notenoughink.com\" target=\"_blank\">Richard Gung</a>,  <a href=\"http://whaoanon.tumblr.com/\" target=\"_blank\">Shad</a>, <a href=\"http://skepsisfox.deviantart.com/\" target=\"_blank\">SkepticArcher</a>,  <a href=\"http://luzerna.livejournal.com/\" target=\"_blank\">Sockpuppy</a>, <a href=\"http://taviamorra.com\" target=\"_blank\">Tavia Morra</a>, <a href=\"http://viivus.tumblr.com/\" target=\"_blank\">Vivus</a>, <a href=\"http://xamag-homestuck.tumblr.com/\" target=\"_blank\">Xamag</a>"
         },
         {
           "pages": ["007163", "007208", "007298"],

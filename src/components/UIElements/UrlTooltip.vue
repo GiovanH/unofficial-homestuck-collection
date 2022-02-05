@@ -26,7 +26,7 @@ export default {
     },
     getDisplayUrl(new_url){
       new_url = new_url.replace("http://localhost:8080/", "/")
-      return new_url
+      return this.$resolvePath(new_url)
     }
   },
   watch: {

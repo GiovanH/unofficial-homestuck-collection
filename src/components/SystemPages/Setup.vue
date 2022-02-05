@@ -61,7 +61,6 @@
         <p v-text="loadText"></p>
       </div>
 
-
       <div class="card" v-else>
         <!-- Something went wrong. -->
         <div class="cardContent card_intro">
@@ -70,7 +69,14 @@
             <p>Sorry! Something went critically wrong loading the program.</p><br>
             <p>You currently have mods enabled:</p><br>
             <ol>
-              <li v-for="id in modsEnabled" v-text="id.label" :key="id.key"/>
+              <li
+                v-for="option in modsEnabled"
+                :key="option.key"
+                :data-value="option.key"
+              >
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
+              </li>
             </ol>
             <br>
             <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>

@@ -35,7 +35,7 @@ Vue.use(localData, {
 })
 
 const {shell, ipcRenderer} = require('electron')
-const port = ipcRenderer.sendSync('STARTUP_GET_PORT')
+const {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
 
 const Resources = require("@/resources.js")
 Resources.init({
@@ -65,7 +65,7 @@ Vue.mixin(Memoization.mixin)
 Vue.mixin({
   data(){
     return {
-      $appVersion: '2.0.0',
+      $appVersion: appVersion,
       $expectedAssetVersion: '2'
     }
   },
@@ -475,7 +475,9 @@ Vue.mixin({
 window.vm = new Vue({
   data(){
     return {
-      archive: undefined
+      archive: undefined,
+      tabTheme: undefined,
+      loadState: undefined
     }
   },
   router,
