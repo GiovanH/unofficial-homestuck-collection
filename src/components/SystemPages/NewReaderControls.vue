@@ -303,7 +303,7 @@ export default {
       margin: auto;
       button {
         margin: 0.5em;
-        padding: 1em;
+        padding: 0.5em;
         min-width: 140px;
       }
     }

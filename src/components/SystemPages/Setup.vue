@@ -125,6 +125,8 @@
           <div></div><div></div><div></div><div></div>
         </div>
         <p v-text="loadText"></p>
+        <!-- Preloader -->
+        <Logo class="hidden"/>
       </div>
 
       <div class="card" v-else>
@@ -162,12 +164,12 @@
             <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
             <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
             <div class="center">
-              <button @click="locateAssets()">Locate Assets</button><br>
-              <span class="hint">Directory: {{assetDir || $localData.assetDir || 'None selected'}}</span>
+              <button @click="locateAssets()">Locate Assets</button>
+              <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
             </div>
-            <br>
+            
             <div class="center">
-              <button @click="errorModeRestart()">All done. Let's roll!</button>
+              <button class="letsroll" @click="errorModeRestart()">All done. Let's roll!</button>
             </div>
           </div>
         </div>
@@ -182,6 +184,7 @@
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+import Logo from '@/components/UIElements/Logo.vue'
 
 // import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
@@ -189,7 +192,7 @@ const { ipcRenderer } = require('electron')
 export default {
   name: 'setup',
   components: {
-    TitleBar, NewReaderControls, SpoilerBox
+    TitleBar, NewReaderControls, SpoilerBox, Logo
   },
   data: function() {
     return {
@@ -362,6 +365,54 @@ export default {
     padding: 12px 8px;
     overflow-y: scroll;
   }
+  .center {
+    text-align: center;
+  }
+
+    .letsroll {
+      font-size: 200% !important;
+      padding: 0.2em;
+      margin: 1rem;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+    > div {
+      text-align: justify;
+
+      .tiny {
+        font-size: 11px;
+      }
+      .hint {
+        display: block;
+        font-size: 13px;
+        color: #888888;
+      }
+    }
+    hr {
+      border-top: 3px solid #c6c6c6;
+    }
+    ol { 
+      margin-left: 1.5em;
+    }
+    button {
+      font-size: 110%;
+    }
+    input {
+      &[type="text"] {
+        border: 1px solid #777;
+        min-width: 35px;
+        border-radius: 2px;
+        padding: 2px 3px;
+
+        &.invalid:not(:disabled) {
+          background: pink;
+          border-color: rgb(187, 0, 37);
+          box-shadow: 0 0 3px 1px red;
+        }
+      }
+    }
   .wizard {
     .wizardSidebar {
       width: 210px;
@@ -427,53 +478,6 @@ export default {
       ::v-deep .spoilerbox .logContent {
         padding: 0 1em;
       }
-      .letsroll {
-        font-size: 200% !important;
-        padding: 0.2em;
-        margin: 1rem;
-      }
-
-      h1, h2 {
-        text-align: center;
-      }
-      > div {
-        text-align: justify;
-
-        .tiny {
-          font-size: 11px;
-        }
-        .hint {
-          display: block;
-          font-size: 13px;
-          color: #888888;
-        }
-        .center {
-          text-align: center;
-        }
-      }
-      hr {
-        border-top: 3px solid #c6c6c6;
-      }
-      ol { 
-        margin-left: 1.5em;
-      }
-      input {
-        &[type="text"] {
-          border: 1px solid #777;
-          min-width: 35px;
-          border-radius: 2px;
-          padding: 2px 3px;
-
-          &.invalid:not(:disabled) {
-            background: pink;
-            border-color: rgb(187, 0, 37);
-            box-shadow: 0 0 3px 1px red;
-          }
-        }
-      }
-      button {
-        font-size: 110%;
-      }
       // CSS reset is a lie that hurts people.
       p {
         margin-block-start: 1em;
@@ -496,19 +500,6 @@ export default {
       }
     }
   }
-  // .pageFrame {
-  //   width: 950px;
-  //   padding-top: 7px;
-  //   padding-bottom: 23px;
-  //   margin: 0 auto;
-
-  //   flex: 0 1 auto;
-  //   display: flex;
-  //   flex-flow: column nowrap;
-  //   justify-content: center;
-  //   align-items: center;
-  //   align-content: center;
-  // }
   .card {
     position: relative;
     margin: auto;
