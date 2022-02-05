@@ -401,9 +401,10 @@
                               <center style="padding:15px;">
                                 <p>Monsters in the yard. Monsters in the house. Monsters in the hall, beating on your door. Your brother's trapped in his treehouse, so he’s not gonna be much help. You're going to have to get yourself out of this. But where did they come from? How are you supposed to deal with this? Well, certainly not by cowering in your room. That's for, uh, cowards.</p><br>
                                 <p>First things first. You need to open the door.</p><br>
-                                <p>HIVESWAP: Act 1 is the first of a four-part series set in Andrew Hussie’s Homestuck universe, with a companion series, <em>Hauntswitch</em>, to follow. Continue your save from chapter to chapter, then from game to game, to carry your story, choices, friendships and frenemies across them all--then do it again! Once released, HIVESWAP and <em>Hauntswitch</em> will be playable in either order. Haven’t read Homestuck? That’s fine! This game is set in 1994! Homestuck hasn’t even been invented yet!</p><br>
+                                <p>HIVESWAP is a four-part series set in Andrew Hussie’s Homestuck universe, with a companion series, <em>Hauntswitch</em>, to follow. Continue your save from chapter to chapter, then from game to game, to carry your story, choices, friendships and frenemies across them all--then do it again! Once released, HIVESWAP and <em>Hauntswitch</em> will be playable in either order. Haven’t read Homestuck? That’s fine! This game is set in 1994! Homestuck hasn’t even been invented yet!</p><br>
+                                <p>Also see the <a href='http://hs.hiveswap.com/ezodiac/index.php'>Extended Zodiac</a>, an official personality quiz that assigns you a zodiac symbol based on your quiz answers released as romotional material for the Hiveswap games.</p><br />
                                 <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | ???</em></p>
-                                <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Description from Steam store page.</a></em></p>
+                                <p><em><a href="https://store.steampowered.com/curator/35533744-Homestuck-Universe/list/49536/">Steam store page</a></em></p>
                                 <p><em>14 September 2017 - Ongoing</em></p>
                               </center>
                             </td>
@@ -570,12 +571,12 @@
                                         <td>
                                           <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />
                                         </td>
-                                        <td>
+                                        <!-- <td>
                                           <font size="6"><a href="https://www.patreon.com/homestuck" target="_blank">$$$</a></font>
                                         </td>
                                         <td>
                                           <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
-                                        </td>
+                                        </td> -->
                                       </tr>
                                     </tbody>
                                   </table>
@@ -591,8 +592,10 @@
                                 <p>Homestuck^2: Beyond Canon is an official continuation of the cult-classic webcomic Homestuck and a follow-up to The Homestuck Epilogues, dropped as a major event in April of 2019.</p>
                                 <p>Homestuck 2: Beyond Canon takes a combination of Andrew Hussie's original writing and plot outlines and concepts and joins him with a team of new, diverse voices to expand the compelling narratives of Homestuck's most (and least) beloved characters.</p></br>
 
+                                <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p></br>
+
                                 <p><em><a href="https://www.patreon.com/homestuck">Description from the Homestuck Patreon.</a></em></p>
-                                <p><em>25 October 2019 - Ongoing</em></p>
+                                <p><em>25 October 2019 - (HIATUS)</em></p>
                               </center>
                             </td>
                           </tr>

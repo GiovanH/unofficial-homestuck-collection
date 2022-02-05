@@ -139,18 +139,11 @@ export default {
           desc: "The MSPA Wiki. A great database of character information and summaries. (Caution: hosted by fandom.com)"
         },
         {
-          id: 'hs2',
-          type: 'work',
-          url: 'https://homestuck2.com',
-          name: 'Homestuck^2',
-          desc: "A semi-official continuation of the Homestuck comic, picking up after the epilogues. Abandoned, as of time of writing."
-        },
-        {
-          id: 'ezodiac',
-          type: 'work',
-          url: 'http://hs.hiveswap.com/ezodiac/index.php',
-          name: 'Extended Zodiac',
-          desc: "An official personality quiz that assigns you a zodiac symbol based on your quiz answers. Promotional material for the Hiveswap games."
+          id: 'skaianet',
+          type: 'info',
+          url: 'http://skaia.net',
+          name: 'Skaia.net',
+          desc: "An internet radio station for Homestuck music, and an archive that hosts fanmade MSPA resources including music, artwork, and group projects."
         },
         {
           id: 'rafe',
