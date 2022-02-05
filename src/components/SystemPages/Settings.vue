@@ -503,6 +503,7 @@ export default {
       ],
       themes: [
         {text: "Auto", value: "default"},
+        {text: "Dark", value: "dark"},
         {text: "MSPA", value: "mspa"},
         {text: "Retro", value: "retro"},
         {text: "Scratch", value: "scratch"},
@@ -566,7 +567,7 @@ export default {
       }
     },
     darkModeChecked(){
-      if (this.$localData.settings.themeOverride == "cascade") return true
+      if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
     }
@@ -633,7 +634,7 @@ export default {
         this.$localData.settings.themeOverride = "default"
       } else {
         // Check "dark mode style"
-        this.$localData.settings.themeOverride = "cascade"
+        this.$localData.settings.themeOverride = "dark"
       }
       this.$localData.root.saveLocalStorage()
     },
