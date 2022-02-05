@@ -348,6 +348,22 @@
         </HomeRowItem>
       </div>
     </div>
+
+    <div v-if="modHomeRowItems.length" class="card noHeaderCard">
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          v-for="item in modHomeRowItems"
+          class="rowItem"
+          :key="item.href"
+          :href="item.href"
+          :thumbsrc="item.thumbsrc"
+          :afterpage="item.afterpage"
+          :date="item.date">
+          <template v-slot:title>{{ item.title }}</template>
+          <div v-html="item.description"></div>
+        </HomeRowItem>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -367,6 +383,15 @@ export default {
   },
   data: function() {
     return {
+      modHomeRowItems: [
+      // {
+      //   href: "/ryanquest",
+      //   thumbsrc: "/archive/collection/archive_ryanquest.png",
+      //   date: "Oct 2010",
+      //   title: 'Ryanquest',
+      //   description: `<p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>`
+      // }
+      ]
     }
   },
   title: function(ctx) {
