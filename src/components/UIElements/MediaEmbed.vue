@@ -7,6 +7,7 @@
   <component v-else-if="getMediaType(url) === 'html'" 
   :is="frameType"
   :src='resolveFrameUrl(url)' 
+  sandbox="allow-same-origin allow-scripts"
   :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
   class="sburb"  @did-finish-load="initHtmlFrame" seamless />
   <div v-else-if="getMediaType(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />

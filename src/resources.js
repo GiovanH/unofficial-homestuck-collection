@@ -21,6 +21,9 @@ function fileIsAsset(url) {
   const is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
   if (is_bundled) return false
 
+  const is_outlink = /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url)
+  if (is_outlink) return false
+
   // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
   const has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov|html)$/i.test(url)
