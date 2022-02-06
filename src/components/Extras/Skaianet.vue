@@ -402,10 +402,25 @@
                             <td colspan="3" bgcolor="#b9b8b9">
                               <center style="padding:15px;">
                                 <p>Monsters in the yard. Monsters in the house. Monsters in the hall, beating on your door. Your brother's trapped in his treehouse, so he’s not gonna be much help. You're going to have to get yourself out of this. But where did they come from? How are you supposed to deal with this? Well, certainly not by cowering in your room. That's for, uh, cowards.</p><br>
+
                                 <p>First things first. You need to open the door.</p><br>
+
                                 <p>HIVESWAP is a four-part series set in Andrew Hussie’s Homestuck universe, with a companion series, <em>Hauntswitch</em>, to follow. Continue your save from chapter to chapter, then from game to game, to carry your story, choices, friendships and frenemies across them all--then do it again! Once released, HIVESWAP and <em>Hauntswitch</em> will be playable in either order. Haven’t read Homestuck? That’s fine! This game is set in 1994! Homestuck hasn’t even been invented yet!</p><br>
-                                <p>Also see the <a href='http://hs.hiveswap.com/ezodiac/index.php'>Extended Zodiac</a>, an official personality quiz that assigns you a zodiac symbol based on your quiz answers released as romotional material for the Hiveswap games.</p><br />
-                                <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | ???</em></p>
+
+                                <p>Also see the <a href='http://hs.hiveswap.com/ezodiac/index.php'>Extended Zodiac</a>, an official personality quiz that assigns you a zodiac symbol based on your quiz answers and the Act 2 character preview <a href='http://hs.hiveswap.com/trollcall/'>Troll Call</a>, released as promotional material for the Hiveswap games.</p><br />
+
+                                <p>Hiveswap - <em>
+                                  <a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | 
+                                  <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | 
+                                  <a>Act 3</a> | 
+                                  <a>Act 4</a>
+                                </em> </p>
+                                <p>Hauntswitch - <em>
+                                  <a>Act 1</a> | 
+                                  <a>Act 2</a> | 
+                                  <a>Act 3</a> | 
+                                  <a>Act 4</a>
+                                </em></p>
                                 <p><em><a href="https://store.steampowered.com/curator/35533744-Homestuck-Universe/list/49536/">Steam store page</a></em></p>
                                 <p><em>14 September 2017 - Ongoing</em></p>
                                 </center>
