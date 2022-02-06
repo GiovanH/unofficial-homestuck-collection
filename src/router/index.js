@@ -167,7 +167,7 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '1'
+        redirect: '000001'
       },
       {
         path: ':p',

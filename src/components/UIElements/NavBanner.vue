@@ -36,7 +36,6 @@ export default {
           "/"
         ],
         [
-          "/news",
           "/help"
         ],
         [
@@ -45,6 +44,7 @@ export default {
           "/search"
         ],
         [
+          "/news",
           "/music"
         ],
         [
