@@ -298,6 +298,13 @@
     cursor: progress;
   }
 
+  .addressBar {
+    --headerHeight: 82px;
+  }
+  .noAddressBar {
+    --headerHeight: 51px;
+  }
+
   html, body {
     height: 100%;
   }
