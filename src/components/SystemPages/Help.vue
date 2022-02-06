@@ -4,15 +4,16 @@
     <div class="card">
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent pageMenu">
-        <span v-for="(label, key) in {newreader: 'New Reader', usage: 'Usage'}" 
+        <a v-for="(label, key) in {newreader: 'New Reader', usage: 'Usage'}" 
           :key="key"
-          @click="cardSelection = key" 
+          :href="`/help/${key}`" 
           :class="{selected: cardSelection == key}"
           v-text="label" />
 
       </div>
       <hr />
-      <div class="cardContent" v-if="cardSelection == 'newreader'">
+      <div class="cardContent" 
+        v-if="cardSelection == 'newreader'">
         <section>
           <h2>Welcome! Wondering where to begin?</h2> 
           <p>
@@ -103,7 +104,11 @@ export default {
   title: () => "Help",
   data: function() {
     return {
-      cardSelection: 'newreader'
+    }
+  },
+  computed: {
+    cardSelection(){
+      return this.routeParams.mode || 'newreader'
     }
   }
 }
@@ -140,9 +145,10 @@ export default {
   .pageMenu {
     display: flex;
     justify-content: space-evenly;
-    span {
+    a {
       color: var(--page-links);
       font-size: 24px; 
+      text-decoration: none;
       &:hover {
         cursor: pointer;
       }
