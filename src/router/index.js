@@ -21,6 +21,10 @@ const routes = [
     props: true
   },
   {
+    path: '/help/:mode',
+    props: true
+  },
+  {
     path: '/credits/:mode',
     props: true,
     children: [
