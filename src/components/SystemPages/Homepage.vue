@@ -206,55 +206,6 @@
       </div>
     </div>
 
-    <div class="card newsCard">
-      <div class="logo newsLogo cardContent">
-        <Media url="assets://archive/collection/news_logo.png" />
-        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
-      </div>
-      <div class="cardContent">
-        <div class="description">
-          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while others ran at different times.</p>
-        </div>
-      </div>
-      <div class="cardContent cardRows">
-        <HomeRowItem
-          class="rowItem"
-          href="/news"
-          thumbsrc="/archive/collection/archive_news.png"
-          date="Jun 2007 - Apr 2018">
-          <template v-slot:title>MSPA Newsposts</template>
-          <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/blogspot"
-          thumbsrc="/archive/collection/archive_blogspot.png"
-          afterpage="002821"
-          date="Dec 2008 - Jul 2010">
-          <template v-slot:title>Blogspot</template>
-          <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/formspring"
-          thumbsrc="/archive/collection/archive_formspring.png"
-          afterpage="003478"
-          date="Feb 2010 - Aug 2011">
-          <template v-slot:title>Formspring</template>
-          <p>Q&As with Andrew Hussie, providing context and commentary on Homestuck until it was dropped in mid-2011.</p>
-        </HomeRowItem>
-        <HomeRowItem
-          class="rowItem"
-          href="/tumblr"
-          thumbsrc="/archive/collection/archive_tumblr.png"
-          afterpage="006010"
-          date="Oct 2011 -  Mar 2013">
-          <template v-slot:title>Tumblr</template>
-          <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
-        </HomeRowItem>
-      </div>
-    </div>
-
     <div class="card tsoCard">
       <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo cardContent" />
       <div class="cardContent cardEntry tsoCard">
@@ -302,6 +253,55 @@
           date="Jun 2008 - May 2009">
           <template v-slot:title>The Man-On-Man Suckoff Challenge</template>
           <p>Gaze deep into the uncanny valley.</p>
+        </HomeRowItem>
+      </div>
+    </div>
+
+    <div class="card newsCard">
+      <div class="logo newsLogo cardContent">
+        <Media url="assets://archive/collection/news_logo.png" />
+        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
+      </div>
+      <div class="cardContent">
+        <div class="description">
+          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while others ran at different times.</p>
+        </div>
+      </div>
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          class="rowItem"
+          href="/news"
+          thumbsrc="/archive/collection/archive_news.png"
+          date="Jun 2007 - Apr 2018">
+          <template v-slot:title>MSPA Newsposts</template>
+          <p>An archive of official newsposts, ranging the entire lifespan of the MSPA website.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/blogspot"
+          thumbsrc="/archive/collection/archive_blogspot.png"
+          afterpage="002821"
+          date="Dec 2008 - Jul 2010">
+          <template v-slot:title>Blogspot</template>
+          <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/formspring"
+          thumbsrc="/archive/collection/archive_formspring.png"
+          afterpage="003478"
+          date="Feb 2010 - Aug 2011">
+          <template v-slot:title>Formspring</template>
+          <p>Q&As with Andrew Hussie, providing context and commentary on Homestuck until it was dropped in mid-2011.</p>
+        </HomeRowItem>
+        <HomeRowItem
+          class="rowItem"
+          href="/tumblr"
+          thumbsrc="/archive/collection/archive_tumblr.png"
+          afterpage="006010"
+          date="Oct 2011 -  Mar 2013">
+          <template v-slot:title>Tumblr</template>
+          <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
         </HomeRowItem>
       </div>
     </div>
