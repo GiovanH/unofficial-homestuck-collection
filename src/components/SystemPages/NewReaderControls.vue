@@ -95,7 +95,7 @@
         <dt>
           <input type="radio" id="fast_forward=false" :value="false" 
             v-model="myFastForward"/>
-          <label for="fast_forward=false">Replay</label>
+          <label for="fast_forward=false">Replay (Recommended)</label>
         </dt>
         <dd><label for="fast_forward=false">Read as if you were reading it live.<br>
           All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see 
@@ -376,7 +376,12 @@ export default {
     // Descriptions of whole sections
     > dd.settingDesc { margin-top: 1em; }
 
-    dt { margin: 20px 0 5px 10px; }
+    dt { 
+      margin: 20px 0 5px 10px; 
+      label {
+        font-weight: bolder;
+      }
+    }
     div.subOption { margin-left: 40px; }
 
   }
