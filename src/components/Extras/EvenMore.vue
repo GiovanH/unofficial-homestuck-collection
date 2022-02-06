@@ -2,7 +2,7 @@
   <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="card">
-      <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a class="logo" href="/"><Logo /></a>
       <div class="cardContent" v-if="this.$isNewReader">
         <h2>Looking for more?</h2> 
         <section>
@@ -52,6 +52,7 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
 
 function shuffle(obj){
   return obj
@@ -98,7 +99,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, Logo
   },
   title: () => "Even more content",
   data: function() {
