@@ -10,7 +10,7 @@
             We've tried to pack as much as we possibly can into this archive, but there are so many more fan resources and communities you can explore.
           </p>
           <p>
-            They're <em>chalk full</em> of spoilers, though, to the point where it's hard to even describe some of them without spoiling new readers. And thumbnails are right out.
+            They're <em>chock full</em> of spoilers, though, to the point where it's hard to even describe some of them without spoiling new readers. And thumbnails are right out.
           </p>
           <p>
             Come back once you finish Homestuck!
