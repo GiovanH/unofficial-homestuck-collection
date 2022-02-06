@@ -35,6 +35,27 @@
           <dd>Read as an archival reader.<br>Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
         </dl>
 
+        <SpoilerBox kind="Granular Retcon Settings" v-if="!$isNewReader">
+          <div class="settings retcons" style="padding: 0;">
+            <p class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</p>
+            <dl>
+              <template v-for="retcon in retconList">
+                <dt :key="retcon.model"><label>
+                  <input type="checkbox" 
+                    :name="retcon.model" 
+                    v-model="$localData.settings[retcon.model]" 
+                    :disabled="$localData.settings.fastForward"
+                    @click="toggleSetting(retcon.model)"
+                  >{{retcon.label}}</label></dt>
+                <dd class="settingDesc">
+                  Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
+                </dd>
+              </template>
+            </dl>
+            <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
+          </div>
+        </SpoilerBox>
+
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
           <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
@@ -172,25 +193,6 @@
       </div>
     </div>
     <div class="card">
-      <div class="settings retcons" v-if="!$isNewReader">
-        <h2>Retcons</h2>
-        <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
-        <dl>
-          <template v-for="retcon in retconList">
-            <dt :key="retcon.model"><label>
-              <input type="checkbox" 
-                :name="retcon.model" 
-                v-model="$localData.settings[retcon.model]" 
-                :disabled="$localData.settings.fastForward"
-                @click="toggleSetting(retcon.model)"
-              >{{retcon.label}}</label></dt>
-            <dd class="settingDesc">
-              Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
-            </dd>
-          </template>
-        </dl>
-        <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
-      </div>
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
         <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited.</p>
@@ -270,12 +272,22 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <p class="settingDesc">
-          Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>. </p>
+        <section class="modPrattle">
+          <p class="settingDesc">
+            Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>.
+<!--           </p>
+          <p> -->
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
+<!--           </p>
+          <p> -->
+            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
+        </section>
           
-        <p class="settingDesc">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
+        <div class='hint'>
+          <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
+          
+        </div>
 
-        <button v-if="$localData.settings.devMode" @click="reloadModList">Dev: Reload Choices</button> 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
             <draggable tag="ul" group="sortable-mods">
@@ -314,13 +326,15 @@
             </draggable>
           </div>
         </section>
+          
+        <p class="hint">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
 
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
 
         <div class="system">
-          <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
+          <p v-if="needReload" class="needreload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <!-- v-if="$localData.settings.devMode || needReload"  -->
-          <button @click="forceReload">Reload Application</button>
+          <button @click="forceReload" class="reload">Reload Application</button>
         </div>
       </div>
     </div>
@@ -923,12 +937,22 @@ export default {
 
 
 
+    &.mod button.reload {
+      margin: 0.5em;
+      padding: 0.5em;
+      min-width: 140px;
+    }
+
     button {
       font-size: 110%;
     }
     .hint {
       font-size: 13px;
       color: var(--page-nav-meta);
+      button {
+        font-size: 1em;
+        padding: 0 4px;
+      }
     }
     .themeSelector, .fontSelector {
       font-size: 16px;
@@ -1010,6 +1034,7 @@ export default {
   }
   .sortable {
     font-weight: normal;
+    margin: 1em 0;
     
     ul, ol {  
       text-align: left;        
