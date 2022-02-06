@@ -5,7 +5,7 @@
       <div class="newReaderInput">
         <!-- Settings for adjusting new reader mode -->
         <template v-if="$isNewReader">
-          <p>New reader mode enabled.</p>
+          <p class="pageStatus"><strong>New reader mode</strong> set to <strong>page {{this.$mspaOrVizNumber(this.$newReaderCurrent)}}</strong> of <strong>{{currentAdventureName}}</strong>.</p>
           <!-- Can't show picker if you're in viz mode. -->
           <StoryPageLink
             v-if="isNewReadingPreHS" 
@@ -27,7 +27,7 @@
             </span>
         </template>
         <template v-else>
-          <p>New reader mode disabled.</p>
+          <p class="pageStatus"><strong>New reader mode disabled.</strong></p>
           <input type="number" size="1" maxlength="6" 
             v-model="newReaderPageInput"
             @keydown.enter="setNewReader()"
@@ -48,13 +48,14 @@
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
-        <div style="height: 40px;" v-if="$isNewReader">
+        <div v-if="$isNewReader">
             <br />
           <div class="bigButtonRow">
             <button @click="clearNewReader()">Switch off new reader mode</button>
           </div>
         </div>
-        <div style="height: 40px;" v-else>
+        <div v-else>
+            <br />
           <p class="hint">Or activate a preset:</p>
           <div class="bigButtonRow">
             <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
@@ -187,6 +188,11 @@ export default {
     },
     isNewReadingPreHS(){
       return (!this.$localData.settings.mspaMode && this.$newReaderCurrent && this.$newReaderCurrent < '001901')
+    },
+    currentAdventureName(){
+      if (this.$newReaderCurrent <= '001892') return "Problem Sleuth"
+      else if (this.$newReaderCurrent <= '001900') return "Homestuck Beta"
+      else return "Homestuck"
     }
   },
   methods: {
@@ -299,10 +305,12 @@ export default {
       display: inline-block;
 
       @keyframes urgent { from { 
-        box-shadow: 0 0 0px 1px red;
+        box-shadow: 0 0 0px 1px royalblue;
       } to { 
-        box-shadow: 0 0 5px 1px red;
+        box-shadow: 0 0 5px 1px royalblue;
       }  }
+
+      border-radius: 3px;
       border-color: #ffaa00;
       background: #ffaa00;
       border-style: hidden;
@@ -343,6 +351,9 @@ export default {
         min-width: 200px;
       }
     }
+  }
+  .pageStatus {
+    margin-bottom: 10px;
   }
   .hint {
     font-size: 13px;
