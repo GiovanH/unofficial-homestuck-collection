@@ -128,18 +128,18 @@ export default {
         },
         {
           id: 'MSPFA',
-          type: 'social',
+          type: 'work',
           url: 'https://mspfa.com',
           name: 'MS Paint Fan Adventures',
           desc: `A hub for fans to write and share their own MSPA-styled adventures.`
         },
-        {
-          id: 'reddit',
-          type: 'social',
-          url: 'https://www.reddit.com/r/homestuck/',
-          name: 'r/Homestuck',
-          desc: "The Homestuck fan subreddit. Art, discussion, chat."
-        },
+        // {
+        //   id: 'reddit',
+        //   type: 'social',
+        //   url: 'https://www.reddit.com/r/homestuck/',
+        //   name: 'r/Homestuck',
+        //   desc: "The Homestuck fan subreddit. Art, discussion, chat."
+        // },
         {
           id: 'homestuck_net',
           type: 'info',
@@ -189,20 +189,20 @@ export default {
           name: "Voxus: Let's Read Homestuck",
           desc: "An extensive voice-acting readthrough of Homestuck. "
         },
-        {
-          id: 'omega',
-          type: 'social',
-          url: 'https://omegaupdate.freeforums.net',
-          name: "Omegaupdate Forums",
-          desc: "One of several MSPA Forums replacements. This sprung up after the forums went down and the comic was on the hiatus known as the \"Omegapause\""
-        },
-        {
-          id: 'xyz',
-          type: 'social',
-          url: 'https://forum.homestuck.xyz',
-          name: "homestuck.xyz MSPA Forums",
-          desc: "One of several MSPA Forums replacements. This is intended as a direct replacement of the classic MSPA Forums rather than as a forum for any particular adventure."
-        },
+        // {
+        //   id: 'omega',
+        //   type: 'social',
+        //   url: 'https://omegaupdate.freeforums.net',
+        //   name: "Omegaupdate Forums",
+        //   desc: "One of several MSPA Forums replacements. This sprung up after the forums went down and the comic was on the hiatus known as the \"Omegapause\""
+        // },
+        // {
+        //   id: 'xyz',
+        //   type: 'social',
+        //   url: 'https://forum.homestuck.xyz',
+        //   name: "homestuck.xyz MSPA Forums",
+        //   desc: "One of several MSPA Forums replacements. This is intended as a direct replacement of the classic MSPA Forums rather than as a forum for any particular adventure."
+        // },
         {
           id: 'mozai',
           type: 'info',
