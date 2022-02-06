@@ -4,7 +4,7 @@
     <div class="card">
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent pageMenu">
-        <a v-for="(label, key) in {newreader: 'New Reader', usage: 'Usage'}" 
+        <a v-for="(label, key) in {newreader: 'New Readers', usage: 'How To Use The Collection'}" 
           :key="key"
           :href="`/help/${key}`" 
           :class="{selected: cardSelection == key}"
@@ -37,7 +37,7 @@
             Late-arrival spoilers will slap you in the face. Try asking a friend! 
           </p>
           <p>
-            Failing that, <a href="/evenmore">Homestuck fan communities</a> are often happy to help newcomers and will answer your questions, although they're not set up to provide spoiler-free experiences.
+            Failing that, Homestuck fan communities are often happy to help newcomers and will answer your questions, although they're not set up to provide spoiler-free experiences.
           </p>
         </section>
 
