@@ -294,7 +294,7 @@ Vue.mixin({
       }
     },
     $isVizBase(base){
-      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck', 'ryanquest'].includes(base)
+      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
     },
     $mspaOrVizNumber(mspaId){
       return !(mspaId in this.$archive.mspa.story) || this.$localData.settings.mspaMode ? mspaId : this.$mspaToViz(mspaId).p

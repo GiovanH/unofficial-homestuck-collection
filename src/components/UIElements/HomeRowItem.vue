@@ -14,7 +14,8 @@
     <div class="description">
       <h2>??????</h2>
       <p class="date" v-text="date_" />
-      <p>Reach page {{$mspaOrVizNumber(afterpage)}} of Homestuck to unlock!</p>
+      <p v-if="afterpage">Reach page {{$mspaOrVizNumber(afterpage)}} of Homestuck to unlock!</p>
+      <p v-else>Keep reading to unlock!</p>
     </div>
   </div>
 </template>
