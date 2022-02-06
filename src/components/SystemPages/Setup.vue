@@ -82,7 +82,9 @@
               <p>So, all that to say, you probably don't care about this. But you're in on the secret! Also, if you want to adjust what you see, you have more granular timeline controls in Settings.</p>
             </SpoilerBox>
 
-            <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
+            <!-- forceGateChoice="true"  -->
+            <NewReaderControls features="fastforward" 
+            ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
           </div>
 
           <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
@@ -261,11 +263,11 @@ export default {
           return true
         else return false
       }
-      if (pagename == 'Reading Experience') {
-        if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
-          return true
-        else return false
-      }
+      // if (pagename == 'Reading Experience') {
+      //   if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
+      //     return true
+      //   else return false
+      // }
       return false
     },
     validatePage() {
@@ -485,7 +487,7 @@ export default {
       position: relative;
       display: grid;
       margin: 25px;
-      min-height: 620px; // Measured value
+      min-height: 580px; // Measured value
 
       .wizardFooter {
         position: absolute;
