@@ -354,12 +354,17 @@
                             </tr>
                           </tbody>
                         </table>
-                        <span v-if="$localData.settings.cursedHistory">
+                        <span>
                           <br><br>
                           <table summary="" border="2" width="685px" cellpadding="0px" bgcolor="">
                             <tr>
                               <td bgcolor="#b9b8b9" >
-                                <center><br><br><a href="/skaianet/cursed_history">The following assets have been acquired by Skaianet Systems Incorporated.</a><br><br><br></center>
+                                <center><br><br>
+                                  <a 
+                                    :href="$localData.settings.cursedHistory ? '/skaianet/cursed_history' : '/settings/controversial'"
+                                    :class="{hijack: !$localData.settings.cursedHistory}">
+                                  The following assets have been acquired by Skaianet Systems Incorporated.</a>
+                                <br><br><br></center>
                               </td>
                             </tr>
                           </table>
@@ -806,6 +811,11 @@ img {
 
 img.logo {
   width:70%;
+}
+
+a.hijack {
+  // pointer-events: none;
+  color: gray;
 }
 
 .cursedHistoryText {
