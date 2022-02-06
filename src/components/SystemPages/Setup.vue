@@ -49,9 +49,6 @@
               </div>
             </SpoilerBox>
             <p>
-              Mainly your general slew of 2010s edgy stuff.
-            </p>
-            <p>
               Most of the particularly harsh examples are either briefly touched on or buried away in corners (older comics, beyond canon, etc).
             </p>
           </div>
@@ -77,6 +74,7 @@
 
             <p>Okay, one last choice we're going to force you to make before you jump in:</p>
 
+            <!-- this never displays, haha -->
             <SpoilerBox v-if="!$isNewReader" :always-open="true" style="font-size: 14px;">
               <p>Since you did not enable new reader mode on the previous page, here's an explanation of how this works:</p>
               <p>As you progress through the story in New Reader Mode, the archive of course keeps track of your current page. If you choose the <b>Replay</b> experience, image retcons will appear as they did at the time of publication. But once you get to the point where the images changed, you can go back and see the changes in the text.</p>
@@ -84,7 +82,9 @@
               <p>So, all that to say, you probably don't care about this. But you're in on the secret! Also, if you want to adjust what you see, you have more granular timeline controls in Settings.</p>
             </SpoilerBox>
 
-            <NewReaderControls features="fastforward" forceGateChoice="true" ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
+            <!-- forceGateChoice="true"  -->
+            <NewReaderControls features="fastforward" 
+            ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
           </div>
 
           <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
@@ -263,11 +263,11 @@ export default {
           return true
         else return false
       }
-      if (pagename == 'Reading Experience') {
-        if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
-          return true
-        else return false
-      }
+      // if (pagename == 'Reading Experience') {
+      //   if (!this.$refs.ffcontrol || this.$refs.ffcontrol.myFastForward == undefined)
+      //     return true
+      //   else return false
+      // }
       return false
     },
     validatePage() {
@@ -487,7 +487,7 @@ export default {
       position: relative;
       display: grid;
       margin: 25px;
-      min-height: 620px; // Measured value
+      min-height: 580px; // Measured value
 
       .wizardFooter {
         position: absolute;

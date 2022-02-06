@@ -2,10 +2,10 @@
   <div class="newReaderControls">
     <template v-if="featureList.includes('pagenumber')">
       <!-- <span v-if="$localData.settings['devMode']" v-text="newReaderPage" /> -->
-      <div class="newReaderInput" v-if="$isNewReader">
+      <div class="newReaderInput">
         <!-- Settings for adjusting new reader mode -->
-        <p>New reader mode enabled.<br>
-          Currently up to page 
+        <template v-if="$isNewReader">
+          <p>New reader mode enabled.</p>
           <!-- Can't show picker if you're in viz mode. -->
           <StoryPageLink
             v-if="isNewReadingPreHS" 
@@ -19,36 +19,48 @@
               empty: !newReaderPageInput || !newReaderPageInput.length, 
               changed: newReaderPageChanged
             }" >
-        </p>
-        <button v-if="isValidPageSet && newReaderPageChanged" 
-          @click="changeNewReader()">Set adjusted page</button>
-        <br />
-        <button @click="clearNewReader()">Switch off new reader mode</button>
-      </div>
-      <div class="newReaderInput" v-else>
-        <!-- Settings for turning on new reader mode -->
-        <p class="hint">Quick Setup</p>
-        <div class="quickset">
-          <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
-          <button @click="setupHomestuck()">Start Homestuck</button>
-        </div>
-        <p class="hint">Or enter a page manually</p>
-        <input type="number" size="1" maxlength="6" 
-          v-model="newReaderPageInput"
-          @keydown.enter="setNewReader()"
-          :class="{
-            invalid: !isValidPageSet, 
-            empty: !newReaderPageInput || !newReaderPageInput.length, 
-            changed: newReaderPageChanged
-          }" >
-        <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" @click="setNewReader()">Activate</button>
-        <!-- <StoryPageLink :mspaId='newReaderPage' titleOnly="true"/> -->
+            <span :class="{ urgent: newReaderPageChanged }">
+            <button :disabled="!(isValidPageSet && newReaderPageChanged)" 
+              @click="changeNewReader()" 
+              class="rightBtn"
+              >Adjust</button>
+            </span>
+        </template>
+        <template v-else>
+          <p>New reader mode disabled.</p>
+          <input type="number" size="1" maxlength="6" 
+            v-model="newReaderPageInput"
+            @keydown.enter="setNewReader()"
+            :class="{
+              invalid: !isValidPageSet, 
+              empty: !newReaderPageInput || !newReaderPageInput.length, 
+              changed: newReaderPageChanged
+            }" >
+          <span :class="{ urgent: newReaderPageChanged }">
+          <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
+          @click="setNewReader()"
+          class="rightBtn">Activate</button>
+          </span>
+        </template>
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number<br>
           e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
+        <div style="height: 40px;" v-if="$isNewReader">
+            <br />
+          <div class="bigButtonRow">
+            <button @click="clearNewReader()">Switch off new reader mode</button>
+          </div>
+        </div>
+        <div style="height: 40px;" v-else>
+          <p class="hint">Or activate a preset:</p>
+          <div class="bigButtonRow">
+            <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
+            <button @click="setupHomestuck()">Start Homestuck</button>
+          </div>
+        </div>
       </div>
 
       <!-- <pre v-if="$localData.settings.devMode">
@@ -133,6 +145,7 @@ export default {
   data: function() {
     return {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
+      // TODO: This assignment sometimes doesn't work, and assigns 001901 anyway?
       newReaderPageInput: this.$newReaderCurrent || this.$mspaOrVizNumber('001901'),
       // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
       myFastForward: this.forceGateChoice ? undefined : this.$localData.settings['fastForward'],
@@ -211,8 +224,12 @@ export default {
       }
     },
     setupHomestuck() {
-      this.newReaderPageInput = this.$mspaOrVizNumber("001901")
-      this.setNewReader()
+      this.$localData.settings.mspaMode = false
+      this.$nextTick(() => {
+        this.$logger.info("Set HS number")
+        this.newReaderPageInput = this.$mspaOrVizNumber("001901")
+        this.setNewReader()
+      })
     },
     setupProblemSleuth() {
       this.$localData.settings.mspaMode = true
@@ -258,6 +275,9 @@ export default {
         this.newReaderPageInput = newto
       }
     }
+  },
+  mounted(){
+    if (this.$newReaderCurrent) this.newReaderPageInput = this.$newReaderCurrent
   }
 }
 
@@ -268,15 +288,34 @@ export default {
     font-size: 14px;
     font-weight: bolder;
     overflow-wrap: break-word;
+    font-weight: initial;
+    position: relative;
   }
   .newReaderInput {
     margin-top: 20px;
     text-align: center;
 
+    .urgent {
+      display: inline-block;
+
+      @keyframes urgent { from { 
+        box-shadow: 0 0 0px 1px red;
+      } to { 
+        box-shadow: 0 0 5px 1px red;
+      }  }
+      border-color: #ffaa00;
+      background: #ffaa00;
+      border-style: hidden;
+      animation: 0.5s linear 0s infinite alternate urgent;
+    }
+
     button {
       // display: block;
       margin: 0 auto;
       // margin-bottom: 1em;
+      &.rightBtn{
+        min-width: 5em;
+      }
     }
     input {
       border: 1px solid #777;
@@ -291,12 +330,9 @@ export default {
         border-color: rgb(187, 0, 37);
         box-shadow: 0 0 3px 1px red;
       }
-      &.changed {
-        border-color: #ffaa00;
-        box-shadow: 0 0 3px 1px red;
-      }
     }
-    .quickset {
+
+    .bigButtonRow {
       display: flex;
       justify-content: space-evenly;
       width: 400px;
@@ -304,7 +340,7 @@ export default {
       button {
         margin: 0.5em;
         padding: 0.5em;
-        min-width: 140px;
+        min-width: 200px;
       }
     }
   }
