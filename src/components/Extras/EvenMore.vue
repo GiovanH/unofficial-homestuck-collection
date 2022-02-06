@@ -208,13 +208,6 @@ export default {
           url: 'https://nepeta.mozai.com',
           name: "nepeta.mozai.com",
           desc: "<a href='https://mozai.com'>Mozai's</a> Homestuck fansite, with an archive of old fandom resources."
-        },
-        {
-          id: 'viz',
-          type: 'work',
-          url: 'https://www.homestuck.com',
-          name: "homestuck.com",
-          desc: "The current version of the MSPA website. More mobile-friendly, but with a number of issues. Hence this archive. Also has links to get official Homestuck merch."
         }
       ]
     }
