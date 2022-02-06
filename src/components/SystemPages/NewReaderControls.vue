@@ -5,7 +5,11 @@
       <div class="newReaderInput">
         <!-- Settings for adjusting new reader mode -->
         <template v-if="$isNewReader">
-          <p class="pageStatus"><strong>New reader mode</strong> set to <strong>page {{this.$mspaOrVizNumber(this.$newReaderCurrent)}}</strong> of <strong>{{currentAdventureName}}</strong>.</p>
+          <p class="pageStatus">
+            <strong>New reader mode</strong> set to 
+            <strong>page {{$mspaOrVizNumber($newReaderCurrent)}}</strong> 
+            ({{$getChapter($newReaderCurrent)}})</strong>.
+          </p>
           <!-- Can't show picker if you're in viz mode. -->
           <StoryPageLink
             v-if="isNewReadingPreHS" 
@@ -19,15 +23,18 @@
               empty: !newReaderPageInput || !newReaderPageInput.length, 
               changed: newReaderPageChanged
             }" >
-            <span :class="{ urgent: newReaderPageChanged }">
-            <button :disabled="!(isValidPageSet && newReaderPageChanged)" 
+          <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
+            <button v-if="!isNewReadingPreHS" :disabled="!(isValidPageSet && newReaderPageChanged)" 
               @click="changeNewReader()" 
               class="rightBtn"
               >Adjust</button>
-            </span>
+          </span>
+          <span v-html="pageInvalidReason" class="errorHint"/>
         </template>
         <template v-else>
-          <p class="pageStatus"><strong>New reader mode disabled.</strong></p>
+          <p class="pageStatus">
+            <strong>New reader mode disabled.</strong>
+          </p>
           <input type="number" size="1" maxlength="6" 
             v-model="newReaderPageInput"
             @keydown.enter="setNewReader()"
@@ -36,26 +43,26 @@
               empty: !newReaderPageInput || !newReaderPageInput.length, 
               changed: newReaderPageChanged
             }" >
-          <span :class="{ urgent: newReaderPageChanged }">
-          <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
-          @click="setNewReader()"
-          class="rightBtn">Activate</button>
+          <span :class="{ urgent: isValidPageSet && newReaderPage != '001901' }">
+            <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
+            @click="setNewReader()"
+            class="rightBtn">Activate</button>
           </span>
+          <span v-html="pageInvalidReason" class="errorHint"/>
         </template>
         <p class="hint" v-if="$localData.settings.mspaMode">
-          Enter an <strong>MS Paint Adventures</strong> page number<br>
+          Enter an <strong>MS Paint Adventures</strong> page number between 000219 and 010029.<br>
           e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
-        <div v-if="$isNewReader">
+        <div style="height: 60px;" v-if="$isNewReader">
             <br />
           <div class="bigButtonRow">
             <button @click="clearNewReader()">Switch off new reader mode</button>
           </div>
         </div>
-        <div v-else>
-            <br />
+        <div style="height: 60px;" v-else>
           <p class="hint">Or activate a preset:</p>
           <div class="bigButtonRow">
             <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
@@ -64,7 +71,7 @@
         </div>
       </div>
 
-      <!-- <pre v-if="$localData.settings.devMode">
+      <!-- <pre>
         newReaderPageInput: {{newReaderPageInput}}
         newReaderPage: {{newReaderPage}}
         $newReaderCurrent: {{$newReaderCurrent}}
@@ -147,7 +154,7 @@ export default {
     return {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
       // TODO: This assignment sometimes doesn't work, and assigns 001901 anyway?
-      newReaderPageInput: this.$newReaderCurrent || this.$mspaOrVizNumber('001901'),
+      newReaderPageInput: undefined,
       // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
       myFastForward: this.forceGateChoice ? undefined : this.$localData.settings['fastForward'],
       settingListBoolean: [
@@ -171,12 +178,29 @@ export default {
 
       return this.$parseMspaOrViz(this.newReaderPageInput)
     },
+    pageInvalidReason() {
+      if (this.isValidPageSet) return undefined
+      if (this.isNewReadingPreHS) return "Use MSPA page numbers to adjust"
+
+      const pageId = this.newReaderPage
+      const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
+      
+      if (pageId < '000219') return `Can't start before Problem Sleuth<br />
+        Minimum page ${this.$mspaOrVizNumber('000219')}`
+      if (pageId > '010029') return `Can't start after Homestuck!<br />
+        Maximum page ${this.$mspaOrVizNumber('010029')}`
+      if (!pageInStory) return "Page not in story"
+      if (/\D/.test(pageId)) return ""
+
+      throw new Error(`Page '${pageId}'/'${this.newReaderPageInput}' invalid, but reason unknown?`)
+    },
     isValidPageSet(){
       // Can't set a valid PS page in viz mode
       if (this.isNewReadingPreHS) return false
       
       const pageId = this.newReaderPage
       const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
+
       return pageInStory && 
         pageId >= '000219' && 
         pageId <= '010029' && 
@@ -188,14 +212,15 @@ export default {
     },
     isNewReadingPreHS(){
       return (!this.$localData.settings.mspaMode && this.$newReaderCurrent && this.$newReaderCurrent < '001901')
-    },
-    currentAdventureName(){
-      if (this.$newReaderCurrent <= '001892') return "Problem Sleuth"
-      else if (this.$newReaderCurrent <= '001900') return "Homestuck Beta"
-      else return "Homestuck"
     }
   },
   methods: {
+    genInputString(){
+      // Returns a good string to use as the input.
+      // Usually just the input string, but may reset it
+      // if the string has been cleared.
+      return this.newReaderPageInput || this.$mspaOrVizNumber(this.$newReaderCurrent)
+    },
     changeNewReader(){
       if (this.isValidPageSet) {
         this.$emit('change', this.newReaderPage) 
@@ -221,7 +246,7 @@ export default {
       if (this.handleDisable) {
         this.handleDisable()
       } else {
-        const prev_input = this.newReaderPageInput
+        const prev_input = this.genInputString()
         this.$localData.root.NEW_READER_CLEAR()
         this.$nextTick(() => {
           this.newReaderPageInput = prev_input
@@ -259,8 +284,9 @@ export default {
     '$localData.settings.mspaMode'(to, from) {
       if (to == true) {
         // to mspa mode
-        const newto = this.$vizToMspa('homestuck', this.newReaderPageInput).p
-        this.$logger.info("to mspa", this.newReaderPageInput, newto)
+        this.newReaderPageInput = this.$vizToMspa('homestuck', this.newReaderPageInput).p
+        const newto = this.genInputString()
+        this.$logger.info("to mspa", this.newReaderPageInput, this.$newReaderCurrent, newto)
         this.newReaderPageInput = newto
       } else {
         // to viz mode
@@ -283,7 +309,9 @@ export default {
     }
   },
   mounted(){
-    if (this.$newReaderCurrent) this.newReaderPageInput = this.$newReaderCurrent
+    if (this.$newReaderCurrent) {
+      this.newReaderPageInput = this.genInputString()
+    }
   }
 }
 
@@ -310,10 +338,10 @@ export default {
         box-shadow: 0 0 5px 1px royalblue;
       }  }
 
-      border-radius: 3px;
-      border-color: #ffaa00;
-      background: #ffaa00;
-      border-style: hidden;
+      // border-radius: 3px;
+      // border-color: #ffaa00;
+      // background: #ffaa00;
+      // border-style: hidden;
       animation: 0.5s linear 0s infinite alternate urgent;
     }
 
@@ -333,11 +361,11 @@ export default {
       padding: 2px 3px;
       margin: 5px;
 
-      &.invalid:not(:disabled):not(.empty) {
-        background: pink;
-        border-color: rgb(187, 0, 37);
-        box-shadow: 0 0 3px 1px red;
-      }
+      // &.invalid:not(:disabled):not(.empty) {
+      //   background: pink;
+      //   border-color: rgb(187, 0, 37);
+      //   box-shadow: 0 0 3px 1px red;
+      // }
     }
 
     .bigButtonRow {
@@ -359,6 +387,16 @@ export default {
     font-size: 13px;
     color: var(--page-nav-meta);
     font-weight: normal;
+  }
+  .errorHint {
+    position: absolute;
+    color: red;
+    font-style: italic;
+    font-size: 0.8em;
+    text-align: left;
+    margin: 0 8px;
+    height: 3em;
+    line-height: 1.5;
   }
   .settings {
     p {

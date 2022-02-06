@@ -433,6 +433,8 @@ Vue.mixin({
       // "Hiveswap Friendsim" and "Pesterquest" are pseudopages used by the bandcamp viewer
       // to reference tracks and volumes, i.e. "Pesterquest: Volume 14"
 
+      if (!this.$archive) return true // Setup mode
+
       const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
       const parsedPage = parseInt(page)
       return this.$isNewReader && (
