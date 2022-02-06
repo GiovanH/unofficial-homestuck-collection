@@ -1,24 +1,24 @@
 <template>
-<section class="pageBody">
-  <center>
-    <NavBanner />
-    <table summary="" cellpadding="0px" border="2" bgcolor="#b9b8b9">
-      <tbody>
-        <tr>
-          <td colspan="3" bgcolor="#b9b8b9">
-            <center>
-              <div style="width:; white-space:nowrap; height:px; overflow:hidden; font-size: 50px;word-wrap:none; color:#000000;"><a href="http://skaianetsystems.com/">Skaianet Systems Incorporated</a></div>
-            </center>
-          </td>
-        </tr>
-        <tr>
-          <td width="5px" bgcolor="#b9b8b9"></td>
-          <td bgcolor="#1c3019">
-            <table summary="" width="" height="400px" cellpadding="40px" border="0" bgcolor="">
-              <tbody>
-                <tr>
-                  <td>
-                    <center v-if="routeParams.cursed_history == 'cursed_history'">
+  <section class="pageBody">
+    <center>
+      <NavBanner />
+      <table summary="" cellpadding="0px" border="2" bgcolor="#b9b8b9">
+        <tbody>
+          <tr>
+            <td colspan="3" bgcolor="#b9b8b9">
+              <center>
+                <div style="width:; white-space:nowrap; height:px; overflow:hidden; font-size: 50px;word-wrap:none; color:#000000;"><a href="http://skaianetsystems.com/">Skaianet Systems Incorporated</a></div>
+              </center>
+            </td>
+          </tr>
+          <tr>
+            <td width="5px" bgcolor="#b9b8b9"></td>
+            <td bgcolor="#1c3019">
+              <table summary="" width="" height="400px" cellpadding="40px" border="0" bgcolor="">
+                <tbody>
+                  <tr>
+                    <td>
+                      <center v-if="routeParams.cursed_history == 'cursed_history'">
                         <table summary="" border="2" width="685px" cellpadding="0px" bgcolor="" style="margin-bottom:25px;">
                           <tr>
                             <td bgcolor="#b9b8b9" >
@@ -44,358 +44,360 @@
                             </td>
                           </tr>
                         </table>
-
                         <table summary="" border="2" width="685px" cellpadding="0px" bgcolor="">
                           <tr v-for="id in cursedId" :key="id" >
-                            <td bgcolor="#b9b8b9" ><center>
-                              <div class="cursedHistoryText" v-html="getFile(`/archive/skaianet/FORBIDDEN_ENTRIES/${id}`)" />
-                            </center></td>
+                            <td bgcolor="#b9b8b9" >
+                              <center>
+                                <div class="cursedHistoryText" v-html="getFile(`/archive/skaianet/FORBIDDEN_ENTRIES/${id}`)" />
+                              </center>
+                            </td>
                           </tr>
                         </table>
-                    </center>
-                    <center v-else>
-                      <table summary="" width="680px" cellpadding="0px" border="2" bgcolor="">
-                        <tbody>
+                      </center>
+                      <center v-else>
+                        <table summary="" width="680px" cellpadding="0px" border="2" bgcolor="">
+                          <tbody>
                           <tr>
                             <td width="220px" bgcolor="#000">
                               <center><MediaEmbed url="archive/skaianet/logob.png" class="log" size="30%" alt="" height="163" /></center>
                             </td>
                             <td width="2"></td>
-                            <td bgcolor="#000">
-                              <center>
+                              <td bgcolor="#000">
                                 <center>
-                                  <div style="width:; white-space:nowrap; height:px; overflow:hidden; font-size: 24px;word-wrap:none; color:#FFFFFF;">UNESTABLISHED IN:</div>
+                                  <center>
+                                    <div style="width:; white-space:nowrap; height:px; overflow:hidden; font-size: 24px;word-wrap:none; color:#FFFFFF;">UNESTABLISHED IN:</div>
+                                  </center>
+                                  <br>
+                                  <table summary="" width="400px" cellpadding="0px" border="2" bgcolor="">
+                                    <tbody>
+                                      <tr>
+                                        <td bgcolor="#b9b8b9">
+                                          <center>
+                                            <br>
+                                            <p class="Apophis" v-text="apophis" />
+                                              <br>
+                                          </center>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
                                 </center>
-                                <br>
-                                <table summary="" width="400px" cellpadding="0px" border="2" bgcolor="">
-                                  <tbody>
-                                    <tr>
-                                      <td bgcolor="#b9b8b9">
-                                        <center>
-                                          <br>
-                                          <p class="Apophis" v-text="apophis" />
-                                          <br>
-                                        </center>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <table summary="" cellpadding="0px" border="2" bgcolor="">
-                        <tbody>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" cellpadding="0px" border="2" bgcolor="">
+                          <tbody>
                           <tr>
                             <td bgcolor="#000">
                               <center><MediaEmbed url="archive/skaianet/map.jpg" /></center>
                             </td>
-                          </tr>
-                          <tr>
-                            <td bgcolor="#000">
-                              <div style="background-color:#000; width:680px; height:15px;margin-left:5px;" class="microsoft marquee"><span>
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              Latitude: -9.20952, Longitude: -66.87065, 
-                              Latitude: 33.43228, Longitude: 97.88285, 
-                              Latitude: -26.08581, Longitude: 24.69693, 
-                              Latitude: 11.24559, Longitude: 12.08721, 
-                              Latitude: -16.36835, Longitude: -50.59490, 
-                              Latitude: 68.74373, Longitude: -144.17275, 
-                              Latitude: 17.04005, Longitude: 97.68261, 
-                              Latitude: 38.24650, Longitude: 106.49642, 
-                              Latitude: 21.85192, Longitude: -3.09684, 
-                              Latitude: 62.88434, Longitude: -124.20298, 
-                              Latitude: 38.60233, Longitude: 80.15358, 
-                              Latitude: 54.19481, Longitude: 72.48143, 
-                              Latitude: -27.50667, Longitude: 133.93761, 
-                              Latitude: -9.04663, Longitude: -36.10689, 
-                              Latitude: -27.26953, Longitude: -57.91870, 
-                              Latitude: 58.40644, Longitude: -68.97977, 
-                              Latitude: -2.48229, Longitude: -51.64199, 
-                              Latitude: -12.05939, Longitude: 25.55648,
-                              Latitude: 30.67068, Longitude: 118.61092,
-                              Latitude: 26.90603, Longitude: 85.96731,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              Latitude: -9.20952, Longitude: -66.87065, 
-                              Latitude: 33.43228, Longitude: 97.88285, 
-                              Latitude: -26.08581, Longitude: 24.69693, 
-                              Latitude: 11.24559, Longitude: 12.08721, 
-                              Latitude: -16.36835, Longitude: -50.59490, 
-                              Latitude: 68.74373, Longitude: -144.17275, 
-                              Latitude: 17.04005, Longitude: 97.68261, 
-                              Latitude: 38.24650, Longitude: 106.49642, 
-                              Latitude: 21.85192, Longitude: -3.09684, 
-                              Latitude: 62.88434, Longitude: -124.20298, 
-                              Latitude: 38.60233, Longitude: 80.15358, 
-                              Latitude: 54.19481, Longitude: 72.48143, 
-                              Latitude: -27.50667, Longitude: 133.93761, 
-                              Latitude: -9.04663, Longitude: -36.10689, 
-                              Latitude: -27.26953, Longitude: -57.91870, 
-                              Latitude: 58.40644, Longitude: -68.97977, 
-                              Latitude: -2.48229, Longitude: -51.64199, 
-                              Latitude: -12.05939, Longitude: 25.55648,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              Latitude: -9.20952, Longitude: -66.87065, 
-                              Latitude: 33.43228, Longitude: 97.88285, 
-                              Latitude: -26.08581, Longitude: 24.69693, 
-                              Latitude: 11.24559, Longitude: 12.08721, 
-                              Latitude: -16.36835, Longitude: -50.59490, 
-                              Latitude: 68.74373, Longitude: -144.17275, 
-                              Latitude: 17.04005, Longitude: 97.68261, 
-                              Latitude: 38.24650, Longitude: 106.49642, 
-                              Latitude: 21.85192, Longitude: -3.09684, 
-                              Latitude: 62.88434, Longitude: -124.20298, 
-                              Latitude: 38.60233, Longitude: 80.15358, 
-                              Latitude: 54.19481, Longitude: 72.48143, 
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              Latitude: -9.20952, Longitude: -66.87065, 
-                              Latitude: 33.43228, Longitude: 97.88285, 
-                              Latitude: -26.08581, Longitude: 24.69693, 
-                              Latitude: 11.24559, Longitude: 12.08721, 
-                              Latitude: -16.36835, Longitude: -50.59490, 
-                              Latitude: 68.74373, Longitude: -144.17275, 
-                              Latitude: 17.04005, Longitude: 97.68261, 
-                              Latitude: 38.24650, Longitude: 106.49642, 
-                              Latitude: 21.85192, Longitude: -3.09684, 
-                              Latitude: 62.88434, Longitude: -124.20298, 
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              Latitude: -9.20952, Longitude: -66.87065, 
-                              Latitude: 33.43228, Longitude: 97.88285, 
-                              Latitude: -26.08581, Longitude: 24.69693, 
-                              Latitude: 11.24559, Longitude: 12.08721, 
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              Latitude: 60.74755, Longitude: 142.01706,
-                              Latitude: -5.37813, Longitude: 31.42891,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              Latitude: 74.88070, Longitude: 90.63174,
-                              Latitude: 65.21932, Longitude: -173.74283,
-                              Latitude: 21.10738, Longitude: 74.57002,
-                              Latitude: 73.10748, Longitude: -48.45428,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              Latitude: 44.78893, Longitude: 81.14044,
-                              Latitude: 55.82463, Longitude: 127.22151,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              Latitude: 52.41077, Longitude: 87.31729,
-                              Latitude: -28.33136, Longitude: 138.58945,
-                              Latitude: 1.40001, Longitude: -61.52241,
-                              Latitude: 34.54162, Longitude: -119.63153,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              Latitude: -23.56785, Longitude: 114.93736, 
-                              Latitude: 31.29668, Longitude: 12.54051, 
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              Latitude: 53.33706, Longitude: 111.77075,
-                              Latitude: 61.40545, Longitude: 80.60927, 
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              Latitude: 32.69014, Longitude: 75.69641,
-                              •
-                              Latitude: 7.54044, Longitude: 19.34320, 
-                              Latitude: 59.59924, Longitude: 142.56831, 
-                              •
-                              </span>
-                              <p></p>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <span v-if="$localData.settings.cursedHistory">
-                        <br><br>
-                        <table summary="" border="2" width="685px" cellpadding="0px" bgcolor="">
-                            <tr>
-                                <td bgcolor="#b9b8b9" ><center><br><br><a href="/skaianet/cursed_history">The following assets have been acquired by Skaianet Systems Incorporated.</a><br><br><br></center></td>
                             </tr>
+                            <tr>
+                              <td bgcolor="#000">
+                                <div style="background-color:#000; width:680px; height:15px;margin-left:5px;" class="microsoft marquee">
+                                  <span>
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  Latitude: -9.20952, Longitude: -66.87065, 
+                                  Latitude: 33.43228, Longitude: 97.88285, 
+                                  Latitude: -26.08581, Longitude: 24.69693, 
+                                  Latitude: 11.24559, Longitude: 12.08721, 
+                                  Latitude: -16.36835, Longitude: -50.59490, 
+                                  Latitude: 68.74373, Longitude: -144.17275, 
+                                  Latitude: 17.04005, Longitude: 97.68261, 
+                                  Latitude: 38.24650, Longitude: 106.49642, 
+                                  Latitude: 21.85192, Longitude: -3.09684, 
+                                  Latitude: 62.88434, Longitude: -124.20298, 
+                                  Latitude: 38.60233, Longitude: 80.15358, 
+                                  Latitude: 54.19481, Longitude: 72.48143, 
+                                  Latitude: -27.50667, Longitude: 133.93761, 
+                                  Latitude: -9.04663, Longitude: -36.10689, 
+                                  Latitude: -27.26953, Longitude: -57.91870, 
+                                  Latitude: 58.40644, Longitude: -68.97977, 
+                                  Latitude: -2.48229, Longitude: -51.64199, 
+                                  Latitude: -12.05939, Longitude: 25.55648,
+                                  Latitude: 30.67068, Longitude: 118.61092,
+                                  Latitude: 26.90603, Longitude: 85.96731,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  Latitude: -9.20952, Longitude: -66.87065, 
+                                  Latitude: 33.43228, Longitude: 97.88285, 
+                                  Latitude: -26.08581, Longitude: 24.69693, 
+                                  Latitude: 11.24559, Longitude: 12.08721, 
+                                  Latitude: -16.36835, Longitude: -50.59490, 
+                                  Latitude: 68.74373, Longitude: -144.17275, 
+                                  Latitude: 17.04005, Longitude: 97.68261, 
+                                  Latitude: 38.24650, Longitude: 106.49642, 
+                                  Latitude: 21.85192, Longitude: -3.09684, 
+                                  Latitude: 62.88434, Longitude: -124.20298, 
+                                  Latitude: 38.60233, Longitude: 80.15358, 
+                                  Latitude: 54.19481, Longitude: 72.48143, 
+                                  Latitude: -27.50667, Longitude: 133.93761, 
+                                  Latitude: -9.04663, Longitude: -36.10689, 
+                                  Latitude: -27.26953, Longitude: -57.91870, 
+                                  Latitude: 58.40644, Longitude: -68.97977, 
+                                  Latitude: -2.48229, Longitude: -51.64199, 
+                                  Latitude: -12.05939, Longitude: 25.55648,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  Latitude: -9.20952, Longitude: -66.87065, 
+                                  Latitude: 33.43228, Longitude: 97.88285, 
+                                  Latitude: -26.08581, Longitude: 24.69693, 
+                                  Latitude: 11.24559, Longitude: 12.08721, 
+                                  Latitude: -16.36835, Longitude: -50.59490, 
+                                  Latitude: 68.74373, Longitude: -144.17275, 
+                                  Latitude: 17.04005, Longitude: 97.68261, 
+                                  Latitude: 38.24650, Longitude: 106.49642, 
+                                  Latitude: 21.85192, Longitude: -3.09684, 
+                                  Latitude: 62.88434, Longitude: -124.20298, 
+                                  Latitude: 38.60233, Longitude: 80.15358, 
+                                  Latitude: 54.19481, Longitude: 72.48143, 
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  Latitude: -9.20952, Longitude: -66.87065, 
+                                  Latitude: 33.43228, Longitude: 97.88285, 
+                                  Latitude: -26.08581, Longitude: 24.69693, 
+                                  Latitude: 11.24559, Longitude: 12.08721, 
+                                  Latitude: -16.36835, Longitude: -50.59490, 
+                                  Latitude: 68.74373, Longitude: -144.17275, 
+                                  Latitude: 17.04005, Longitude: 97.68261, 
+                                  Latitude: 38.24650, Longitude: 106.49642, 
+                                  Latitude: 21.85192, Longitude: -3.09684, 
+                                  Latitude: 62.88434, Longitude: -124.20298, 
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  Latitude: -9.20952, Longitude: -66.87065, 
+                                  Latitude: 33.43228, Longitude: 97.88285, 
+                                  Latitude: -26.08581, Longitude: 24.69693, 
+                                  Latitude: 11.24559, Longitude: 12.08721, 
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  Latitude: 60.74755, Longitude: 142.01706,
+                                  Latitude: -5.37813, Longitude: 31.42891,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  Latitude: 74.88070, Longitude: 90.63174,
+                                  Latitude: 65.21932, Longitude: -173.74283,
+                                  Latitude: 21.10738, Longitude: 74.57002,
+                                  Latitude: 73.10748, Longitude: -48.45428,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  Latitude: 44.78893, Longitude: 81.14044,
+                                  Latitude: 55.82463, Longitude: 127.22151,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  Latitude: 52.41077, Longitude: 87.31729,
+                                  Latitude: -28.33136, Longitude: 138.58945,
+                                  Latitude: 1.40001, Longitude: -61.52241,
+                                  Latitude: 34.54162, Longitude: -119.63153,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  Latitude: -23.56785, Longitude: 114.93736, 
+                                  Latitude: 31.29668, Longitude: 12.54051, 
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  Latitude: 53.33706, Longitude: 111.77075,
+                                  Latitude: 61.40545, Longitude: 80.60927, 
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  Latitude: 32.69014, Longitude: 75.69641,
+                                  •
+                                  Latitude: 7.54044, Longitude: 19.34320, 
+                                  Latitude: 59.59924, Longitude: 142.56831, 
+                                  •
+                                  </span>
+                                  <p></p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
                         </table>
+                        <span v-if="$localData.settings.cursedHistory">
+                          <br><br>
+                          <table summary="" border="2" width="685px" cellpadding="0px" bgcolor="">
+                            <tr>
+                              <td bgcolor="#b9b8b9" >
+                                <center><br><br><a href="/skaianet/cursed_history">The following assets have been acquired by Skaianet Systems Incorporated.</a><br><br><br></center>
+                              </td>
+                            </tr>
+                          </table>
+                          <br>
+                        </span>
                         <br>
-                      </span>
-
-                      <br>
-                      <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
-                        <tbody>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                          <tbody>
                           <tr>
                             <td width="74px" bgcolor="#b9b8b9">
                               <center><MediaEmbed url="archive/skaianet/hs.gif" /></center>
                             </td>
                             <td width="2" bgcolor="#b9b8b9"></td>
-                            <td height="64" bgcolor="#b9b8b9">
-                              <center>
-                                <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <td>
-                                          <font size="6"><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/" target="_blank">HIVESWAP.EXE</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
-                                        </td>
-                                        <td>
-                                          <font size="6"><a href="http://www.hiveswap.com" target="_blank">WWW</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </center>
-                            </td>
-                          </tr>
+                              <td height="64" bgcolor="#b9b8b9">
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/" target="_blank">HIVESWAP.EXE</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
+                                          </td>
+                                          <td>
+                                            <font size="6"><a href="http://www.hiveswap.com" target="_blank">WWW</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
                           <tr>
                             <td colspan="3" bgcolor="#b9b8b9">
                               <center style="padding:15px;">
@@ -406,13 +408,52 @@
                                 <p><em><a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/">Act 1</a> | <a href="https://store.steampowered.com/app/1181840/HIVESWAP_Act_2/">Act 2</a> | ???</em></p>
                                 <p><em><a href="https://store.steampowered.com/curator/35533744-Homestuck-Universe/list/49536/">Steam store page</a></em></p>
                                 <p><em>14 September 2017 - Ongoing</em></p>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                                </center>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                          <tbody>
+                            <tr>
+                              <td width="74px" bgcolor="#b9b8b9">
+                              <center><MediaEmbed url="archive/skaianet/viz.gif" /></center>
+                              </td>
+                              <td width="2" bgcolor="#b9b8b9"></td>
+                              <td height="64" bgcolor="#b9b8b9">
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://www.homestuck.com/" target="_blank">HOMESTUCK.COM</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="assets://archive/skaianet/www.gif" align="middle" />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="3" bgcolor="#b9b8b9">
+                                <center style="padding:15px;">
+                                 <p>The current version of the MSPA website. More mobile-friendly, but with a number of issues. Hence this archive. Also has links to get official Homestuck merch.</p>
+                                 <br />
+                                 <p><a href='/news/4-03-18'>Site Announcement</a></p>
+                                 <p><em>2 April 2018 - Present</em></p>
+                                </center>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
                         <tbody>
                           <tr>
                             <td width="74px" bgcolor="#b9b8b9">
@@ -420,30 +461,30 @@
                             </td>
                             <td width="2" bgcolor="#b9b8b9"></td>
                             <td height="64" bgcolor="#b9b8b9">
-                              <center>
-                                <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <td>
-                                          <font size="6"><a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/" target="_blank">FRIENDSIM.EXE</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
-                                        </td>
-                                        <td>
-                                          <font size="6"><a href="http://hs.hiveswap.com/friendsim/" target="_blank">WWW</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </center>
-                            </td>
-                          </tr>
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/" target="_blank">FRIENDSIM.EXE</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
+                                          </td>
+                                          <td>
+                                            <font size="6"><a href="http://hs.hiveswap.com/friendsim/" target="_blank">WWW</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
                           <tr>
                             <td colspan="3" bgcolor="#b9b8b9">
                               <center style="padding:15px;">
@@ -453,12 +494,12 @@
                                 <p><em><a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/">Description from Steam store page.</a></em></p>
                                 <p><em>13 April 2018 - 14 December 2018</em></p>
                               </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
                         <tbody>
                           <tr>
                             <td width="74px" bgcolor="#b9b8b9">
@@ -466,93 +507,96 @@
                             </td>
                             <td width="2" bgcolor="#b9b8b9"></td>
                             <td height="64" bgcolor="#b9b8b9">
-                              <center>
-                                <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <td>
-                                          <font size="6"><a href="https://www.homestuck.com/epilogues" target="_blank">EPILOGUES.TXT</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />
-                                        </td>
-                                        <td>
-                                          <font size="6"><a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154" target="_blank">VIZ</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/book.gif" align="middle" />
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </center>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colspan="3" bgcolor="#b9b8b9">
-                              <center style="padding:15px;">
-                                <p>Tales of dubious authenticity.</p><br>
-                                <p>Ten years ago, a young man stood in his bedroom. The events set in motion that day would change his and his friends' lives forever, for the better and the worse (and the ridiculous). Now, in the aftermath, he has to make a choice: Meat or Candy?</p></br>
-                                
-                                <p><em><a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154">Description from VIZ Media.</a></em></p>
-                                <p><em>Online release: 13 - 20 April 2019</em></p>
-                                <p><em>VIZ Media print release: 14 January 2020</em></p>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://www.homestuck.com/epilogues" target="_blank">EPILOGUES.TXT</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />
+                                          </td>
+                                          <td>
+                                            <font size="6"><a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154" target="_blank">VIZ</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/book.gif" align="middle" />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="3" bgcolor="#b9b8b9">
+                                <center style="padding:15px;">
+                                  <p>Tales of dubious authenticity.</p>
+                                  <br>
+                                  <p>Ten years ago, a young man stood in his bedroom. The events set in motion that day would change his and his friends' lives forever, for the better and the worse (and the ridiculous). Now, in the aftermath, he has to make a choice: Meat or Candy?</p>
+                                  </br>
+                                  <p><em><a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154">Description from VIZ Media.</a></em></p>
+                                  <p><em>Online release: 13 - 20 April 2019</em></p>
+                                  <p><em>VIZ Media print release: 14 January 2020</em></p>
+                                </center>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
                         <tbody>
                           <tr>
                             <td width="74px" bgcolor="#b9b8b9">
                               <center><MediaEmbed url="archive/skaianet/pq.gif" /></center>
                             </td>
-                            <td width="2" bgcolor="#b9b8b9"></td>
-                            <td height="64" bgcolor="#b9b8b9">
-                              <center>
-                                <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <td>
-                                          <font size="6"><a href="https://store.steampowered.com/app/1144030/Pesterquest/" target="_blank">PESTERQUEST.EXE</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
-                                        </td>
-                                        <td>
-                                          <font size="6"><a href="http://whatpumpkin.com/" target="_blank">WWW</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </center>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colspan="3" bgcolor="#b9b8b9">
-                              <center style="padding:15px;">
-                                <p>Who are you again? And what the hell are you doing here? Wait… is this Earth, and who exactly is that kid over there? He looks nice! </p><br>
-                                <p>Embark on a quest of epic importance in Pesterquest, a grimsical episodic visual novel set in the darkly funny Homestuck/Hiveswap universe created by American author and artist <strong>Andrew Hussie.</strong></p><br>
-                                <p>Find all the answers you're looking for across 14 volumes of idiosyncratic adventure packed with visual mastery and shrewdly written narrative. As you zap between Earth and Alternia, you’ll discover and reconnect with up to 20 friends both extra and terrestrial.</p><br>
-
-                                <p><em><a href="https://store.steampowered.com/app/1144030/Pesterquest/">Description from Steam store page.</a></em></p>
-                                <p><em>4 September 2019 - 1 April 2020</em></p>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <br>
-                      <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
+                              <td width="2" bgcolor="#b9b8b9"></td>
+                              <td height="64" bgcolor="#b9b8b9">
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://store.steampowered.com/app/1144030/Pesterquest/" target="_blank">PESTERQUEST.EXE</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/exe.gif" align="middle" />
+                                          </td>
+                                          <td>
+                                            <font size="6"><a href="http://whatpumpkin.com/" target="_blank">WWW</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="3" bgcolor="#b9b8b9">
+                                <center style="padding:15px;">
+                                  <p>Who are you again? And what the hell are you doing here? Wait… is this Earth, and who exactly is that kid over there? He looks nice! </p>
+                                  <br>
+                                  <p>Embark on a quest of epic importance in Pesterquest, a grimsical episodic visual novel set in the darkly funny Homestuck/Hiveswap universe created by American author and artist <strong>Andrew Hussie.</strong></p>
+                                  <br>
+                                  <p>Find all the answers you're looking for across 14 volumes of idiosyncratic adventure packed with visual mastery and shrewdly written narrative. As you zap between Earth and Alternia, you’ll discover and reconnect with up to 20 friends both extra and terrestrial.</p>
+                                  <br>
+                                  <p><em><a href="https://store.steampowered.com/app/1144030/Pesterquest/">Description from Steam store page.</a></em></p>
+                                  <p><em>4 September 2019 - 1 April 2020</em></p>
+                                </center>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <br>
+                        <table summary="" width="685px" cellpadding="0px" border="2" bgcolor="">
                         <tbody>
                           <tr>
                             <td width="74px" bgcolor="#b9b8b9">
@@ -560,62 +604,64 @@
                             </td>
                             <td width="2" bgcolor="#b9b8b9"></td>
                             <td height="64" bgcolor="#b9b8b9">
-                              <center>
-                                <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
-                                  <table>
-                                    <tbody>
-                                      <tr>
-                                        <td>
-                                          <font size="6"><a href="https://www.homestuck2.com" target="_blank">HOMESTUCK^2.TXT</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />
-                                        </td>
-                                        <!-- <td>
-                                          <font size="6"><a href="https://www.patreon.com/homestuck" target="_blank">$$$</a></font>
-                                        </td>
-                                        <td>
-                                          <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
-                                        </td> -->
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </center>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colspan="3" bgcolor="#b9b8b9">
-                              <center style="padding:15px;">
-                                <p>This is not Homestuck. But it is not <em>not</em> Homestuck. This is...</p><br>
-                                <h2>HOMESTUCK^2: BEYOND CANON</h2><br>
-                                <p>Homestuck^2: Beyond Canon is an official continuation of the cult-classic webcomic Homestuck and a follow-up to The Homestuck Epilogues, dropped as a major event in April of 2019.</p>
-                                <p>Homestuck 2: Beyond Canon takes a combination of Andrew Hussie's original writing and plot outlines and concepts and joins him with a team of new, diverse voices to expand the compelling narratives of Homestuck's most (and least) beloved characters.</p></br>
-
-                                <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p></br>
-
-                                <p><em><a href="https://www.patreon.com/homestuck">Description from the Homestuck Patreon.</a></em></p>
-                                <p><em>25 October 2019 - (HIATUS)</em></p>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </center>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-          <td width="5px" bgcolor="#b9b8b9"></td>
-        </tr>
-        <tr>
-          <td colspan="3" bgcolor="#b9b8b9">
-            <center> © 1889-2029 Skaianet Systems Incorporated. All rights reserved. </center>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+                                <center>
+                                  <div style="width:550px; white-space:nowrap; height:px; overflow:hidden; font-size: 34px;word-wrap:none; background-color:;">
+                                    <table>
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <font size="6"><a href="https://www.homestuck2.com" target="_blank">HOMESTUCK^2.TXT</a></font>
+                                          </td>
+                                          <td>
+                                            <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />
+                                          </td>
+                                          <!-- <td>
+                                            <font size="6"><a href="https://www.patreon.com/homestuck" target="_blank">$$$</a></font>
+                                            </td>
+                                            <td>
+                                            <MediaEmbed url="archive/skaianet/www.gif" align="middle" />
+                                            </td> -->
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </center>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colspan="3" bgcolor="#b9b8b9">
+                                <center style="padding:15px;">
+                                  <p>This is not Homestuck. But it is not <em>not</em> Homestuck. This is...</p>
+                                  <br>
+                                  <h2>HOMESTUCK^2: BEYOND CANON</h2>
+                                  <br>
+                                  <p>Homestuck^2: Beyond Canon is an official continuation of the cult-classic webcomic Homestuck and a follow-up to The Homestuck Epilogues, dropped as a major event in April of 2019.</p>
+                                  <p>Homestuck 2: Beyond Canon takes a combination of Andrew Hussie's original writing and plot outlines and concepts and joins him with a team of new, diverse voices to expand the compelling narratives of Homestuck's most (and least) beloved characters.</p>
+                                  </br>
+                                  <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p>
+                                  </br>
+                                  <p><em><a href="https://www.patreon.com/homestuck">Description from the Homestuck Patreon.</a></em></p>
+                                  <p><em>25 October 2019 - (HIATUS)</em></p>
+                                </center>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </center>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td width="5px" bgcolor="#b9b8b9"></td>
+          </tr>
+          <tr>
+            <td colspan="3" bgcolor="#b9b8b9">
+              <center> © 1889-2029 Skaianet Systems Incorporated. All rights reserved. </center>
+            </td>
+          </tr>
+        </tbody>
+      </table>
   </center>
 </section>
 </template>
