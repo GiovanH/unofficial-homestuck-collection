@@ -123,7 +123,7 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined)
+    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -146,7 +146,7 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined)
+    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -411,8 +411,13 @@ function getModJs(mod_dir, options={}) {
         // imod AND this is the second attempt at importing it
         if (mod_dir.startsWith("_") && options.singlefile) {
           console.log(e)
-          console.log("Couldn't load imod, trying re-extract")
-          extractimods()
+          if (fs.existsSync(path.join(assetDir, "archive"))) {
+            console.log("Couldn't load imod, trying re-extract")
+            extractimods()
+          } else {
+            console.log('Asset pack not found.');
+            throw e
+          }
           // eslint-disable-next-line no-undef
           mod = __non_webpack_require__(modjs_path)
         } else throw e

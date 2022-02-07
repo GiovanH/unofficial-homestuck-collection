@@ -16,7 +16,9 @@
       <MediaEmbed url="assets://archive/music/squiddles/squiddlevid.swf" class="video" />
 
       <div class="credits">
-        <MediaEmbed url="assets://archive/squiddles/squiddles_logo.jpg" />
+        <a href='assets://archive/music/squiddles/Squiddles_booklet.pdf'>
+          <MediaEmbed url="assets://archive/squiddles/squiddles_logo.jpg" />
+        </a>
         <p class="preface">
           The Squiddles! album/animation combo pack was a big team effort.<br />
           All these awesome dudes and ladies had a hand in its creation:

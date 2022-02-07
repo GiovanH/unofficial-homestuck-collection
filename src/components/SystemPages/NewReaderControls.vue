@@ -107,7 +107,7 @@
         <dd><label for="fast_forward=false">Read as if you were reading it live.<br>
           All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see 
           <!-- Don't link to CC in setup mode (no settings page yet!) -->
-          <template v-if="false && $localData.assetDir">
+          <template v-if="$localData.assetDir">
             <a href='/settings/controversial'>controversial content</a>).
           </template>
           <template v-else>

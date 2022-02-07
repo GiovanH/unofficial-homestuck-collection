@@ -69,7 +69,9 @@ class LocalData {
         fontFamily: "",
         bold: false,
         fontSize: 0,
-        lineHeight: 0
+        lineHeight: 0,
+        paragraphSpacing: false,
+        highContrast: false,
       },
       arrowNav: true,
       openLogs: false,
