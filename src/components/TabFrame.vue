@@ -459,7 +459,6 @@ export default {
     watch: {
         'tabIsActive'(to, from) {
             if (to)
-                this.$root.tabTheme = this.theme
             // Prevents tab from unloading if there's anything that might need to run in the background
             if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
             else if (this.forceLoad) {

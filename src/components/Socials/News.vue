@@ -57,7 +57,7 @@ export default {
       return this.activeYear == "ALL";
     },
     newsLogo() {
-      return this.$root.tabTheme == 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
+      return this.$root.tabTheme.rendered == 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
     },
     newsposts(){
       return this.$archive.news

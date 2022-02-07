@@ -479,9 +479,13 @@ window.vm = new Vue({
   data(){
     return {
       archive: undefined,
-      tabTheme: undefined,
       loadState: undefined
     }
+  },
+  computed: {
+    // Easy access
+    app(){ return this.$refs.App },
+    tabTheme(){ return this.App.tabTheme }
   },
   router,
   render: function (h) { return h(App, {ref: 'App'}) },

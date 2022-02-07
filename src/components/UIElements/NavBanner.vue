@@ -89,7 +89,7 @@ export default {
           "/music": "DUMB NOISE.",
           // "toggleBookmarks": "TRASH.",
           
-          "/evenmore": "SHIT.",
+          "/evenmore": "WHO CARES?",
           "/credits": "MORONS.",
           "/settings": "WHATEVER."
         }
@@ -108,12 +108,17 @@ export default {
       return this.labelDict[href] || href
     }
   },
+  watch: {
+    '$root.tabTheme'(to, from){
+      this.$logger.info("Nav: Reacting tabTheme", to)
+    }
+  },
   computed: {
     tabComponent() {
       return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
     },
     labelDict() {
-      return this.labels[this.$root.tabTheme] || this.labels['mspa']
+      return this.labels[this.$root.tabTheme.rendered] || this.labels['mspa']
     }
   }
 }
