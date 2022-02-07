@@ -1,7 +1,7 @@
 <template>
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
-    <div class="card tight">
+    <div class="card logoCard">
       <a href="/" class="cardContent">
         <Logo />
       </a>
@@ -425,6 +425,7 @@ export default {
   .card {
     position: relative;
     margin-top: 75px;
+    &.logoCard { margin-top: 0;}
     &.tight, &.unsortedCard { margin-top: 20px; }
     &.mspaCard { margin-top: 50px; }
     &.newsCard { margin-top: 50px; }

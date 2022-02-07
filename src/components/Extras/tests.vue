@@ -2,7 +2,12 @@
   <div class="pageBody">
     <NavBanner />
     <div class="pageFrame">
-      <div class="pageContent">
+      <div class="pageContent" v-if="$isNewReader">
+          <div class="textContent">
+            <p>no</p>
+          </div>
+      </div>
+      <div class="pageContent" v-else>
         <div class="logItems" v-if="otherComponents.length">
           <h2>Overview</h2>
           <div v-for="ikey in intersectionKeys" class="flexbox">
@@ -387,6 +392,11 @@ export default {
           .notmatch {color: darkred;}
         }
       }
+    }
+    .textContent{
+      margin: 30px 0;
+      width: 600px;
+      text-align: center;
     }
 
   }

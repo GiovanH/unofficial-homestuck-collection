@@ -298,6 +298,7 @@
     cursor: progress;
   }
 
+  // TODO: Replace --headerHeight with dynamic sizing
   .addressBar {
     --headerHeight: 82px;
   }
