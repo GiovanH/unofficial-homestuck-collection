@@ -12,12 +12,8 @@
           </p>
           <!-- Can't show picker if you're in viz mode. -->
           <div class="row">
-            <StoryPageLink
-              v-if="isNewReadingPreHS" 
-              :mspaId='$newReaderCurrent'/>
             <input type="number" size="1" maxlength="6" 
               v-model="newReaderPageInput"
-              v-else
               @keydown.enter="changeNewReader()"
               :class="{
                 invalid: !isValidPageSet, 
@@ -25,7 +21,7 @@
                 changed: newReaderPageChanged
               }" >
             <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
-              <button v-if="!isNewReadingPreHS" :disabled="!(isValidPageSet && newReaderPageChanged)" 
+              <button :disabled="!(isValidPageSet && newReaderPageChanged)" 
                 @click="changeNewReader()" 
                 class="rightBtn"
                 >Adjust</button>
@@ -75,12 +71,13 @@
         </div>
       </div>
 
-      <!-- <pre>
-        newReaderPageInput: {{newReaderPageInput}}
-        newReaderPage: {{newReaderPage}}
-        $newReaderCurrent: {{$newReaderCurrent}}
+      <pre v-if="$localData.settings.devMode">
+        newReaderPageInput: {{newReaderPageInput}} 
+        newReaderPage: {{newReaderPage}} {{$getChapter(newReaderPage)}}
+        $newReaderCurrent: {{$newReaderCurrent}} {{$getChapter($newReaderCurrent)}}
         isValidPageSet: {{isValidPageSet}}
-      </pre> -->
+        vizStory: {{vizStory}}
+      </pre>
 
       <div v-if="promptMspaMode" class="settings application" >
         <dl>
@@ -171,6 +168,11 @@ export default {
     }
   },
   computed: {
+    vizStory(){
+      if (this.$newReaderCurrent && this.$getChapter(this.$newReaderCurrent).startsWith('Problem Sleuth'))
+        return 'problem-sleuth'
+      return 'homestuck'
+    },
     featureList(){
       return this.features.toLowerCase().split(" ")
     },
@@ -180,11 +182,10 @@ export default {
         return undefined
       }
 
-      return this.$parseMspaOrViz(this.newReaderPageInput)
+      return this.$parseMspaOrViz(this.newReaderPageInput, this.vizStory)
     },
     pageInvalidReason() {
       if (this.isValidPageSet) return undefined
-      if (this.isNewReadingPreHS) return "Use MSPA page numbers to adjust"
 
       const pageId = this.newReaderPage
       const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
@@ -199,9 +200,6 @@ export default {
       throw new Error(`Page '${pageId}'/'${this.newReaderPageInput}' invalid, but reason unknown?`)
     },
     isValidPageSet(){
-      // Can't set a valid PS page in viz mode
-      if (this.isNewReadingPreHS) return false
-      
       const pageId = this.newReaderPage
       const pageInStory = this.$archive ? pageId in this.$archive.mspa.story : true
 
@@ -290,20 +288,15 @@ export default {
     '$localData.settings.mspaMode'(to, from) {
       if (to == true) {
         // to mspa mode
-        this.newReaderPageInput = this.$vizToMspa('homestuck', this.newReaderPageInput).p
+        this.newReaderPageInput = this.$vizToMspa(this.vizStory, this.newReaderPageInput).p
         const newto = this.genInputString()
         this.$logger.info("to mspa", this.newReaderPageInput, this.$newReaderCurrent, newto)
         this.newReaderPageInput = newto
       } else {
         // to viz mode
         const newto = this.$mspaToViz(this.newReaderPageInput)
-        if (newto.s == 'homestuck') {
-          this.$logger.info("to viz", newto.s, from, to, newto.p)
-          this.newReaderPageInput = newto.p
-        } else {
-          this.$logger.info("to viz non-hs", newto.s, this.newReaderPageInput)
-          this.newReaderPageInput = undefined
-        }
+        this.$logger.info("to viz", newto.s, from, to, newto.p)
+        this.newReaderPageInput = newto.p
       }
     },
     newReaderPageInput(to, from){
