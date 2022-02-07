@@ -1,5 +1,5 @@
 <template>
-    <div :class="['footer', $root.$refs['App'].theme, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
+    <div :class="['footer', this.$root.tabTheme.rendered, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
         <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" />
         <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" />
     </div>
@@ -28,7 +28,7 @@ export default {
             }
         },
         bannerImage() {
-            switch (this.$root.tabTheme) {
+            switch (this.$root.tabTheme.rendered) {
                 case 'mspa':
                     return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
                 case 'scratch':
@@ -42,7 +42,7 @@ export default {
                 case 'pxs':
                     return ['/images/mspalogo_pxs.png', '/images/mspalogo_pxs.png']
                 default:
-                    this.$logger.warn("Couldn't read root theme?", this.$root.tabTheme)
+                    this.$logger.warn("Couldn't read root theme?", this.$root.tabTheme.rendered)
                     return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
             }
         }

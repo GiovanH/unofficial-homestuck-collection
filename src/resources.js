@@ -16,14 +16,18 @@ function fileIsAsset(url) {
 
   // If this function is false, url is either an internal vue link
   // or an external web page.
+  // due to html modals currently being disabled, the result of calling this on an html file is undefined
 
   // ...except for these files that are part of the installer.
   const is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
   if (is_bundled) return false
 
+  const is_outlink = /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url)
+  if (is_outlink) return false
+
   // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
-  const has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov|html)$/i.test(url)
+  const has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov)$/i.test(url)
 
   // if you reference an html file in `archive/` that should match too, as a failsafe
 
@@ -173,8 +177,10 @@ const UrlFilterMixin = {
       document.querySelectorAll("A").forEach((link) => {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
-          logger.debug("[filterL]", "looking up", pseudLinkHref)
           link.href = getResourceURL(pseudLinkHref)
+          if (link.href != pseudLinkHref) {
+            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+          }
         }
       })
 
@@ -187,10 +193,12 @@ const UrlFilterMixin = {
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
-        logger.debug("[fltrSrc]", "looking up", pseudMediaSrc)
         media[i].src = resolveURL(pseudMediaSrc)
+        if (media[i].src != pseudMediaSrc) {
+          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+        }
 
-        if (media[i].tagName == 'IMG') {  
+        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  
           media[i].ondragstart = (e) => {
             e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'

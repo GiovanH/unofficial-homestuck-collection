@@ -4,11 +4,15 @@
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
   <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
-  <component v-else-if="getMediaType(url) === 'html'" 
+
+  <component v-else-if="getMediaType(url) === 'html'"
   :is="frameType"
   :src='resolveFrameUrl(url)' 
+  ref='frame'
   :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
-  class="sburb"  @did-finish-load="initHtmlFrame" seamless />
+  @did-finish-load="initHtmlFrame" seamless />
+  <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
+
   <div v-else-if="getMediaType(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
   <audio v-else-if="getMediaType(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
 </template>
@@ -20,7 +24,8 @@ import Resources from "@/resources.js"
 
 export default {
   name: "MediaEmbed",
-  props: ['url', 'gifmode'],
+  props: ['url', 'gifmode', 'webarchive'],
+  emits: ['blockedevent'], 
   data() {
     return {
       indexedFlashProps: {
@@ -213,6 +218,7 @@ export default {
       audio: [],
       source: undefined,
       lastStartedAudio: undefined,
+      shouldEnsaftenWebviews: true,
 
       timer: {
         interval: undefined,
@@ -225,6 +231,7 @@ export default {
   },
   computed: {
     frameType() {
+      if (this.webarchive) return 'webview'
       return 'iframe'
     },
     videoWidth() {
@@ -305,7 +312,42 @@ export default {
   },
   methods: {
     initHtmlFrame(event) {
-      // stub
+      if (this.frameType == 'webview') {
+        const webview = event.srcElement
+
+        // copy console messages
+        webview.addEventListener("console-message", (event) => {
+          this.$logger.info(event.message)
+          if (event.message == "!!onDisabledEvent") {
+            this.$emit('blockedevent')
+          }
+        })
+
+        // ensaften webviews
+        if (this.shouldEnsaftenWebviews) {
+          webview.executeJavaScript(`
+console.log("initHtmlFrame")
+
+document.addEventListener('click', function (e) {
+  let shouldBlockClick = false
+
+  var url = e.target.href;
+  shouldBlockClick = shouldBlockClick || (url === undefined)
+
+  const is_outlink = /^http(s{0,1}):\\/\\//.test(url) && !/^http(s{0,1}):\\/\\/localhost/.test(url)  // see src/resources.js
+  shouldBlockClick = shouldBlockClick || is_outlink  
+
+  console.log('element-clicked with path', url, "is_outlink:", is_outlink, "should block:", shouldBlockClick);
+  if (shouldBlockClick) {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log("!!onDisabledEvent")
+    return false
+  }
+}, true)
+          `)
+        }
+      }
     },
     initIframe() {
       this.$el.contentWindow.vm = this

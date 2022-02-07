@@ -115,7 +115,7 @@ export default {
       this.$localData.root.TABS_HISTORY_FORWARD()
     },
     saveGame(){
-      window.vm.$children[0].$refs[this.$localData.tabData.activeTabKey][0].toggleBookmarks()
+      window.vm.app.activeTabComponent.toggleBookmarks()
     },
     resetZoom(){
       this.$parent.resetZoom()

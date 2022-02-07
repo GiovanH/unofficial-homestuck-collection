@@ -1,7 +1,8 @@
 <template>
   <div id="app" :class="[
     // $root.loadState != 'DONE' ? 'busy' : '',
-    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
+    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+      theme
     ]" v-if="$archive && $root.loadState !== 'ERROR'">
     <AppHeader :class="theme" ref="appheader" />
     <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
@@ -121,7 +122,7 @@
         if (this.$localData.settings.showAddressBar) {
           document.querySelector('#jumpBox input').select()
         } else {
-          this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
+          this.activeTabComponent.$refs.jumpbox.toggle()
         }
       }
     },
@@ -189,7 +190,7 @@
         this.resetZoom()
       })
       electron.ipcRenderer.on('OPEN_FINDBOX', (event) => {
-        this.$refs[this.$localData.tabData.activeTabKey][0].$refs.findbox.open()
+        this.activeTabComponent.$refs.findbox.open()
       })      
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
@@ -297,8 +298,9 @@
     cursor: progress;
   }
 
+  // TODO: Replace --headerHeight with dynamic sizing
   .addressBar {
-    --headerHeight: 79px;
+    --headerHeight: 82px;
   }
   .noAddressBar {
     --headerHeight: 51px;
@@ -356,7 +358,8 @@
     &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href$=".pdf"],
-    &[href$=".html"]:not([href*="assets://"]) {
+    // &[href$=".html"]:not([href*="assets://"]) {
+    &[href$=".html"] {
       &::after{
         @extend %fa-icon;
         @extend .fas;

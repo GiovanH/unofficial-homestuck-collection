@@ -172,7 +172,7 @@ export default {
       return this.thisPage.flag.includes('SWFNAV')
     },
     footerBanner() {
-      switch (this.$root.tabTheme) {
+      switch (this.$root.tabTheme.rendered) {
         case 'scratch':
           return 'customScratchFooter.png'
         case 'sbahj':

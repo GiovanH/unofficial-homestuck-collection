@@ -8,7 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -23,7 +23,7 @@ log.transports.console.format = '[{level}] {text}';
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -112,7 +112,7 @@ Vue.mixin({
     $openLink(url, auxClick = false) {
       const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
 
-      if (urlObject.protocol == "assets:") {
+      if (urlObject.protocol == "assets:" && !/\.html$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
@@ -126,7 +126,7 @@ Vue.mixin({
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
-        } else shell.openExternal(urlObject.href)
+        } else shell.openExternal(Resources.resolveURL(urlObject.href))
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
         shell.openExternal(Resources.resolveURL(to))
@@ -294,7 +294,7 @@ Vue.mixin({
       }
     },
     $isVizBase(base){
-      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck', 'ryanquest'].includes(base)
+      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
     },
     $mspaOrVizNumber(mspaId){
       return !(mspaId in this.$archive.mspa.story) || this.$localData.settings.mspaMode ? mspaId : this.$mspaToViz(mspaId).p
@@ -325,6 +325,9 @@ Vue.mixin({
           if (offByOnePages.includes(thisPageId)) {
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
           }
+
+          // End of problem sleuth
+          else if (thisPageId == '001892') nextLimit  = '001902'
 
           // A6 CHARACTER SELECTS
           else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
@@ -476,9 +479,13 @@ window.vm = new Vue({
   data(){
     return {
       archive: undefined,
-      tabTheme: undefined,
       loadState: undefined
     }
+  },
+  computed: {
+    // Easy access
+    app(){ return this.$refs.App },
+    tabTheme(){ return this.app.tabTheme }
   },
   router,
   render: function (h) { return h(App, {ref: 'App'}) },
