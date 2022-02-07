@@ -211,6 +211,7 @@ export default {
       contentWarnings: [
         'Slurs',
         'Misogyny, sexism',
+        'Fatphobia',
 
         'Alcohol abuse',
         'Drug abuse',
@@ -241,8 +242,10 @@ export default {
         'Possession',
         'Mind control',
         'Male pregnancy',
+        'Bestiality',
 
         'War crimes',
+        'Genocide',
         'Imperialist empires',
       ],
       loadStages: {
