@@ -390,13 +390,17 @@ export default {
   }
   .errorHint {
     position: absolute;
-    color: red;
-    font-style: italic;
-    font-size: 0.8em;
-    text-align: left;
-    margin: 0 8px;
     height: 3em;
-    line-height: 1.5;
+    align-items: center;
+    display: inline-flex;
+    
+    justify-content: center;
+    margin: 0 8px;
+
+    text-align: left;
+    color: red;
+    font-size: 0.8em;
+    font-style: italic;
   }
   .settings {
     p {
