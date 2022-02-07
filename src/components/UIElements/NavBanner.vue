@@ -61,13 +61,13 @@ export default {
           "/": "HOMESTUCK COLLECTION",
 
           // "toggleJumpBox": "JUMP",
-          "/news": "NEWS",
           "/help": "HELP",
 
           "/map": "MAP",
           "/log": "LOG",
           "/search": "SEARCH",
 
+          "/news": "NEWS",
           "/music": "MUSIC",
           // "toggleBookmarks": "SAVE/LOAD",
 
@@ -78,8 +78,8 @@ export default {
         A6A6: {
           "/": "WORTHLESS GARBAGE.",
 
+          // "toggleJumpBox": "WHO CARES?",
           "/help": "STUPID.",
-          "toggleJumpBox": "WHO CARES?",
 
           "/map": "WOW.",
           "/log": "NO.",
@@ -87,7 +87,7 @@ export default {
 
           "/news": "BULLSHIT.",
           "/music": "DUMB NOISE.",
-          "toggleBookmarks": "TRASH.",
+          // "toggleBookmarks": "TRASH.",
           
           "/evenmore": "SHIT.",
           "/credits": "MORONS.",
@@ -131,7 +131,7 @@ export default {
       .candyCorn {
         content: var(--nav-candyCornContent);
       }
-      ul li:not(:last-child):after {
+      ul li:before {
         color: var(--nav-divider);
       }
     }
