@@ -2,7 +2,7 @@
   <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="card">
-      <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a class="logo" href="/"><Logo /></a>
       <div class="cardContent pageMenu">
         <a v-for="(label, key) in {newreader: 'New Readers', usage: 'How To Use The Collection', faq: 'FAQ'}" 
           :key="key"

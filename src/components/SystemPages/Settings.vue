@@ -935,8 +935,6 @@ export default {
       }
     }
 
-
-
     &.mod button.reload {
       margin: 0.5em;
       padding: 0.5em;
@@ -1009,10 +1007,8 @@ export default {
     }
     .ccPageNos {
       font-weight: normal;
-
-      }
-
     }
+
     span.cw {
       padding: 0 7px;
       font-size: 12px;
@@ -1047,14 +1043,14 @@ export default {
     }
 
     li {
-        /*list-style-position: inside;*/
-        background-color: var(--page-log-bg);
-        border: 1px solid rgba(0,0,0,.125);
-        margin-bottom: -1px;
-        padding: .2em;
-        .summary:before {
-          content: ' - '
-        }
+      /*list-style-position: inside;*/
+      background-color: var(--page-log-bg);
+      border: 1px solid rgba(0,0,0,.125);
+      margin-bottom: -1px;
+      padding: .2em;
+      .summary:before {
+        content: ' - '
+      }
     }
 
     ul li {
@@ -1066,8 +1062,8 @@ export default {
     }
 
     .col {  
-        width: 100%;
-        margin: 0 20px;
+      width: 100%;
+      margin: 0 20px;
     }
     .modButton {
       float: right;
@@ -1082,9 +1078,9 @@ export default {
   }
 
   .col {
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
   }
 
   .row {
