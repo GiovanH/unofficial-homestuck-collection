@@ -195,8 +195,8 @@ export default {
   background-color: rgba(0, 0, 0, 0.85);
   position: fixed;
 
-  width: 100%;
-  height: 100%;
+  width: 100%;  
+  height: calc(100% - var(--headerHeight));
   left: 0;
   overflow: hidden;
 

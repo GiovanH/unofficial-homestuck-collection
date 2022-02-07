@@ -326,6 +326,9 @@ Vue.mixin({
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
           }
 
+          // End of problem sleuth
+          else if (thisPageId == '001892') nextLimit  = '001902'
+
           // A6 CHARACTER SELECTS
           else if ('006021' <= thisPageId && thisPageId <= '006094') nextLimit = '006095' // Jane+Jake
           else if ('006369' <= thisPageId && thisPageId <= '006468') nextLimit = '006469' // Roxy+Dirk
