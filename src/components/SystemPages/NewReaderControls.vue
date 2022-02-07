@@ -219,7 +219,9 @@ export default {
       // Returns a good string to use as the input.
       // Usually just the input string, but may reset it
       // if the string has been cleared.
-      return this.newReaderPageInput || this.$mspaOrVizNumber(this.$newReaderCurrent) || this.$mspaOrVizNumber('001901')
+      return this.newReaderPageInput || 
+        (this.$newReaderCurrent && this.$mspaOrVizNumber(this.$newReaderCurrent)) || 
+        this.$mspaOrVizNumber('001901')
     },
     changeNewReader(){
       if (this.isValidPageSet) {
