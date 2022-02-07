@@ -129,22 +129,24 @@
                     </option>
                   </select>
                 </label>
-                <span v-if="$localData.settings.textOverride.fontFamily">
-                  <br><br>
-                  <label ><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                </span>
+                <div class="textOptions">
+                  <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                  <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
+                  <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+                </div>
                 <br><br>
                 <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
                 <br><br>
                 <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
               </div>
               <div class="textpreviews">
-                <PageText class="examplePrattle" 
+                <!-- PageText usually require a tab change to recalculate theme. -->
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
-                <PageText class="examplePrattle" 
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
                 <!-- v-if="!this.$pageIsSpoiler('001926')" -->
-                <PageText class="examplePrattle" 
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
                 content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
               </div>
@@ -501,6 +503,7 @@ export default {
       ],
       themes: [
         {text: "Auto", value: "default"},
+        {text: "Dark", value: "dark"},
         {text: "MSPA", value: "mspa"},
         {text: "Retro", value: "retro"},
         {text: "Scratch", value: "scratch"},
@@ -564,7 +567,7 @@ export default {
       }
     },
     darkModeChecked(){
-      if (this.$localData.settings.themeOverride == "cascade") return true
+      if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
     }
@@ -631,7 +634,7 @@ export default {
         this.$localData.settings.themeOverride = "default"
       } else {
         // Check "dark mode style"
-        this.$localData.settings.themeOverride = "cascade"
+        this.$localData.settings.themeOverride = "dark"
       }
       this.$localData.root.saveLocalStorage()
     },
@@ -823,7 +826,7 @@ export default {
     background-color: #35bfff;
     background-attachment: fixed;
     
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
 
@@ -943,6 +946,10 @@ export default {
         .textOverrideSettings {
           margin-top: 16px;
           text-align: center;
+          
+          .textOptions label {
+            display: block;
+          }
 
           .textpreviews {
             border: 6px solid var(--page-pageFrame);
@@ -1013,15 +1020,15 @@ export default {
       
       ul, ol {  
         text-align: left;
-        border: solid #c6c6c6;
-        border-width: 7px 7px 0 0;
+        border: solid var(--page-pageBorder, var(--page-pageFrame));
+        border-width: 5px 5px 0 0;
         padding-bottom: 6em;
         height: 100%;
       }
 
       li {
           /*list-style-position: inside;*/
-          background-color: #fff;
+          background-color: var(--page-log-bg);
           border: 1px solid rgba(0,0,0,.125);
           margin-bottom: -1px;
           padding: .2em;
@@ -1046,10 +1053,10 @@ export default {
         float: right;
         width: 18px;
         height: 18px;
-        background: #EEE;
+        background: var(--saves-tab);
         text-align: center;
         &:hover {
-          background: #c6c6c6
+          background: var(--saves-tabHover)
         }
       }
     }

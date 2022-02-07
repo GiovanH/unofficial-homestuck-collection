@@ -52,6 +52,42 @@
 		// Use all defaults with no modifications.
 	}
 
+	&.dark {
+		--font-default: #ffffff;
+		--font-header: #ffffff;
+		--font-highlight: #000000;
+		--font-disabled: rgba(255, 255, 255, 0.2);
+		--font-ctx: #ffffff;
+
+		--header-bg: #262626;
+		--header-tabSection: #404040;
+		--header-border: #363636;
+
+		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+
+		--page-pageBody: #000000;
+		--page-pageFrame: #262626;
+		--page-pageContent: #393939;
+		--page-pageBorder: #6a6a6a;
+		--page-nav-divider: #0066ff;
+		--page-nav-meta: #979797;
+		--page-links: #0066ff;
+		--page-log-bg: #000000;
+		
+		--ctx-bg: #262626;
+		--ctx-frame: #000000;
+		--ctx-select: #0066ff;
+		--ctx-divider: #ffffff;
+
+		--saves-bg: #454545;
+		--saves-tab: #262626;
+		--saves-tabHover: #3c3c3c;
+		--saves-border: #363636;
+		--saves-scroll: #5a5a5a;
+		--saves-scrollHover: #6a6a6a;
+	}
+
 	&.retro {
 		--app-icon: "build/icons/default.ico";
 		
@@ -182,6 +218,7 @@
 		--page-nav-divider: #0066ff;
 		--page-nav-meta: #0066ff;
 		--page-links: #0066ff;
+		--page-log-bg: #000000;
 		
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
