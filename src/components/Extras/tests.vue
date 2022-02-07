@@ -8,7 +8,15 @@
           </div>
       </div>
       <div class="pageContent" v-else>
-        <div class="logItems" v-if="otherComponents.length">
+        <h2 class="pageTitle">Gio's super cool thing-testing page</h2>
+        <div class="testSection" style="border-top: none;">
+          <p>i make absolutely no promises about anything here</p>
+          <p>also this isn't the secret. that's something else</p>
+          <br />
+          <p>some of these I might make into full-fledged features at some point, like the conversation search. that's rad</p>
+        </div>
+
+        <div class="testSection" v-if="otherComponents.length">
           <h2>Overview</h2>
           <div v-for="ikey in intersectionKeys" class="flexbox">
             <h3 v-text="ikey" /><br />
@@ -39,13 +47,19 @@
             </li>
           </ul> -->
         </div>
-        <div class="logItems">
+        <div class="testSection">
           <h2>Vue template compiler</h2>
+          <p>Okay this one might be legitimately useful to mod developers: put vue styled html here, get a render function out.</p>
           <textarea v-model="compileTemplate" style="width: 100%;" />
-          <pre v-text="compiledResult" style="white-space: pre-wrap;"/>
+          <pre v-text="compiledResult" class="output" style="
+            white-space: pre-wrap;
+          "/>
         </div>
-        <div class="logItems">
+        <div class="testSection">
           <h2>Conversations</h2>
+          <p>filter conversations by speaker</p>
+          <p>speakers are id'd by color, not label (so 'DAVE: ' = 'TG: ')</p>
+          <p>multiple selections load the intersection ("convos with both dirk and jane")</p>
           <ul v-if="loadConversations">
             <li  v-for="__, color in speakerColorData.pagesByColor" :key="color">
               <label>
@@ -56,35 +70,39 @@
             </li>
           </ul>
           <button v-else @click="loadConversations = true">Load</button>
-          <ul v-if="Object.values(selectedConvoColors).some(Boolean)">
+          <ul class="output" v-if="Object.values(selectedConvoColors).some(Boolean)">
             <hr />
             <li v-for='idc in convoResults' :key='idc[0]'>
               <StoryPageLink long :mspaId='idc[0]'></StoryPageLink> {{idc[1]}} <span v-text="$archive.mspa.story[idc[0]].content.match(/<span/g).length" /> spans
             </li>
           </ul>
         </div>
-        <div class="logItems">
+        <div class="testSection">
           <h2>Media Lookup</h2>
+          <p>swf# -> page#</p>
+          <p>works on media that isn't swf too I guess</p>
           <input type="text" v-model="swfLookup">
-          <ul>
+          <ul class="output">
             <li v-for='id in swfResults' :key='id'>
               <StoryPageLink long :mspaId='id'></StoryPageLink>
             </li>
           </ul>
         </div>
-        <div class="logItems">
+        <div class="testSection">
           <h2>Flag Lookup</h2>
+          <p>look up pages by secret flags</p>
           <select v-model="flagLookup">
               <option v-for='flag in allFlags' v-text="flag" :value="flag" :key="flag"></option>
             </select>
-          <ul>
+          <ul class="output">
             <li v-for='id in flagResults' :key='id'>
               <StoryPageLink long :mspaId='id'></StoryPageLink>
             </li>
           </ul>
         </div>
-        <div class="logItems">
+        <div class="testSection">
           <h2>Misc</h2>
+          <p>just arbitrary links to some pages</p>
           <ul>
             <li><a href="/mspa/000110">Multiple images</a></li>
             <li><a href="/mspa/000136">Multiple commands</a></li>
@@ -319,6 +337,24 @@ export default {
   ::v-deep a{
     color: var(--page-links);
   }
+  p {
+    // fuck you *unresets your css*
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+
+    font-weight: normal;
+    color: #aa0001;
+  }
+  .output { 
+    border: 1px dashed grey;
+    padding: 4px;
+    @at-root ul#{&}, ol#{&} {
+      list-style: inside;
+    }
+  }
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);
@@ -370,7 +406,8 @@ export default {
             font-size: 18px;
           }
         }
-        .logItems {
+        .testSection {
+          border-top: 1em solid var(--page-pageFrame);
           padding: 30px;
 
           font-family: Verdana, Geneva, Tahoma, sans-serif;
