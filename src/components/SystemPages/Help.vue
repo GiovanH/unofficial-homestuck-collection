@@ -4,7 +4,7 @@
     <div class="card">
       <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
       <div class="cardContent pageMenu">
-        <a v-for="(label, key) in {newreader: 'New Readers', usage: 'How To Use The Collection'}" 
+        <a v-for="(label, key) in {newreader: 'New Readers', usage: 'How To Use The Collection', faq: 'FAQ'}" 
           :key="key"
           :href="`/help/${key}`" 
           :class="{selected: cardSelection == key}"
@@ -86,6 +86,45 @@
           <Media url="/archive/collection/userguide_search.png" />
         </section>
       </div>
+      <div class="cardContent" v-if="cardSelection == 'faq'">
+        <h2>FREQUENTLY ASKED QUESTIONS</h2>
+        <section>
+        <dl class="faq">
+          <dt>Some panels/images/media aren't loading at all!</dt>
+          <dd>This is usually caused by a faulty asset pack install. Try redownloading and re-extracting the asset pack.</dd>
+
+          <dt>Is there a dark mode?</dt>
+          <dd>Yes: in the <a href='/settings/enhancements' target='_blank'>Settings page, under Enhancements.</a></dd>
+
+          <dt>Can I see that list of content warnings from the setup page again?</dt>
+          <dd>Sure!</dd>
+
+          <SpoilerBox>
+            <div class="scrollbox" style="max-height: 18em;">
+              <ul>
+                <li v-for="cw in contentWarnings" v-text="cw" :key="cw" />
+              </ul>
+            </div>
+          </SpoilerBox>
+
+          <dt>How does this collection handle [controversial material that was later replaced by What Pumpkin]?</dt>
+          <dd>The collection includes all the original material in controversial content, but it is disabled by default. Controls for enabling it are in <a href='/settings/controversial' target='_blank'>Settings</a>.</dd>
+
+          <dt>What's all this I hear about mods?</dt>
+          <dd>Version 2.0 of the collection has mod support so it can easily be extended with commentary or other tweaks. More information including links to documentation and other resources is available in the <a href='/settings/mod' target='_blank'>Settings page under Mod Settings.</a></dd>
+
+          <dt>[Legal question]</dt>
+          <dd>Legal info can be found under <a href='/credits' target='_blank'>Archive Credits</a></dd>
+        </dl>
+        </section>
+        <section>
+          <p>Still having trouble? Reach out to us:</p>
+        </section>
+        <section>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement" target="_blank" class="anchorButton">Request a feature</a>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -93,17 +132,23 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
+import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+
+import SETUP from '@/components/SystemPages/Setup.vue'
+
 export default {
   name: 'help',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, Logo
+    NavBanner, Media, Logo, SpoilerBox
   },
   title: () => "Help",
   data: function() {
     return {
+      contentWarnings: (SETUP.data() || {contentWarnings: ['pls merge setup branch']}).contentWarnings
     }
   },
   computed: {
@@ -146,6 +191,7 @@ export default {
     display: flex;
     justify-content: space-evenly;
     a {
+      flex: 1;
       color: var(--page-links);
       font-size: 24px; 
       text-decoration: none;
@@ -230,6 +276,24 @@ export default {
     }
     .tiny {
       font-size: x-small;
+    }
+    .faq {
+      text-align: left;
+      margin: auto;
+      width: 720px;
+      font-size: 1.2em;
+      dt {
+        padding-top: 1em;
+        font-style: italic;
+      }
+    }  
+    div.scrollbox {
+      background: #fff;
+      box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+      display: block;
+      margin: 0;
+      padding: 12px 8px;
+      overflow-y: scroll;
     }
   }
 </style>
