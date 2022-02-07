@@ -358,7 +358,8 @@
     &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href$=".pdf"],
-    &[href$=".html"]:not([href*="assets://"]) {
+    // &[href$=".html"]:not([href*="assets://"]) {
+    &[href$=".html"] {
       &::after{
         @extend %fa-icon;
         @extend .fas;

@@ -112,7 +112,7 @@ Vue.mixin({
     $openLink(url, auxClick = false) {
       const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
 
-      if (urlObject.protocol == "assets:") {
+      if (urlObject.protocol == "assets:" && !/\.html$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
@@ -126,7 +126,7 @@ Vue.mixin({
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
-        } else shell.openExternal(urlObject.href)
+        } else shell.openExternal(Resources.resolveURL(urlObject.href))
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
         shell.openExternal(Resources.resolveURL(to))
