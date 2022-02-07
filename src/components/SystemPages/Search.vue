@@ -149,7 +149,6 @@ export default {
   },
   methods: {
     invokeSearch(params){
-      this.$logger.info(params)
       return ipcRenderer.invoke('search', params)
     },
     async search() {
@@ -189,7 +188,6 @@ export default {
       })
     },
     htmlEscape(str) {
-      this.$logger.info("escape", str)
       const queries = this.query
         .split(/[^\w&#;]/g)
         .filter(word => word.length > 1)
