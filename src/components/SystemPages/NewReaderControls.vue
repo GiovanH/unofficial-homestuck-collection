@@ -11,44 +11,48 @@
             ({{$getChapter($newReaderCurrent)}})</strong>.
           </p>
           <!-- Can't show picker if you're in viz mode. -->
-          <StoryPageLink
-            v-if="isNewReadingPreHS" 
-            :mspaId='$newReaderCurrent'/>
-          <input type="number" size="1" maxlength="6" 
-            v-model="newReaderPageInput"
-            v-else
-            @keydown.enter="changeNewReader()"
-            :class="{
-              invalid: !isValidPageSet, 
-              empty: !newReaderPageInput || !newReaderPageInput.length, 
-              changed: newReaderPageChanged
-            }" >
-          <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
-            <button v-if="!isNewReadingPreHS" :disabled="!(isValidPageSet && newReaderPageChanged)" 
-              @click="changeNewReader()" 
-              class="rightBtn"
-              >Adjust</button>
-          </span>
-          <span v-html="pageInvalidReason" class="errorHint"/>
+          <div class="row">
+            <StoryPageLink
+              v-if="isNewReadingPreHS" 
+              :mspaId='$newReaderCurrent'/>
+            <input type="number" size="1" maxlength="6" 
+              v-model="newReaderPageInput"
+              v-else
+              @keydown.enter="changeNewReader()"
+              :class="{
+                invalid: !isValidPageSet, 
+                empty: !newReaderPageInput || !newReaderPageInput.length, 
+                changed: newReaderPageChanged
+              }" >
+            <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
+              <button v-if="!isNewReadingPreHS" :disabled="!(isValidPageSet && newReaderPageChanged)" 
+                @click="changeNewReader()" 
+                class="rightBtn"
+                >Adjust</button>
+            </span>
+            <span v-html="pageInvalidReason" class="errorHint"/>
+          </div>
         </template>
         <template v-else>
           <p class="pageStatus">
             <strong>New reader mode disabled.</strong>
           </p>
-          <input type="number" size="1" maxlength="6" 
-            v-model="newReaderPageInput"
-            @keydown.enter="setNewReader()"
-            :class="{
-              invalid: !isValidPageSet, 
-              empty: !newReaderPageInput || !newReaderPageInput.length, 
-              changed: newReaderPageChanged
-            }" >
-          <span :class="{ urgent: isValidPageSet && newReaderPage != '001901' }">
-            <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
-            @click="setNewReader()"
-            class="rightBtn">Activate</button>
-          </span>
-          <span v-html="pageInvalidReason" class="errorHint"/>
+          <div class="row">
+            <input type="number" size="1" maxlength="6" 
+              v-model="newReaderPageInput"
+              @keydown.enter="setNewReader()"
+              :class="{
+                invalid: !isValidPageSet, 
+                empty: !newReaderPageInput || !newReaderPageInput.length, 
+                changed: newReaderPageChanged
+              }" >
+            <span :class="{ urgent: isValidPageSet && newReaderPage != '001901' }">
+              <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
+              @click="setNewReader()"
+              class="rightBtn">Activate</button>
+            </span>
+            <span v-html="pageInvalidReason" class="errorHint"/>
+          </div>
         </template>
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number between 000219 and 010029.<br>
@@ -388,12 +392,15 @@ export default {
     color: var(--page-nav-meta);
     font-weight: normal;
   }
+  .row {
+    position: relative;
+  }
   .errorHint {
     position: absolute;
-    height: 3em;
+    height: 100%;
     align-items: center;
     display: inline-flex;
-    
+
     justify-content: center;
     margin: 0 8px;
 
