@@ -101,7 +101,7 @@ export default {
       this.tabComponent.$refs.bookmarks.toggle()
     },
     toggleJumpBox(){
-      this.$root.$children[0].openJumpbox()
+      this.$root.app.openJumpbox()
     },
     getLabel(href){
       // Tries to get a themed label, otherwise just prints the URL
@@ -115,7 +115,7 @@ export default {
   },
   computed: {
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
     },
     labelDict() {
       return this.labels[this.$root.tabTheme.rendered] || this.labels['mspa']

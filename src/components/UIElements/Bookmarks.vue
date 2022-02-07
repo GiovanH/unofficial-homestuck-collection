@@ -140,7 +140,7 @@ export default {
     blurBookmark(event, key) {
       if (key == this.editKey && this.$refs[key][0]) {
         if (document.getElementById('contextMenu').contains(event.relatedTarget)) {
-          this.$root.$children[0].$refs.contextMenu.lendFocus(event.target.tagName =='INPUT' ? event.target :this.$refs[key][0] )
+          this.$root.app.$refs.contextMenu.lendFocus(event.target.tagName =='INPUT' ? event.target :this.$refs[key][0] )
         }
         else if (!this.$refs[key][0].contains(event.relatedTarget)) {
           this.cancelEditSave(this.editKey)

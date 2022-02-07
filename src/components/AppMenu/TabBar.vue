@@ -109,7 +109,7 @@ export default {
       // // it as a reference, but it has a race condition which makes it
       // // a poor fit here.
       // try {
-      //   const page = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.page
+      //   const page = this.$root.app.activeTabComponent.$refs.page
       //   if (page.$options.name == "page")
       //     return page.thisPage.pageId
       //   else
@@ -131,16 +131,16 @@ export default {
       return undefined
     },
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
     }
   },
   methods: {
     toggleBookmarks(){
-      const tabComponent = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      const tabComponent = this.$root.app.activeTabComponent
       tabComponent.$refs.bookmarks.toggle()
     },
     toggleJumpBox(){
-      this.$root.$children[0].openJumpbox()
+      this.$root.app.openJumpbox()
     },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
@@ -158,7 +158,7 @@ export default {
     },
     reloadTab(e) {
       try {
-        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+        this.$root.app.activeTabComponent.reload()
       } catch (e) {
         this.$logger.warn("Couldn't reload tab (no page?)", e)
       }

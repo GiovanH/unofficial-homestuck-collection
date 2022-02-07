@@ -85,7 +85,7 @@ export default {
     },
     onFocusOut(event) {
       if (document.getElementById('contextMenu').contains(event.relatedTarget)) {
-        this.$root.$children[0].$refs.contextMenu.lendFocus(event.target)
+        this.$root.app.$refs.contextMenu.lendFocus(event.target)
       } else if (!this.$el.contains(event.relatedTarget))
         this.close()
     },

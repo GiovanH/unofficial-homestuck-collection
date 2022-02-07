@@ -122,7 +122,7 @@
         if (this.$localData.settings.showAddressBar) {
           document.querySelector('#jumpBox input').select()
         } else {
-          this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
+          this.activeTabComponent.$refs.jumpbox.toggle()
         }
       }
     },
@@ -190,7 +190,7 @@
         this.resetZoom()
       })
       electron.ipcRenderer.on('OPEN_FINDBOX', (event) => {
-        this.$refs[this.$localData.tabData.activeTabKey][0].$refs.findbox.open()
+        this.activeTabComponent.$refs.findbox.open()
       })      
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()

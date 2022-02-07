@@ -79,14 +79,14 @@ export default {
       )
     },
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
     },
     thisTabPageId(){
       // // This is a good implementation to grab an inner page, so I'm leaving 
       // // it as a reference, but it has a race condition which makes it
       // // a poor fit here.
       // try {
-      //   const page = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.page
+      //   const page = this.$root.app.activeTabComponent.$refs.page
       //   if (page.$options.name == "page")
       //     return page.thisPage.pageId
       //   else
@@ -148,7 +148,7 @@ export default {
       }
     },
     reloadTab(e) {
-      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+      this.$root.app.activeTabComponent.reload()
     },
     onSuggestSelect(event){
       if (!event) return
