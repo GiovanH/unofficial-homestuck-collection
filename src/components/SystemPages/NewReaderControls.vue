@@ -10,8 +10,28 @@
             <strong>page {{$mspaOrVizNumber($newReaderCurrent)}}</strong> 
             ({{$getChapter($newReaderCurrent)}})</strong>.
           </p>
-          <!-- Can't show picker if you're in viz mode. -->
           <div class="row">
+            <div class="left">
+              <select class="vizStorySelect" 
+                v-if="!$localData.settings.mspaMode"
+                v-model="vizStory" >
+                <option 
+                  value="problem-sleuth" 
+                  key="problem-sleuth">
+                  Problem Sleuth
+                </option>
+                <option 
+                  value="homestuck" 
+                  key="homestuck">
+                  Homestuck
+                </option>
+              </select>
+              <select class="vizStorySelect" 
+                v-else
+                disabled>
+                <option>MSPA</option>
+              </select>
+            </div>
             <input type="number" size="1" maxlength="6" 
               v-model="newReaderPageInput"
               @keydown.enter="changeNewReader()"
@@ -20,13 +40,15 @@
                 empty: !newReaderPageInput || !newReaderPageInput.length, 
                 changed: newReaderPageChanged
               }" >
-            <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
-              <button :disabled="!(isValidPageSet && newReaderPageChanged)" 
-                @click="changeNewReader()" 
-                class="rightBtn"
-                >Adjust</button>
-            </span>
-            <span v-html="pageInvalidReason" class="errorHint"/>
+            <div class="right">
+              <span :class="{ urgent: isValidPageSet && newReaderPageChanged }">
+                <button :disabled="!(isValidPageSet && newReaderPageChanged)" 
+                  @click="changeNewReader()" 
+                  class="rightBtn"
+                  >Adjust</button>
+              </span>
+              <span v-html="pageInvalidReason" class="errorHint"/>
+            </div>
           </div>
         </template>
         <template v-else>
@@ -34,6 +56,27 @@
             <strong>New reader mode disabled.</strong>
           </p>
           <div class="row">
+            <div class="left">
+              <select class="vizStorySelect" 
+                v-if="!$localData.settings.mspaMode"
+                v-model="vizStory" >
+                <option 
+                  value="problem-sleuth" 
+                  key="problem-sleuth">
+                  Problem Sleuth
+                </option>
+                <option 
+                  value="homestuck" 
+                  key="homestuck">
+                  Homestuck
+                </option>
+              </select>
+              <select class="vizStorySelect" 
+                v-else
+                disabled>
+                <option>MSPA</option>
+              </select>
+            </div>
             <input type="number" size="1" maxlength="6" 
               v-model="newReaderPageInput"
               @keydown.enter="setNewReader()"
@@ -42,12 +85,14 @@
                 empty: !newReaderPageInput || !newReaderPageInput.length, 
                 changed: newReaderPageChanged
               }" >
-            <span :class="{ urgent: isValidPageSet && newReaderPage != '001901' }">
-              <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
-              @click="setNewReader()"
-              class="rightBtn">Activate</button>
-            </span>
-            <span v-html="pageInvalidReason" class="errorHint"/>
+            <div class="right">
+              <span :class="{ urgent: isValidPageSet && newReaderPage != '001901' }">
+                <button :disabled="!isValidPageSet || newReaderPageInput.length < 1" 
+                @click="setNewReader()"
+                class="rightBtn">Activate</button>
+              </span>
+              <span v-html="pageInvalidReason" class="errorHint"/>
+            </div>
           </div>
         </template>
         <p class="hint" v-if="$localData.settings.mspaMode">
@@ -134,7 +179,9 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 export default {
   name: 'NewReaderControls',
   emits: ['enable', 'disable', 'change', 'test', 'ffchange'],
-  components: {StoryPageLink},
+  components: { 
+    StoryPageLink 
+  },
   props: {
     promptMspaMode: {
       type: Boolean,
@@ -156,6 +203,7 @@ export default {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
       // TODO: This assignment sometimes doesn't work, and assigns 001901 anyway?
       newReaderPageInput: undefined,
+      vizStory: 'homestuck',
       // myFastForward is kept out-of-sync and undefined by default if forceGateChoice is set.
       myFastForward: this.forceGateChoice ? undefined : this.$localData.settings['fastForward'],
       settingListBoolean: [
@@ -168,11 +216,6 @@ export default {
     }
   },
   computed: {
-    vizStory(){
-      if (this.$newReaderCurrent && this.$getChapter(this.$newReaderCurrent).startsWith('Problem Sleuth'))
-        return 'problem-sleuth'
-      return 'homestuck'
-    },
     featureList(){
       return this.features.toLowerCase().split(" ")
     },
@@ -225,6 +268,11 @@ export default {
         (this.$newReaderCurrent && this.$mspaOrVizNumber(this.$newReaderCurrent)) || 
         this.$mspaOrVizNumber('001901')
     },
+    genVizStory(){
+      if (this.$newReaderCurrent && this.$getChapter(this.$newReaderCurrent).startsWith('Problem Sleuth'))
+        return 'problem-sleuth'
+      return 'homestuck'
+    },
     changeNewReader(){
       if (this.isValidPageSet) {
         this.$emit('change', this.newReaderPage) 
@@ -260,6 +308,7 @@ export default {
     },
     setupHomestuck() {
       this.$localData.settings.mspaMode = false
+      this.vizStory = 'homestuck'
       this.$nextTick(() => {
         this.$logger.info("Set HS number")
         this.newReaderPageInput = this.$mspaOrVizNumber("001901")
@@ -268,6 +317,7 @@ export default {
     },
     setupProblemSleuth() {
       this.$localData.settings.mspaMode = true
+      this.vizStory = 'problem-sleuth'
       this.$nextTick(() => {
         this.$logger.info("Set PS number")
         this.newReaderPageInput = "000219"
@@ -309,6 +359,7 @@ export default {
   },
   mounted(){
     this.newReaderPageInput = this.genInputString()
+    this.vizStory = this.genVizStory()
   }
 }
 
@@ -387,20 +438,26 @@ export default {
   }
   .row {
     position: relative;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    > .left, .right {
+      flex: 1;
+    }
+    > .right {
+      text-align: left;
+    }
+    > .left {
+      text-align: right;
+    }
   }
   .errorHint {
-    position: absolute;
-    height: 100%;
-    align-items: center;
-    display: inline-flex;
-
-    justify-content: center;
-    margin: 0 8px;
-
     text-align: left;
     color: red;
     font-size: 0.8em;
     font-style: italic;
+    margin-left: 6px;
   }
   .settings {
     p {
