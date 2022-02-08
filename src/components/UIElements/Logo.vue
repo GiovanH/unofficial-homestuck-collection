@@ -20,7 +20,7 @@ export default {
 
 <style scoped lang="scss">
   .topLogo {
-    margin-bottom: 25px;
+    // margin-bottom: 25px;
     img, video {
       width: 800px;
       max-width: 100%;

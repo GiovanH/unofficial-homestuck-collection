@@ -21,6 +21,10 @@ const routes = [
     props: true
   },
   {
+    path: '/help/:mode',
+    props: true
+  },
+  {
     path: '/credits/:mode',
     props: true,
     children: [
@@ -163,7 +167,7 @@ const routes = [
     children: [
       {
         path: '',
-        redirect: '1'
+        redirect: '000001'
       },
       {
         path: ':p',

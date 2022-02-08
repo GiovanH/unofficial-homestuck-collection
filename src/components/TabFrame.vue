@@ -39,8 +39,7 @@ import ERROR404 from '@/components/SystemPages/Error404.vue'
 import SPOILER from '@/components/SystemPages/Spoiler.vue'
 
 import HOMEPAGE from '@/components/SystemPages/Homepage.vue'
-import NEWREADER from '@/components/SystemPages/NewReader.vue'
-import USERGUIDE from '@/components/SystemPages/UserGuide.vue'
+import HELP from '@/components/SystemPages/Help.vue'
 import MAP from '@/components/SystemPages/Map.vue'
 import LOG from '@/components/SystemPages/Log.vue'
 import SEARCH from '@/components/SystemPages/Search.vue'
@@ -65,9 +64,11 @@ import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
 import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
 import SQUIDDLES from '@/components/Extras/Squiddles.vue'
+import EVENMORE from '@/components/Extras/EvenMore.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
+import SOCIALS from '@/components/Socials/Socials.vue'
 import DSTRIDER from '@/components/Socials/DStrider.vue'
 import BLOGSPOT from '@/components/Socials/Blogspot.vue'
 import MAGICALJOURNEY from '@/components/Socials/MagicalJourney.vue'
@@ -90,7 +91,7 @@ export default {
     props: [
         'tabKey'
     ],
-    components : {
+    components: {
         Bookmarks,
         FindBox,
         JumpBox,
@@ -100,8 +101,7 @@ export default {
         SPOILER,
 
         HOMEPAGE,
-        NEWREADER,
-        USERGUIDE,
+        HELP,
         MAP,
         LOG,
         SEARCH,
@@ -126,8 +126,10 @@ export default {
         VIGILPRINCE,
         SKAIANET,
         SQUIDDLES,
+        EVENMORE,
 
         MUSIC,
+        SOCIALS,
         DSTRIDER,
         BLOGSPOT,
         MAGICALJOURNEY,
@@ -457,7 +459,6 @@ export default {
     watch: {
         'tabIsActive'(to, from) {
             if (to)
-                this.$root.tabTheme = this.theme
             // Prevents tab from unloading if there's anything that might need to run in the background
             if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
             else if (this.forceLoad) {

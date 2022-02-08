@@ -70,7 +70,7 @@ export default {
             return result
         },
         theme(){
-            return this.forcetheme || this.$root.tabTheme
+            return this.forcetheme || this.$root.tabTheme.rendered
         },
         isDarkBackground() {
             this.theme; this.isMounted;

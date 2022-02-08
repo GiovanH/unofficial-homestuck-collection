@@ -1,14 +1,14 @@
 <template>
   <div class="pageBody customStyles homepage">
     <NavBanner useCustomStyles="true" />
-    <div class="card topLogo">
+    <div class="card logoCard">
       <a href="/" class="cardContent">
         <Logo />
       </a>
       <div class="cardContent collection">
-        <div class="links">
+        <!-- <div class="links">
           <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
-        </div>
+        </div> -->
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
           Things <em>may</em> still work, but you should probably update<br />
@@ -16,11 +16,12 @@
         </p>
       </div>
     </div>
-    <div class="card">
+    <div class="card tight hsCard">
       <!-- <Media url="/archive/collection/hs_logo.png" class="logo hsLogo cardContent" /> -->
-      <div class="cardContent cardEntry hsCard">
+      <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
+          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 167px;" v-if="$root.tabTheme === 'A6A6'" >
           <p class="date">Apr 2009 - Apr 2016</p>
           <p class="date">8,130 pages</p>
         </div>
@@ -60,6 +61,7 @@
           <template v-slot:title>Music</template>
           <p>Explore the entire discography of official Homestuck music.</p>
         </HomeRowItem>
+        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 399px;" v-if="$root.tabTheme === 'A6A6'" >
         <HomeRowItem
           class="rowItem"
           href="/sbahj"
@@ -127,9 +129,9 @@
       </div>
     </div>
     
-    <div class="card">
+    <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
-      <div class="cardContent cardEntry jbCard">
+      <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
           <p class="date">Sep 2006 - Feb 2007</p>
@@ -172,7 +174,7 @@
           <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
           <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
           <div class="links">
-            <div class="left bigLink">
+            <div class="left">
               &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
             </div>
             <div class="center">
@@ -189,23 +191,22 @@
           class="rowItem"
           href="/unlock" 
           thumbsrc="/archive/collection/archive_unlocks.png"
-          date="Apr 2009">
+          :aftertimestamp="1226966400">
           <template v-slot:title>Unlockable Content</template>
-          <p>Fan-requested commands drawn for fans who made donations. But he is no longer doing them. Sorry!</p>
+          <p>Fan-requested commands drawn for fans who made donations. But Andrew is no longer doing them. Sorry!</p>
         </HomeRowItem>
         <HomeRowItem
           class="rowItem"
           href="/faqs/science" 
           thumbsrc="/archive/collection/archive_science.png"
-          :aftertimestamp="1236384000"
-          date="Apr 2009">
+          :aftertimestamp="1236384000">
           <template v-slot:title>Science FAQ</template>
           <p>An explanation of some of the science works in Problem Sleuth. Is physics real? Sorta!</p>
         </HomeRowItem>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card tsoCard">
       <Media url="/archive/collection/tso_logo.png" class="logo tsoLogo cardContent" />
       <div class="cardContent cardEntry tsoCard">
         <div class="icon">
@@ -256,7 +257,16 @@
       </div>
     </div>
 
-    <div class="card noHeaderCard">
+    <div class="card newsCard">
+      <div class="logo newsLogo cardContent">
+        <Media url="assets://archive/collection/news_logo.png" />
+        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
+      </div>
+      <div class="cardContent">
+        <div class="description">
+          <p>Throughout the run of MSPA, Andrew Hussie used various means of communicating with fans. The "news blurb" lasted the full run of the site, while others ran at different times.</p>
+        </div>
+      </div>
       <div class="cardContent cardRows">
         <HomeRowItem
           class="rowItem"
@@ -293,6 +303,11 @@
           <template v-slot:title>Tumblr</template>
           <p>Picked up in place of Formspring. Used mainly for announcements and Q&As, then abandoned in 2013.</p>
         </HomeRowItem>
+      </div>
+    </div>
+
+    <div class="card unsortedCard noHeaderCard">
+      <div class="cardContent cardRows">
         <HomeRowItem
           class="rowItem"
           href="/desktops"
@@ -331,6 +346,22 @@
         </HomeRowItem>
       </div>
     </div>
+
+    <div v-if="modHomeRowItems.length" class="card unsortedCard noHeaderCard">
+      <div class="cardContent cardRows">
+        <HomeRowItem
+          v-for="item in modHomeRowItems"
+          class="rowItem"
+          :key="item.href"
+          :href="item.href"
+          :thumbsrc="item.thumbsrc"
+          :afterpage="item.afterpage"
+          :date="item.date">
+          <template v-slot:title>{{ item.title }}</template>
+          <div v-html="item.description"></div>
+        </HomeRowItem>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -350,6 +381,15 @@ export default {
   },
   data: function() {
     return {
+      modHomeRowItems: [
+      // {
+      //   href: "/ryanquest",
+      //   thumbsrc: "/archive/collection/archive_ryanquest.png",
+      //   date: "Oct 2010",
+      //   title: 'Ryanquest',
+      //   description: `<p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>`
+      // }
+      ]
     }
   },
   title: function(ctx) {
@@ -376,9 +416,7 @@ export default {
     background-attachment: fixed;
 
     color: var(--font-default);
-    a:not([disabled]) {
-      color: var(--page-links);
-    }
+    padding-bottom: 50px;
   }
 
   .navBanner {
@@ -386,7 +424,13 @@ export default {
   }
   .card {
     position: relative;
-    margin-bottom: 75px;
+    margin-top: 75px;
+    &.logoCard { margin-top: 0;}
+    &.tight, &.unsortedCard { margin-top: 20px; }
+    &.mspaCard { margin-top: 50px; }
+    &.newsCard { margin-top: 50px; }
+    &.tsoCard { margin-top: 75px; }
+
     padding: 25px 50px;
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
@@ -399,7 +443,18 @@ export default {
     align-items: center;
     align-content: center;
 
+    ::v-deep a:not([disabled]) {
+      color: var(--page-links);
+    }
+
+    .a6a6graffiti {
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      top: 0;
+    }
     .logo {
+      position: relative;
       max-width: 920px;
       // position: absolute;
       &.hsLogo {
@@ -408,6 +463,10 @@ export default {
       }
       &.mspaLogo {
         margin-top: -65px;
+      }
+      &.newsLogo {
+        margin-top: -64px;
+        .a6a6graffiti {margin: -30px -86px;}
       }
       &.tsoLogo {
         margin-top: -105px;

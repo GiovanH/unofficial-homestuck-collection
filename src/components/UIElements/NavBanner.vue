@@ -2,7 +2,7 @@
   <nav class="navBanner" :class="{customNavBanner: useCustomStyles, pixelated: $localData.settings.pixelScaling}">
     <div class="navList">
       <template v-for="(group, gi) in urls">
-        <ul :class="'nav' + (gi+1)">
+        <ul :class="'nav' + (gi+1)" :key="'nav' + (gi+1)">
           <li v-for="href in group">
             <a v-if="href == 'toggleJumpBox'" @click.prevent="toggleJumpBox()">{{getLabel(href)}}</a>
             <a v-else-if="href == 'toggleBookmarks'" @click.prevent="toggleBookmarks()">{{getLabel(href)}}</a>
@@ -26,13 +26,17 @@ export default {
   ],
   data: function() {
     return {
+      // MS PAINT ADVENTURES
+      // ARCHIVE | NEW READER?
+      // MAP | LOG | SEARCH
+      // SHOP | MUSIC
+      // FORUMS | SECRETS | CREDITS
       urls: [
         [
-          "https://www.homestuck.com"
+          "/"
         ],
         [
-          "/",
-          "toggleJumpBox"
+          "/help"
         ],
         [
           "/map",
@@ -40,9 +44,11 @@ export default {
           "/search"
         ],
         [
-          "toggleBookmarks"
+          "/news",
+          "/music"
         ],
         [
+          "/evenmore",
           "/settings",
           "/credits"
         ]
@@ -50,27 +56,42 @@ export default {
       labels: {
         // list<theme => list<href => label>>
         // default theme in settings is the empty string
-        "": {
-          "https://www.homestuck.com": "HOMESTUCK.COM",
-          "/": "HOME",
-          "toggleJumpBox": "JUMP",
+        mspa: {
+          // "https://www.homestuck.com": "HOMESTUCK.COM",
+          "/": "HOMESTUCK COLLECTION",
+
+          // "toggleJumpBox": "JUMP",
+          "/help": "HELP",
+
           "/map": "MAP",
           "/log": "LOG",
           "/search": "SEARCH",
-          "toggleBookmarks": "SAVE/LOAD",
+
+          "/news": "NEWS",
+          "/music": "MUSIC",
+          // "toggleBookmarks": "SAVE/LOAD",
+
+          "/evenmore": "MORE",
           "/settings": "SETTINGS",
           "/credits": "CREDITS"
         },
         A6A6: {
-          "https://www.homestuck.com": "WORTHLESS GARBAGE.",
-          "/": "STUPID.",
-          "toggleJumpBox": "WHO CARES?",
+          "/": "WORTHLESS GARBAGE.",
+
+          // "toggleJumpBox": "WHO CARES?",
+          "/help": "STUPID.",
+
           "/map": "WOW.",
           "/log": "NO.",
           "/search": "BORING.",
-          "toggleBookmarks": "DUMB NOISE.",
-          "/settings": "BULLSHIT.",
-          "/credits": "WHATEVER."
+
+          "/news": "BULLSHIT.",
+          "/music": "DUMB NOISE.",
+          // "toggleBookmarks": "TRASH.",
+          
+          "/evenmore": "WHO CARES?",
+          "/credits": "MORONS.",
+          "/settings": "WHATEVER."
         }
       }
     }
@@ -80,18 +101,26 @@ export default {
       this.tabComponent.$refs.bookmarks.toggle()
     },
     toggleJumpBox(){
-      this.$root.$children[0].openJumpbox()
+      this.$root.app.openJumpbox()
     },
     getLabel(href){
       // Tries to get a themed label, otherwise just prints the URL
-      return (this.labels[this.$root.tabTheme] || this.labels[''])[href] || href
+      return this.labelDict[href] || href
+    }
+  },
+  watch: {
+    '$root.tabTheme'(to, from){
+      this.$logger.info("Nav: Reacting tabTheme", to)
     }
   },
   computed: {
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
+    },
+    labelDict() {
+      return this.labels[this.$root.tabTheme.rendered] || this.labels['mspa']
     }
-  },
+  }
 }
 </script>
 
@@ -107,7 +136,7 @@ export default {
       .candyCorn {
         content: var(--nav-candyCornContent);
       }
-      ul li:not(:last-child):after {
+      ul li:before {
         color: var(--nav-divider);
       }
     }
@@ -184,15 +213,14 @@ export default {
           align-content: center;
           align-items: center;
           justify-content: center;
-          &:not(:last-child):after {
-            content: " |";
-            color: #FFFFFF;
-            display: inline-block;
-            margin: 0 0.3em
-          }
+        }
+        li + li:before {
+          content: " | ";
+          color: #FFFFFF;
+          display: inline-block;
+          margin: 0 0.3em
         }
       }
-
     }
   }
 </style>

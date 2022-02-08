@@ -1,21 +1,30 @@
 <template>
   <div id="tabBar">
-    <div id="tabNavigation">
-      <div class="systemButton historyButton" @click="historyBack" @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory"><fa-icon icon="chevron-left"></fa-icon></div>
-      <div class="systemButton historyButton" @click="historyForward" @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture"><fa-icon icon="chevron-right"></fa-icon></div>
-      <div class="systemButton historyButton" @click="reloadTab" @click.middle="forceReload" style="font-size: 22px;"><fa-icon icon="redo"></fa-icon></div>
+    <div class="navigationButtons">
+      <button class="systemButton historyButton historyBack" @click="historyBack" 
+        @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory">
+        <fa-icon icon="chevron-left"></fa-icon></button>
+      <button class="systemButton historyButton historyForward" @click="historyForward" 
+        @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture">
+        <fa-icon icon="chevron-right"></fa-icon></button>
+
+      <button class="systemButton historyButton refresh" 
+        @click="reloadTab" @click.middle="forceReload">
+        <fa-icon icon="redo"></fa-icon></button>
     </div>
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>
       <!-- Toolbars go here -->
-      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
+      <component v-for="(__, componentkey) in browserToolbars" 
+        :is="componentkey" :key="componentkey" class="toolbar"/>
       <div class="lineBreak"/>
     </template>
 
     <div id="tabSection">
-      <div id="dragTab" class="tab activeTab" tabindex="-1" v-show="showDragTab">
+      <div id="dragTab" class="tab activeTab" 
+        tabindex="-1" v-show="showDragTab">
         <div class="tabTitle" :class="{dragTitleFade}"></div>
-        <div class="systemButton closeTabButton">✕</div>
+        <button class="systemButton closeTabButton">✕</button>
       </div>
       <transition-group name="tab-list" tag="ul" id="tabs">
         <Tab v-for="key in sortedTabList" 
@@ -23,12 +32,22 @@
           :ref="'tab_' + key" 
           @mousedown.left.native="initDrag()" />
       </transition-group>
-      <div class="systemButton newTabButton" @click="newTab()">＋</div>
+      <button class="systemButton newTabButton" @click="newTab()" title="New tab">
+        <span>＋</span></button>
+      <div class="sysActionButtons">
+        <button class="systemButton sysActionButton jumpBoxButton" 
+         v-if="!$localData.settings.showAddressBar" 
+         @click="toggleJumpBox" title="Jump box">
+          <fa-icon icon="terminal"></fa-icon></button>
+        <button class="systemButton sysActionButton bookmarksButton" @click="toggleBookmarks" title="Bookmarks">
+          <fa-icon icon="bookmark"></fa-icon></button>
+      </div>
     </div>
 
     <template v-if="!$localData.settings.showAddressBar">
       <!-- Toolbars go here too (compact layout) -->
-      <component v-for="(__, componentkey) in browserToolbars" :is="componentkey" :key="componentkey" class="toolbar"/>
+      <component v-for="(__, componentkey) in browserToolbars" 
+        :is="componentkey" :key="componentkey" class="toolbar"/>
     </template>
     <div />
   </div>
@@ -90,7 +109,7 @@ export default {
       // // it as a reference, but it has a race condition which makes it
       // // a poor fit here.
       // try {
-      //   const page = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.page
+      //   const page = this.$root.app.activeTabComponent.$refs.page
       //   if (page.$options.name == "page")
       //     return page.thisPage.pageId
       //   else
@@ -112,10 +131,17 @@ export default {
       return undefined
     },
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
     }
   },
   methods: {
+    toggleBookmarks(){
+      const tabComponent = this.$root.app.activeTabComponent
+      tabComponent.$refs.bookmarks.toggle()
+    },
+    toggleJumpBox(){
+      this.$root.app.openJumpbox()
+    },
     historyBack(e) {
       this.$localData.root.TABS_HISTORY_BACK()
     },
@@ -132,7 +158,7 @@ export default {
     },
     reloadTab(e) {
       try {
-        this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+        this.$root.app.activeTabComponent.reload()
       } catch (e) {
         this.$logger.warn("Couldn't reload tab (no page?)", e)
       }
@@ -265,106 +291,141 @@ export default {
     display: flex;
     flex-flow: row wrap;
     border-bottom: 1px solid var(--header-border);
+  }
 
-    #tabNavigation {
-      display: inline-block;
-      height: 28px;
-      display: flex;      
-      .historyButton {
-        height: 28px;
-        width: 29px;
-        margin: 0;
+  .navigationButtons, .sysActionButtons {
+    margin-left: auto;
+    display: inline-block;
+    height: var(--address-bar-height);
+    display: flex;
+  }
+  .navigationButtons {
+    --padding: 2px;
+    padding: 0px var(--padding);
+  }
+  .sysActionButtons {
+    --padding: 4px;
+    padding: 2px var(--padding);
+  }
+  .historyButton, .sysActionButton {
+    &[disabled] { color: var(--font-disabled); }
 
-        line-height: 34px;
-        font-size: 24px;
-        text-decoration: none;
-        text-align: center;
+      height: var(--address-bar-height);
+      width: calc(var(--address-bar-height) * (8/7));
+      margin: 0;
+
+      text-decoration: none;
+      text-align: center;
+
+      --symbol-font-size: calc(var(--address-bar-height) - 2*var(--padding));
+      font-size: var(--symbol-font-size);
+
+      > svg {
+        display: block;
+      margin: auto;
+      height: 100%;
+    }
+  }
+  .historyBack > svg { padding-right: 0.1em; }
+  .refresh, .jumpBoxButton { 
+    > svg { font-size: calc(var(--symbol-font-size) * 0.9) } 
+  }
+
+  .sysActionButton {
+    opacity: 0.4;
+    &:not([disabled]) {
+      &:hover, &:active {
+        opacity: 0.8;
       }
     }
-    
-    .lineBreak {
-      flex-basis: 100%;
-      height: 3px;
-    }
-    .toolbar {
-      flex-basis: 100%;
-    }
-    #tabSection {
-      background: var(--header-tabSection);
-      width: 1px; // Grow to fit
-      flex-grow: 1;
-      height: 28px;
+  }
+
+  .lineBreak {
+    flex-basis: 100%;
+    height: 3px;
+  }
+  .toolbar {
+    flex-basis: 100%;
+  }
+  #tabSection {
+    background: var(--header-tabSection);
+    width: 1px; // Grow to fit
+    flex-grow: 1;
+    height: var(--tab-height);
+    display: inline-flex;
+
+    #dragTab {
+      position: absolute;
+      z-index: 1;
+      pointer-events: none;
+
+      background: var(--header-bg);
+
+      // tab css copied
       display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      min-width: 0;
+      height: 28px;
+      cursor: default;
 
-      #dragTab {
-        position: absolute;
-        z-index: 1;
-        pointer-events: none;
-
-        background: var(--header-bg);
-
-        // tab css copied
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
+      .tabTitle {
+        flex: 1 10 auto;
+        padding-left: 5px;
+        white-space: nowrap;
         min-width: 0;
-        height: 28px;
-        cursor: default;
-
-        .tabTitle {
-          flex: 1 10 auto;
-          padding-left: 5px;
-          white-space: nowrap;
-          min-width: 0;
-          overflow: hidden;
-
-          &.dragTitleFade {
-            mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
-          }
-        }
-
-        .closeTabButton {
-          float: right;
-          padding: 0;
-          margin-right: 5px;
-
-          flex: 0 0 auto;
-          width: 21px;
-          height: 21px;
-
-          line-height: 22px;
-          font-family: Arial, Helvetica, sans-serif;
-        }
-      }
-      #tabs{
-        display: inline-flex;
-        max-width: calc(100% - 28px);
         overflow: hidden;
-      }
-      .tab-list-enter, .tab-list-leave-to  {
-        opacity: 0;
-        width: 0;
-        min-width: 0;
-      }
-      .tab-list-enter-active, .tab-list-leave-active {
-        transition: all 0.1s;
-        ::v-deep .tabShell{
-          transition: width 0.1s;
+
+        &.dragTitleFade {
+          mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
         }
       }
 
-      // .tab-list-move {
-      //   transition: transform 0.1s;
-      // }
+      .closeTabButton {
+        float: right;
+        padding: 0;
+        margin-right: 5px;
 
-      .newTabButton {
+        flex: 0 0 auto;
+        width: 21px;
+        height: 21px;
+
+        line-height: 22px;
         font-family: Arial, Helvetica, sans-serif;
-        width: 28px;
-        height: 28px;
-        font-size: 28px;
-        line-height: 1;
       }
+    }
+    #tabs{
+      display: inline-flex;
+      max-width: calc(100% - 28px);
+      overflow: hidden;
+    }
+    .tab-list-enter, .tab-list-leave-to  {
+      opacity: 0;
+      width: 0;
+      min-width: 0;
+    }
+    .tab-list-enter-active, .tab-list-leave-active {
+      transition: all 0.1s;
+      ::v-deep .tabShell{
+        transition: width 0.1s;
+      }
+    }
+
+    // .tab-list-move {
+    //   transition: transform 0.1s;
+    // }
+
+    .newTabButton {
+      font-family: Arial, Helvetica, sans-serif;
+      height: var(--tab-height);
+      width: calc(var(--tab-height) * (8/7));
+      font-size: 24px;
+      // line-height: 1;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>
