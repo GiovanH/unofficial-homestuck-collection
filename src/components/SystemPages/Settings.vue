@@ -995,8 +995,8 @@ export default {
     }
 
     li {
-      /*list-style-position: inside;*/
       background-color: var(--page-log-bg);
+      // TODO Use a background color here from the theme that isn't log-bg
       border: 1px solid rgba(0,0,0,.125);
       margin-bottom: -1px;
       padding: .2em;

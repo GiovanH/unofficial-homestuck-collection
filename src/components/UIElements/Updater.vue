@@ -32,7 +32,7 @@ export default {
     appLatestReleaseSemver(){
       if (!this.ghReleases) return undefined
       const tag_name = this.appLatestRelease.tag_name
-      return tag_name.replace(/^[Vv]/, '')
+      return tag_name.replace(/^[Vv]/, '').replace(/-\w*$/, '')
     },
     appHasUpdate(){
       if (!this.ghReleases) return undefined
