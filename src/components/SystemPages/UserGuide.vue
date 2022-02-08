@@ -2,7 +2,7 @@
   <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="card">
-      <a class="logo" href="/"><Media url="/archive/collection/collection_logo.png" /></a>
+      <a class="logo" href="/"><Logo /></a>
       <div class="cardContent">
         <h2>GENERAL NAVIGATION</h2>
         <p>In The Unofficial Homestuck Collection, <a href="/">the homepage</a> is your main hub for accessing content! You should be able to get a glance of everything the collection contains from here. If you want to quickly navigate to another part of the collection, your first stop should be the homepage.</p>
@@ -40,21 +40,24 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Logo from '@/components/UIElements/Logo.vue'
+
 export default {
   name: 'userGuide',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Logo, Media
   },
+  title: () => "Navigation tips",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
 }
 </script>

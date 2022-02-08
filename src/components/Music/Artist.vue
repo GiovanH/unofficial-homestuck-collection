@@ -86,26 +86,10 @@ export default {
         url.includes('twitter.com') ? 'Twitter' :
         url.includes('deviantart.com') ? 'DeviantArt' :
         url.includes('wikipedia.org') ? 'Wikipedia' : url}</a>`)
-      return this.joinNoOxford(sources, 'or')
+      return (new Intl.ListFormat('en', { style: 'long', type: 'disjunction' }).format(sources))
     },
   },
-  methods:{
-    //thnks florrie 👍
-    joinNoOxford(array, plural = 'and') {
-      if (array.length === 0) {
-          return ''
-      }
-
-      if (array.length === 1) {
-          return array[0]
-      }
-
-      if (array.length === 2) {
-          return `${array[0]} ${plural} ${array[1]}`
-      }
-
-      return `${array.slice(0, -1).join(', ')} ${plural} ${array[array.length - 1]}`
-    },
+  methods: {
     linkAlbum(album) {
       return this.$albumIsSpoiler(album) ? '??????' : `<a href="/music/album/${album}">${this.$archive.music.albums[album].name}</a>`   
     },

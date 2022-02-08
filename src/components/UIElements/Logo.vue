@@ -1,0 +1,29 @@
+<template>
+  <div class="topLogo">
+    <Media :url="logo_src"  gifmode />
+  </div>
+</template>
+
+<script>
+import Media from '@/components/UIElements/MediaEmbed.vue'
+
+export default {
+  name: 'logo',
+  components: {Media},
+  data: function(){
+    return {
+      logo_src: "assets://archive/collection/logo_v2_full.webm"
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+  .topLogo {
+    // margin-bottom: 25px;
+    img, video {
+      width: 800px;
+      max-width: 100%;
+    }
+  }
+</style>

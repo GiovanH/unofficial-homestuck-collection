@@ -4,19 +4,22 @@
     <div class="pageFrame" v-if="log">
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
-        <a :href="reverseLink" class="switchOrder">Reverse order</a>
-        <div class="logItems" v-html="log" />
+        <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
+        <div class="logItems" v-if="log.length > 0">
+          <template v-for="page in log">
+            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
+          </template>
+        </div>
+        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
       </div>
     </div>
     <div class="pageFrame noLog" v-else >
       <div class="pageContent">
         <h2 class="pageTitle">Adventure Logs</h2>
         <div class="adventureLinks">
-          <div class="adventure"><a href="/log/1"><Media url="/images/archive_jb.gif" /><br>Jailbreak</a></div>
-          <div class="adventure"><a href="/log/2"><Media url="/images/archive_bq.gif" /><br>Bard Quest</a></div>
-          <div class="adventure"><a href="/log/4"><Media url="/images/archive_ps.gif" /><br>Problem Sleuth</a></div>
-          <div class="adventure"><a href="/log/5"><Media url="/images/archive_beta.gif" /><br>Homestuck Beta</a></div>
-          <div class="adventure"><a href="/log/6"><Media url="/images/archive_hs.gif" /><br>Homestuck</a></div>
+          <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
+            <a :href="advlink.href"><Media :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
+          </div>
         </div>
       </div>
     </div>
@@ -29,6 +32,16 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
+
+const { DateTime } = require('luxon');
+
+const sort_methods = {
+    asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
+    desc: (a, b) => (a.page_num < b.page_num) ? 1 : -1,
+    alpha: (a, b) => (a.title > b.title) ? 1 : -1,
+    random: (a, b) => 0.5 - Math.random()
+}
 
 export default {
   name: 'log',
@@ -36,38 +49,115 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, PageFooter
+    NavBanner, Media, PageFooter, MediaEmbed
+  },
+  title(ctx){
+    const adventure = ctx.routeParams.mode ? ctx.routeParams.mode[0] - 1 : undefined
+    const suffix = [
+      " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+    ][adventure]
+    return "Adventure Log" + (suffix || '')
   },
   data: function() {
     return {
       sort: 'log',
-      reverseText: ['oldest', 'newest']
+      sortNames: {
+        asc: 'oldest to newest',
+        desc: 'newest to oldest'
+      },
+      adventureLinks: [
+          {href: "/log/1", img: "/images/archive_jb.gif", label: "Jailbreak"},
+          {href: "/log/2", img: "/images/archive_bq.gif", label: "Bard Quest"},
+          {href: "/log/4", img: "/images/archive_ps.gif", label: "Problem Sleuth"},
+          // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
+          {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
+          // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
+      ]
     }
   },
   computed: {
-    log() {
-      if (this.routeParams.mode) {
-        this.sort = /^\d_rev$/.test(this.routeParams.mode) ? 'rev' : 'log'
-        let story = this.routeParams.mode.charAt(0)
-        
-        if (story in this.$archive.log[this.sort]){
-          let logData = this.$archive.log[this.sort][story]
-          if (this.$isNewReader) {
-            let regex = this.sort == 'log' ? new RegExp(`^(.*${this.$localData.settings.newReader.current}">".*?"<\/a><br>).*$`) : new RegExp(`^.*?(.{12}<a href="\/mspa\/${this.$localData.settings.newReader.current}.*)$`)
-            return logData.replace(regex, '$1')
-          }
-          else {
-            return logData
-          }
-        }
+    storyId(){
+      if (!this.routeParams.mode) {
+        // We are on the root page
+        return undefined
       }
-      else return undefined
+
+      // TODO: Replace character splicing with something actually resembling parsing
+      let story = this.routeParams.mode.charAt(0)
+      if (story == "r")
+        story = "ryanquest"
+
+      return story
+    },
+    log() {
+      // depends on
+      // this.$localData.settings.newReader;
+
+      // A sorted list of log objects
+      if (!this.storyId) 
+        return undefined
+
+      return this.storyLogRaw(this.storyId).filter(page => 
+        !this.$pageIsSpoiler(page.page_num)
+      ).sort(this.sorter)
     },
     reverseLink(){
-      return /^\d_rev$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_rev`
+      return /^\d_asc$/.test(this.routeParams.mode) ? `/log/${this.routeParams.mode.charAt(0)}` : `/log/${this.routeParams.mode}_asc`
     },
+    reverseText(){
+      // Todo
+      return "View " + (this.sortNames[this.sortOrderNext] || "log")
+    },
+    sortOrderNext(){
+      let next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
+      return next
+    },
+    sortOrder(){
+      // The text key that defines the sort order
+      if (!this.routeParams.mode)
+        // Sort order w/o selected log???
+        return undefined
+
+      let sort_order = /^\d_asc$/.test(this.routeParams.mode) ? 'asc' : 'desc'
+      return sort_order
+    },
+    sorter(){
+      // The sorter function that .sort() keys
+      let default_="asc"
+      return sort_methods[this.sortOrder] || sort_methods[default_]
+    },
+    storyLogRaw() {
+      // The unsorted story log
+      this.$archive;
+
+      // Vue should really be able to keep track of this, but it just can't. 
+      
+      return this.memoized(story_id => {
+        // console.log("Recalculating raw story log (BAD)")
+
+        return this.$getAllPagesInStory(story_id).map(page_num => 
+          this.getLogEntry(story_id, page_num)
+        )
+      }, "storyLogRaw", 10)
+    }
   },
-  methods:{
+  methods: {
+    getLogEntry(story_id, page_num) {
+      // Returns the actual entry object for a given page
+      // needs the story_id because ryanquest
+
+      // TODO: Memoize this?
+      let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
+      let page = story[page_num];
+      let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
+      let time_zone = "America/New_York"
+      return {
+        title: page.title,
+        page_num: page.pageId,
+        href: `/${page_type}/${page.pageId}`,
+        date: (page.timestamp ? DateTime.fromSeconds(Number(page.timestamp)).setZone(time_zone).toFormat("MM/dd/yy") : "??/??/??")
+      }
+    }
   }
 }
 </script>
@@ -103,6 +193,10 @@ export default {
       align-content: center;
       .pageContent{
         background: var(--page-pageContent);
+
+        .pageContent img {
+            max-width: 100%;
+        }
         
         width: 650px;     
         h2.pageTitle {

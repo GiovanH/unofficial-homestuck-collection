@@ -1,9 +1,14 @@
-#app {
+#app > *, .tabFrame > div {
+
+	--app-icon: "build/icons/icon.ico";
+
 	--font-default: #000000;
 	--font-header: #000000;
 	--font-ctx: #000000;
 	--font-log: #000000;
 	--font-disabled: darkgrey;
+
+	--font-family-ui: Segoe UI, San Francisco, Helvetica Neue, Arial, sans-serif;
 
 	--header-bg: #EEEEEE;
 	--header-tabSection: #C6C6C6;
@@ -19,6 +24,7 @@
 
 	--page-pageBody: #535353;
 	--page-pageFrame: #C6C6C6;
+	--page-pageBorder: #C6C6C6;
 	--page-pageContent: #EEEEEE;
 	--page-log-border: #808080;
 	--page-log-bg: #EEEEEE;
@@ -42,12 +48,55 @@
 
 	--find--highlight: lawngreen;
 
+	&.mspa {
+		// Use all defaults with no modifications.
+	}
+
+	&.dark {
+		--font-default: #ffffff;
+		--font-header: #ffffff;
+		--font-highlight: #000000;
+		--font-disabled: rgba(255, 255, 255, 0.2);
+		--font-ctx: #ffffff;
+
+		--header-bg: #262626;
+		--header-tabSection: #404040;
+		--header-border: #363636;
+
+		--header-buttonHoverState: rgba(255, 255, 255, 0.1);
+		--header-buttonClickState: rgba(255, 255, 255, 0.15);
+
+		--page-pageBody: #000000;
+		--page-pageFrame: #262626;
+		--page-pageContent: #393939;
+		--page-pageBorder: #6a6a6a;
+		--page-nav-divider: #0066ff;
+		--page-nav-meta: #979797;
+		--page-links: #0066ff;
+		--page-log-bg: #000000;
+		
+		--ctx-bg: #262626;
+		--ctx-frame: #000000;
+		--ctx-select: #0066ff;
+		--ctx-divider: #ffffff;
+
+		--saves-bg: #454545;
+		--saves-tab: #262626;
+		--saves-tabHover: #3c3c3c;
+		--saves-border: #363636;
+		--saves-scroll: #5a5a5a;
+		--saves-scrollHover: #6a6a6a;
+	}
+
 	&.retro {
+		--app-icon: "build/icons/default.ico";
+		
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
 
 		--page-pageBody: #DDDDDD;
 		--page-pageFrame: #EEEEEE;
+		--page-pageBorder: #EEEEEE;
 		--page-pageContent: #FFFFFF;
 		--page-log-bg: #FFFFFF;
 
@@ -56,13 +105,15 @@
 		--ctx-bg: #FFFFFF;
 		--ctx-divider: #DDDDDD;
 		
-		.customStyles .navBanner .candyCorn:before {
+		&.customStyles .navBanner .candyCorn:before {
 			color: white;
 			content: "||"
 		}
 	}
 
 	&.scratch {
+		--app-icon: "build/icons/scratch.ico";
+
 		--font-default: #ffffff;
 		--font-header: #ffffff;
 		--font-ctx: #ffffff;
@@ -84,6 +135,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #082a00;
+		--page-pageBorder: #082a00;
 		--page-pageContent: #0e4603;
 		--page-log-bg: #000000;
 		--page-nav-divider: #FFFFFF;
@@ -106,7 +158,10 @@
 	}
 
 	&.sbahj {
+		--app-icon: "build/icons/sbahj.ico";
+
 		--font-disabled: #00000060;
+		--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
 
 		--header-bg: #FFFF00;
 		--header-tabSection: #F400EC;
@@ -116,6 +171,7 @@
 
 		--page-pageBody: #0707ec;
 		--page-pageFrame: #f400ec;
+		--page-pageBorder: #f400ec;
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
 
@@ -136,7 +192,7 @@
 		#titleBarText {
 			font-size: 12px;
 		}
-		#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, .customStyles * {
+		#titleBarText, .tab,  .bookmarkWindow, .findBox, .jumpBoxInput, &.customStyles * {
 			font-family: "Comic Sans MS", "Comic Sans", cursive;
 		}
 	}
@@ -162,6 +218,7 @@
 		--page-nav-divider: #0066ff;
 		--page-nav-meta: #0066ff;
 		--page-links: #0066ff;
+		--page-log-bg: #000000;
 		
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
@@ -192,6 +249,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #454545;
+		--page-pageBorder: #454545;
 		--page-pageContent: #363636;
 		--page-nav-divider: red;
 		--page-nav-meta: red;
@@ -228,6 +286,7 @@
 
 		--page-pageBody: #000000;
 		--page-pageFrame: #2f2f2f;
+		--page-pageBorder: #2f2f2f;
 		--page-pageContent: #111111;
 		--page-nav-divider: #A1EE26;
 		--page-nav-meta: #A1EE26;
@@ -247,6 +306,7 @@
 	}
 
 	&.trickster {
+		--app-icon: "build/icons/sucker.ico";
 		--font-default: #f9fd6b;
 		--font-header: #f9fd6b;
 		--font-highlight: #000000;
@@ -284,7 +344,7 @@
 		--saves-scroll: #0707ec;
 		--saves-scrollHover: #4040ee;
 
-		.customStyles {
+		&.customStyles {
 			.nextArrowLink{
 				visibility: hidden;
 				font-size: 0px;
@@ -299,6 +359,7 @@
 	}
 
 	&.A6A6 {
+		--app-icon: "build/icons/cherub.ico";
 		--font-default: #2ed73a;
 		--font-header: #ffffff;
 		--font-highlight: #000000;
@@ -321,6 +382,7 @@
 
 		--page-pageBody: #042300;
 		--page-pageFrame: #168500;
+		--page-pageBorder: #168500;
 		--page-pageContent: #073c00;
 		// --page-log-bg: #000000;
 		--page-nav-divider: #000000;
@@ -339,32 +401,35 @@
 		--saves-scroll: #2ed73a;
 		--saves-scrollHover: #27b731;
 
-		.customStyles .navBanner {
+		&.customStyles .navBanner {
 			height: 19px;
 		}
 	}
 
 	&.pxs {
+		--app-icon: "build/icons/pxs.ico";
+
 		--font-default: #ffffff;
 		--font-header: #ffffff;
 		--font-ctx: #ffffff;
 		--font-highlight: #000000;
 		--font-disabled: #a9a9a933;
-	
+
 		--header-bg: #095486;
 		--header-tabSection: #003b64;
 		--header-border: #095486;
-	
+
 		--header-buttonHoverState: #ffffff1a;
 		--header-buttonClickState: #ffffff26;
-	
+
 		--nav-bg: #003b64;
 		--nav-link: #72abd2;
 		--nav-divider: #72abd2;
 		--nav-candyCornContent: url(assets://archive/comics/pxs/candycorn_pxs.png);
-	
+
 		--page-pageBody: #00101a;
 		--page-pageFrame: #002d4d;
+		--page-pageBorder: #002d4d;
 		--page-pageContent: #095486;
 		// --page-log-border: #808080;
 		// --page-log-bg: #EEEEEE;
@@ -372,7 +437,7 @@
 		--page-nav-meta: #72abd2;
 		--page-links: #72abd2;
 		--page-links-visited: #ffffff;
-	
+
 		--ctx-bg: #003b64;
 		--ctx-frame: #095486;
 		--ctx-shadow: #000000;
@@ -386,7 +451,7 @@
 		--saves-scroll: #003b64;
 		--saves-scrollHover: #0d456c;
 
-		.customStyles .navBanner {
+		&.customStyles .navBanner {
 			border-bottom: 4px solid #095486;
 			height: 23px;
 			a { 

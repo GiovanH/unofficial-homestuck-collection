@@ -35,7 +35,7 @@
     <div class="pageFrame hsMap" v-else-if="isHSMap">
       <div class="pageContent">
         <h2 class="pageTitle">Homestuck Map</h2>
-        <div class="mapFrame" :key="currentPage">
+        <div class="mapFrame" :key="$newReaderCurrent">
 
           <div class="sides" v-if="!$isNewReader">
             <Media class="side1" url="/maps/map_side1.gif" />
@@ -661,10 +661,14 @@ export default {
     Media,
     PageFooter
   },
+  title(ctx) {
+    const adventureTitle = [
+      " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+    ][ctx.routeParams.mode - 1]
+    return "Adventure Map" + (adventureTitle || '')
+  },
   data: function() {
-    return {
-      currentPage: this.$localData.settings.newReader.current
-    }
+    return {}
   },
   computed: {
     isPSMap() {
@@ -674,7 +678,7 @@ export default {
       return this.routeParams.mode == '6'
     }
   },
-  methods:{
+  methods: {
   },
 }
 </script>

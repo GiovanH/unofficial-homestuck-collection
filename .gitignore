@@ -21,5 +21,11 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-#Electron-builder output
+# Electron-builder output
 /dist_electron
+
+# install pseudofile
+install
+
+# generated file
+src/imods.tar

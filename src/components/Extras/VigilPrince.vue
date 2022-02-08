@@ -20,13 +20,14 @@ export default {
   components: {
     NavBanner, MediaEmbed
   },
+  title: () => "The Vigil Prince",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
   updated() {
   },

@@ -145,7 +145,7 @@
         expression, deciding I would relate it to you folks later. </p>
     <p style="text-align:left;">How far down did it go? Quite far.
         It just kept on going, in fact. I was met with
-        <a href="/archive/social/blogspot/oldblog/offerslist.jpg" style="text-align:left;">screen after vertically-scrolling screen of first-tier promotional
+        <a href="assets://archive/social/blogspot/oldblog/offerslist.jpg" style="text-align:left;">screen after vertically-scrolling screen of first-tier promotional
             offers</a>. And that was just page one. I truly was like Alice tumbling head over heels after
         ingesting whatever hallucinogen triggered her Wonderland trip.</p>
     <p style="text-align:left;">Now these all looked like fine
@@ -296,13 +296,14 @@ export default {
     MediaEmbed,
     NavBanner
   },
+  title: () => "Come With Me on a Magical Journey Through the Internet",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   }
 }
 </script>

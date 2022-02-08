@@ -47,14 +47,18 @@
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 
+import Resources from '@/resources.js'
+
 export default {
   name: 'tumblr',
+  mixins: [ Resources.UrlFilterMixin ],
   props: [
     'tab', 'routeParams'
   ],
   components: {
     Media, NavBanner
   },
+  title: () => ":o",
   data() {
     return {
       reverse: true
@@ -62,14 +66,14 @@ export default {
   },
   computed: {
     posts() {
-      let filteredPosts = this.$isNewReader ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$localData.settings.newReader.current].timestamp) : [...this.$archive.social.tumblr]
+      let filteredPosts = this.$isNewReader ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$newReaderCurrent].timestamp) : [...this.$archive.social.tumblr]
       return this.reverse ? filteredPosts.reverse() : filteredPosts
     },
     filteredPostCount() {
       return this.$archive.social.tumblr.length - this.posts.length
     }
   },
-  methods:{
+  methods: {
     reversePosts() {
       this.reverse = !this.reverse
     },
@@ -82,30 +86,6 @@ export default {
       else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
-    },
-    filterLinksAndImages(){
-      let el = this.$el.querySelector('.content')
-
-      // Check if this is a comment
-      if (el.nodeType !== 8){
-        let links = el.getElementsByTagName('A')
-        for(let i = 0;i < links.length; i++) {
-          links[i].href = this.$filterURL(links[i].href)
-        }
-        
-        //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-        let images = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
-        for(let i = 0;i < images.length; i++) {
-          images[i].src = this.$mspaURL(images[i].src)
-          if (images[i].tagName == 'IMG') {  
-            images[i].ondragstart = (e) => {
-              e.preventDefault()
-              e.dataTransfer.effectAllowed = 'copy'
-              require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-            }
-          }
-        }
-      }
     }
   },
   watch: {
@@ -114,11 +94,11 @@ export default {
     }
   },
   updated(){
-    this.filterLinksAndImages()
+    this.filterLinksAndImages(this.$el.querySelector('.content'))
   },
   mounted(){
     this.jumpToClass(this.routeParams.id)
-    this.filterLinksAndImages()
+    this.filterLinksAndImages(this.$el.querySelector('.content'))
   }
 }
 </script>

@@ -1,7 +1,8 @@
 <template>
-  <div class="pageBody echidna">
+  <div class="pageBody echidna" :data-pageid="`${storyId}/${thisPage.pageId}`">
     <div class="pageFrame">
       <div class="pageContent">
+        <Footnotes :pageId="thisPage.pageId" preface />
           <Media url="/storyfiles/hs2/echidna/echidna.swf" />
           <div class="mediaContent">
               <Media :url="thisPage.media[0]" class="hscroll" />
@@ -10,6 +11,7 @@
               <FlashCredit  :pageId="thisPage.pageId" />
               <PageNav baseURL="mspa" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav"/>
           </div>
+        <Footnotes :pageId="thisPage.pageId" />
       </div>
     </div>
   </div>
@@ -20,6 +22,9 @@
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
+
+import PAGE from '@/components/Page/Page.vue'
 
 export default {
   name: 'echidna',
@@ -27,31 +32,25 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-     Media, PageNav, FlashCredit
+     Media, PageNav, FlashCredit, Footnotes
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   data: function() {
     return {
     }
   },
   computed: {
-    thisPage() {
-      return this.$archive.mspa.story['009535']
-    },
-    nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
-      let nextPages = []
-      this.thisPage.next.forEach(nextID => {
-        nextPages.push(this.$archive.mspa.story[nextID])
-      })
-      return nextPages
-    }
+    pageNum: PAGE.computed.pageNum,
+    storyId: PAGE.computed.storyId,
+    thisPage: PAGE.computed.thisPage,
+    isRyanquest: PAGE.computed.isRyanquest,
+    pageCollection: PAGE.computed.pageCollection,
+    nextPagesArray: PAGE.computed.nextPagesArray
   },
-  methods:{
-    keyNavEvent(dir) {
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.nextPagesArray.length == 1 && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
-    }
-  },
+  methods: {
+    keyNavEvent: PAGE.methods.keyNavEvent
+  }
 }
 </script>
 

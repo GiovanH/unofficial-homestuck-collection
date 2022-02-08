@@ -1,5 +1,5 @@
 <template>
-  <div class="creditWrapper" v-if="$localData.settings.credits && credit">
+  <div class="creditWrapper" v-if="(forceShow || $localData.settings.credits) && credit">
     <a class="frame" target="_blank" v-for="(track, i) in credit" :key="track" :href="musicLink(track) || false" ref="credit"  @mouseenter="startScroll(i)" @mouseleave="endScroll(i)">
       <span class="icon"><fa-icon icon="music"></fa-icon></span>
       <div class="credit"><span class="marquee" v-text="musicText(track)" /></div>
@@ -11,7 +11,7 @@
 export default {
   name: 'FlashCredit',
   props: [
-    'pageId'
+    'pageId', 'trackIds', 'forceShow'
   ],
   components: {
   },
@@ -23,15 +23,19 @@ export default {
   },
   computed: {
     credit() {
-      //Manual exception to prevent appearance on A6A6 introduction
+      if (this.trackIds) {
+        return this.trackIds
+      }
+      // Manual exception to prevent appearance on A6A6 introduction
+      // TODO: why does this get special treatment?
       if (this.pageId in this.$archive.music.flashes && this.pageId != '008143') {
         if (this.$localData.settings.bolin && 'bolin' in this.$archive.music.flashes[this.pageId]) return this.$archive.music.flashes[this.pageId].bolin
         else return this.$archive.music.flashes[this.pageId].tracks
-      }
-      else return false
-    },
+      } else 
+        return false
+    }
   },
-  methods:{
+  methods: {
     musicLink(ref){
       if (ref in this.$archive.music.tracks) return `/music/track/${ref}`
       else return false
@@ -49,7 +53,6 @@ export default {
       let marquee = this.$refs.credit[i].querySelector('.marquee')
       let overflow = marquee.clientWidth - this.$refs.credit[i].querySelector('.credit').clientWidth + 5
       if (overflow > 0) {
-
         let distance = marquee.clientWidth + 25
 
         this.marqueeText = marquee.innerText
@@ -100,6 +103,11 @@ export default {
   border: solid 2px #ff9000;
   transition: opacity 1s;
 }
+
+.modalContainer .creditWrapper {
+  margin: 1em;
+}
+
 .frame {
   display: flex;
   text-decoration: none;

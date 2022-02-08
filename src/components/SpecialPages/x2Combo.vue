@@ -7,7 +7,9 @@
       <NavBanner class="rightNavBanner" useCustomStyles="true" />
     </div>
     <div class="pageFrame">
+      <Metadata v-if="showMetadata" :thisPage="thisPage[0]" />
       <div class="pageContent leftPage">
+        <Footnotes :pageId="thisPage[0].pageId" preface />
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage[0].title" />
               <div class="media">
@@ -18,8 +20,10 @@
               <TextContent :key="thisPage[0].pageId" :content="thisPage[0].content"/>
               <PageNav :thisPage="thisPage[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
           </div>
+        <Footnotes :pageId="thisPage[0].pageId" />
       </div>
       <div class="pageContent rightPage">
+        <Footnotes :pageId="thisPage[1].pageId" preface />
           <div class="mediaContent">
               <h2 class="pageTitle" v-html="thisPage[1].title" />
               <div class="media">
@@ -30,6 +34,7 @@
               <TextContent :key="thisPage[1].pageId" :content="thisPage[1].content"/>
               <PageNav :thisPage="thisPage[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
           </div>
+        <Footnotes :pageId="thisPage[1].pageId" />
       </div>
     </div>
     <PageFooter pageWidth="1660px" />
@@ -44,6 +49,10 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/SpecialPages/x2ComboNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
+
+import PAGE from '@/components/Page/Page.vue'
 
 export default {
   name: 'x2Combo',
@@ -51,36 +60,48 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Footnotes, Metadata
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      showMetadata: false
     }
   },
+  theme: PAGE.theme,
+  title: PAGE.title,
   computed: {
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
+    pageNum: PAGE.computed.pageNum,  // Page number of the left page
+    storyId: PAGE.computed.storyId,
+    isRyanquest: PAGE.computed.isRyanquest,
+    pageCollection: PAGE.computed.pageCollection,
     thisPage() {
       let thisPageId = this.pageNum
       let leftPageId, rightPageId
       if (parseInt(thisPageId) % 2 == 0) {
         leftPageId = thisPageId
         rightPageId = this.$archive.mspa.story[thisPageId].next[0]
-      }
-      else {
+      } else {
         leftPageId = this.$archive.mspa.story[thisPageId].previous
         rightPageId = thisPageId
       }
 
-      let page = [this.$archive.mspa.story[leftPageId], this.$archive.mspa.story[rightPageId]]
-      return page
+      return [
+        {
+          ...this.$archive.mspa.story[leftPageId],
+          storyId: this.storyId,
+          isRyanquest: this.isRyanquest
+        },
+        {
+          ...this.$archive.mspa.story[rightPageId],
+          storyId: this.storyId,
+          isRyanquest: this.isRyanquest
+        }
+      ]
     },
     pageMedia() {
+      // TODO: This doesn't seem to be used anywhere or do anything.
+      // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
       let preloadPages = [
         this.nextPagesArray[1][0],
@@ -90,15 +111,16 @@ export default {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
             let img = new Image()
-            img.src = this.$mspaURL(media)
+            img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
         })
       })
+
       return [this.thisPage[0].media, this.thisPage[1].media]
     },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage[1].title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage[1].title}`)
       let nextPages = [[], []]
       this.thisPage[0].next.forEach(nextID => {
         nextPages[0].push(this.$archive.mspa.story[nextID])
@@ -109,11 +131,8 @@ export default {
       return nextPages
     }
   },
-  methods:{
-    keyNavEvent(dir) {
-      if (dir == 'left' && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav1.backUrl)
-      else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.$refs.pageNav2.nextUrl(this.nextPagesArray[1][0]))
-    }
+  methods: {
+    keyNavEvent: PAGE.methods.keyNavEvent
   }
 }
 </script>

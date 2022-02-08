@@ -1,11 +1,11 @@
+import Vue from 'vue'
+
 const Store = require('electron-store')
 const store = new Store()
 
 const LOADED_TAB_LIMIT = 10
 const DEAD_TAB_LIMIT = 15
 const HISTORY_LIMIT = 350
-
-import Vue from 'vue'
 
 class LocalData {
   constructor(init) {
@@ -18,6 +18,7 @@ class LocalData {
             key: "000",
             url: '/',
             title: '',
+            hasAudio: false,
             history: [],
             future: []
           }
@@ -41,27 +42,36 @@ class LocalData {
 
     let initSettings = {
       newReader: {
-        current: false,
-        limit: false
+        current: '001901',
+        limit: '001902'
       },
       notifications: true,
+      subNotifications: false,
 
       showAddressBar: false,
+      urlTooltip: false,
       switchToNewTabs: false,
       forceScrollBar: true,
+      hideFullscreenHeader: false,
       smoothScrolling: true,
       pixelScaling: true,
       mspaMode: false,
       bandcampEmbed: true,
+      allowSysUpdateNotifs: true,
       devMode: false,
 
-      themeOverride: "",
+      themeOverride: "default",
+      themeOverrideUI: "default",
       forceThemeOverride: false,
+      forceThemeOverrideUI: false,
+
       textOverride: {
         fontFamily: "",
         bold: false,
         fontSize: 0,
-        lineHeight: 0
+        lineHeight: 0,
+        paragraphSpacing: false,
+        highContrast: false,
       },
       arrowNav: true,
       openLogs: false,
@@ -70,6 +80,8 @@ class LocalData {
       credits: true,
       footnotes: false,
 
+      fastForward: false,
+
       retcon1: true,
       retcon2: true,
       retcon3: true,
@@ -77,15 +89,17 @@ class LocalData {
       retcon5: true,
       retcon6: true,
 
-      enableControversial: false,
       bolin: false,
+      soluslunes: false,
       unpeachy: false,
       pxsTavros: false,
-      cursedHistory: false
+      cursedHistory: false,
+
+      modListEnabled: []  // name hardcoded in mods.js, be careful
     }
 
-    //Data will only contain settings if the app has already been used.
-    //In this case, copy replace all default values with the user's values
+    // Data will only contain settings if the app has already been used.
+    // In this case, copy replace all default values with the user's values
     if (data.settings) {
       Object.keys(data.settings).forEach(setting => {
         if (setting in initSettings) initSettings[setting] = data.settings[setting]
@@ -108,6 +122,19 @@ class LocalData {
         },
         activeTabObject() {
           return this.tabData.tabs[this.tabData.activeTabKey]
+        },
+        allHistory() {
+          return this.tabData.tabList.map(
+            key => this.tabData.tabs[key]
+          ).reduce((a, t) => {
+            a.push(t.url)
+            return a.concat(t.history)
+          }, [])
+        },
+        openUrls() {
+          return this.tabData.tabList.map(
+            key => this.tabData.tabs[key]
+          ).map(tab => tab.url)
         }
       },
       methods: {
@@ -126,6 +153,21 @@ class LocalData {
             settings
           })
         },
+        reloadLocalStorage() {
+          let back = store.get('localData', {})
+
+          this.assetDir = back.assetDir
+          this.tabData = back.tabData
+          this.saveData = back.saveData
+          this.settings = back.settings
+          console.log(this.settings)
+        },
+        HISTORY_CLEAR() {
+          this.tabData.tabList.forEach(k => {
+            this.tabData.tabs[k].history = []
+          })
+          this.saveLocalStorage()
+        },
         TABS_RESET() {
           this.$set(this, 'tabData', {
             activeTabKey: "000",
@@ -134,6 +176,7 @@ class LocalData {
                 key: "000",
                 url: '/',
                 title: '',
+                hasAudio: false,
                 history: [],
                 future: []
               }
@@ -161,7 +204,7 @@ class LocalData {
           this.tabData.tabs[key].history.push(this.tabData.tabs[key].url)
           this.tabData.tabs[key].future = []
           while (this.tabData.tabs[key].history.length > HISTORY_LIMIT) this.tabData.tabs[key].history.shift()
-          this.$set(this.tabData.tabs[key], 'url', url.toLowerCase())
+          this.$set(this.tabData.tabs[key], 'url', url)
           
           this.saveLocalStorage()
         },
@@ -174,15 +217,16 @@ class LocalData {
 
           this.$set(this.tabData.tabs, key, {
             key: key,
-            url: url.toLowerCase(),
+            url: url,
             title: '',
+            hasAudio: false,
             history: [],
             future: []
           })
 
           this.tabData.tabList.push(key)
 
-          //If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
+          // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
           if (adjacent) {
             this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
             this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
@@ -197,7 +241,7 @@ class LocalData {
             this.TABS_SWITCH_TO(key)
           }
           else {
-            //TABS_SWITCH_TO also saves localStorage, so we only need to run this here if we're not switching tabs
+            // TABS_SWITCH_TO also saves localStorage, so we only need to run this here if we're not switching tabs
             this.saveLocalStorage()
           }
         },
@@ -211,7 +255,7 @@ class LocalData {
 
             this.tabData.tabList.push(key)
             
-            //If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
+            // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
             if (adjacent) {
               this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
               this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
@@ -222,7 +266,7 @@ class LocalData {
             
             let targetTab = this.tabData.tabs[target]
 
-            let url = targetTab.url.toLowerCase()
+            let url = targetTab.url
             let history = [...targetTab.history]
             let future = [...targetTab.future]
 
@@ -240,6 +284,7 @@ class LocalData {
               key: key,
               url,
               title: '',
+              hasAudio: false,
               history,
               future
             })
@@ -273,8 +318,7 @@ class LocalData {
             if (!this.temp.loadedTabList.includes(key)) {
               this.temp.loadedTabList.push(key)
               while (this.temp.loadedTabList.length > LOADED_TAB_LIMIT) this.temp.loadedTabList.shift()
-            }
-            else {
+            } else {
               this.temp.loadedTabList.splice(this.temp.loadedTabList.indexOf(key), 1)
               this.temp.loadedTabList.push(key)
             }
@@ -322,7 +366,7 @@ class LocalData {
           if (this.tabData.tabList.length > this.tabData.sortedTabList.length) this.TABS_RESYNC()
 
           this.saveLocalStorage()
-          //Dont remove tab from tab object, so it can be re-opened
+          // Dont remove tab from tab object, so it can be re-opened
         },
 
         TABS_CLOSE_ON_RIGHT(key = this.tabData.activeTabKey) {
@@ -362,6 +406,16 @@ class LocalData {
           this.tabData.tabs[key].title = title
 
           this.saveLocalStorage()
+        },
+
+        TABS_SET_HASAUDIO(key, hasAudio) {
+          if (!key) {
+            console.warn("Can't set hasAudio of a tab you haven't sent me")
+            return
+          }
+          this.tabData.tabs[key].hasAudio = hasAudio
+
+          // this.saveLocalStorage()
         },
 
         TABS_SWAP(key1, key2) {
@@ -409,7 +463,7 @@ class LocalData {
           do {
             key = Math.random().toString(36).substring(2, 5)
           } while (key in this.saveData.saves)
-          this.$set(this.saveData.saves, key, {key, name, url: url.toLowerCase()})
+          this.$set(this.saveData.saves, key, {key, name, url})
           this.saveData.saveList.unshift(key)
 
           this.saveLocalStorage()
@@ -418,7 +472,7 @@ class LocalData {
         },
         SAVES_EDIT(key, name, url) {
           this.saveData.saves[key].name = name
-          this.saveData.saves[key].url = url.toLowerCase()
+          this.saveData.saves[key].url = url
 
           this.saveLocalStorage()
         },
@@ -467,27 +521,35 @@ class LocalData {
     })
     
     this.VM.saveLocalStorage()
-
   }
+
   get root() {
     return this.VM
   }
+
   get assetDir() {
     return this.VM.$data.assetDir
   }
+
   get tabData() {
     return this.VM.$data.tabData
   }
+
   get saveData() {
     return this.VM.$data.saveData
   }
+
   get settings() {
     return this.VM.$data.settings
   }
+
   get temp() {
     return this.VM.$data.temp
   }
 
+  get allHistory() {
+    return this.VM.allHistory
+  }
 }
 
 export default {

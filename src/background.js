@@ -6,67 +6,279 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
 import FlexSearch from 'flexsearch'
 
+import Resources from "./resources.js"
+import Mods from "./mods.js"
+
+const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
-const http = require ('http')
+const http = require('http')
 
 const Store = require('electron-store')
 const store = new Store()
 
+const log = require('electron-log')
+const logger = log.scope('ElectronMain')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
 const gotTheLock = app.requestSingleInstanceLock()
 
-//Improve overall performance by disabling GPU acceleration
-//We're not running crysis or anything its all gifs
+// Improve overall performance by disabling GPU acceleration
+// We're not running crysis or anything its all gifs
 app.disableHardwareAcceleration()
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', privileges: { standard: true } }
+  { scheme: 'assets', 
+    privileges: { 
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      stream: true
+    }
+  }
 ])
 
-var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-var archive
-var port
-var menuTemplate 
-// Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-try {
-  if (!assetDir) throw "No reference to asset directory"
+// zoom functions
+function zoomIn() {
+  if (win) {
+    win.webContents.send('ZOOM_IN');
+  }
+}
+function zoomOut() {
+  if (win) {
+    win.webContents.send('ZOOM_OUT');
+  }
+}
 
-  //Grab and parse all data jsons
-  archive = {
-    ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
-    mspa : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
-    log : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/log.json'), 'utf8')),
-    social : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
-    music : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
-    comics : JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
-    search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8'))
+var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+
+var port
+var chapterIndex;
+
+// Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
+var menuTemplate = [
+  {
+    label: 'File',
+    submenu: [
+      { role: 'quit' }
+    ]
+  },
+  {
+    role: 'editMenu'
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      {
+        label: 'Zoom In',
+        accelerator: 'CmdOrCtrl+=',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        accelerator: 'CmdOrCtrl+-',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Zoom In',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numadd',
+        click: () => {if (win) win.webContents.send('ZOOM_IN')}
+      },
+      {
+        label: 'Zoom Out',
+        visible: false,
+        acceleratorWorksWhenHidden: true,
+        accelerator: 'CommandOrControl+numsub',
+        click: () => {if (win) win.webContents.send('ZOOM_OUT')}
+      },
+      {
+        label: 'Reset Zoom',
+        accelerator: 'CmdOrCtrl+0',
+        click: () => {if (win) win.webContents.send('ZOOM_RESET')}
+      },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  {
+    label: 'Tabs',
+    submenu: [
+      {
+        label: 'Go back one page',
+        accelerator: 'Alt+Left',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
+      },
+      {
+        label: 'Go forward one page',
+        accelerator: 'Alt+Right',
+        click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
+      },
+      { type: 'separator' },
+      {
+        label: 'New Tab',
+        accelerator: 'CmdOrCtrl+T',
+        click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+      },
+      {
+        label: 'Close Tab',
+        accelerator: 'CmdOrCtrl+W',
+        click: () => {if (win) win.webContents.send('TABS_CLOSE')}
+      },
+      { type: 'separator' },
+      {
+        label: 'Next Tab',
+        accelerator: 'CmdOrCtrl+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
+      },
+      {
+        label: 'Previous Tab',
+        accelerator: 'CmdOrCtrl+Shift+Tab',
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
+      },
+      { type: 'separator' },
+      {
+        label: 'Duplicate Tab',
+        accelerator: 'CmdOrCtrl+Shift+D',
+        click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
+      },
+      {
+        label: 'Restore Closed Tab',
+        accelerator: 'CmdOrCtrl+Shift+T',
+        click: () => {if (win) win.webContents.send('TABS_RESTORE')}
+      }
+    ]
+  },
+  // { role: 'windowMenu' }
+  {
+    label: 'Window',
+    submenu: [
+      {
+        label: 'Open Jump Bar',
+        accelerator: 'CmdOrCtrl+L',
+        click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
+      },
+      {
+        label: 'Find in page',
+        accelerator: 'CmdOrCtrl+F',
+        click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
+      },
+      { role: 'minimize' }
+    ]
+  }
+]
+
+function loadArchiveData(){
+  // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
+  // This returns an `archive` object, and does not modify the global archive directly. 
+  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+  logger.info("Loading archive")
+
+  if (!assetDir) throw Error("No reference to asset directory")
+
+  let data
+
+  try {
+    // Grab and parse all data jsons
+    data = {
+      ...JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/version.json'), 'utf8')),
+      mspa: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/mspa.json'), 'utf8')),
+      social: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/social.json'), 'utf8')),
+      news: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/news.json'), 'utf8')),
+      music: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/music.json'), 'utf8')),
+      comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
+      extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
+      tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
+      audioData: {},
+      flags: {}
+    }
+  } catch (e) {
+    // Error loading json. Probably a bad asset pack installation.
+    logger.error(e)
+    return undefined
   }
 
+  if (!data) throw new Error("Data empty after attempted load")
+
+  // We pre-build this here so mods have access to it
+  data.search = Object.values(data.mspa.story).map(storypage => {
+    return {
+      key: storypage.pageId,
+      chapter: Resources.getChapter(storypage.pageId),
+      content: `${storypage.title}###${storypage.content}`
+    }
+  })
+
+  win.webContents.send('SET_LOAD_STAGE', "MODS")
+  logger.info("Loading mods")
+
+  try {
+    logger.debug("Applying mod archive edits")
+    Mods.editArchive(data)
+    // This isn't strictly part of loading the archive data,
+    // but we should do this only when we reload the archive
+    logger.debug("Baking mod routes")
+    Mods.bakeRoutes()
+
+    // Sanity checks
+    const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+    required_keys.forEach(key => {
+      if (!data[key]) throw new Error("Archive object missing required key", key)
+    })
+  } catch (e) {
+    // Errors should already log/handle themselves by now
+    // but we need to update the application state to react to it
+    // This is probably due to a poorly written mod, somehow.
+    // specifically $localdata can be in an invalid state
+    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
+    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
+
+    dialog.showMessageBoxSync({
+      type: 'error',
+      title: 'Archive load error',
+      message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
+    })
+
+    throw e
+  }
+
+  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
+  logger.info("Loading patches")
+  // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
+  if (data.version == "1") {
+    logger.info("Applying asset pack v1 patches")
+    const gankraSearchPage = data.search.find(x => x.key == '002745')
+    if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+
+    data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
+
+    data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
+
+    data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
+  }
+
+  chapterIndex = undefined
   
-  //TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  let gankraSearchPage = archive.search.find(x => x.key == '002745')
-  if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
+  return data
+}
 
-  archive.mspa.story['002745'].content = archive.mspa.story['002745'].content.replace('Gankro', 'Gankra')
-
-  archive.mspa.faqs.new.content = archive.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
-
-  archive.music.tracks['ascend'].commentary = archive.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
-
-
-  //Pick the appropriate flash plugin for the user's platform
+function getFlashPath(){
   let flashPlugin
   switch (process.platform) {
     case 'win32':
-      flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
+      flashPlugin = `archive/data/plugins/pepflashplayer${process.arch.replace('x', '')}.dll`
       break
     case 'darwin':
       flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
@@ -74,165 +286,54 @@ try {
     case 'linux':
       flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
       break
+    default:
+      throw Error("Unknown platform", process.platform)
   }
   let flashPath = path.join(assetDir, flashPlugin)
+
+  if (process.platform == "win32" && !fs.existsSync(flashPath)) {
+    // On a windows install with the old asset pack and a unified DLL
+    flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
+    flashPath = path.join(assetDir, flashPlugin)
+  }
+  return flashPath
+}
+
+try {
+  // Pick the appropriate flash plugin for the user's platform
+  const flashPath = getFlashPath()
+
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
     if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
-  }
-  else throw `Flash plugin not located at ${flashPath}`
-
-  //Set up search index
-  var chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: 'content',
-      tag: 'chapter'
-    }
-  })
-  chapterIndex.add(archive.search)
+  } else throw Error(`Flash plugin not located at ${flashPath}`)
   
-  //Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
-  menuTemplate = [
-    {
-      label: 'File',
-      submenu: [
-        { role: 'quit' }
-      ]
-    },
-    {
-      role: 'editMenu'
-    },
-    // { role: 'viewMenu' }
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        {
-          label: 'Zoom In',
-          accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
-        },
-        {
-          label: 'Zoom In',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numadd',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
-        },
-        {
-          label: 'Zoom Out',
-          visible: false,
-          acceleratorWorksWhenHidden: true,
-          accelerator: 'CommandOrControl+numsub',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
-        },
-        {
-          label: 'Reset Zoom',
-          accelerator: 'CmdOrCtrl+0',
-          click: () => {if (win) win.webContents.send('ZOOM_RESET')}
-        },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
-    {
-      label: 'Tabs',
-      submenu: [
-        {
-          label: 'Go back one page',
-          accelerator: 'Alt+Left',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_BACK')}
-        },
-        {
-          label: 'Go forward one page',
-          accelerator: 'Alt+Right',
-          click: () => {if (win) win.webContents.send('TABS_HISTORY_FORWARD')}
-        },
-        { type: 'separator' },
-        {
-          label: 'New Tab',
-          accelerator: 'CmdOrCtrl+T',
-          click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
-        },
-        {
-          label: 'Close Tab',
-          accelerator: 'CmdOrCtrl+W',
-          click: () => {if (win) win.webContents.send('TABS_CLOSE')}
-        },
-        { type: 'separator' },
-        {
-          label: 'Next Tab',
-          accelerator: 'CmdOrCtrl+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
-        },
-        {
-          label: 'Previous Tab',
-          accelerator: 'CmdOrCtrl+Shift+Tab',
-          click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
-        },
-        { type: 'separator' },
-        {
-          label: 'Duplicate Tab',
-          accelerator: 'CmdOrCtrl+Shift+D',
-          click: () => {if (win) win.webContents.send('TABS_DUPLICATE')}
-        },
-        {
-          label: 'Restore Closed Tab',
-          accelerator: 'CmdOrCtrl+Shift+T',
-          click: () => {if (win) win.webContents.send('TABS_RESTORE')}
-        }
-      ]
-    },
-    // { role: 'windowMenu' }
-    {
-      label: 'Window',
-      submenu: [
-        {
-          label: 'Open Jump Bar',
-          accelerator: 'CmdOrCtrl+L',
-          click: () => {if (win) win.webContents.send('OPEN_JUMPBOX') }
-        },
-        {
-          label: 'Find in page',
-          accelerator: 'CmdOrCtrl+F',
-          click: () => {if (win) win.webContents.send('OPEN_FINDBOX') }
-        },
-        { role: 'minimize' },
-      ]
-    }
-  ]
-  
-  //Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
+  // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
     return handler(request, response, {
-        public: assetDir
+      public: assetDir
     })
   })
 
   server.listen(0, '127.0.0.1', (error) => {
     if (error) throw error
     port = server.address().port
-  })
-} 
-catch (error) {
-  console.log(error)
-
-  //If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
-  //Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
-  port = undefined
-  archive = undefined
   
-  //Throw together a neutered menu for setup mode
+    // Initialize Resources
+    Resources.init({
+      assets_root: `http://127.0.0.1:${port}/`
+    })
+  })
+} catch (error) {
+  logger.error(error)
+  logger.info("Loading check failed, loading setup mode")
+
+  // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
+  // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
+  port = undefined
+  
+  // Throw together a neutered menu for setup mode
   menuTemplate = [
     {
       role: 'fileMenu'
@@ -259,46 +360,93 @@ catch (error) {
         {
           label: 'Zoom In',
           accelerator: 'CmdOrCtrl+=',
-          click: () => {if (win) win.webContents.send('ZOOM_IN')}
+          click: zoomIn
         },
         {
           label: 'Zoom Out',
           accelerator: 'CmdOrCtrl+-',
-          click: () => {if (win) win.webContents.send('ZOOM_OUT')}
-        },
+          click: zoomOut
+        }
       ]
     }
   ]
-}
-finally {
+} finally {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
 
-//The renderer process requests the chosen port on startup, which we're happy to oblige
-ipcMain.on('STARTUP_REQUEST', (event) => {
-  event.returnValue = { port, archive }
+// The renderer process requests the chosen port on startup, which we're happy to oblige
+ipcMain.on('STARTUP_GET_INFO', (event) => {
+  event.returnValue = {port: port, appVersion: APP_VERSION}
+})
+
+if (assetDir) {
+  // App version checks
+  const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+
+  const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
+  if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
+    console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
+    Mods.extractimods()
+  } else {
+    console.log(`last version ${last_app_version} gte current version ${APP_VERSION}`)
+  }
+
+  store.set("appVersion", APP_VERSION)
+} else {
+  console.log("Deferring app version checks until initial configuration is complete.")
+}
+
+// Speed hack, try to preload the first copy of the archive
+var first_archive
+var archive // Also, keep a reference to the latest archive, for lazy eval
+try {
+  archive = first_archive = loadArchiveData()
+} catch (e) {
+  // logger.warn(e)
+  // don't even warn, honestly
+}
+
+ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+  win.webContents.send('SET_LOAD_STATE', "LOADING")
+  try {
+    if (first_archive) {
+      archive = first_archive
+      first_archive = undefined;
+    } else archive = loadArchiveData()
+    win.webContents.send('ARCHIVE_UPDATE', archive)
+  } catch (e) {
+    logger.error("Error reloading archive", e)
+    win.webContents.send('SET_LOAD_STATE', "ERROR")
+  }
+  win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()
 })
+
 ipcMain.handle('win-maximize', async (event) => {
   if (win.isFullScreen()){
     win.setFullScreen(false)
-  }
-  else if(win.isMaximized()){
+  } else if (win.isMaximized()){
     win.unmaximize()
-  }
-  else{
+  } else {
     win.maximize()
   }
 })
 ipcMain.handle('win-close', async (event) => {
+  logger.info("Got asynchronous close event")
   win.close()
 })
+ipcMain.on('win-close-sync', (e) => {
+  logger.warn("Got synchronous close event!")
+  win.destroy()
+  e.returnValue = true;
+})
+
 
 ipcMain.handle('save-file', async (event, payload) => {
-  let newPath = dialog.showSaveDialogSync(win, {
+  const newPath = dialog.showSaveDialogSync(win, {
     defaultPath: path.basename(payload.url)
   })
   if (newPath) fs.createReadStream(payload.url).pipe(fs.createWriteStream(newPath))
@@ -309,8 +457,8 @@ ipcMain.handle('inspect-element', async (event, payload) => {
 })
 
 ipcMain.handle('locate-assets', async (event, payload) => {
-  let defaultPath = assetDir || undefined
-  let newPath = dialog.showOpenDialogSync(win, {
+  const defaultPath = assetDir || undefined
+  const newPath = dialog.showOpenDialogSync(win, {
     defaultPath,
     properties: [
       'openDirectory'
@@ -319,38 +467,22 @@ ipcMain.handle('locate-assets', async (event, payload) => {
   if (newPath) {
     let validated = true
     try {
-      let testAssets = {
-        ...JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/version.json'), 'utf8')),
-        mspa : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/mspa.json'), 'utf8')),
-        log : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/log.json'), 'utf8')),
-        social : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/social.json'), 'utf8')),
-        music : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/music.json'), 'utf8')),
-        comics : JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/comics.json'), 'utf8')),
-        search: JSON.parse(fs.readFileSync(path.join(newPath[0], 'archive/data/search.json'), 'utf8'))
-      }
+      // If there's an issue with the archive data, this should fail.
+      assetDir = newPath[0]
+      logger.info(assetDir)
+      loadArchiveData()
 
-      let flashPlugin
-      switch (process.platform) {
-        case 'win32':
-          flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
-          break
-        case 'darwin':
-          flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
-          break
-        case 'linux':
-          flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
-          break
-      }
-      if (!fs.existsSync(path.join(newPath[0], flashPlugin))) throw "Flash plugin not found"
-    }
-    catch(error) {
-      console.log(error)
+      let flashPath = getFlashPath()
+      // logger.info(assetDir, flashPlugin, flashPath)
+      if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
+    } catch (error) {
+      logger.error(error)
       validated = false
     }
 
     if (validated) {
       if (payload.restart) {
-        let confirmation = dialog.showMessageBoxSync(win, {
+        const confirmation = dialog.showMessageBoxSync(win, {
           type: 'warning',
           buttons: [
             'OK',
@@ -367,10 +499,8 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           app.relaunch()
           app.exit()
         }
-      }
-      else return newPath[0]
-    }
-    else {
+      } else return newPath[0]
+    } else {
       dialog.showMessageBoxSync(win, {
         type: 'warning',
         title: 'Assets not found',
@@ -386,19 +516,13 @@ ipcMain.handle('restart', async (event) => {
   app.exit()
 })
 
-ipcMain.handle('factory-reset', async (event) => {
-  let confirmation = dialog.showMessageBoxSync(win, {
-    type: 'warning',
-    buttons: [
-      'OK',
-      'Cancel'
-    ],
-    cancelId: 1,
-    defaultId: 1,
-    title: 'Notice',
-    message: 'Are you absolutely sure? This will reset everything: Your reading progress, tab history, save files, and settings will all be completely gone!'
-  })
-  if (confirmation == 0) {
+ipcMain.handle('reload', async (event) => {
+  win.reload()
+})
+
+
+ipcMain.handle('factory-reset', async (event, confirmation) => {
+  if (confirmation === true) {
     store.delete('localData')
   
     app.relaunch()
@@ -406,22 +530,70 @@ ipcMain.handle('factory-reset', async (event) => {
   }
 })
 
-ipcMain.handle('disable-new-reader', async (event) => {
-  return dialog.showMessageBoxSync(win, {
+ipcMain.handle('prompt-okay-cancel', async (event, args) => {
+  const title = args.title || "Notice"
+  const ok_string = args.okay || "OK"
+  const cancel_string = args.cancel || "Cancel"
+  const answer = dialog.showMessageBoxSync(win, {
     type: 'warning',
     buttons: [
-      'OK',
-      'Cancel'
+      ok_string,
+      cancel_string
     ],
     cancelId: 1,
     defaultId: 1,
-    title: 'Notice',
-    message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
+    title,
+    message: args.message
   })
+  return (answer === 0)
 })
 
+function buildChapterIndex(){
+  logger.info("Building new search index")
+  chapterIndex = new FlexSearch({
+    doc: {
+      id: 'key',
+      field: ['mspa_num', 'content'],
+      tag: 'chapter'
+    }
+  })
+
+  const storytextList = Object.keys(archive.mspa.story).map(page_num => {
+    const page = archive.mspa.story[page_num]
+    return {
+      key: page_num,
+      mspa_num: page_num,
+      chapter: Resources.getChapter(page_num),
+      content: `${page.title}<br />${page.content}`
+    }
+  })
+
+  logger.info("Populating search index with", storytextList.length, "page documents")
+  chapterIndex.add(storytextList)
+
+  const footnoteList = Object.keys(archive.footnotes.story).map(page_num => {
+    return {
+      key: `${page_num}-notes`, // Duplicate keys are not allowed.
+      mspa_num: page_num,
+      chapter: Resources.getChapter(page_num),
+      content: archive.footnotes.story[page_num].map(
+        note => note.content
+      ).join("###")
+    }
+  })
+
+  logger.info("Populating search index with", footnoteList.length, "footnote documents")
+  chapterIndex.add(footnoteList)
+}
+
 ipcMain.handle('search', async (event, payload) => {
-  let keyAlias = {
+  if (chapterIndex == undefined)
+    buildChapterIndex()
+
+  if (payload == undefined)
+    return // Just wanted to ensure the index
+
+  const keyAlias = {
     "mc0001": 1892.5,
     "jb2_000000": 135.5,
     "pony": 2838.5,
@@ -431,9 +603,9 @@ ipcMain.handle('search', async (event, payload) => {
   }
   
   let limit = 1000
-  let sort = (a, b) => {
-    let aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
-    let bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
+  const sort = (a, b) => {
+    const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
+    const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
     return (payload.sort == 'desc') 
       ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0 
       : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
@@ -441,36 +613,48 @@ ipcMain.handle('search', async (event, payload) => {
 
   let filteredIndex
   if (payload.filter[0]) {
-    let items = chapterIndex.where(function(item) {
+    const items = chapterIndex.where(function(item) {
       return payload.filter.includes(item.chapter)
     })
     limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({doc: {id: 'key', field: 'content'}}).add(items)
-  }
-  else {
+    filteredIndex = new FlexSearch({
+      doc: {
+        id: 'key', 
+        field: ['mspa_num', 'content']
+      }
+    }).add(items)
+  } else {
     filteredIndex = chapterIndex
   }
 
-  let results = (payload.sort == 'asc' || payload.sort == 'desc') 
+  const results = (payload.sort == 'asc' || payload.sort == 'desc') 
     ? filteredIndex.search(payload.input, {limit, sort})
     : filteredIndex.search(payload.input, {limit})
 
-  let foundText = []
+  const foundText = []
   for (const page of results) {
-    let flex = new FlexSearch()
-    let lines = page.content.split('###')
-    for (let i = 0; i < lines.length; i++) {
-      flex.add(i, lines[i])
+    const flex = new FlexSearch()
+    const page_lines = page.content.split('<br />')
+    for (let i = 0; i < page_lines.length; i++) {
+      flex.add(i, page_lines[i])
     }
-    let indexes = flex.search(payload.input)
-    let output = []
-    for (let i = 0; i < indexes.length; i++) {
-      output.push(lines[indexes[i]])
-    }
-    if (output.length > 0){
+    const indexes = flex.search(payload.input)
+    const spread_indexes = Array.from(
+      indexes.reduce((acc, i) => {
+        const spread = 2;
+        for (let j = i - spread; j < i + spread; j++) {
+          acc.add(j)
+        }
+        return acc
+      }, new Set())
+    ).sort()
+    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
+
+    if (matching_lines.length > 0){
       foundText.push({
         key: page.key,
-        lines: output
+        mspa_num: page.mspa_num,
+        lines: matching_lines
       })
     }
   }
@@ -478,8 +662,8 @@ ipcMain.handle('search', async (event, payload) => {
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
-  const steamUrl = browserUrl.replace(/^.*steampowered.com\/app/i, 'steam://url/StoreAppPage')
-
+  const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
+  
   if (app.getApplicationNameForProtocol(steamUrl)) {
     await shell.openExternal(steamUrl)
   } else {
@@ -487,8 +671,7 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   }
 })
 
-
-//Hook onto image drag events to allow images to be dragged into other programs
+// Hook onto image drag events to allow images to be dragged into other programs
 ipcMain.on('ondragstart', (event, filePath) => {
   event.sender.startDrag({
     file: filePath,
@@ -496,38 +679,15 @@ ipcMain.on('ondragstart', (event, filePath) => {
   })
 })
 
-//Define which URL schemes to be intercepted
-const filter = {
-  urls: [
-    '*://*.mspaintadventures.com/*', 
-    'assets://*/*',
-    "http://www.turner.com/planet/mp3/cp_close.mp3", 
-    "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
-    "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
-    "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
-    "*://*.sweetcred.com/*",
-  ]
-}
-//Rules for transforming intercepted URLS
-function filterURL(url) {
-  return url
-    .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") //Linked from a few flashes
-    .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") //Covers for 99% of flashes that link to other pages
-    .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") //Covers for story links without page numbers
-    .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") //Link from CD rack flash
-    .replace(/http:\/\/www\.sweetcred\.com/, `http://127.0.0.1:${port}/archive/sweetcred`)
-    .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `127.0.0.1:${port}/storyfiles/hs2/00338`) // phat beat machine
-    .replace(/www\.timelesschaos\.com\/transferFiles/, `127.0.0.1:${port}/storyfiles/hs2/03318` ) // return to core - 618heircut.mp3
-    .replace(/assets\:\/\//, `http://127.0.0.1:${port}/`) //Used to redirect resource requests to asset folder
-    .replace(/http\:\/\/((www|cdn)\.)?mspaintadventures\.com/, `http://127.0.0.1:${port}`) //Complete, should ideally never happen and probably won't work properly if it does
-}
+let openedWithUrl
+const OPENWITH_PROTOCOL = 'mspa'
 
 async function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-		'minWidth': 1000,
+    'minWidth': 1000,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
@@ -536,46 +696,150 @@ async function createWindow () {
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
-      plugins: true
+      plugins: true,
+      webviewTag: true
     }
   })
 
-  //Catch-all to prevent navigating away from application page
+  win.webContents.on('zoom-changed', (e, zoomDirection) => {
+    if (zoomDirection === 'in') {
+      zoomIn()
+    }
+    if (zoomDirection === 'out') {
+      zoomOut()
+    }
+  });
+
+  // Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
-  
-  //This should only ever trigger from flashes requesting resources or page redirects
-  win.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-    console.log(`onBeforeRequest: ${details.url} ===> ${filterURL(details.url)}`)
-    if (details.resourceType =="subFrame") win.webContents.send('TABS_PUSH_URL', filterURL(details.url))
-		else callback({redirectURL: filterURL(details.url)})
-	})
 
-  //It's important that only one window is ever active at a time
-  //Target="_blank"/external links are generally handled through the frontend filter, so should hopefully only intercept flashes
-  //Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
-  win.webContents.on('new-window', (event, url) => {
-    event.preventDefault()
-    let parsedURL = filterURL(url)
-    console.log(`new-window: ${url} ===> ${parsedURL}`)
-    if (/http/.test(parsedURL)) shell.openExternal(url) //if filterURL didnt work, open in the browser just to be safe
-    else win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+  win.webContents.on('update-target-url', (event, new_url) => {
+    win.webContents.send('update-target-url', new_url)
+  })
+  
+  // Resolve asset URLs
+  
+  // You can only have one of these, so all behavior has to go in here.
+  // Yes, it's a pain.
+  win.webContents.session.webRequest.onBeforeRequest({
+    urls: [
+      // 'assets://*/*',  // yes, both
+
+      '*://*.mspaintadventures.com/*', 
+      "assets://*/*",  // yes, both
+      "http://www.turner.com/planet/mp3/cp_close.mp3", 
+      "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
+      "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
+      "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://*.sweetcred.com/*"
+    ]
+  }, (details, callback) => {
+    if (details.url.startsWith("assets://")) {
+      const redirectURL = Resources.resolveAssetsProtocol(details.url)
+      callback({redirectURL})
+    } else {
+      const destination_url = Resources.resolveURL(details.url)
+      if (details.resourceType == "subFrame")
+        win.webContents.send('TABS_PUSH_URL', destination_url)
+      else callback({
+        redirectURL: destination_url
+      })
+    }
   })
 
+  // It's important that only one window is ever active at a time
+  // Target="_blank"/external links are generally handled through the frontend filter, so should hopefully only intercept flashes
+  // Thing is, there isn't a single flash that tries to open an external webpage/new window either! we're just going for the security here
+  win.webContents.on('new-window', (event, url) => {
+    event.preventDefault()
+
+    const parsedURL = Resources.resolveURL(url)
+    logger.info(`new-window: ${url} ===> ${parsedURL}`)
+
+    // If the given URL is still external, open a browser window.
+    if (/http/.test(parsedURL))
+      shell.openExternal(url) 
+    else
+      win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+  })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
-  } 
-  else {
+  } else {
     createProtocol('app')
-    win.loadURL('app://./index.html')
+    await win.loadURL('app://./index.html')
   }
 
   win.on('closed', () => {
     win = null
+  })
+
+  var current_icon // = "build/icons/icon.ico"
+  // win.setIcon(current_icon)
+
+  ipcMain.on('set-sys-icon', (event, new_icon) => {
+    new_icon = new_icon || "build/icons/icon.ico"
+    if (new_icon && new_icon != current_icon) {
+      win.setIcon(new_icon)
+      logger.info("Changing icon to", new_icon)
+      current_icon = new_icon
+    }
+  })
+
+  // Give mods a reference to the window object so it can reload 
+  Mods.giveWindow(win);
+
+  if (openedWithUrl)
+    win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))
+}
+
+app.removeAsDefaultProtocolClient(OPENWITH_PROTOCOL)
+if (isDevelopment && process.platform === 'win32') {
+  // Set the path of electron.exe and your app.
+  // These two additional parameters are only available on windows.
+  // Setting this is required to get this working in dev mode.
+  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL, process.execPath, [
+    path.resolve(process.argv[1])
+  ])
+} else {
+  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL)
+}
+
+app.on('open-url', function (event, url) {
+  event.preventDefault()
+  openedWithUrl = url
+})
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+
+    if (process.platform !== 'darwin') {
+      // Find the arg that is our custom protocol url and store it
+      openedWithUrl = commandLine.find((arg) => arg.startsWith(OPENWITH_PROTOCOL + '://'))
+    }
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+      if (openedWithUrl)
+        win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))
+    }
+  })
+  app.whenReady().then(async () => {
+    if (isDevelopment && !process.env.IS_TEST) {
+      try {
+        await installExtension(VUEJS_DEVTOOLS)
+      } catch (e) {
+        logger.error('Vue Devtools failed to install:', e.toString())
+      }
+    }
+    await createWindow()
   })
 }
 
@@ -590,30 +854,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-
-if (!gotTheLock) {
-  app.quit()
-} 
-else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (win) {
-      if (win.isMinimized()) win.restore()
-      win.focus()
-    }
-  })
-  app.whenReady().then(async () => {
-    if (isDevelopment && !process.env.IS_TEST) {
-      try {
-        await installExtension(VUEJS_DEVTOOLS)
-      } catch (e) {
-        console.error('Vue Devtools failed to install:', e.toString())
-      }
-    }
-    createWindow()
-  })
-}
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

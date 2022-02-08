@@ -1,10 +1,11 @@
 <template>
-  <div class="pageBody" :class="bgClass">
+  <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
     <div class="tall">
       <div class="main">
         <div class="header">
           <Banner :id="tab.key" :page="thisPage"/>
         </div>
+        <Footnotes :pageId="thisPage.pageId" preface />
         <div class="vid">
           <Media :url="thisPage.media[0]" />
         </div>      
@@ -12,6 +13,7 @@
           <FlashCredit  :pageId="thisPage.pageId" />
           <PageNav base="mspa" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
         </div>
+        <Footnotes :pageId="thisPage.pageId" />
       </div>
     </div>
   </div>
@@ -24,6 +26,8 @@ import PageNav from '@/components/Page/PageNav.vue'
 import Banner from '@/components/Page/PageBanner.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
+import PAGE from '@/components/Page/Page.vue'
+
 export default {
   name: 'EndOfHS',
   props: [
@@ -32,51 +36,41 @@ export default {
   components: {
     Media, PageNav, Banner, FlashCredit
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.$archive.mspa.story[p].theme) return ctx.$archive.mspa.story[p].theme
+  },
+  title: PAGE.title,
   data: function() {
     return {
     }
   },
   computed: {
+    pageNum: PAGE.computed.pageNum,
+    storyId: PAGE.computed.storyId,
+    pageCollection: PAGE.computed.pageCollection,
+    thisPage: PAGE.computed.thisPage,
+    nextPagesArray: PAGE.computed.nextPagesArray,
     bgClass() {
       return {
         collide: this.pageNum === "009987",
         act7: this.pageNum === "010027",
         credits: this.pageNum === "010030"
       }
-    },
-    pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
-    thisPage() {
-      return this.$archive.mspa.story[this.pageNum]
-    },
-    nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
-      let nextPages = []
-      this.thisPage.next.forEach(nextID => {
-        nextPages.push(this.$archive.mspa.story[nextID])
-      })
-      return nextPages
     }
   },
-  methods:{
-    keyNavEvent(dir) {
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.nextPagesArray.length == 1 && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
-    }
+  methods: {
+    keyNavEvent: PAGE.methods.keyNavEvent
   },
   beforeDestroy() {
-    //Trigger EOH notifications if leaving new-reader mode
+    // Trigger EOH notifications if leaving new-reader mode
     if (this.pageNum === "010030") this.$popNotifFromPageId('010030')
   }
 }
 </script>
 
 <style scoped lang="scss">
-    //Classes copied from original pages to preserve original theme through style changes
+    // Classes copied from original pages to preserve original theme through style changes
 
   .pageBody {
     margin: 0;
@@ -85,6 +79,50 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
+
+    .footnote {
+      width: 600px;
+      // border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
+      padding: 30px 25px;
+      p {
+        text-align: center;
+        margin: 0 auto;
+        width: 600px;
+      }
+    }
+    .preface {
+      width: 600px;
+      margin: 1em 0;
+
+      border-style: dashed;
+      border-width: 1px;
+
+      border-color: var(--page-log-border);
+      background-color: var(--page-pageFrame);
+      color: var(--page-nav-divider);
+      p {
+        text-align: center;
+        margin: 0 auto;
+        width: 600px;
+      }
+    }
+
+    .footnote, .preface {
+      .author {
+        font-weight: 300;
+        font-size: 10px;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+
+        display: flex;
+        justify-content: flex-end;
+
+        position: relative;
+        top: 12px;
+        margin-top: -12px;
+
+        color: var(--page-nav-meta);
+      }
+    }
 
     &.collide {
       background: #000;

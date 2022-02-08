@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     showButtons() {
-      //Only show buttons if the navigator doesn't report a mac system
+      // Only show buttons if the navigator doesn't report a mac system
       return navigator.appVersion.indexOf('Macintosh') == -1
     },
     activeTabTitle() {
@@ -43,6 +43,10 @@ export default {
     },
     close() {
       ipcRenderer.invoke('win-close')
+      // Give the OS 2500 ms, then force close
+      setTimeout(function() {
+        ipcRenderer.sendSync('win-close-sync')
+      }, 2500)
     }
   },
   mounted() {
@@ -51,25 +55,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
   #titleBar{
+    position: relative;
+    --title-bar-height: 22px;
+    --title-button-margin: 0px;
+
     background: var(--header-bg);
     color: var(--font-header);
 
-    min-height: 18px;
-    margin-top: 4px;
+    height: var(--title-bar-height);
     -webkit-app-region: drag;
 
     * {
       user-select: none;
     }
   }
-  #titleBarText{
+  #titleBarText {
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     width: 85%;
     margin: 0 auto;
+    padding-top: 4px;
     padding-bottom: 2px;
+    font-size: 14px;
   }
   #titleBarButtons {
     -webkit-app-region: no-drag;
@@ -80,17 +90,16 @@ export default {
     .systemButton {
       display: inline-block;
       pointer-events: auto;
-      width: 25px;
-      height: 22px;
+      width: calc((8 / 7) * var(--title-bar-height));
+      height: var(--title-bar-height);
 
-      line-height: 24px;
+      line-height: var(--title-bar-height);
       padding: 0 2px;
+      margin: var(--title-button-margin);
     }
-    #closeButton{
-      &:hover {
-        color: white;
-				background: rgb(255, 73, 73);
-			}
-    }
+    #closeButton:hover {
+      color: white;
+			background: rgb(255, 73, 73);
+		}
   }
 </style>

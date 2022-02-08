@@ -8,7 +8,7 @@
               <MediaEmbed url="/advimgs/bq/bq008b.gif" />
           </div>
           <div class="textContent">
-            <p>You are not far enough into Homestuck to see this! Come back later.</p>
+            <p>You have not read far enough to see this! Come back later.</p>
           </div>
       </div>
     </div>    
@@ -30,13 +30,14 @@ export default {
   components: {
     NavBanner, MediaEmbed, PageFooter
   },
+  title: () => "Spoilers!",
   data: function() {
     return {
     }
   },
   computed: {
   },
-  methods:{
+  methods: {
   },
 }
 </script>

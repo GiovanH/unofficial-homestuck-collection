@@ -1,6 +1,6 @@
 <template>
   <div class="gameBody" v-if="this.routeParams.play == 'play'">
-    <iframe class="gameFrame" ref="game" :src="$mspaURL('archive/namcohigh/game/index2.html')" :width="`${gameWidth}px`" :height="`${gameHeight}px`" @load="initLocalStorage"/>
+    <iframe class="gameFrame" ref="game" :src="frameSrc" :width="`${gameWidth}px`" :height="`${gameHeight}px`" @load="initLocalStorage"/>
   </div>
   <div class="pageBody" v-else>
     <div class="header">
@@ -531,6 +531,7 @@
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Resources from "@/resources.js"
 
 export default {
   name: 'NamcoHigh',
@@ -540,6 +541,7 @@ export default {
   components: {
     NavBanner, Media
   },
+  title: () => "Namco High",
   data: function() {
     return {
       gameWidth: undefined,
@@ -551,8 +553,12 @@ export default {
     }
   },
   computed: {
+    frameSrc(){
+      // We have to do this in MediaEmbed too
+      return Resources.resolveURL("assets://archive/namcohigh/game/index2.html")
+    }
   },
-  methods:{
+  methods: {
     // The slideshow functions have two modes of operation: Student, and Artist. The bool tells it which box to affect
     slidesJump(index, isStudent = false) {
       if (isStudent) this.studentIndex = index

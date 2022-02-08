@@ -24,7 +24,7 @@
             <p><strong>SPOILER WARNING:</strong> Expect all external links within this database to contain direct spoilers for the end of Homestuck. Click with care!</p>
           </div>
           <div class="sidebarItem">
-            <p>This information is current as of the <br><strong>25th October, 2020</strong>.<br> For more recent info, deeper categorization, and unofficial albums, visit the <a href="https://hsmusic.github.io/">Homestuck Music Wiki.</a></p>
+            <p>This information is current as of the <br><strong>14th February, 2022</strong>.<br> For more recent info, deeper categorization, and unofficial albums, visit the <a href="https://hsmusic.wiki/">Homestuck Music Wiki.</a></p>
             <br>
             <p>If you're enjoying the tunes, how about dropping some money on the albums at the <a href="https://homestuck.bandcamp.com/">Official Homestuck Bandcamp?</a></p>
           </div>
@@ -57,13 +57,23 @@ export default {
     Discography, 
     Track
   },
+  title: function(ctx) {
+    var title = 'Homestuck Music'
+    if (ctx.routeParams.mode == 'tracks') title = `All tracks - Homestuck Music`
+    else if (ctx.routeParams.mode == 'artists') title = `All artists - Homestuck Music`
+    else if (ctx.routeParams.mode == 'features') title = `All features - Homestuck Music`
+    else if (ctx.routeParams.mode == 'album') title = `${ctx.$archive.music.albums[ctx.routeParams.id].name} - Homestuck Music`
+    else if (ctx.routeParams.mode == 'track') title = `${ctx.$archive.music.tracks[ctx.routeParams.id].name} - Homestuck Music`
+    else if (ctx.routeParams.mode == 'artist') title = `${ctx.$archive.music.artists[ctx.routeParams.id].name} - Homestuck Music`
+    return title
+  },
   data: function() {
     return {
     }
   },
   computed: {
     thisAlbum() {
-      let mode
+      // let mode // unused?
       let key = this.routeParams.id || undefined
       return (this.routeParams.mode == 'album' && key in this.$archive.music.albums) ? this.$archive.music.albums[key] : undefined
     },
@@ -76,7 +86,7 @@ export default {
       return (this.routeParams.mode == 'artist' && key in this.$archive.music.artists) ? this.$archive.music.artists[key] : undefined
     }
   },
-  methods:{
+  methods: {
   }
 }
 </script>

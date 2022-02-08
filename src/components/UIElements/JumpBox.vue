@@ -4,19 +4,41 @@
       <div class="wrapper">
         <a :href="jumpboxText" class="jumpboxLink" ref="link">
         </a>
-        <input class="jumpBoxInput" ref="input" type="text" spellcheck="false" v-model="jumpboxText"  @keydown.enter="focusLink()" />
+        <vue-simple-suggest
+            v-model="jumpboxText" 
+            :list="allUrlSuggestions"
+            display-attribute="title"
+            value-attribute="url"
+            @select="onSuggestSelect"
+            :filter-by-query="true"
+            :max-suggestions="15"
+            ref="suggest" 
+          >
+          <input 
+            class="jumpBoxInput"
+            ref="input"
+            type="text"
+            spellcheck="false"
+            v-model="jumpboxText"
+            @keydown.enter="focusLink"
+          />
+        </vue-simple-suggest> 
       </div>
     </div>
   </transition>
 </template>
 
 <script>
+import VueSimpleSuggest from 'vue-simple-suggest'
 
 export default {
   name: 'jumpBox',
   props: [
 		'tab'
   ],
+  components: {
+    VueSimpleSuggest
+  },
   data() {
     return {
       isActive: false,
@@ -24,6 +46,31 @@ export default {
     }
   },
   computed: {
+    allHistory(){
+      return [...new Set(this.$localData.root.tabData.tabList.map(
+        key => this.$localData.root.tabData.tabs[key]
+      ).reduce((a, t) => {
+        return a.concat(t.history)
+      }, []))]
+    },
+    allUrlSuggestions(){
+      const dumbUrlMap = url => ({
+        title: url,
+        url: url
+      })
+      const simple = ["/music", "/news", "/settings", "/credits"].map(dumbUrlMap)
+      const history = this.allHistory.map(dumbUrlMap)
+
+      const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
+        title: `${bookmark.url} - ${bookmark.name}`,
+        url: bookmark.url
+      }))
+
+      return [...simple, ...bookmarks, ...history].filter((obj, pos, arr) => {
+        // Deduplicate based on 'url' param
+        return arr.map(mapObj => mapObj['url']).indexOf(obj['url']) === pos
+      })
+    }
   },
   methods: {
 		open() {
@@ -38,9 +85,9 @@ export default {
     },
     onFocusOut(event) {
       if (document.getElementById('contextMenu').contains(event.relatedTarget)) {
-        this.$root.$children[0].$refs.contextMenu.lendFocus(event.target)
-      }
-      else if (!this.$el.contains(event.relatedTarget)) this.close()
+        this.$root.app.$refs.contextMenu.lendFocus(event.target)
+      } else if (!this.$el.contains(event.relatedTarget))
+        this.close()
     },
 		close(){
       this.isActive = false
@@ -51,7 +98,14 @@ export default {
     },
     focusLink(){
       this.$refs.link.click()
-    }
+    },
+    onSuggestSelect(event){
+      this.jumpboxText = event.url
+      // this.$nextTick(this.focusLink)
+      this.$localData.root.TABS_PUSH_URL(event.url) // avoids some weird focus cases
+      this.$refs.suggest.hideList()
+      document.activeElement.blur()
+    },
   },
   mounted() {
   },
@@ -64,7 +118,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .jumpBox {
+  .jumpBox::v-deep {
     font-family: initial;
     font-weight: initial;
     font-size: initial;
@@ -72,7 +126,7 @@ export default {
     
     position: fixed;
     width: 100%;
-    top: calc(var(--headerHeight) + 50px);
+    top: 80px;
     z-index: 4;
 
     .wrapper {
@@ -102,9 +156,32 @@ export default {
       input {
         padding: 2px 0;
         font-size: 22px;
+        font-family: var(--font-family-ui);
         height: 30px;
         width: 500px;
         border: none;
+      }
+      .suggestions {
+        background-color: var(--ctx-bg);
+        border: solid 1px var(--ctx-frame);
+        color: var(--font-ctx);
+
+        font-family: var(--font-family-ui);
+        font-weight: normal;
+
+        list-style: none;
+
+        li[aria-selected="true"] {
+          background: var(--ctx-select);
+        }
+
+        z-index: 5;
+        padding: 5px;
+        outline: none;
+        cursor: default;
+        position: fixed;
+        user-select: none;
+        white-space: nowrap;
       }
     }
   }

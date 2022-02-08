@@ -1,21 +1,29 @@
 <template>
   <div tabindex="-1" class="contextMenu" id="contextMenu" @click="handleClick()" @blur="away">
-    <ul v-if="tags.length <= 0">
-      <li @mouseup="back()">Back</li>
-      <li @mouseup="forward()" class="border">Forward</li>
-      <li @mouseup="selectAll()">Select All</li>
-      <li @mouseup="saveGame()">Save/Load</li>
-    </ul>
+    <template v-if="tags.length <= 0">
+      <ul>
+        <li @mouseup="back()">Back</li>
+        <li @mouseup="forward()">Forward</li>
+      </ul>
+      <ul>
+        <li @mouseup="selectAll()">Select All</li>
+        <li @mouseup="saveGame()">Save/Load</li>
+      </ul>
+    </template>
     <ul v-if="tags.includes('History')">
       <li @mouseup="back()">Back</li>
-      <li @mouseup="forward()" class="border">Forward</li>
+      <li @mouseup="forward()">Forward</li>
     </ul>
-    <ul v-if="tags.includes('Tab')">
-      <li @mouseup="duplicateTab()">Duplicate Tab</li>
-      <li @mouseup="closeTab()" class="border">Close Tab</li>
-      <li @mouseup="closeTabsToRight()">Close Tabs to the Right</li>
-      <li @mouseup="closeAllOtherTabs()">Close Other Tabs</li>  
-    </ul>
+    <template v-if="tags.includes('Tab')">
+      <ul>
+        <li @mouseup="duplicateTab()">Duplicate Tab</li>
+        <li @mouseup="closeTab()">Close Tab</li>
+      </ul>
+      <ul>
+        <li @mouseup="closeTabsToRight()">Close Tabs to the Right</li>
+        <li @mouseup="closeAllOtherTabs()">Close Other Tabs</li>  
+      </ul>
+    </template>
     <ul v-if="tags.includes('TabSection')">
       <li @mouseup="newTab()">New Tab</li>
       <li @mouseup="reopenTab()">Reopen Closed Tab</li>
@@ -25,25 +33,32 @@
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
       <li @mouseup="googleSearch()">Search with Google</li>  
+      <li v-for="(action, index) in actionsText" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
     </ul>
-    <ul v-if="tags.includes('Input')">
-      <li @mouseup="cut()">Cut</li>
-      <li @mouseup="copy()">Copy</li>
-      <li @mouseup="paste()">Paste</li>
-      <li @mouseup="deleteText()" class="border">Delete</li>
-      <li @mouseup="selectAll()">Select All</li>
-    </ul>
+    <template v-if="tags.includes('Input')">
+      <ul>
+        <li @mouseup="cut()">Cut</li>
+        <li @mouseup="copy()">Copy</li>
+        <li @mouseup="paste()">Paste</li>  
+      </ul>
+      <ul>
+        <li @mouseup="deleteText()">Delete</li>
+        <li @mouseup="selectAll()">Select All</li>
+      </ul>
+    </template>
     <ul v-if="tags.includes('Link')">
       <li v-if="tags.includes('External')" @mouseup="openLinkInNewTab()">Open Link in Browser</li>
       <li v-else-if="tags.includes('MediaModal')" @mouseup="openLinkInNewTab()">Open Link in Popup</li>
       <li v-else @mouseup="openLinkInNewTab()">Open Link in New Tab</li>
       <li @mouseup="copyLink()">Copy Link</li>
       <li v-if="targetAnchor.innerText.length > 0" @mouseup="copyLinkText()">Copy Link Text</li>
+      <li v-for="(action, index) in actionsLink" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
     </ul>
     <ul v-if="tags.includes('Image')">
-      <li @mouseup="openImage()">Open Image</li>
-      <li @mouseup="openImageFile()">Open in Folder</li>      
-      <li @mouseup="saveImage()">Save Image</li>
+      <li v-for="(action, index) in actionsImage" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
+    </ul>
+    <ul v-if="actionsEx.length">
+      <li v-for="(action, index) in actionsEx" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
     </ul>
     <ul v-if="$parent.zoomLevel != 0">
       <li @mouseup="resetZoom()">Reset Zoom</li>
@@ -56,7 +71,6 @@
 
 <script>
 const {shell, clipboard, ipcRenderer} = require('electron')
-import fs from 'fs'
 
 export default {
   name: 'contextMenu',
@@ -65,6 +79,23 @@ export default {
   data(){
     return {
       tags: [],
+      actionsImage: [
+        {
+          title: "Open Image",
+          cb() { shell.openPath(this.$mspaFileStream(this.target.src)) }
+        },
+        {
+          title: "Open in Folder",
+          cb() { shell.showItemInFolder(this.$mspaFileStream(this.target.src)) }
+        },
+        {
+          title: "Save Image",
+          cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
+        }
+      ],
+      actionsLink: [],
+      actionsText: [],
+      actionsEx: [],
       target: undefined,
       targetAnchor: undefined,
       partnerEl: undefined,
@@ -74,6 +105,9 @@ export default {
   computed: {
   },
   methods: {
+    bind(cb, $event){
+      return cb.bind(this)($event)
+    },
     back(){
       this.$localData.root.TABS_HISTORY_BACK()
     },
@@ -81,7 +115,7 @@ export default {
       this.$localData.root.TABS_HISTORY_FORWARD()
     },
     saveGame(){
-      vm.$children[0].$refs[this.$localData.tabData.activeTabKey][0].toggleBookmarks()
+      window.vm.app.activeTabComponent.toggleBookmarks()
     },
     resetZoom(){
       this.$parent.resetZoom()
@@ -134,15 +168,6 @@ export default {
     copyLinkText(){
       clipboard.writeText(this.target.innerText)
     },
-    saveImage(){
-      ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)})
-    },
-    openImage(){
-      shell.openPath(this.$mspaFileStream(this.target.src))
-    },
-    openImageFile(){
-      shell.showItemInFolder(this.$mspaFileStream(this.target.src))
-    },
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
     },
@@ -180,8 +205,8 @@ export default {
           box.style.display = 'block'
 
           let page = document.body
-          let boxX = e.clientX //mouse X
-          let boxY = e.clientY //mouse Y
+          let boxX = e.clientX // mouse X
+          let boxY = e.clientY // mouse Y
           let boxWidth = box.clientWidth
           let boxHeight = box.clientHeight
 
@@ -236,6 +261,9 @@ export default {
   box-shadow: 2px 2px 2px -2px var(--ctx-shadow);
   color: var(--font-ctx);
 
+  font-family: var(--font-family-ui);
+  font-weight: normal;
+
   z-index: 5;
   padding: 5px;
   outline: none;
@@ -253,8 +281,10 @@ export default {
       background: var(--ctx-select);
     }
   }
-  ul:not(:last-child),  li.border:not(:last-child){
+  ul:not(:last-child) {
     border-bottom: 1px solid var(--ctx-divider);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
   }
 }
 </style>

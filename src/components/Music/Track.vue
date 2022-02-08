@@ -60,9 +60,11 @@
 
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Resources from '@/resources.js'
 
 export default {
   name: 'MusicTrack',
+  mixins: [ Resources.UrlFilterMixin ],
   props: [
     'track'
   ],
@@ -93,6 +95,7 @@ export default {
       return this.joinNoOxford(this.linkArtists(this.track.coverArtists || []))
     },
     linkPages() {
+      // TODO: No. None of this is okay.
       if (this.track.pages && this.track.pages.length > 0) {
         let result = []
         this.track.pages.forEach(page => {
@@ -108,6 +111,7 @@ export default {
             }
           }
           else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/ps_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
+          else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') result.push(`<a href="assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf" target="_blank" >SBAHJthemovie1.swf</a>`)
           else result.push(page)
         })
         return result
@@ -116,6 +120,7 @@ export default {
     },
     linkAndJoinExternalMusic() {
       if (this.track.urls) {
+        // Todo: rewrite this with host sanitization (let host = urlLib.parse(url).host == bandcamp.com)
         let sources = this.track.urls.map(url =>`<a href="${url}">${
           url.includes('bandcamp.com') ? 'Bandcamp' :
           url.includes('youtu') ? 'YouTube' :
@@ -129,8 +134,8 @@ export default {
       else return false
     }
   },
-  methods:{
-    //thnks florrie 👍
+  methods: {
+    // thnks florrie 👍
     joinNoOxford(array, plural = 'and') {
       if (array.length === 0) {
           return ''
@@ -178,21 +183,7 @@ export default {
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
-      let links = this.$refs.commentary.getElementsByTagName('A')
-      for(let i = 0;i < links.length; i++) {
-        links[i].href = this.$filterURL(links[i].href)
-      }
-      
-      //Normally, this process would be handled by the MediaEmbed component. Gotta get the behaviour into all them images somehow!
-      let images = this.$refs.commentary.getElementsByTagName('IMG')
-      for(let i = 0;i < images.length; i++) {
-        images[i].src = this.$mspaURL(images[i].src)
-        images[i].ondragstart = (e) => {
-          e.preventDefault()
-          e.dataTransfer.effectAllowed = 'copy'
-          require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-        }
-      }
+      return this.filterLinksAndImages(this.$refs.commentary);
     }
   },
   mounted(){

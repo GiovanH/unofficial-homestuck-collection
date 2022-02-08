@@ -1,10 +1,12 @@
 <template>
-  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}">
+  <div class="pageBody customStyles" :class="{pixelated, supercartridge, hscroll, scratchIntermission}" :data-pageid="`${thisPage.storyId}/${thisPage.pageId}`">
     <Banner :tab="tab" :page="thisPage"/>
     <Firefly :tab="tab" v-if="fireflies"/>
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
+      <Metadata v-if="showMetadata == true" :thisPage="thisPage" />
       <div class="pageContent">
+        <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
               <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
               <div class="media" ref="media">
@@ -13,12 +15,15 @@
           </div>
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="pageContent"/>
-              <PageNav v-if="pageNum in pageData" :isRyanquest="storyDataKey == 'ryanquest'" :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
+              <PageNav :thisPage="thisPage" 
+                :nextPages="nextPagesArray" ref="pageNav"
+                :class="{'hidden': hideNav}" />
           </div>
-          <div class="footnote" v-if="footnote">
-            <p v-html="footnote"/>
-          </div>
+        <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
+      </div>
+      <div class="hidden">
+        <Media v-for="url in nextPagesMedia" :key="url" :url="url" class="panel"/>
       </div>
     </div>
     <PageFooter :pageWidth="scratchIntermission ? '940px' : hscroll ? '1200px' : '950px'" />
@@ -33,6 +38,8 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Metadata from '@/components/Page/PageMetadata.vue'
 
 import Firefly from '@/components/SpecialPages/Firefly.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
@@ -43,67 +50,108 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit
+    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Firefly, FlashCredit, Footnotes, Metadata
   },
   data: function() {
     return {
-      preload: []
+      preload: [],
+      retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
+      forceKeyboardEnable: false, // overridden by oddities
+      showMetadata: false
     }
   },
+  theme: function(ctx) {
+    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) 
+      return ctx.$archive.mspa.story[p].theme
+  },
+  title: function(ctx) {
+    var title
+    
+    const exceptions = {
+      '006715': 'DOTA',
+      '008801': 'GAME OVER',
+      '009305': 'shes8ack',
+      '009987': "ACT 6 ACT 6 ACT 6",
+      '010027': 'ACT 7',
+      '010030': 'Credits'
+    }
+    const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+
+    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
+      title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
+    } else {
+      if (p in exceptions) {
+        title = exceptions[p]
+      } else {
+        title = ctx.$archive.mspa.story[p].title + [
+          " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
+        ][ctx.$getStory(p) - 1]
+      }
+    }
+    return title
+  },
   computed: {
-    storyDataKey() {
-      if (this.routeParams.base === 'ryanquest') return 'ryanquest'
-      else return 'story'
+    isRyanquest(){
+      return (this.routeParams.base === 'ryanquest')
     },
     pageNum() {
-      return this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p).p : this.routeParams.p
+      if (this.$isVizBase(this.routeParams.base)) {
+        return this.$vizToMspa(this.routeParams.base, this.routeParams.p).p
+      } else {
+        return this.routeParams.p
+      }
     },
-    pageData() {
-      return this.$archive.mspa[this.storyDataKey]
+    storyId() {
+      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
     },
-    pageMedia() {
+    pageCollection() {
+      const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
+      return this.$archive.mspa[storyDataKey]
+    },
+    thisPage() {
+      // Add useful information to archive object
+      return {
+        ...this.pageCollection[this.pageNum],
+        storyId: this.storyId,
+        isRyanquest: this.isRyanquest
+      }
+    },
+    audioData(){
       let media = Array.from(this.thisPage.media)
       this.deretcon(media)
+      return this.$archive.audioData[media[0]]
+    },
+    pageMedia() {
+      const media = Array.from(this.thisPage.media)
+      this.deretcon(media)
+      var mediakey = media[0]
 
-      if (this.thisPage.flag.includes('F') || this.thisPage.flag.includes('S')) {
-        let flashPath = media[0].substring(0, media[0].length-4)
-        if (this.thisPage.flag.includes('BOLIN') && this.$localData.settings.bolin) 
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('BOLINHQ')) ? `${flashPath}_bolin_hq.swf` : `${flashPath}_bolin.swf`
-        else
-          media[0] = (this.$localData.settings.hqAudio && this.thisPage.flag.includes('HQ')) ? `${flashPath}_hq.swf` : media[0]
+      if (this.audioData) {
+        const flashPath = mediakey.substring(0, mediakey.length - 4)
+        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+        media[0] = `${flashPath}_hq.swf`
+      } else if (mediakey.includes(".swf")) {
+        this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
-
-      this.preload = []
-      this.nextPagesArray.forEach(page => {
-        page.media.forEach(media => {
-          if (/(gif|png)$/i.test(media)) {
-            let img = new Image()
-            img.src = this.$mspaURL(media)
-            this.preload.push(img)
-          }
-        })
-      })
 
       return media
     },
-    pageContent() {
-      return (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) ? this.thisPage.content.replace('PEACHY.gif', 'CAUCASIAN.gif') : this.thisPage.content
-    },
-    storyNum() {
-      return this.$getStory(this.pageNum)
-    },
-    thisPage() {
-      return this.pageData[this.pageNum]
-    },
     nextPagesArray() {
-      console.log(`${this.tab.url} - ${this.thisPage.title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
-        //Removes [??????] password links if the retcon hasn't been triggered yet
-        if (!this.$localData.settings.retcon6 && ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"].includes(nextID)) return
-        nextPages.push(this.pageData[nextID.trim()])
+        // Removes [??????] password links if the retcon hasn't been triggered yet
+        if (!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
+        nextPages.push(this.pageCollection[nextID.trim()])
       })
       return nextPages
+    },
+    nextPagesMedia(){
+      return this.nextPagesArray.reduce((acc, page) => {
+        return [...acc, ...page.media.filter(x => /(gif|png)$/i.test(x))]
+      }, []).map(this.$getResourceURL)
     },
     pixelated() {
       return this.$localData.settings.pixelScaling
@@ -120,12 +168,11 @@ export default {
     fireflies() {
       return this.thisPage.flag.includes('FIREFLY')
     },
-    footnote() {
-      return (this.$archive.mspa.footnotes && this.$localData.settings.footnotes && this.thisPage.pageId in this.$archive.mspa.footnotes) ? this.$archive.mspa.footnotes[this.thisPage.pageId] : undefined
+    hideNav(){
+      return this.thisPage.flag.includes('SWFNAV')
     },
-    footerBanner() {            
-      let num = parseInt(this.pageNum)
-      switch (this.$root.theme) {
+    footerBanner() {
+      switch (this.$root.tabTheme.rendered) {
         case 'scratch':
           return 'customScratchFooter.png'
         case 'sbahj':
@@ -139,14 +186,15 @@ export default {
       }
     }
   },
-  methods:{
+  methods: {
     deretcon(media) {
+      // TODO: Refactor retcon resource reservations
       if (
-      (this.thisPage.flag.includes('R1') && !this.$localData.settings.retcon1) ||
-      (this.thisPage.flag.includes('R2') && !this.$localData.settings.retcon2) ||
-      (this.thisPage.flag.includes('R3') && !this.$localData.settings.retcon3) ||
-      (this.thisPage.flag.includes('R4') && !this.$localData.settings.retcon4) ||
-      (this.thisPage.flag.includes('R5') && !this.$localData.settings.retcon5) ){
+      (this.thisPage.flag.includes('R1') && !this.$shouldRetcon('retcon1')) ||
+      (this.thisPage.flag.includes('R2') && !this.$shouldRetcon('retcon2')) ||
+      (this.thisPage.flag.includes('R3') && !this.$shouldRetcon('retcon3')) ||
+      (this.thisPage.flag.includes('R4') && !this.$shouldRetcon('retcon4')) ||
+      (this.thisPage.flag.includes('R5') && !this.$shouldRetcon('retcon5')) ){
           for (let i in media) {
             media[i] = media[i]
             .replace(/1([0-9]{4})\/1[0-9]{4}\.swf/g, "0$1/0$1.swf")
@@ -156,12 +204,13 @@ export default {
             // }
           }
       }
-      else if (this.thisPage.flag.includes('PEACHY') && this.$localData.settings.unpeachy) {
-        media[1] = media[1].replace('scraps/fruitone', '05720_2')
-      }
       return media
     },
     keyNavEvent(dir) {
+      // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.forceKeyboardEnable)
+        return
+
       if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
@@ -240,6 +289,7 @@ export default {
       padding-top: 7px;
       padding-bottom: 23px;
       margin: 0 auto;
+      position: relative; // Allow things to align to the page
 
       flex: 0 1 auto;
       display: flex;
@@ -254,6 +304,10 @@ export default {
         flex: 0 1 auto;
         align-items: center;
         flex-flow: column;
+
+        .footnotesContainer {
+          width: 100%;
+        }
 
         .mediaContent {
           display: flex;
@@ -288,21 +342,7 @@ export default {
           flex-direction: column;
           
         }
-        .footnote {
-          width: 650px;
-          border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-          padding: 30px 0;
-          p {
-            text-align: center;
-            margin: 0 auto;
-            width: 600px;
-          }
-        }
-      }	
+      }
     }
-
   }
-  
-
 </style>
-
