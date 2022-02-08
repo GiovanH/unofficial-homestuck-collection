@@ -108,11 +108,6 @@ export default {
       return this.labelDict[href] || href
     }
   },
-  watch: {
-    '$root.tabTheme'(to, from){
-      this.$logger.info("Nav: Reacting tabTheme", to)
-    }
-  },
   computed: {
     tabComponent() {
       return this.$root.app.activeTabComponent

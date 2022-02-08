@@ -117,7 +117,7 @@ export default {
           type: 'info',
           url: 'https://hsmusic.wiki',
           name: 'HSMusic',
-          desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most assocoited music and has tons of information and supplementary material."
+          desc: "HSMusic Wiki is an extensive catalog of Homestuck music and musicians. It includes the full Homestuck discography and most associated music and has tons of information and supplementary material."
         },
         {
           id: 'readmspa',

@@ -281,6 +281,7 @@
 <!--           </p>
           <p> -->
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
+            <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
         </section>
           
         <div class='hint'>
@@ -1044,7 +1045,7 @@ export default {
 
     li {
       /*list-style-position: inside;*/
-      background-color: var(--page-log-bg);
+      background-color: #FFFa;
       border: 1px solid rgba(0,0,0,.125);
       margin-bottom: -1px;
       padding: .2em;

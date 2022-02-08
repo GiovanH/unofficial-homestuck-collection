@@ -91,7 +91,7 @@
         <section>
         <dl class="faq">
           <dt>Some panels/images/media aren't loading at all!</dt>
-          <dd>This is usually caused by a faulty asset pack install. Try redownloading and re-extracting the asset pack.</dd>
+          <dd>This is usually caused by a faulty asset pack install. Try re-downloading and re-extracting the asset pack.</dd>
 
           <dt>Is there a dark mode?</dt>
           <dd>Yes: in the <a href='/settings/enhancements' target='_blank'>Settings page, under Enhancements.</a></dd>
@@ -110,13 +110,25 @@
           <dt>How does this collection handle [controversial material that was later replaced by What Pumpkin]?</dt>
           <dd>The collection includes all the original material in controversial content, but it is disabled by default. Controls for enabling it are in <a href='/settings/controversial' target='_blank'>Settings</a>.</dd>
 
+          <dt>Why does the collection have two different version numbers? How does that work?</dt>
+          <dd>
+            <p>The collection is composed of two parts: the main app, and the Asset Pack. The main app handles the code and logic and processing, and the asset pack stores the data.
+            </p>
+            <p>For a couple of different reasons (namely, the Asset Pack is very large and also not GPL licensed) we distribute the Asset Pack and the collection separately. The app has a version number that looks like {{$data.$appVersion}} (that's me!), and the asset pack just has one version number (you're on v{{$archive.version}})</p>
+            <p>The good news is the collection can be updated with bugfixes and features without requiring a new Asset Pack! We use semver, so if you were on 1.0.0, an update to 1.0.X would be a bugfix, and an update to 1.X.X would mean bugfixes and new features. Only an update to X.X.X would require re-downloading a new asset pack.</p>
+          </dd>
+
           <dt>What's all this I hear about mods?</dt>
           <dd>Version 2.0 of the collection has mod support so it can easily be extended with commentary or other tweaks. More information including links to documentation and other resources is available in the <a href='/settings/mod' target='_blank'>Settings page under Mod Settings.</a></dd>
+
+          <dt>Can you port this to [phones/chromebooks]?</dt>
+          <dd>Right now due to the way electron works and the collection's Flash requirements, we're not able to port this beyond PC/Mac/Linux. With things like Ruffle, though, it might be possible someday!</dd>
 
           <dt>[Legal question]</dt>
           <dd>Legal info can be found under <a href='/credits' target='_blank'>Archive Credits</a></dd>
         </dl>
         </section>
+
         <section>
           <p>Still having trouble? Reach out to us:</p>
         </section>
@@ -273,6 +285,9 @@ export default {
       font-weight: normal;
       font-family: Verdana,Arial,Helvetica,sans-serif;
       margin-bottom: 1em;
+    }
+    dd p {
+      margin-bottom: 0.5em;
     }
     .tiny {
       font-size: x-small;
