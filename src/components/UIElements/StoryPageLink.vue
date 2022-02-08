@@ -14,10 +14,10 @@
 export default {
   name: 'StoryPageLink',
   props: [
-    'mspaId',
-    'long',
-    'titleOnly',
-    'credit'
+    'mspaId', // mspa ID of page
+    'long', // Identify page by title and number
+    'titleOnly', // Identify page by title, not number
+    'credit' // Show "Page " prefix
   ],
   computed: {
     page(){return this.$archive.mspa.story[this.mspaId]},

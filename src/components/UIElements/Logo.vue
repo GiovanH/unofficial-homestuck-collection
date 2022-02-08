@@ -23,6 +23,7 @@ export default {
     // margin-bottom: 25px;
     img, video {
       width: 800px;
+      max-width: 100%;
     }
   }
 </style>

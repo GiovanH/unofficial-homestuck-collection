@@ -42,8 +42,8 @@ class LocalData {
 
     let initSettings = {
       newReader: {
-        current: false,
-        limit: false
+        current: '001901',
+        limit: '001902'
       },
       notifications: true,
       subNotifications: false,
