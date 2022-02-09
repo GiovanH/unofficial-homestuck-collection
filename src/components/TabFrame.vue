@@ -147,7 +147,6 @@ export default {
     },
     data() {
         return {
-            forceLoad: false,
             gameOverThemeOverride: false,
             modBrowserPages: {}
         }
@@ -419,6 +418,9 @@ export default {
               }
             }
             return (theme == 'default' ? 'mspa' : theme)
+        },
+        forceLoad(){
+            return this.tab.hasAudio
         }
     },
     methods: {
@@ -478,10 +480,7 @@ export default {
     },
     watch: {
         'tabIsActive'(to, from) {
-            if (to)
-            // Prevents tab from unloading if there's anything that might need to run in the background
-            if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
-            else if (this.forceLoad) {
+            if (to && this.forceLoad) {
                 // Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
                 // Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
                 this.$el.style.borderTop = 'solid 1px #000000FF'
@@ -489,15 +488,6 @@ export default {
                     this.$el.style.borderTop = ''
                 }, 10)
             }
-        },
-        '$localData.settings.hqAudio'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.jsFlashes'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.bolin'() {
-            this.forceLoad = false
         }
     },
     mounted(){
@@ -512,7 +502,7 @@ export default {
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up
-        let iframes = document.querySelectorAll(`[id='${this.tab.key}'] iframe`)
+        let iframes = this.$el.querySelectorAll(`iframe`)
         for (var i = 0; i < iframes.length; i++) {
             iframes[i].parentNode.removeChild(iframes[i])
         }

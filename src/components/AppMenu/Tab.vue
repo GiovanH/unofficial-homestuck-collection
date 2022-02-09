@@ -6,7 +6,7 @@
       <div class="tabTitle" :class="{titleFade}" ref="title" >
         <span v-text="title" ref="titleText"/>
       </div>
-      <fa-icon v-if="hasAudio" icon="music" />
+      <span v-if="hasAudio" class='music'><fa-icon icon="music" /></span>
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -91,6 +91,7 @@ export default {
   min-width: 0;
   height: var(--tab-height);
   cursor: default;
+  padding-right: 8px;
 
   &:not(.activeTab) {
     &:hover {
@@ -118,17 +119,25 @@ export default {
     }
   }
 
-  .closeTabButton {
-    float: right;
-    padding: 0;
-    margin-right: 5px;
-
+  .music, .closeTabButton {
     flex: 0 0 auto;
     width: 21px;
     height: 21px;
+  }
+
+  .closeTabButton {
+    float: right;
+    padding: 0;
+    margin-right: -2px;
 
     line-height: 22px;
     font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .music {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 
