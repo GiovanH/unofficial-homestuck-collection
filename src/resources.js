@@ -86,6 +86,7 @@ function getResourceURL(request_url){
 
   // Preliminary filtering
   resource_url = resource_url
+    .replace(/^app:\/\/\.\//, "/") // app://./archive/ comes up on non-windows platforms, sometimes?
     .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") // Linked from a few flashes
     .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") // Covers for 99% of flashes that link to other pages
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
