@@ -300,6 +300,7 @@ export default {
                 }
                 case 'SQUIDDLES': {
                     if (this.$pageIsSpoiler('004432')) component = 'Spoiler'
+                    break
                 }
                 case 'UNLOCK': {
                     if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'
