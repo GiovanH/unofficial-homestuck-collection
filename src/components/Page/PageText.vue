@@ -313,7 +313,7 @@ export default {
         button {
             text-transform: capitalize;
             position: inherit;
-            z-index: 10;
+            z-index: 0;
         }
         
         .logContent{
@@ -321,14 +321,13 @@ export default {
             padding: 15px 5%;
             text-align: left;
             position: inherit;
-            z-index: 5;
+            z-index: 0;
         }
 
         &.logHidden {
             .logContent, .bgshade {
                 display: none; 
             }
-
         }
 
         .bgshade {
@@ -338,7 +337,7 @@ export default {
             pointer-events: none;
             top: 0;
             left: 0;
-            z-index: 0;
+            z-index: -1;
         }
     }
 </style>
