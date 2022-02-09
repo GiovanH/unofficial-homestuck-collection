@@ -10,9 +10,14 @@
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
          v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
         <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .log .logContent span:not(:last-child) {
-            padding-bottom: 0.5em;
+          .log .logContent span:not(:first-child) {
+            padding-top: 1em;
             display: inline-block;
+            white-space: pre-wrap;
+          }          
+          .log .logContent span + span {
+            padding: initial;
+            display: inline !important;
           }
         </component>
 	</div>
@@ -21,9 +26,14 @@
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
             v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
         <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .authorlog .logContent span:not(:last-child) {
-            padding-bottom: 0.5em;
+          .authorlog .logContent span:not(:first-child) {
+            padding-top: 1em;
             display: inline-block;
+            white-space: pre-wrap;
+          }
+          .authorlog .logContent span + span {
+            padding: initial;
+            display: inline !important;
           }
         </component>
 	</div>
