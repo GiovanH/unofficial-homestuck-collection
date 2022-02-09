@@ -22,7 +22,7 @@ function fileIsAsset(url) {
   const is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
   if (is_bundled) return false
 
-  const is_outlink = /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url)
+  const is_outlink = /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url) && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url)
   if (is_outlink) return false
 
   // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
@@ -83,8 +83,6 @@ function getResourceURL(request_url){
   // /images/mspalogo_mspa.png to assets://images/mspalogo_mspa.png
 
   let resource_url = request_url
-  //     .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:8080\//, "app://") 
-  //     .replace(/^http(s{0,1}):\/\/localhost:8080\//, "app://") 
 
   // Preliminary filtering
   resource_url = resource_url
@@ -93,16 +91,20 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
     .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") // Link from CD rack flash
     .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1") // TODO double-check this regex
-    .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/, "assets://") // Complete, should ideally never happen and probably won't work properly if it does
-
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
   
+  if (resource_url != request_url)
+    logger.debug("[getResU prelim]", request_url, "to", resource_url)
+
+  request_url = resource_url
+
   // If it has a file extension, it should be an asset://
   // If it does not, it is a logical vue page.
   if (fileIsAsset(resource_url)) {
     resource_url = resource_url
+      .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\//, "assets://")
       .replace(/^\//, "assets://")
       .replace(/^\\/, "assets://")
       .replace(/\/Sfiles/, "")
@@ -112,16 +114,21 @@ function getResourceURL(request_url){
     // if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))
     //     // files like 'archive/xxx'
     //     resource_url = "assets://" + resource_url
-    if (!resource_url.startsWith("assets://")) {
+    if (!resource_url.startsWith("assets://"))
       resource_url = resource_url.replace(/^(?=\w)/, "assets://")
-    }
-  }
 
-  // if (resource_url != request_url) {
-  //   logger.debug("[getResU]", request_url, "to", resource_url)
-  // } else {
-  //   logger.debug("[getResU]", "no change for", request_url, fileIsAsset(resource_url))
-  // }
+    if (resource_url != request_url)
+      logger.debug("[getResU asset]", request_url, "to", resource_url)
+    request_url = resource_url
+  } else {
+    // waywardvagabond has assets in its folder but we redirect some paths to vue
+    resource_url = resource_url
+      .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
+  
+    if (resource_url != request_url) 
+      logger.debug("[getResU nonas]", request_url, "to", resource_url)
+    request_url = resource_url
+  }
   return resource_url
 }
 
