@@ -16,7 +16,7 @@ function fileIsAsset(url) {
 
   // If this function is false, url is either an internal vue link
   // or an external web page.
-  // due to html modals currently being disabled, the result of calling this on an html file is undefined
+  // html files are assets, but don't show up in modals due to logic elsewhere.
 
   // ...except for these files that are part of the installer.
   const is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
@@ -27,7 +27,7 @@ function fileIsAsset(url) {
 
   // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
-  const has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov)$/i.test(url)
+  const has_file_ext = /\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm|mov|html)$/i.test(url)
 
   // if you reference an html file in `archive/` that should match too, as a failsafe
 
