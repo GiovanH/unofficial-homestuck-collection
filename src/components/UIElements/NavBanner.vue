@@ -57,10 +57,10 @@ export default {
         // list<theme => list<href => label>>
         // default theme in settings is the empty string
         mspa: {
-          // "https://www.homestuck.com": "HOMESTUCK.COM",
+          "https://www.homestuck.com": "HOMESTUCK.COM",
           "/": "HOMESTUCK COLLECTION",
 
-          // "toggleJumpBox": "JUMP",
+          "toggleJumpBox": "JUMP",
           "/help": "HELP",
 
           "/map": "MAP",
@@ -69,7 +69,7 @@ export default {
 
           "/news": "NEWS",
           "/music": "MUSIC",
-          // "toggleBookmarks": "SAVE/LOAD",
+          "toggleBookmarks": "SAVE/LOAD",
 
           "/evenmore": "MORE",
           "/settings": "SETTINGS",
@@ -78,7 +78,7 @@ export default {
         A6A6: {
           "/": "WORTHLESS GARBAGE.",
 
-          // "toggleJumpBox": "WHO CARES?",
+          "toggleJumpBox": "WHO CARES?",
           "/help": "STUPID.",
 
           "/map": "WOW.",
@@ -87,7 +87,7 @@ export default {
 
           "/news": "BULLSHIT.",
           "/music": "DUMB NOISE.",
-          // "toggleBookmarks": "TRASH.",
+          "toggleBookmarks": "TRASH.",
           
           "/evenmore": "WHO CARES?",
           "/credits": "MORONS.",

@@ -268,6 +268,7 @@ export default {
 
   .settings {
     font-weight: bold;
+    margin: 1em 0;
 
     dt {
       margin: 10px 0 5px 10px;

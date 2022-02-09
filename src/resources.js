@@ -38,13 +38,13 @@ function fileIsAsset(url) {
 function resolveURL(url) {
   // The main logic
   let resource_url = getResourceURL(url)
-  logger.debug("Got resource URL", resource_url)
+  // logger.debug("Got resource URL", resource_url)
 
   if (resource_url.startsWith("assets://")) {
-    logger.debug("[resvUrl]", url, "to", resource_url, "to", resolveAssetsProtocol(resource_url))
+    // logger.debug("[resvUrl]", url, "to", resource_url, "to", resolveAssetsProtocol(resource_url))
     resource_url = resolveAssetsProtocol(resource_url) 
   } else {
-    logger.debug("[resvUrl]", "no change for", resource_url)
+    // logger.debug("[resvUrl]", "no change for", resource_url)
   }
 
   return resource_url
@@ -97,7 +97,7 @@ function getResourceURL(request_url){
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
   
   if (resource_url != request_url)
-    logger.debug("[getResU prelim]", request_url, "to", resource_url)
+    // logger.debug("[getResU prelim]", request_url, "to", resource_url)
 
   request_url = resource_url
 
@@ -119,7 +119,7 @@ function getResourceURL(request_url){
       resource_url = resource_url.replace(/^(?=\w)/, "assets://")
 
     if (resource_url != request_url)
-      logger.debug("[getResU asset]", request_url, "to", resource_url)
+      // logger.debug("[getResU asset]", request_url, "to", resource_url)
     request_url = resource_url
   } else {
     // waywardvagabond has assets in its folder but we redirect some paths to vue
@@ -127,7 +127,7 @@ function getResourceURL(request_url){
       .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
   
     if (resource_url != request_url) 
-      logger.debug("[getResU nonas]", request_url, "to", resource_url)
+      // logger.debug("[getResU nonas]", request_url, "to", resource_url)
     request_url = resource_url
   }
   return resource_url
@@ -144,7 +144,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 
   const mod_route = Mods.getAssetRoute(asset_url)
   if (mod_route) {
-    logger.debug("[resolvA]", asset_url, "mod to", mod_route)
+    // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
     if (loopcheck.includes(mod_route)) {
       loopcheck.push(mod_route)
       throw Error("Circular asset path!" + loopcheck)
@@ -163,7 +163,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
   if (asset_url != resource_url) {
     // logger.debug("[resolvA]", asset_url, "to", resource_url)
   } else {
-    logger.debug("[resolvA]", "no change for", resource_url)
+    // logger.debug("[resolvA]", "no change for", resource_url)
   }
   return resource_url
 }
@@ -187,7 +187,7 @@ const UrlFilterMixin = {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
           link.href = getResourceURL(pseudLinkHref)
           if (link.href != pseudLinkHref) {
-            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+            // logger.debug("[filterL]", pseudLinkHref, "->", link.href)
           }
         }
       })
@@ -203,7 +203,7 @@ const UrlFilterMixin = {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
         media[i].src = resolveURL(pseudMediaSrc)
         if (media[i].src != pseudMediaSrc) {
-          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+          // logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
         }
 
         if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  

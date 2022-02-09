@@ -7,7 +7,7 @@
       </a>
       <div class="cardContent collection">
         <!-- <div class="links">
-          <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
+          <a href="/help" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
         </div> -->
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
@@ -131,57 +131,59 @@
     
     <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
-      <div class="cardContent cardEntry">
-        <div class="icon">
-          <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
-          <p class="date">Sep 2006 - Feb 2007</p>
-          <p class="date">134 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/1" >Jailbreak</a></h2>
-          <p><em href="/mspa/1">A guy tries to escape from prison.</em></p><br>
-          <p>The very first MS Paint Adventure. Andrew Hussie ran it as a game on his personal forum, with a rule that forced him to follow the first command suggested after each post. This resulted in barely controlled chaos.</p><br>
-          <p>Jailbreak was the origin point of several long running jokes that would later return in Homestuck.</p>
-          <div class="links">
-            > <a href="/log/1" >Adventure Log</a>
+      <div class="cardContent mainSection">
+        <div class="cardContent cardEntry jbCard">
+          <div class="icon">
+            <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
+            <p class="date">Sep 2006 - Feb 2007</p>
+            <p class="date">134 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/1" >Jailbreak</a></h2>
+            <p><em href="/mspa/1">A guy tries to escape from prison.</em></p><br>
+            <p>The very first MS Paint Adventure. Andrew Hussie ran it as a game on his personal forum, with a rule that forced him to follow the first command suggested after each post. This resulted in barely controlled chaos.</p><br>
+            <p>Jailbreak was the origin point of several long running jokes that would later return in Homestuck.</p>
+            <div class="links">
+              > <a href="/log/1" >Adventure Log</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="cardContent cardEntry bqCard">
-        <div class="icon">
-          <a href="/mspa/2" ><Media url="/images/archive_bq.gif" /></a>
-          <p class="date">Jun - Jul 2007</p>
-          <p class="date">47 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/2" >Bard Quest</a></h2>
-          <p><em>A young bard's endeavor to slay some dragons. Branching "choose your own adventure" style.</em></p><br>
-          <p>The second MS Paint Adventure. The branching paths were an experiement that ultimately proved too complex to manage, dooming it to an early cancellation.</p>
-          <div class="links">
-            > <a href="/log/2" >Adventure Log</a>
+        <div class="cardContent cardEntry bqCard">
+          <div class="icon">
+            <a href="/mspa/2" ><Media url="/images/archive_bq.gif" /></a>
+            <p class="date">Jun - Jul 2007</p>
+            <p class="date">47 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/2" >Bard Quest</a></h2>
+            <p><em>A young bard's endeavor to slay some dragons. Branching "choose your own adventure" style.</em></p><br>
+            <p>The second MS Paint Adventure. The branching paths were an experiement that ultimately proved too complex to manage, dooming it to an early cancellation.</p>
+            <div class="links">
+              > <a href="/log/2" >Adventure Log</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="cardContent cardEntry psCard">
-        <div class="icon">
-          <a href="/mspa/4" ><Media url="/images/archive_ps.gif" /></a>
-          <p class="date">Mar 2008 - Apr 2009</p>
-          <p class="date">1,674 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/4" >Problem Sleuth</a></h2>
-          <p><em>An adventure about a hard boiled detective in his office.</em></p><br>
-          <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
-          <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
-          <div class="links">
-            <div class="left">
-              &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
-            </div>
-            <div class="center">
-              &gt; <a href="/log/4" >Adventure Log</a><br>
-            </div>
-            <div class="right">
-              &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
+        <div class="cardContent cardEntry psCard">
+          <div class="icon">
+            <a href="/mspa/4" ><Media url="/images/archive_ps.gif" /></a>
+            <p class="date">Mar 2008 - Apr 2009</p>
+            <p class="date">1,674 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/4" >Problem Sleuth</a></h2>
+            <p><em>An adventure about a hard boiled detective in his office.</em></p><br>
+            <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
+            <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
+            <div class="links">
+              <div class="left">
+                &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
+              </div>
+              <div class="center">
+                &gt; <a href="/log/4" >Adventure Log</a><br>
+              </div>
+              <div class="right">
+                &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
+              </div>
             </div>
           </div>
         </div>
@@ -546,6 +548,7 @@ export default {
       }
       &.cardRows {
         margin-bottom: -10px;
+        margin-top: -10px;
         display: flex;
         flex-flow: row wrap;
         width: 100%;
