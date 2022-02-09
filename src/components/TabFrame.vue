@@ -209,15 +209,35 @@ export default {
             if (!this.routeParams.base) component = 'Homepage'
             switch (component) {
                 case 'PAGE': {
-                    let convertedPage = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p) : this.routeParams
-                    let p = convertedPage.p ? convertedPage.p : undefined
-                    if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
-                    else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
+                    // Construct canonical story name and page number
+                    let story_id
+                    let page_num
+                    if (this.$isVizBase(this.routeParams.base)) {
+                        const {s, p} = this.$vizToMspa(this.routeParams.base, this.routeParams.p)
+                        story_id = s
+                        page_num = p
+                    } else {
+                        const is_ryanquest = this.routeParams.base === 'ryanquest'
+                        page_num = this.routeParams.p
+                        const tryLookup = this.$mspaToViz(page_num, is_ryanquest)
+                        if (tryLookup) {
+                            story_id = tryLookup.s
+                        } else {
+                            story_id = undefined // MSPA number does not map to valid viz story
+                        }
+                    }
+
+                    if (!(page_num && story_id)) component = 'Error404'
+                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (
+                        (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
+                        (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))
+                    ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(p)
+                        if (this.$isNewReader) this.$updateNewReader(page_num)
                         
-                        let flag = this.$archive.mspa.story[p].flag
+                        const flag = this.$archive.mspa.story[page_num].flag
                         
                         if (flag.includes('X2COMBO')) component = 'x2Combo'
                         else if (flag.includes('FULLSCREEN') || flag.includes('DOTA') || flag.includes('GAMEOVER') || flag.includes('SHES8ACK')) component = 'fullscreenFlash'
