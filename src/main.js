@@ -514,3 +514,7 @@ window.vm = new Vue({
     }
   }
 }).$mount('#app')
+
+// Expose for debugging
+window.Resources = Resources
+window.Mods = Mods

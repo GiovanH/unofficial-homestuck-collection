@@ -353,6 +353,7 @@ document.addEventListener('click', function (e) {
       this.$el.contentWindow.vm = this
     },
     resolveFrameUrl(url){
+      this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
       return Resources.resolveURL(url)
     },
     invokeFromFlash(func) {
