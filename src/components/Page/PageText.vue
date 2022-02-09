@@ -190,10 +190,11 @@ export default {
                         }
 
                         const saturationExtrema = 0.5
-                        const needClampsaturation = (textcolor.getSaturation() < saturationExtrema)
+                        const needClampsaturation = (textcolor.getSaturation() < saturationExtrema) && textcolor.getHue()
 
                         if (needClampsaturation) {
                             e.setAttribute("data-orig-color", textcolor.toString())
+                            e.setAttribute("data-orig-hue", textcolor.getHue())
                             textcolor = textcolor.saturation(saturationExtrema)
                             e.style.color = textcolor.toString()
                         }
