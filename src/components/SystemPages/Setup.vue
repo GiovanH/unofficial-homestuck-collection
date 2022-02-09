@@ -290,7 +290,7 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key])
+        this.$modChoices[key]).filter(val => !!val)
     }
   },
   mounted() {

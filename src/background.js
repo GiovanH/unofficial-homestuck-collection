@@ -187,6 +187,7 @@ function loadArchiveData(){
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
+  if (!fs.existsSync(assetDir)) throw Error("Asset directory is missing!")
 
   let data
 
