@@ -400,7 +400,7 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/newreader'>New reader</a>"
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
         }, {
           model: "devMode",
           label: "Enable Developer Mode",
