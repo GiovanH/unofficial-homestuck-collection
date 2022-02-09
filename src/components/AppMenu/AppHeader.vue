@@ -22,7 +22,7 @@ export default {
   computed: {
     isHidden() {
       const isFullscreen = (this.windowHeight === screen.height)
-      return isFullscreen && !this.$localData.settings.hideFullscreenHeader
+      return isFullscreen && this.$localData.settings.hideFullscreenHeader
     }
   },
   methods: {
