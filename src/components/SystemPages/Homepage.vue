@@ -176,7 +176,7 @@
             <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
             <div class="links">
               <div class="left">
-                &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
+                &gt; <a href="/unlock/PS_titlescreen" >Title screen</a>
               </div>
               <div class="center">
                 &gt; <a href="/log/4" >Adventure Log</a><br>

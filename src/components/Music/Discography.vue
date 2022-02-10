@@ -226,7 +226,7 @@ export default {
         title: 'Problem Sleuth Titlescreen',
         pageNum: 'ps_titlescreen',
         thumbnail: 'ps_titlescreen',
-        url: '/unlock/ps_titlescreen'
+        url: '/unlock/PS_titlescreen'
       })
       else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') return ({
         title: 'SBAHJthemovie1',

@@ -110,7 +110,7 @@ export default {
               result.push(`<em>Page ${pageNum}</em> - <a href="/mspa/${page}" target="_blank" >${pageTitle}</a> ${bolin ? ' (Removed 11/Jun/2010)' : ''}`)
             }
           }
-          else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/ps_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
+          else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/PS_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
           else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') result.push(`<a href="assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf" target="_blank" >SBAHJthemovie1.swf</a>`)
           else result.push(page)
         })
