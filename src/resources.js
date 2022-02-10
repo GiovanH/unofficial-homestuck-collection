@@ -338,7 +338,63 @@ function getChapter(key) {
   }
 }
 
-function testResources(){
+async function testArchiveMusic(archive){
+  archive = archive || window.vm.archive
+  
+  // logger.info("Flash art")
+  // // from discography.vue
+  // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
+  // logger.info(flash_urls)
+
+  // await Promise.all(flash_urls.map(u => fetch(u, {mode: 'no-cors'})))
+  // logger.info("Done (opaque)")
+
+  logger.info("Album art...")
+  // from discography.vue
+  const album_urls = Object.values(archive.music.albums).map(album => `assets://archive/music/${album.directory}/cover.jpg`)
+  album_urls.push(`assets://archive/music/spoiler.png`)
+
+  await Promise.all(album_urls.map(u => fetch(u, {mode: 'no-cors'})))
+  logger.info("Done (opaque)")
+
+  logger.info("Track art...")
+  // from track.vue
+  const track_urls = Object.values(archive.music.tracks).map(track => {
+    const dirName = track.album.find(album => archive.music.albums[album].hasTrackArt) || track.album[0]
+    const fileName = track.coverArtists && archive.music.albums[dirName].hasTrackArt ? track.directory : 'cover'
+    return `assets://archive/music/${dirName}/${fileName}.jpg`
+  })
+  track_urls.push(`assets://archive/music/spoiler.png`)
+
+  await Promise.all([...new Set(track_urls)].map(u => fetch(u, {mode: 'no-cors'})))
+  logger.info("Done (opaque)")
+}
+
+async function testArchiveComic(archive){
+  archive = archive || window.vm.archive
+  
+  // logger.info("Flash art")
+  // // from discography.vue
+  // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
+  // logger.info(flash_urls)
+
+  // await Promise.all(flash_urls.map(u => fetch(u, {mode: 'no-cors'})))
+  // logger.info("Done (opaque)")
+
+  logger.info("MSPA story...")
+  // from discography.vue
+  const media_urls = Object.values(archive.mspa.story).reduce((acc, page) => [...acc, ...page.media], [])
+  let array = [...new Set(media_urls)]
+  const chunk_size = 1000
+  for (let i = 0; i < array.length; i += chunk_size) {
+    const chunk = array.slice(i, i + chunk_size)
+    await Promise.all(chunk.map(u => fetch(getResourceURL(u), {mode: 'no-cors'})))
+    logger.info(i)
+  }
+  logger.info("Done (opaque)")
+}
+
+function testResolution(){
   const libGetResourceUrl = {
     "/advimgs/jb/mspaintadventure08.gif": "assets://advimgs/jb/mspaintadventure08.gif",
     "/archive/collection/archive_beta.png": "assets://archive/collection/archive_beta.png",
@@ -716,6 +772,8 @@ module.exports = {
   getResourceURL,
   getChapter,
   resolveAssetsProtocol,
-  testResources,
+  testResolution,
+  testArchiveMusic,
+  testArchiveComic,
   linkIsOutlink
 }
