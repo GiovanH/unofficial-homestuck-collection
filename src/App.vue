@@ -1,20 +1,22 @@
 <template>
-  <div id="app" :class="[
-    // $root.loadState != 'DONE' ? 'busy' : '',
-    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
-      theme
-    ]" v-if="$archive && $root.loadState !== 'ERROR'">
-    <AppHeader :class="theme" ref="appheader" />
-    <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
-    <Notifications :class="theme" ref="notifications" />
-    <ContextMenu :class="theme" ref="contextMenu" />
-    <Updater ref="Updater" />
-    <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
-    <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
-  </div>
-  <div id="app" class="mspa"  v-else>
-    <Setup />
-    <ContextMenu ref="contextMenu" />
+  <div id="window" :class="theme">
+    <div id="app" :class="[
+      // $root.loadState != 'DONE' ? 'busy' : '',
+      $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        
+      ]" v-if="$archive && $root.loadState !== 'ERROR'">
+      <AppHeader :class="theme" ref="appheader" />
+      <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
+      <Notifications :class="theme" ref="notifications" />
+      <ContextMenu :class="theme" ref="contextMenu" />
+      <Updater ref="Updater" />
+      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+      <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
+    </div>
+    <div id="app" class="mspa"  v-else>
+      <Setup />
+      <ContextMenu ref="contextMenu" />
+    </div>
   </div>
 </template>
 
@@ -293,6 +295,12 @@
 @import "@/css/fa/scss/solid.scss";
 
 @import '@/css/mspaThemes.scss';
+
+  #window {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
 
   #app.busy {
     cursor: progress;
