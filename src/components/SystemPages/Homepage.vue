@@ -508,6 +508,8 @@ export default {
         flex-flow: row nowrap;
         align-items: flex-start;
 
+        z-index: 1;
+
         .icon {
           text-align: center;
 
@@ -552,6 +554,9 @@ export default {
         display: flex;
         flex-flow: row wrap;
         width: 100%;
+
+        // Keep margin behind adventure links
+        z-index: 0;
 
         ::v-deep .comicsans {
           font-family: "Comic Sans MS", "Comic Sans", cursive;
