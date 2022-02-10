@@ -78,7 +78,7 @@ export default {
     }
     const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
 
-    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    if (ctx.gameOverThemeOverride == 'mspa') title = "ACT 6 ACT 6 INTERMISSION 3"
     else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
       title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
     } else {
