@@ -779,15 +779,24 @@ async function createWindow () {
     win = null
   })
 
-  var current_icon // = "build/icons/icon.ico"
+  var current_icon // = "build/icons/icon"
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
-    new_icon = new_icon || "build/icons/icon.ico"
+    new_icon = new_icon || "build/icons/icon"
     if (new_icon && new_icon != current_icon) {
-      win.setIcon(new_icon)
-      logger.info("Changing icon to", new_icon)
-      current_icon = new_icon
+      try {
+        if (process.platform == "win32") {
+          new_icon += ".ico"
+        } else {
+          new_icon += ".png"
+        }
+        logger.info("Changing icon to", new_icon, process.platform)
+        win.setIcon(new_icon)
+        current_icon = new_icon
+      } catch (e) {
+        logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
+      }
     }
   })
 

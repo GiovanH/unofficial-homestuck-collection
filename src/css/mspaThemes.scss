@@ -1,6 +1,6 @@
 #app > *, .tabFrame > div {
 
-	--app-icon: "build/icons/icon.ico";
+	--app-icon: "build/icons/icon";
 
 	--font-default: #000000;
 	--font-header: #000000;
@@ -89,7 +89,7 @@
 	}
 
 	&.retro {
-		--app-icon: "build/icons/default.ico";
+		--app-icon: "build/icons/default";
 		
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
@@ -112,7 +112,7 @@
 	}
 
 	&.scratch {
-		--app-icon: "build/icons/scratch.ico";
+		--app-icon: "build/icons/scratch";
 
 		--font-default: #ffffff;
 		--font-header: #ffffff;
@@ -158,7 +158,7 @@
 	}
 
 	&.sbahj {
-		--app-icon: "build/icons/sbahj.ico";
+		--app-icon: "build/icons/sbahj";
 
 		--font-disabled: #00000060;
 		--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
@@ -306,7 +306,7 @@
 	}
 
 	&.trickster {
-		--app-icon: "build/icons/sucker.ico";
+		--app-icon: "build/icons/sucker";
 		--font-default: #f9fd6b;
 		--font-header: #f9fd6b;
 		--font-highlight: #000000;
@@ -359,7 +359,7 @@
 	}
 
 	&.A6A6 {
-		--app-icon: "build/icons/cherub.ico";
+		--app-icon: "build/icons/cherub";
 		--font-default: #2ed73a;
 		--font-header: #ffffff;
 		--font-highlight: #000000;
@@ -407,7 +407,7 @@
 	}
 
 	&.pxs {
-		--app-icon: "build/icons/pxs.ico";
+		--app-icon: "build/icons/pxs";
 
 		--font-default: #ffffff;
 		--font-header: #ffffff;
