@@ -126,18 +126,21 @@
         } else {
           this.activeTabComponent.$refs.jumpbox.toggle()
         }
-      }
-    },
-    watch: {
-      'theme'(to, from) {
+      },
+      updateAppIcon(){ 
         this.$nextTick(() => {
+          if (!this.$refs["appheader"]) {
+            this.$logger.warn("trying to updateAppIcon, but no appheader element yet")
+            setTimeout(() => this.updateAppIcon(), 2000)
+            return
+          }
           let app_icon_var = window.getComputedStyle(this.$refs["appheader"].$el).getPropertyValue('--app-icon')
           let match
           // eslint-disable-next-line no-cond-assign
-          if (match = / url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
+          if (match = /url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
             app_icon_var = this.$mspaFileStream(match[1].replace(/\\/g, ''))
           // eslint-disable-next-line no-cond-assign
-          } else if (match = / "(.+)"/.exec(app_icon_var)) {
+          } else if (match = /"(.+)"/.exec(app_icon_var)) {
             app_icon_var = match[1]
           } else {
             this.$logger.error(`Couldn't match '${app_icon_var}'`)
@@ -146,9 +149,16 @@
           this.$logger.info("Requesting icon change to", app_icon_var)
           electron.ipcRenderer.send('set-sys-icon', app_icon_var)
         })
+      }
+    },
+    watch: {
+      'theme'(to, from) {
+        this.updateAppIcon()
       } 
     },
     mounted () {
+      this.$nextTick(() => this.updateAppIcon())
+
       this.$localData.root.TABS_SWITCH_TO()
 
       electron.webFrame.setZoomFactor(1)
