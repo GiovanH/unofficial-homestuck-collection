@@ -108,7 +108,7 @@ export default {
     font-weight: normal;
     color: var(--page-nav-divider);
 
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
   }

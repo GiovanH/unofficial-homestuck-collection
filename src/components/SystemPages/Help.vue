@@ -231,7 +231,7 @@ export default {
     font-weight: normal;
 
     color: var(--font-default);
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
   }
