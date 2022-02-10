@@ -269,8 +269,10 @@
           this.$refs.contextMenu.open(event, target)
           return
         } else if (button == 3) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_BACK()
         } else if (button == 4) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_FORWARD()
         }
         while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode

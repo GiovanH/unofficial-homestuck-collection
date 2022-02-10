@@ -715,6 +715,20 @@ async function createWindow () {
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
+  //  ;[
+  //   'will-navigate',
+  //   'did-navigate-in-page',
+  //   'did-start-navigation',
+  //   'will-redirect',
+  //   'did-redirect-navigation',
+  //   'did-navigate',
+  //   'did-frame-navigate'
+  // ].forEach(eventName => {
+  //   win.webContents.on(eventName, (event) => {
+  //     logger.info("blocking", eventName)
+  //     event.preventDefault()
+  //   })
+  // })
 
   win.webContents.on('update-target-url', (event, new_url) => {
     win.webContents.send('update-target-url', new_url)

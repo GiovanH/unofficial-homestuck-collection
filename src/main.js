@@ -515,6 +515,14 @@ window.vm = new Vue({
   }
 }).$mount('#app')
 
+// Even though we cancel the auxclick, reallly *really* cancel mouse navigation.
+window.addEventListener("mouseup", (e) => {
+  if (e.button === 3 || e.button === 4){
+    window.vm.$logger.info("blocking mouse navigation")
+    e.preventDefault()
+  }
+})
+
 // Expose for debugging
 window.Resources = Resources
 window.Mods = Mods
