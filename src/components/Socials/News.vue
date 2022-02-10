@@ -94,6 +94,12 @@ export default {
       this.activeYear = this.activeYear != year ? year : undefined
       if (this.activeYear && !this.routeParams.id) this.$nextTick(() => {this.jumpToClass(year)})
     },
+    filterIa(){
+      this.$el.querySelectorAll("div.newsYear").forEach(div => {
+        const year = div.querySelector(".yearTitle").textContent
+        this.filterLinksAndImagesInternetArchive(div, year)
+      })
+    },
     jumpToClass(id){
       const className = id || ""
       const el = this.$el.getElementsByClassName(className)[0]
@@ -121,12 +127,18 @@ export default {
       this.jumpFromUrl()
     },
     'activeYear'(to, from) {
-      this.$nextTick(() => this.filterLinksAndImages())
+      this.$nextTick(() => {
+        this.filterLinksAndImages()
+        this.filterIa()
+      })
     }
   },
   mounted(){
     this.jumpFromUrl()
-    this.$nextTick(() => this.filterLinksAndImages())
+    this.$nextTick(() => {
+      this.filterLinksAndImages()
+      this.filterIa()
+    })
   }
 }
 </script>

@@ -9,6 +9,10 @@ const logger = log.scope('Resources');
 
 var assets_root = undefined
 
+function linkIsOutlink(url) {
+  return /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url) && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url)
+}
+
 // Pure
 function fileIsAsset(url) {
   // Given a url, *without considering the domain*, determine if this should
@@ -22,8 +26,7 @@ function fileIsAsset(url) {
   const is_bundled = /\/assets\/[^/]+\.[^/]+/.test(url)
   if (is_bundled) return false
 
-  const is_outlink = /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url) && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url)
-  if (is_outlink) return false
+  if (linkIsOutlink(url)) return false
 
   // There used to be some cases where /archive urls were meant to redirect to assets, but those should be fixed in data now.
 
@@ -184,12 +187,12 @@ const UrlFilterMixin = {
       if (el.nodeType === 8) return
       
       // else
-      document.querySelectorAll("A").forEach((link) => {
+      el.querySelectorAll("A").forEach((link) => {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
           link.href = getResourceURL(pseudLinkHref)
           if (link.href != pseudLinkHref) {
-            // logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
           }
         }
       })
@@ -205,7 +208,7 @@ const UrlFilterMixin = {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
         media[i].src = resolveURL(pseudMediaSrc)
         if (media[i].src != pseudMediaSrc) {
-          // logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
         }
 
         if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  
@@ -217,6 +220,26 @@ const UrlFilterMixin = {
           }
         }
       }
+    },
+    filterLinksAndImagesInternetArchive(el, best_date=1){
+      // dynamic default
+      // this.$el can be a comment because fuck me of course it can
+      if (!el) { 
+        if (this.$el.nodeType === 8) return
+        else el = this.$el.querySelector('.pageContent')
+      }
+
+      // Check if this is a comment
+      if (el.nodeType === 8) return
+      
+      // else
+      el.querySelectorAll("a[href]").forEach((link) => {
+        const input_href = link.href
+        if (linkIsOutlink(link.href) && !/web\.archive\.org/.test(link.href)) {
+          link.href = `https://web.archive.org/web/${best_date}/` + link.href
+          this.$logger.debug(input_href, "->", link.href)
+        }
+      })
     }
   }
 }
@@ -693,5 +716,6 @@ module.exports = {
   getResourceURL,
   getChapter,
   resolveAssetsProtocol,
-  testResources
+  testResources,
+  linkIsOutlink
 }
