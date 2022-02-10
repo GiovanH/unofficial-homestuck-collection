@@ -282,7 +282,9 @@ export default {
       height: 100%;
       opacity: 40%;
     }
-    &.active svg {opacity: 100%;}
+    &.active > svg {
+      opacity: 100%;
+    }
 
     .badge {
       display: block;
