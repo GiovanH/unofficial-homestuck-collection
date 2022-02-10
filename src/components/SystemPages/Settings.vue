@@ -252,7 +252,7 @@
 
         <section class="modPrattle">
           <p class="settingDesc">
-            Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>.
+            Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
 <!--           </p>
           <p> -->
             You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
