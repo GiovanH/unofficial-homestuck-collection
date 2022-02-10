@@ -96,7 +96,8 @@ function getResourceURL(request_url){
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
-  
+    .replace('http://www.whatpumpkin.com/squiddles.htm', '/squiddles/credits')
+
   if (resource_url != request_url)
     // logger.debug("[getResU prelim]", request_url, "to", resource_url)
 

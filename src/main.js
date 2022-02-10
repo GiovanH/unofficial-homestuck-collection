@@ -112,7 +112,7 @@ Vue.mixin({
     $openLink(url, auxClick = false) {
       const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
 
-      if (urlObject.protocol == "assets:" && !/\.html$/i.test(url)) {
+      if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
