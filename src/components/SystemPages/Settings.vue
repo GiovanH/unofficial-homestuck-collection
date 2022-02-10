@@ -806,6 +806,10 @@ export default {
     }
   }
 
+  ::v-deep .spoilerbox .settings {
+    color: var(--font-log);
+  }
+
   .navBanner {
     margin-bottom: 25px;
   }
