@@ -74,6 +74,7 @@ function getResourceURL(request_url){
   // arbitrary HTTP urls
   // http://localhost:8080/ or app:// urls
   // http://localhost:{port}/ urls
+  // Links from storyPages, like external links, sbahj, tinyurl...
   //
   // Things this should not get:
   // assets://
@@ -91,7 +92,7 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") // Covers for 99% of flashes that link to other pages
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
     .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") // Link from CD rack flash
-    .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:comoc\.php)?\?cid=0(\d{2})\.jpg/, "/sbahj/$1") // TODO double-check this regex
+    .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1") // TODO double-check this regex
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
@@ -315,7 +316,6 @@ function getChapter(key) {
 
 function testResources(){
   const libGetResourceUrl = {
-    "/storyfiles/hs2/05260/05260.html": "assets://storyfiles/hs2/05260/05260.html",
     "/advimgs/jb/mspaintadventure08.gif": "assets://advimgs/jb/mspaintadventure08.gif",
     "/archive/collection/archive_beta.png": "assets://archive/collection/archive_beta.png",
     "/archive/collection/archive_vigilprince.png": "assets://archive/collection/archive_vigilprince.png",
@@ -340,6 +340,7 @@ function testResources(){
     "/ryanquest/01.gif": "assets://ryanquest/01.gif",
     "/ryanquest/02.gif": "assets://ryanquest/02.gif",
     "/storyfiles/hs2/00248retcon.gif": "assets://storyfiles/hs2/00248retcon.gif",
+    "/storyfiles/hs2/05260/05260.html": "assets://storyfiles/hs2/05260/05260.html",
     "/storyfiles/hs2/07631.gif": "assets://storyfiles/hs2/07631.gif",
     "/storyfiles/hs2/08112johndad.png": "assets://storyfiles/hs2/08112johndad.png",
     "/storyfiles/hs2/08113johndad.png": "assets://storyfiles/hs2/08113johndad.png",
@@ -487,6 +488,8 @@ function testResources(){
     "http://www.mspaintadventures.com/storyfiles/hs2/scraps/smuut26.gif": "assets://storyfiles/hs2/scraps/smuut26.gif",
     "http://www.mspaintadventures.com/storyfiles/hs2/waywardvagabond/recordsastutteringstep/": "/waywardvagabond/recordsastutteringstep/",
     "http://www.mspaintadventures.com/storyfiles/hs2/waywardvagabond/recordsastutteringstep/06.gif": "assets://storyfiles/hs2/waywardvagabond/recordsastutteringstep/06.gif",
+    "http://www.mspaintadventures.com/sweetbroandhellajeff/": "/sbahj/",
+    "http://www.mspaintadventures.com/sweetbroandhellajeff/comoc.php?cid=038.jpg": "/sbahj/38",
     "http://www.newgrounds.com/dump/item/f8ababf5e077e0fc05bacb3acad2a4b7": "http://www.newgrounds.com/dump/item/f8ababf5e077e0fc05bacb3acad2a4b7",
     "http://www.newyorkcomiccon.com/": "http://www.newyorkcomiccon.com/",
     "http://www.overcompensating.com/": "http://www.overcompensating.com/",

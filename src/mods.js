@@ -431,7 +431,7 @@ function getModJs(mod_dir, options={}) {
           // eslint-disable-next-line no-undef
           mod = __non_webpack_require__(modjs_path)
         } else {
-          console.log("mod", mod_dir, "is not imod, unrecoverable require error")
+          // console.log("mod", mod_dir, "is not imod, unrecoverable require error")
           throw e
         }
       }
