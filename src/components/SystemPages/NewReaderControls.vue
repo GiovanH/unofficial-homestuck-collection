@@ -331,6 +331,9 @@ export default {
       this.$emit('ffchange', to)
       this.$localData.settings['fastForward'] = to
     },
+    '$localData.settings.fastForward'(to, from){
+      this.myFastForward = to
+    },
     "$localData.settings.newReader.current"(to, from){
       if (to && !this.$parent.tabIsActive)
         this.newReaderPageInput = this.$mspaOrVizNumber(to)
