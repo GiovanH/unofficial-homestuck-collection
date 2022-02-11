@@ -29,7 +29,13 @@ const gotTheLock = app.requestSingleInstanceLock()
 
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
-app.disableHardwareAcceleration()
+
+if (!store.get('localData.settings.enableHardwareAcceleration')) {
+  console.log("Disabling hardware acceleration")
+  app.disableHardwareAcceleration()
+} else {
+  console.log("Not disabling hardware acceleration")
+}
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
