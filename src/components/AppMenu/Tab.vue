@@ -6,7 +6,7 @@
       <div class="tabTitle" :class="{titleFade}" ref="title" >
         <span v-text="title" ref="titleText"/>
       </div>
-      <span v-if="hasAudio" class='music'><fa-icon icon="music" /></span>
+      <span v-if="hasAudio && !stubAudioIcon" class='music'><fa-icon icon="music" /></span>
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -24,7 +24,8 @@ export default {
     return {
       pendingDeletion: false,
       resizeObserver: undefined,
-      titleFade: false
+      titleFade: false,
+      stubAudioIcon: true
     }
   },
   computed: {
@@ -38,8 +39,7 @@ export default {
       return this.$localData.tabData.tabList.length
     },
     title() {
-        let result = !!this.tab.title ? this.tab.title : this.tab.url
-        return result
+        return this.tab.title || this.tab.url
     }
   },
   methods: {
