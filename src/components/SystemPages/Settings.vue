@@ -320,6 +320,20 @@
     <div class="card">
       <div class="settings system">
         <h2>System Settings</h2>
+        <dl>
+          <template v-for="boolSetting in settingListSystem">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]" 
+                @click="toggleSetting(boolSetting.model)"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass -->
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
+          </template>
+        </dl>
         <div class="system">
           <span class="hint">Application version:</span> <strong>v{{$data.$appVersion}}</strong>
           <br><br>
@@ -401,10 +415,6 @@ export default {
           model: "urlTooltip",
           label: "Show URL Tooltip",
           desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
-        }, {
-          model: "devMode",
-          label: "Enable Developer Mode",
-          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
         }
       ],
       enhancementListBoolean: [
@@ -421,10 +431,6 @@ export default {
           label: "Enable high quality Flash audio",
           desc: "This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems."
         }, {
-          model: "jsFlashes",
-          label: "Enable enhanced Flash effects",
-          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
-        }, {
           model: "credits",
           label: "Show inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
@@ -432,6 +438,21 @@ export default {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
           desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+        }
+      ],
+      settingListSystem: [
+        {
+          model: "devMode",
+          label: "Enable Developer Mode",
+          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+        }, {
+          model: "jsFlashes",
+          label: "Enable enhanced Flash effects",
+          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
+        }, {
+          model: "enableHardwareAcceleration",
+          label: "Enable hardware acceleration",
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
