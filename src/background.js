@@ -154,6 +154,20 @@ var menuTemplate = [
         accelerator: 'CmdOrCtrl+Shift+Tab',
         click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
       },
+      {
+        label: 'Next Tab (Alternate)',
+        accelerator: 'CmdOrCtrl+PageDown',
+        visible: false,   
+        acceleratorWorksWhenHidden: true,
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
+      },
+      {
+        label: 'Previous Tab (Alternate)',
+        accelerator: 'CmdOrCtrl+PageUp',
+        visible: false,   
+        acceleratorWorksWhenHidden: true,
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
+      },
       { type: 'separator' },
       {
         label: 'Duplicate Tab',
