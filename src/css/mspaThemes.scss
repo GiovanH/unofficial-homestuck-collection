@@ -33,6 +33,11 @@
 	--page-links: #0000EE;
 	--page-links-visited: #6300c0;
 
+	--system-skycolor: #35bfff;
+	--system-background: 
+		url(assets://archive/collection/homebg_right.png) left top repeat-y fixed,
+      	url(assets://archive/collection/homebg_left.png) right top repeat-y fixed;
+
 	--ctx-bg: #EEEEEE;
 	--ctx-frame: #535353;
 	--ctx-shadow: #000000;
@@ -75,6 +80,9 @@
 		--page-nav-meta: #979797;
 		--page-links: #0066ff;
 		--page-log-bg: #000000;
+
+		--system-background: none;
+		--system-skycolor: #222;
 		
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
@@ -143,6 +151,9 @@
 		--page-nav-meta: #FFFFFF;
 		--page-links: #2cff4b;
 		--page-links-visited: #2cff4b;
+
+		--system-background: none;
+		--system-skycolor: #000000;
 
 		--ctx-bg: #0e4603;
 		--ctx-frame: #082a00;
@@ -221,6 +232,9 @@
 		--page-links: #0066ff;
 		--page-log-bg: #000000;
 		
+		--system-skycolor: #1D1D1D;
+		--system-background: linear-gradient(0.25turn, #752020, #1D1D1D, #252C77);
+
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
 		--ctx-select: #0066ff;
@@ -261,12 +275,16 @@
 		--ctx-select: red;
 		--ctx-divider: #ffffff;
 
+		--system-background: none;
+		--system-skycolor: #000000;
+
 		--saves-bg: #454545;
 		--saves-tab: #262626;
 		--saves-tabHover: #3c3c3c;
 		--saves-border: #363636;
 		--saves-scroll: #5a5a5a;
 		--saves-scrollHover: #6a6a6a;
+
 	}
 
 	&.tso {
@@ -297,6 +315,9 @@
 		--ctx-frame: #000000;
 		--ctx-select: #111111;
 		--ctx-divider: #ffffff;
+
+		--system-background: none;
+		--system-skycolor: #111111;
 
 		--saves-bg: #2f2f2f;
 		--saves-tab: #111111;

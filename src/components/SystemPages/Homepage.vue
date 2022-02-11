@@ -21,7 +21,7 @@
       <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
-          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 167px;" v-if="$root.tabTheme === 'A6A6'" >
+          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 74px;" v-if="$root.tabTheme.rendered === 'A6A6'" >
           <p class="date">Apr 2009 - Apr 2016</p>
           <p class="date">8,130 pages</p>
         </div>
@@ -61,7 +61,7 @@
           <template v-slot:title>Music</template>
           <p>Explore the entire discography of official Homestuck music.</p>
         </HomeRowItem>
-        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 399px;" v-if="$root.tabTheme === 'A6A6'" >
+        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 280px;" v-if="$root.tabTheme.rendered === 'A6A6'" >
         <HomeRowItem
           class="rowItem"
           href="/sbahj"
@@ -262,7 +262,7 @@
     <div class="card newsCard">
       <div class="logo newsLogo cardContent">
         <Media url="assets://archive/collection/news_logo.png" />
-        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
+        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme.rendered === 'A6A6'" >
       </div>
       <div class="cardContent">
         <div class="description">
@@ -412,11 +412,9 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
-
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
+      
     color: var(--font-default);
     padding-bottom: 50px;
   }
