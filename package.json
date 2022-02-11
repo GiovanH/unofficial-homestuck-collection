@@ -5,7 +5,7 @@
     "name": "Bambosh",
     "email": "andrewjnkn7@gmail.com"
   },
-  "version": "2.0.0",
+  "version": "2.0.2",
   "license": "GPL-3.0",
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,
@@ -37,6 +37,7 @@
     "sass": "^1.35.1",
     "serve-handler": "^6.1.3",
     "tar": "^6.1.11",
+    "ts-color-class": "^0.10.1",
     "unzipper": "^0.10.11",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

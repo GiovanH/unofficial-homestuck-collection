@@ -24,7 +24,7 @@
             <p><strong>SPOILER WARNING:</strong> Expect all external links within this database to contain direct spoilers for the end of Homestuck. Click with care!</p>
           </div>
           <div class="sidebarItem">
-            <p>This information is current as of the <br><strong>25th October, 2020</strong>.<br> For more recent info, deeper categorization, and unofficial albums, visit the <a href="https://hsmusic.wiki/">Homestuck Music Wiki.</a></p>
+            <p>This information is current as of the <br><strong>14th February, 2022</strong>.<br> For more recent info, deeper categorization, and unofficial albums, visit the <a href="https://hsmusic.wiki/">Homestuck Music Wiki.</a></p>
             <br>
             <p>If you're enjoying the tunes, how about dropping some money on the albums at the <a href="https://homestuck.bandcamp.com/">Official Homestuck Bandcamp?</a></p>
           </div>

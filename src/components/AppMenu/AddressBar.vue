@@ -22,6 +22,8 @@
         />
       </vue-simple-suggest>    
       <div id="browserActions">
+        <!-- Browser actions go here -->
+        <component v-for="(__, actionkey) in browserActions" :is="actionkey" :key="actionkey" :data-key="actionkey" />
         <div class="systemButton"
           v-if="$localData.settings.devMode && thisTabPageId" 
           :title="`Change current page from ${$newReaderCurrent} to p=${thisTabPageId}\n(Middle click to disable newreader)`"
@@ -37,8 +39,6 @@
           <fa-icon 
             :icon="isCurrentPageBookmarked ? 'star' : 'star'"></fa-icon>
         </div>
-        <!-- Browser actions go here -->
-        <component v-for="(__, actionkey) in browserActions" :is="actionkey" :key="actionkey" />
       </div>      
     </div>
   </div>
@@ -79,14 +79,14 @@ export default {
       )
     },
     tabComponent() {
-      return this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0]
+      return this.$root.app.activeTabComponent
     },
     thisTabPageId(){
       // // This is a good implementation to grab an inner page, so I'm leaving 
       // // it as a reference, but it has a race condition which makes it
       // // a poor fit here.
       // try {
-      //   const page = this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.page
+      //   const page = this.$root.app.activeTabComponent.$refs.page
       //   if (page.$options.name == "page")
       //     return page.thisPage.pageId
       //   else
@@ -148,7 +148,7 @@ export default {
       }
     },
     reloadTab(e) {
-      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].reload()
+      this.$root.app.activeTabComponent.reload()
     },
     onSuggestSelect(event){
       if (!event) return
@@ -189,97 +189,114 @@ export default {
 <style lang="scss" scoped>
 #jumpBox {
   flex: 1 0 auto;
-  margin: auto 5px;
+  margin: auto 0;
+  padding: 0px 4px;
+}
+.jumpBoxWrapper::v-deep {
+  display: flex;
+  flex-flow: row nowrap;
 
-  .jumpBoxWrapper::v-deep {
-    display: flex;
-    flex-flow: row nowrap;
+  --border-size: 1px;
 
-    border-radius: 2px;
-    border: 1px solid var(--header-border);
+  border-radius: 2px;
+  border: var(--border-size) solid var(--header-border);
+  height: calc(var(--address-bar-height) - 2 * var(--border-size));
+
+  background: var(--header-tabSection);
+
+  .vue-simple-suggest {
+    width: 100%;
+  }
+
+  .jumpboxLink {
+    border-radius:  1px 0 0 1px ;
     background: var(--header-tabSection);
+    color: var(--font-header);
+    font-size: 16px;
+    text-decoration: none;
 
-    .vue-simple-suggest {
-      width: 100%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+
+    &::after {
+      text-align: center;
+      width: 22px;
+      margin: 0;
+    }
+  }
+  input {
+    border-radius: 0 1px 1px 0;
+    padding: 2px 0;
+    font-size: calc(var(--address-bar-height) * (3/5));
+    line-height: 20px;
+    width: 100%;
+    border: none;
+    font-family: var(--font-family-ui);
+    background: var(--header-tabSection);
+    color: var(--font-header);
+  }
+  .suggestions {
+    background-color: var(--ctx-bg);
+    border: solid 1px var(--ctx-frame);
+    color: var(--font-ctx);
+
+    font-family: var(--font-family-ui);
+    font-weight: normal;
+
+    list-style: none;
+
+    li[aria-selected="true"] {
+      background: var(--ctx-select);
     }
 
-    .jumpboxLink {
-      border-radius:  1px 0 0 1px ;
-      background: var(--header-tabSection);
-      color: var(--font-header);
-      font-size: 16px;
-      text-decoration: none;
-
-      justify-content: center;
-      align-items: center;
-      display: flex;
-
-      &::after {
-        text-align: center;
-        width: 22px;
-        margin: 0;
-      }
-    }
-    input {
-      border-radius: 0 1px 1px 0;
-      padding: 2px 0;
-      font-size: 15px;
-      line-height: 20px;
-      width: 100%;
-      border: none;
-      font-family: var(--font-family-ui);
-      background: var(--header-tabSection);
-      color: var(--font-header);
-    }
-    .suggestions {
-      background-color: var(--ctx-bg);
-      border: solid 1px var(--ctx-frame);
-      color: var(--font-ctx);
-
-      font-family: var(--font-family-ui);
-      font-weight: normal;
-
-      list-style: none;
-
-      li[aria-selected="true"] {
-        background: var(--ctx-select);
-      }
-
-      z-index: 5;
-      padding: 5px;
-      outline: none;
-      cursor: default;
-      position: fixed;
-      user-select: none;
-      white-space: nowrap;
-    }
+    z-index: 5;
+    padding: 5px;
+    outline: none;
+    cursor: default;
+    position: fixed;
+    user-select: none;
+    white-space: nowrap;
   }
 }
 #browserActions::v-deep {
   display: inline-block;
-  height: 28px;
+  height: var(--address-bar-height);
   display: flex; 
   > div {
-    height: 24px;
-    width: 24px;
     position: relative;
-    padding: 2px;
-    color: var(--font-header);
-    font-size: 24px;
+
+    --padding: 2px;
+    --square-size: calc(var(--address-bar-height) - 2 * var(--padding));
+
+    width: var(--square-size);
+    height: calc(var(--square-size) - 1px);
+    padding: var(--padding);
+    font-size: calc(var(--square-size) - 4px);
+
+    color: var(--font-header);   
+
+    > svg {
+      display: block;
+      margin: auto;
+      height: 100%;
+      opacity: 0.4;
+    }
+    &.active > svg {
+      opacity: 1.0;
+    }
 
     .badge {
       display: block;
       position: absolute;
       background: var(--header-bg);
       font-size: 10px;
-      height: 1em;
+      opacity: 0.8;
+      // height: 1em;
       line-height: normal;
       bottom: 0;
       right: 0;
     }
-  }   
-  svg {opacity: 40%;}
-  div.active svg {opacity: 100%;
   }
 }
 </style>

@@ -695,7 +695,7 @@ export default {
     flex: 1 0 auto;
     align-items: center;
     
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
 

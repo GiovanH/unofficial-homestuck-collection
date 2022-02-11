@@ -174,7 +174,7 @@ export default {
     > img {
       align-self: center;
     }
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
 

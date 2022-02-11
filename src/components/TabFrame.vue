@@ -39,8 +39,7 @@ import ERROR404 from '@/components/SystemPages/Error404.vue'
 import SPOILER from '@/components/SystemPages/Spoiler.vue'
 
 import HOMEPAGE from '@/components/SystemPages/Homepage.vue'
-import NEWREADER from '@/components/SystemPages/NewReader.vue'
-import USERGUIDE from '@/components/SystemPages/UserGuide.vue'
+import HELP from '@/components/SystemPages/Help.vue'
 import MAP from '@/components/SystemPages/Map.vue'
 import LOG from '@/components/SystemPages/Log.vue'
 import SEARCH from '@/components/SystemPages/Search.vue'
@@ -65,9 +64,11 @@ import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
 import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
 import SQUIDDLES from '@/components/Extras/Squiddles.vue'
+import EVENMORE from '@/components/Extras/EvenMore.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
+import SOCIALS from '@/components/Socials/Socials.vue'
 import DSTRIDER from '@/components/Socials/DStrider.vue'
 import BLOGSPOT from '@/components/Socials/Blogspot.vue'
 import MAGICALJOURNEY from '@/components/Socials/MagicalJourney.vue'
@@ -90,7 +91,7 @@ export default {
     props: [
         'tabKey'
     ],
-    components : {
+    components: {
         Bookmarks,
         FindBox,
         JumpBox,
@@ -100,8 +101,7 @@ export default {
         SPOILER,
 
         HOMEPAGE,
-        NEWREADER,
-        USERGUIDE,
+        HELP,
         MAP,
         LOG,
         SEARCH,
@@ -126,8 +126,10 @@ export default {
         VIGILPRINCE,
         SKAIANET,
         SQUIDDLES,
+        EVENMORE,
 
         MUSIC,
+        SOCIALS,
         DSTRIDER,
         BLOGSPOT,
         MAGICALJOURNEY,
@@ -145,7 +147,6 @@ export default {
     },
     data() {
         return {
-            forceLoad: false,
             gameOverThemeOverride: false,
             modBrowserPages: {}
         }
@@ -166,7 +167,7 @@ export default {
         routeParams() {
             let base = this.tab.url.split('/').filter(Boolean)[0]
             return  {
-                base: base || '', 
+                base: (base || '').toLowerCase(), 
                 ...this.$router.resolve(this.tab.url).route.params
             }
         },
@@ -207,15 +208,35 @@ export default {
             if (!this.routeParams.base) component = 'Homepage'
             switch (component) {
                 case 'PAGE': {
-                    let convertedPage = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p) : this.routeParams
-                    let p = convertedPage.p ? convertedPage.p : undefined
-                    if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
-                    else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
+                    // Construct canonical story name and page number
+                    let story_id
+                    let page_num
+                    if (this.$isVizBase(this.routeParams.base)) {
+                        const {s, p} = this.$vizToMspa(this.routeParams.base, this.routeParams.p)
+                        story_id = s
+                        page_num = p
+                    } else {
+                        const is_ryanquest = this.routeParams.base === 'ryanquest'
+                        page_num = this.routeParams.p
+                        const tryLookup = this.$mspaToViz(page_num, is_ryanquest)
+                        if (tryLookup) {
+                            story_id = tryLookup.s
+                        } else {
+                            story_id = undefined // MSPA number does not map to valid viz story
+                        }
+                    }
+
+                    if (!(page_num && story_id)) component = 'Error404'
+                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (
+                        (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
+                        (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))
+                    ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(p)
+                        if (this.$isNewReader) this.$updateNewReader(page_num)
                         
-                        let flag = this.$archive.mspa.story[p].flag
+                        const flag = this.$archive.mspa.story[page_num].flag
                         
                         if (flag.includes('X2COMBO')) component = 'x2Combo'
                         else if (flag.includes('FULLSCREEN') || flag.includes('DOTA') || flag.includes('GAMEOVER') || flag.includes('SHES8ACK')) component = 'fullscreenFlash'
@@ -279,9 +300,10 @@ export default {
                 }
                 case 'SQUIDDLES': {
                     if (this.$pageIsSpoiler('004432')) component = 'Spoiler'
+                    break
                 }
                 case 'UNLOCK': {
-                    if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'
+                    if (this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
                     else if (this.routeParams.p in this.$archive.mspa.psExtras) {
                         if ((this.routeParams.p == 'ps000039' && this.$pageIsSpoiler('003655')) || (this.routeParams.p == 'ps000040' && this.$pageIsSpoiler('003930'))) component = 'Spoiler'
                         else component = 'ExtrasPage'
@@ -397,6 +419,9 @@ export default {
               }
             }
             return (theme == 'default' ? 'mspa' : theme)
+        },
+        forceLoad(){
+            return this.tab.hasAudio
         }
     },
     methods: {
@@ -456,11 +481,7 @@ export default {
     },
     watch: {
         'tabIsActive'(to, from) {
-            if (to)
-                this.$root.tabTheme = this.theme
-            // Prevents tab from unloading if there's anything that might need to run in the background
-            if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
-            else if (this.forceLoad) {
+            if (to && this.forceLoad) {
                 // Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
                 // Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
                 this.$el.style.borderTop = 'solid 1px #000000FF'
@@ -468,15 +489,6 @@ export default {
                     this.$el.style.borderTop = ''
                 }, 10)
             }
-        },
-        '$localData.settings.hqAudio'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.jsFlashes'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.bolin'() {
-            this.forceLoad = false
         }
     },
     mounted(){
@@ -491,9 +503,11 @@ export default {
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up
-        let iframes = document.querySelectorAll(`[id='${this.tab.key}'] iframe`)
-        for (var i = 0; i < iframes.length; i++) {
-            iframes[i].parentNode.removeChild(iframes[i])
+        if (this.$el) {
+            const iframes = this.$el.querySelectorAll(`iframe`)
+            for (var i = 0; i < iframes.length; i++) {
+                iframes[i].parentNode.removeChild(iframes[i])
+            }
         }
     }
 }

@@ -6,7 +6,7 @@
       <div class="tabTitle" :class="{titleFade}" ref="title" >
         <span v-text="title" ref="titleText"/>
       </div>
-      <fa-icon v-if="hasAudio" icon="music" />
+      <span v-if="hasAudio" class='music'><fa-icon icon="music" /></span>
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -54,10 +54,10 @@ export default {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
     onResize() { 
-      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
-      let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
+      const titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
+      const titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
       
-      this.titleFade = titleWidth < titleTextWidth
+      this.titleFade = (titleWidth < titleTextWidth)
     }
   },
   watch: {
@@ -76,64 +76,68 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tabShell{
+.tabShell {
   border-right: solid 1px var(--header-border);
   display: inline-flex;
   width: 240px;
   min-width: 30px;
   flex: 0 10 auto;
+}
+.tab {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: var(--tab-height);
+  cursor: default;
+  padding-right: 8px;
 
-  &.hasAudio {
-    color: red;
+  &:not(.activeTab) {
+    &:hover {
+      background: var(--header-buttonHoverState);
+    }
+    &:active {
+      background: var(--header-buttonClickState);
+    }
   }
 
-  .tab {
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+  &.activeTab {
+    background: var(--header-bg);
+  }
+
+  .tabTitle {
+    flex: 1 10 auto;
+    padding-left: 5px;
+    white-space: nowrap;
     min-width: 0;
-    height: 28px;
-    cursor: default;
-
-    &:not(.activeTab) {
-      &:hover {
-        background: var(--header-buttonHoverState);
-      }
-      &:active {
-        background: var(--header-buttonClickState);
-      }
+    overflow: hidden;
+    pointer-events: none;
+    
+    &.titleFade {
+      mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
     }
+  }
 
-    &.activeTab {
-      background: var(--header-bg);
-    }
+  .music, .closeTabButton {
+    flex: 0 0 auto;
+    width: 21px;
+    height: 21px;
+  }
 
-    .tabTitle {
-      flex: 1 10 auto;
-      padding-left: 5px;
-      white-space: nowrap;
-      min-width: 0;
-      overflow: hidden;
-      pointer-events: none;
-      
-      &.titleFade {
-        mask-image: linear-gradient(90deg, #000000 calc(100% - 20px), #00000000 100%);
-      }
-    }
+  .closeTabButton {
+    float: right;
+    padding: 0;
+    margin-right: -2px;
 
-    .closeTabButton {
-      float: right;
-      padding: 0;
-      margin-right: 5px;
+    line-height: 22px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
 
-      flex: 0 0 auto;
-      width: 21px;
-      height: 21px;
-
-      line-height: 22px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+  .music {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

@@ -331,11 +331,11 @@ export default {
             width: 120px;
             margin: 2px;
             border: solid 3px #fff;
-            filter: opacity(0.8);
+            opacity: 0.8;
             transition: all 0.15s;
             
             &:hover {
-              filter: opacity(1);
+              opacity: 1.0;
             }
 
             img {

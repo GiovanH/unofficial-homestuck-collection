@@ -29,7 +29,13 @@ const gotTheLock = app.requestSingleInstanceLock()
 
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
-app.disableHardwareAcceleration()
+
+if (!store.get('localData.settings.enableHardwareAcceleration')) {
+  console.log("Disabling hardware acceleration")
+  app.disableHardwareAcceleration()
+} else {
+  console.log("Not disabling hardware acceleration")
+}
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -187,6 +193,7 @@ function loadArchiveData(){
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
+  if (!fs.existsSync(assetDir)) throw Error("Asset directory is missing!")
 
   let data
 
@@ -201,7 +208,6 @@ function loadArchiveData(){
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
-      search: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/search.json'), 'utf8')),
       audioData: {},
       flags: {}
     }
@@ -385,7 +391,7 @@ if (assetDir) {
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
-  if (semverGreater(APP_VERSION, last_app_version)) {
+  if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
     Mods.extractimods()
   } else {
@@ -554,21 +560,37 @@ function buildChapterIndex(){
   chapterIndex = new FlexSearch({
     doc: {
       id: 'key',
-      field: 'content',
+      field: ['mspa_num', 'content'],
       tag: 'chapter'
     }
   })
 
-  chapterIndex.add(archive.search)
-  chapterIndex.add(Object.keys(archive.footnotes.story).map(page_num => {
+  const storytextList = Object.keys(archive.mspa.story).map(page_num => {
+    const page = archive.mspa.story[page_num]
     return {
       key: page_num,
+      mspa_num: page_num,
+      chapter: Resources.getChapter(page_num),
+      content: `${page.title}<br />${page.content}`
+    }
+  })
+
+  logger.info("Populating search index with", storytextList.length, "page documents")
+  chapterIndex.add(storytextList)
+
+  const footnoteList = Object.keys(archive.footnotes.story).map(page_num => {
+    return {
+      key: `${page_num}-notes`, // Duplicate keys are not allowed.
+      mspa_num: page_num,
       chapter: Resources.getChapter(page_num),
       content: archive.footnotes.story[page_num].map(
         note => note.content
       ).join("###")
     }
-  }))
+  })
+
+  logger.info("Populating search index with", footnoteList.length, "footnote documents")
+  chapterIndex.add(footnoteList)
 }
 
 ipcMain.handle('search', async (event, payload) => {
@@ -602,7 +624,12 @@ ipcMain.handle('search', async (event, payload) => {
       return payload.filter.includes(item.chapter)
     })
     limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({doc: {id: 'key', field: 'content'}}).add(items)
+    filteredIndex = new FlexSearch({
+      doc: {
+        id: 'key', 
+        field: ['mspa_num', 'content']
+      }
+    }).add(items)
   } else {
     filteredIndex = chapterIndex
   }
@@ -614,19 +641,27 @@ ipcMain.handle('search', async (event, payload) => {
   const foundText = []
   for (const page of results) {
     const flex = new FlexSearch()
-    const lines = page.content.split('###')
-    for (let i = 0; i < lines.length; i++) {
-      flex.add(i, lines[i])
+    const page_lines = page.content.split('<br />')
+    for (let i = 0; i < page_lines.length; i++) {
+      flex.add(i, page_lines[i])
     }
     const indexes = flex.search(payload.input)
-    const output = []
-    for (let i = 0; i < indexes.length; i++) {
-      output.push(lines[indexes[i]])
-    }
-    if (output.length > 0){
+    const spread_indexes = Array.from(
+      indexes.reduce((acc, i) => {
+        const spread = 2;
+        for (let j = i - spread; j < i + spread; j++) {
+          acc.add(j)
+        }
+        return acc
+      }, new Set())
+    ).sort()
+    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
+
+    if (matching_lines.length > 0){
       foundText.push({
         key: page.key,
-        lines: output
+        mspa_num: page.mspa_num,
+        lines: matching_lines
       })
     }
   }
@@ -686,6 +721,20 @@ async function createWindow () {
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
+  //  ;[
+  //   'will-navigate',
+  //   'did-navigate-in-page',
+  //   'did-start-navigation',
+  //   'will-redirect',
+  //   'did-redirect-navigation',
+  //   'did-navigate',
+  //   'did-frame-navigate'
+  // ].forEach(eventName => {
+  //   win.webContents.on(eventName, (event) => {
+  //     logger.info("blocking", eventName)
+  //     event.preventDefault()
+  //   })
+  // })
 
   win.webContents.on('update-target-url', (event, new_url) => {
     win.webContents.send('update-target-url', new_url)
@@ -750,15 +799,24 @@ async function createWindow () {
     win = null
   })
 
-  var current_icon // = "build/icons/icon.ico"
+  var current_icon // = "@/icons/icon"
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
-    new_icon = new_icon || "build/icons/icon.ico"
+    new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
     if (new_icon && new_icon != current_icon) {
-      win.setIcon(new_icon)
-      logger.info("Changing icon to", new_icon)
-      current_icon = new_icon
+      try {
+        if (process.platform == "win32") {
+          new_icon += ".ico"
+        } else {
+          new_icon += ".png"
+        }
+        logger.info("Changing icon to", new_icon, process.platform)
+        win.setIcon(new_icon)
+        current_icon = new_icon
+      } catch (e) {
+        logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
+      }
     }
   })
 

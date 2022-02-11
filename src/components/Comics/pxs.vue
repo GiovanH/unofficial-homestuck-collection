@@ -324,6 +324,110 @@ export default {
           display: block;
         }
       }
+
+      .storyContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 25px;
+
+        .storyButtonContainer {
+          display: flex;
+          margin: 2px 0 5px;
+          justify-content: center;
+
+          .storyButton {
+            font-family: "Century Gothic",arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #70c3f1;
+
+            width: 420px;
+            padding: 4px 4px 6px 15px;
+            margin-right: 5px;
+            border: 0px solid #095486;
+            border-radius:5px;
+            background-color:#0d4162;
+            text-transform:uppercase;
+            cursor: pointer;
+            transition: .15s ease-in-out;
+
+            &:hover {
+              color: #fff;
+              background-color:#1f618a;
+              transition:  .25s ease-in-out;
+              text-shadow: 0 0 8px #41b9fe;
+            }
+
+            .storyCredit, .storyDesc {
+              font-family: "Century Gothic",arial, sans-seriff;
+              font-size: 11px;
+              text-transform:none;
+            }
+
+            .storyDesc {
+              margin-bottom:5px;
+              font-style: italic;
+              font-weight:normal;
+            }
+          }
+
+          a {
+            font-family: "Century Gothic",arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            color: #70c3f1;
+            line-height: 3;
+            text-decoration: none;
+
+            padding: 5px 10px;
+            border: 0px solid #095486;
+            border-radius:5px;
+            background-color:#0d4162;
+            text-transform:uppercase;
+            cursor: pointer;
+            transition: .15s ease-in-out;
+
+            &:hover {
+              color: #fff;
+              background-color:#1f618a;
+              transition:  .25s ease-in-out;
+              text-shadow: 0 0 8px #41b9fe;
+            }
+          }
+        }
+      }
+      .thumbnailWrapper {
+        overflow: hidden;
+      }
+      .thumbs {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        width: 650px;
+        margin-bottom: 3px;
+
+        a {
+          display: block;
+          width: 120px; 
+          height: 189px;
+          margin: 2px;
+          border: solid 3px #fff;
+          background: rgba(255, 255, 192, 0.15);
+          opacity: 0.8;
+          transition: all 0.15s;
+          
+          &:hover {
+            opacity: 1.0;
+          }
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
     }
   }
 }

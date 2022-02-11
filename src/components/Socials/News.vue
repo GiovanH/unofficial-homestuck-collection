@@ -57,7 +57,7 @@ export default {
       return this.activeYear == "ALL";
     },
     newsLogo() {
-      return this.$root.tabTheme === 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
+      return this.$root.tabTheme.rendered == 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
     },
     newsposts(){
       return this.$archive.news
@@ -94,6 +94,12 @@ export default {
       this.activeYear = this.activeYear != year ? year : undefined
       if (this.activeYear && !this.routeParams.id) this.$nextTick(() => {this.jumpToClass(year)})
     },
+    filterIa(){
+      this.$el.querySelectorAll("div.newsYear").forEach(div => {
+        const year = div.querySelector(".yearTitle").textContent
+        this.filterLinksAndImagesInternetArchive(div, year)
+      })
+    },
     jumpToClass(id){
       const className = id || ""
       const el = this.$el.getElementsByClassName(className)[0]
@@ -119,14 +125,20 @@ export default {
   watch: {
     'tab.history': function (to, from) {
       this.jumpFromUrl()
+    },
+    'activeYear'(to, from) {
+      this.$nextTick(() => {
+        this.filterLinksAndImages()
+        this.filterIa()
+      })
     }
-  },
-  updated(){
-    this.filterLinksAndImages()
   },
   mounted(){
     this.jumpFromUrl()
-    this.filterLinksAndImages()
+    this.$nextTick(() => {
+      this.filterLinksAndImages()
+      this.filterIa()
+    })
   }
 }
 </script>

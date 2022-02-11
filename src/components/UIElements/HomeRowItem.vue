@@ -5,7 +5,7 @@
       <h2><a :href="href">
         <slot name="title"></slot>
       </a></h2>
-      <p class="date" v-text="date" />
+      <p class="date" v-text="date_" />
       <slot></slot>
     </div>
   </div>
@@ -13,14 +13,16 @@
     <Media url="/archive/collection/spoiler_small.png"/>
     <div class="description">
       <h2>??????</h2>
-      <p class="date" v-text="date" />
-      <p>Reach page {{$mspaOrVizNumber(afterpage)}} of Homestuck to unlock!</p>
+      <p class="date" v-text="date_" />
+      <p v-if="afterpage">Reach page {{$mspaOrVizNumber(afterpage)}} of Homestuck to unlock!</p>
+      <p v-else>Keep reading to unlock!</p>
     </div>
   </div>
 </template>
 
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
+const DateTime = require('luxon').DateTime
 
 export default {
   name: 'HomeRowItem',
@@ -44,6 +46,13 @@ export default {
         return this.$timestampIsSpoiler(this.aftertimestamp)
       }
       return false
+    },
+    date_(){
+      if (this.aftertimestamp) 
+        return DateTime.fromSeconds(Number(this.aftertimestamp))
+            .setZone("America/New_York")
+            .toFormat("LLL yyyy")
+      return this.date
     }
   }
 }
@@ -70,6 +79,7 @@ export default {
 
   .description {
     padding: 0 10px;
+    width: 100%;
     // height: 80px;
     h2 {
       font-size: 18px;

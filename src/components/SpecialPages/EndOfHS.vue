@@ -25,6 +25,7 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import Banner from '@/components/Page/PageBanner.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
+import Footnotes from '@/components/Page/PageFootnotes.vue'
 
 import PAGE from '@/components/Page/Page.vue'
 
@@ -34,7 +35,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    Media, PageNav, Banner, FlashCredit
+    Media, PageNav, Banner, FlashCredit, Footnotes
   },
   theme: function(ctx) {
     let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p

@@ -32,6 +32,13 @@ function giveWindow(new_win) {
   logger.info("Got window")
 }
 
+let validatedState = false
+function expectWorkingState(){
+  if (validatedState) return true
+  validatedState = (assetDir && fs.existsSync(assetDir))
+  return validatedState
+}
+
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
   if (k) {return `mod.${mod_id}.${k}`}
@@ -42,6 +49,8 @@ function getAssetRoute(url) {
   // If the asset url `url` should be replaced by a mod file,
   // returns the path of the mod file. 
   // Otherwise, returns undefined.
+  if (!expectWorkingState())
+    return undefined
 
   // Lazily bake routes as needed instead of a init hook
   if (routes == undefined) {
@@ -123,7 +132,7 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined)
+    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -146,7 +155,7 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined)
+    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -201,7 +210,7 @@ if (ipcMain) {
 
 function bakeRoutes() {
   const enabled_mods = getEnabledMods()
-  if (!assetDir) {
+  if (!expectWorkingState()) {
     logger.info("No asset directory set, not baking any routes")
     return
   }
@@ -409,13 +418,22 @@ function getModJs(mod_dir, options={}) {
         mod = __non_webpack_require__(modjs_path)
       } catch (e) {
         // imod AND this is the second attempt at importing it
-        if (mod_dir.startsWith("_") && options.singlefile) {
-          console.log(e)
-          console.log("Couldn't load imod, trying re-extract")
-          extractimods()
+        if (mod_dir.startsWith("_")) {
+          console.log("Caught error importing imod")
+          if (fs.existsSync(path.join(assetDir, "archive"))) {
+            console.log("Couldn't load imod, trying re-extract")
+            extractimods()
+          } else {
+            console.log('Asset pack not found.');
+            throw e
+          }
+          console.log("Retrying import")
           // eslint-disable-next-line no-undef
           mod = __non_webpack_require__(modjs_path)
-        } else throw e
+        } else {
+          // console.log("mod", mod_dir, "is not imod, unrecoverable require error")
+          throw e
+        }
       }
     }
 
@@ -486,7 +504,7 @@ const footnote_categories = ['story']
 // Interface
 
 function editArchive(archive) {
-  if (!assetDir) {
+  if (!expectWorkingState()) {
     logger.info("No asset directory set, probably in new reader setup mode. Not editing the archive.")
     return
   }
@@ -618,7 +636,7 @@ function getMainMixin(){
 
           let body = fs.readFileSync(path.resolve(js._mod_root_dir, theme.source))
           body = sass.renderSync({
-            data: `#app.${theme_class} {\n${body}\n}`,
+            data: `#app.${theme_class}, #app > .${theme_class} {\n${body}\n}`,
             sourceComments: true
           }).css.toString()
 

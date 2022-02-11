@@ -246,10 +246,12 @@ export default {
   },
   updated() {
     this.filterLinksAndImages(this.$el.querySelector('.main-wrapper'))
+    this.filterLinksAndImagesInternetArchive(this.$el.querySelector('.main-wrapper'), '2010')
   },
   mounted(){
     this.jumpToClass(this.routeParams.id)
     this.filterLinksAndImages(this.$el.querySelector('.main-wrapper'))
+    this.filterLinksAndImagesInternetArchive(this.$el.querySelector('.main-wrapper'), '2010')
   }
 }
 </script>

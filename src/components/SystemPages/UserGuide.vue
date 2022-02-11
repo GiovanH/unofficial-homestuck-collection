@@ -70,16 +70,14 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
     
     font-family: Verdana,Arial,Helvetica,sans-serif;
     font-weight: normal;
 
     color: var(--font-default);
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
     .navBanner {

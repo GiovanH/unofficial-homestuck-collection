@@ -1,19 +1,22 @@
 <template>
-  <div id="app" :class="[
-    // $root.loadState != 'DONE' ? 'busy' : '',
-    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar'
-    ]" v-if="$archive && $root.loadState !== 'ERROR'">
-    <AppHeader :class="theme" ref="appheader" />
-    <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
-    <Notifications :class="theme" ref="notifications" />
-    <ContextMenu :class="theme" ref="contextMenu" />
-    <Updater ref="Updater" />
-    <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
-    <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
-  </div>
-  <div id="app" class="mspa"  v-else>
-    <Setup />
-    <ContextMenu ref="contextMenu" />
+  <div id="window" :class="theme">
+    <div id="app" :class="[
+      // $root.loadState != 'DONE' ? 'busy' : '',
+      $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        
+      ]" v-if="$archive && $root.loadState !== 'ERROR'">
+      <AppHeader :class="theme" ref="appheader" />
+      <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
+      <Notifications :class="theme" ref="notifications" />
+      <ContextMenu :class="theme" ref="contextMenu" />
+      <Updater ref="Updater" />
+      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+      <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
+    </div>
+    <div id="app" class="mspa"  v-else>
+      <Setup />
+      <ContextMenu ref="contextMenu" />
+    </div>
   </div>
 </template>
 
@@ -66,7 +69,7 @@
           }
           return page_theme
         } else {
-          this.$logger.warn("No tabs! Using default")
+          this.$logger.warn("App.vue:tabTheme: No active tab! Using default")
           return {defined: 'default', rendered: 'default'}
         }
       },
@@ -87,7 +90,9 @@
               theme = set_theme
             } else {
               // Page takes priority over setting
-              theme = this.tabTheme.rendered
+              theme = this.tabTheme.defined
+              // If this were this.tabThem.rendered, you would get
+              // page themes escaping to become app themes.
             }
           } else {
             // User specified a theme, page did not
@@ -121,20 +126,23 @@
         if (this.$localData.settings.showAddressBar) {
           document.querySelector('#jumpBox input').select()
         } else {
-          this.$refs[this.$localData.tabData.activeTabKey][0].$refs.jumpbox.toggle()
+          this.activeTabComponent.$refs.jumpbox.toggle()
         }
-      }
-    },
-    watch: {
-      'theme'(to, from) {
+      },
+      updateAppIcon(){ 
         this.$nextTick(() => {
+          if (!this.$refs["appheader"]) {
+            this.$logger.warn("trying to updateAppIcon, but no appheader element yet")
+            setTimeout(() => this.updateAppIcon(), 2000)
+            return
+          }
           let app_icon_var = window.getComputedStyle(this.$refs["appheader"].$el).getPropertyValue('--app-icon')
           let match
           // eslint-disable-next-line no-cond-assign
-          if (match = / url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
+          if (match = /url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
             app_icon_var = this.$mspaFileStream(match[1].replace(/\\/g, ''))
           // eslint-disable-next-line no-cond-assign
-          } else if (match = / "(.+)"/.exec(app_icon_var)) {
+          } else if (match = /"(.+)"/.exec(app_icon_var)) {
             app_icon_var = match[1]
           } else {
             this.$logger.error(`Couldn't match '${app_icon_var}'`)
@@ -143,9 +151,16 @@
           this.$logger.info("Requesting icon change to", app_icon_var)
           electron.ipcRenderer.send('set-sys-icon', app_icon_var)
         })
+      }
+    },
+    watch: {
+      'theme'(to, from) {
+        this.updateAppIcon()
       } 
     },
     mounted () {
+      this.$nextTick(() => this.updateAppIcon())
+
       this.$localData.root.TABS_SWITCH_TO()
 
       electron.webFrame.setZoomFactor(1)
@@ -189,7 +204,7 @@
         this.resetZoom()
       })
       electron.ipcRenderer.on('OPEN_FINDBOX', (event) => {
-        this.$refs[this.$localData.tabData.activeTabKey][0].$refs.findbox.open()
+        this.activeTabComponent.$refs.findbox.open()
       })      
       electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
@@ -256,8 +271,10 @@
           this.$refs.contextMenu.open(event, target)
           return
         } else if (button == 3) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_BACK()
         } else if (button == 4) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_FORWARD()
         }
         while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
@@ -293,12 +310,19 @@
 
 @import '@/css/mspaThemes.scss';
 
+  #window {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
   #app.busy {
     cursor: progress;
   }
 
+  // TODO: Replace --headerHeight with dynamic sizing
   .addressBar {
-    --headerHeight: 79px;
+    --headerHeight: 82px;
   }
   .noAddressBar {
     --headerHeight: 51px;
@@ -356,7 +380,8 @@
     &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
     &[href$=".pdf"],
-    &[href$=".html"]:not([href*="assets://"]) {
+    // &[href$=".html"]:not([href*="assets://"]) {
+    &[href$=".html"] {
       &::after{
         @extend %fa-icon;
         @extend .fas;

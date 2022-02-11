@@ -10,7 +10,7 @@ def getArgs():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("patch")
     arg_parser.add_argument("base")
-    arg_parser.add_argument("--root", default="mspa")
+    arg_parser.add_argument("--root", default="mspa", help="root object, defaults mspa")
     return arg_parser.parse_args()
 
 def get_difference(obj_1: dict, obj_2: dict, stack="archive") -> dict:

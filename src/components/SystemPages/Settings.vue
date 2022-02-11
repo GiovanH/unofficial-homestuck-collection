@@ -4,36 +4,33 @@
     <div class="card">
       <div class="settings newReader">
         <h2>New Reader Mode</h2>
-        <div class="newReaderInput" v-if="$isNewReader">
-          <p>New reader mode enabled.<br>Currently up to page 
-            <!-- <strong>{{$mspaOrVizNumber(this.$newReaderCurrent)}}</strong>. -->
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length, changed: newReaderPage != $newReaderCurrent}" v-model="newReaderPage">
-          </p><br>
-          <button v-if="newReaderValidation && (newReaderPage != $newReaderCurrent)" @click="changeNewReader()">Set adjusted page</button>
-          <br />
-          <button @click="clearNewReader()">Switch off new reader mode</button>
-        </div>
-        <div class="newReaderInput" v-else>
-          <input type="number" size="1" maxlength="6" :class="{invalid: !newReaderValidation, empty: !newReaderPage.length}" v-model="newReaderPage" @keydown.enter="setNewReader()"><br>
-          <button :disabled="!newReaderValidation || newReaderPage.length < 1" @click="setNewReader()">Activate</button>
-          <p class="hint" v-if="$localData.settings.mspaMode">Enter an <strong>MS Paint Adventures</strong> page number<br>e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong><br>Homestuck starts at 001901 and ends at 100029. Problem Sleuth starts at 000219.</p>
-          <p class="hint" v-else>Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>e.g. www.homestuck.com/story/<strong>413</strong></p>
-        </div>
+        
+        <NewReaderControls 
+          :handleEnable="onNewReaderEnable"
+          :handleDisable="onNewReaderDisable"
+          :handleChange="onNewReaderChange"
+        />
 
-        <h3>Reading Experience</h3>
-        <dl class="fastForwardSelection">
-          <dt>
-            <input type="radio" id="fast_forward=false" :value="false" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
-            <label for="fast_forward=false">Replay</label>
-          </dt>
-          <dd>Read as if you were reading it live.<br>All pages will be presented how they were as of the time of your most recent page. (with some minor exceptions; see <a href='/settings/controversial'>controversial content</a>.</dd>
-
-          <dt>
-            <input type="radio" id="fast_forward=true" :value="true" v-model="$localData.settings['fastForward']" @click="toggleSetting('fastForward')"/>
-            <label for="fast_forward=true">Archival</label>
-          </dt>
-          <dd>Read as an archival reader.<br>Stories will be presented approximately as they were at the time they were finished (or abandoned).</dd>
-        </dl>
+        <SpoilerBox kind="Granular Retcon Settings" v-if="!$isNewReader">
+          <div class="settings retcons" style="padding: 0;">
+            <p class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</p>
+            <dl>
+              <template v-for="retcon in retconList">
+                <dt :key="retcon.model"><label>
+                  <input type="checkbox" 
+                    :name="retcon.model" 
+                    v-model="$localData.settings[retcon.model]" 
+                    :disabled="$localData.settings.fastForward"
+                    @click="toggleSetting(retcon.model)"
+                  >{{retcon.label}}</label></dt>
+                <dd class="settingDesc">
+                  Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
+                </dd>
+              </template>
+            </dl>
+            <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
+          </div>
+        </SpoilerBox>
 
         <dl>
           <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
@@ -44,6 +41,8 @@
           </div>
         </dl>
       </div>
+    </div>
+    <div class="card">
       <div class="settings application">
         <h2>Application Settings</h2>
         <dl>
@@ -55,10 +54,14 @@
                 @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-            <dd class="settingDesc" v-html="boolSetting.desc" />
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
           </template>
         </dl>
       </div>
+    </div>
+    <div class="card">
       <div class="settings enhancements">
         <h2>Enhancements</h2>
         <dl>
@@ -129,22 +132,24 @@
                     </option>
                   </select>
                 </label>
-                <span v-if="$localData.settings.textOverride.fontFamily">
-                  <br><br>
-                  <label ><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                </span>
+                <div class="textOptions">
+                  <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                  <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
+                  <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+                </div>
                 <br><br>
                 <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
                 <br><br>
                 <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
               </div>
               <div class="textpreviews">
-                <PageText class="examplePrattle" 
+                <!-- PageText usually require a tab change to recalculate theme. -->
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
-                <PageText class="examplePrattle" 
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
                 <!-- v-if="!this.$pageIsSpoiler('001926')" -->
-                <PageText class="examplePrattle" 
+                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
                 content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
               </div>
@@ -164,25 +169,8 @@
 
         </dl>
       </div>
-      <div class="settings retcons" v-if="!$isNewReader">
-        <h2>Retcons</h2>
-        <dd class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</dd>
-        <dl>
-          <template v-for="retcon in retconList">
-            <dt :key="retcon.model"><label>
-              <input type="checkbox" 
-                :name="retcon.model" 
-                v-model="$localData.settings[retcon.model]" 
-                :disabled="$localData.settings.fastForward"
-                @click="toggleSetting(retcon.model)"
-              >{{retcon.label}}</label></dt>
-            <dd class="settingDesc">
-              Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
-            </dd>
-          </template>
-        </dl>
-        <p class="settingDesc" v-if="$localData.settings.fastForward">Since you are in Archival mode, these settings will have no effect.</p>
-      </div>
+    </div>
+    <div class="card">
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
         <p class="settingDesc">The Unofficial Homestuck Collection allows you to restore some material that was included in the original publication, but was since officially replaced by MSPA for various reasons. These options allow you to view those pages before they were edited.</p>
@@ -257,16 +245,28 @@
           </SpoilerBox>
         </div>
       </div>
-
+    </div>
+    <div class="card">
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <p class="settingDesc">
-          Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>. </p>
+        <section class="modPrattle">
+          <p class="settingDesc">
+            Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
+<!--           </p>
+          <p> -->
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
+<!--           </p>
+          <p> -->
+            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
+            <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
+        </section>
           
-        <p class="settingDesc">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
+        <div class='hint'>
+          <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
+          
+        </div>
 
-        <button v-if="$localData.settings.devMode" @click="reloadModList">Dev: Reload Choices</button> 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
             <draggable tag="ul" group="sortable-mods">
@@ -305,26 +305,43 @@
             </draggable>
           </div>
         </section>
+          
+        <p class="hint">Drag mods from the pool on the left to the list on the right to enable them. Higher mods take priority on conflicts.</p>
 
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
 
         <div class="system">
-          <p v-if="needReload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
+          <p v-if="needReload" class="needreload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <!-- v-if="$localData.settings.devMode || needReload"  -->
-          <button @click="forceReload">Reload Application</button>
+          <button @click="forceReload" class="reload">Reload Application</button>
         </div>
       </div>
-
+    </div>
+    <div class="card">
       <div class="settings system">
         <h2>System Settings</h2>
+        <dl>
+          <template v-for="boolSetting in settingListSystem">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]" 
+                @click="toggleSetting(boolSetting.model)"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass -->
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
+          </template>
+        </dl>
         <div class="system">
           <span class="hint">Application version:</span> <strong>v{{$data.$appVersion}}</strong>
           <br><br>
-          <span v-if="$archive.version != $data.$expectedAssetVersion">
-            <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
-            <br><br>
-          </span>
           <span class="hint">Asset pack version:</span> <strong>v{{$archive.version}}</strong>
+          <span v-if="$archive.version != $data.$expectedAssetVersion">
+            <br><br>
+            <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
+          </span>
           <br><br>
           <span class="hint">Asset pack directory:</span>
           <br>
@@ -346,6 +363,7 @@ import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
+import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
@@ -359,7 +377,7 @@ export default {
   components: {
     NavBanner, SubSettingsModal, 
     PageText, SpoilerBox, StoryPageLink, 
-    draggable
+    draggable, NewReaderControls
   },
   title: () => "Settings",
   data: function() {
@@ -396,11 +414,7 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/newreader'>New reader</a>"
-        }, {
-          model: "devMode",
-          label: "Enable Developer Mode",
-          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
         }
       ],
       enhancementListBoolean: [
@@ -417,10 +431,6 @@ export default {
           label: "Enable high quality Flash audio",
           desc: "This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems."
         }, {
-          model: "jsFlashes",
-          label: "Enable enhanced Flash effects",
-          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
-        }, {
           model: "credits",
           label: "Show inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
@@ -428,6 +438,21 @@ export default {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
           desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+        }
+      ],
+      settingListSystem: [
+        {
+          model: "devMode",
+          label: "Enable Developer Mode",
+          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+        }, {
+          model: "jsFlashes",
+          label: "Enable enhanced Flash effects",
+          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
+        }, {
+          model: "enableHardwareAcceleration",
+          label: "Enable hardware acceleration",
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
@@ -501,6 +526,7 @@ export default {
       ],
       themes: [
         {text: "Auto", value: "default"},
+        {text: "Dark", value: "dark"},
         {text: "MSPA", value: "mspa"},
         {text: "Retro", value: "retro"},
         {text: "Scratch", value: "scratch"},
@@ -520,9 +546,6 @@ export default {
         {text: "Comic Sans", value: "comicSans"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
-      newReaderPage: this.$newReaderCurrent || 
-        (this.$localData.settings.mspaMode ? '001901' : '1'),
-      newReaderValidation: true,
       allControversial: [
         'bolin',
         'soluslunes',
@@ -564,50 +587,38 @@ export default {
       }
     },
     darkModeChecked(){
-      if (this.$localData.settings.themeOverride == "cascade") return true
+      if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
     }
   },
   methods: {
-    validateNewReader() {
-      const pageId = this.$parseMspaOrViz(this.newReaderPage)
-      this.newReaderValidation = pageId in this.$archive.mspa.story && pageId >= '000219' && pageId <= '010029' && !/\D/.test(pageId)
-    },
-    changeNewReader(){
-      this.validateNewReader() 
-      const pageId = this.$parseMspaOrViz(this.newReaderPage)
-      if (this.newReaderValidation) {
-        const args = {
-          title: "Are you sure?",
-          message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
-        }
-        ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
-          if (answer === true)
-            this.$updateNewReader(pageId, true)
-          else
-            this.newReaderPage = this.$newReaderCurrent
-        })
+    onNewReaderChange(pageId){
+      const args = {
+        title: "Are you sure?",
+        message: 'Be careful! If you change your current page manually, you might encounter spoilers. Are you sure you want to change this setting?'
       }
+      ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
+        if (answer === true)
+          this.$updateNewReader(pageId, true)
+        else
+          this.newReaderPage = this.$newReaderCurrent
+      })
     },
-    setNewReader() {
-      this.validateNewReader() 
-      const pageId = this.$localData.settings.mspaMode ? (this.newReaderPage.padStart(6, '0') in this.$archive.mspa.story) ? this.newReaderPage.padStart(6, '0') : this.newReaderPage : this.$vizToMspa('homestuck', this.newReaderPage).p
-      if (this.newReaderValidation) {
+    onNewReaderEnable(pageId) {
         // eslint-disable-next-line no-return-assign
-        this.allControversial.forEach(key => this.$localData.settings[key] = false)
+      this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
-        if (this.clearThemesForNewReader) {
-          this.$localData.settings.themeOverride = "default"
-          this.$localData.settings.themeOverrideUI = "default"
-          this.$localData.settings.forceThemeOverride = false
-          this.$localData.settings.forceThemeOverrideUI = false
-        }
-
-        this.$updateNewReader(pageId, true)
+      if (this.clearThemesForNewReader) {
+        this.$localData.settings.themeOverride = "default"
+        this.$localData.settings.themeOverrideUI = "default"
+        this.$localData.settings.forceThemeOverride = false
+        this.$localData.settings.forceThemeOverrideUI = false
       }
+
+      this.$updateNewReader(pageId, true)
     },
-    clearNewReader() {
+    onNewReaderDisable() {
       const args = {
         title: "Are you sure?",
         message: 'Watch out! Once you disable new reader mode, major Homestuck spoilers will immediately become visible on many pages of the collection. Are you sure you want to go ahead?'
@@ -631,7 +642,7 @@ export default {
         this.$localData.settings.themeOverride = "default"
       } else {
         // Check "dark mode style"
-        this.$localData.settings.themeOverride = "cascade"
+        this.$localData.settings.themeOverride = "dark"
       }
       this.$localData.root.saveLocalStorage()
     },
@@ -776,22 +787,10 @@ export default {
     }
   },
   watch: {
-    "$localData.settings.newReader.current"(to, from){
-      if (!this.$parent.tabIsActive)
-        this.newReaderPage = to
-    },
     'tab.history': function (to, from) {
       if (this.routeParams.sec) {
         this.scrollToSec(this.routeParams.sec)
       }
-    },
-    newReaderPage(to, from) {
-      if (this.$localData.settings.mspaMode)
-        this.newReaderPage = Number(to).pad(6)
-      this.validateNewReader()
-    },
-    '$localData.settings.mspaMode'() {
-      this.validateNewReader()
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (this.needReload) {
@@ -818,253 +817,250 @@ export default {
     flex: 1 0 auto;
     align-items: center;
 
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
     
-    a {
+    ::v-deep a {
       color: var(--page-links);
-    }
-
-    .navBanner {
-      margin-bottom: 25px;
-    }
-    .card {
-      position: relative;
-      margin-bottom: 75px;
-      padding: 0 50px;
-      border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
-      box-sizing: border-box;
-      width: 950px;
-      background: var(--page-pageContent);
-
-      flex: 0 1 auto;
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: center;
-      align-content: center;
-
-      font-family: Verdana,Arial,Helvetica,sans-serif;
-      
-      .settings {
-        width: 100%;
-        padding: 25px 0;
-
-        &:not(:last-child) {
-          border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-        }
-        h2 {
-          text-align: center;
-        }
-        p {
-          font-weight: normal;
-          margin: 10px 0 5px 10px;
-          label {
-            font-weight: bolder;
-          }
-        }
-        dt {
-          margin: 20px 0 5px 10px;
-        }
-        .settingDesc {
-          color: var(--page-nav-meta);
-          font-weight: normal;
-        }
-
-        div.subOption {
-          margin-left: 40px;
-        }
-
-        > dd.settingDesc {
-          // Descriptions of whole sections
-          margin-top: 1em;
-        }
-        
-        .system {
-          margin-top: 20px;
-          text-align: center;
-          font-weight: normal;
-        }
-
-        .newReaderInput {
-          margin-top: 20px;
-          text-align: center;
-
-          button {
-              margin-bottom: 1em;
-          }
-          input {
-            border: 1px solid #777;
-            width: 70px;
-            font-size: 110%;
-            border-radius: 2px;
-            padding: 2px 3px;
-            margin: 5px;
-
-            &.invalid:not(:disabled):not(.empty) {
-              background: pink;
-              border-color: rgb(187, 0, 37);
-              box-shadow: 0 0 3px 1px red;
-            }
-            &.changed {
-              border-color: #ffaa00;
-              box-shadow: 0 0 3px 1px red;
-            }
-          }
-        }
-
-        .fastForwardSelection {
-          dd {
-            font-weight: normal;
-          }
-        }
-
-        button {
-          font-size: 110%;
-        }
-        .hint {
-          font-size: 13px;
-          color: var(--page-nav-meta);
-        }
-        .themeSelector, .fontSelector {
-          font-size: 16px;
-        }
-        .themeSelector + dt {
-          display: inline;
-        }
-        // Little ones
-        &.retcons dl {
-          column-count: 2;
-          dt:first-child {
-            margin-top: 0;
-          }
-        }
-        .textOverrideSettings {
-          margin-top: 16px;
-          text-align: center;
-
-          .textpreviews {
-            border: 6px solid var(--page-pageFrame);
-            padding: 6px;
-            position: relative;
-            left: 0;
-          }
-
-          .knobs {
-            width: 75%;
-            margin: 0 auto 16px;
-            text-align: left;
-            select {
-              margin: 5px 0;
-            }
-            input[type="range"] {
-              width: 100%;
-            }
-          }
-          div.examplePrattle, p.examplePrattle {
-            margin-bottom: 16px;
-          }
-          .examplePrattle {
-            margin: 0 auto;
-
-            ::v-deep .text{
-              // text-align: center;
-            }
-            &.bold {
-              font-weight: bold;
-            }
-          }
-        }
-        .ccPageNos {
-          font-weight: normal;
-          // width: 600px;
-          // margin: 1em auto;
-          h3 {
-            margin-top: .4em;
-          }
-          ol {
-            margin-inline-start: 2em;
-          }
-
-        }
-        span.cw {
-            padding: 0 7px;
-            font-size: 12px;
-            font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
-            font-weight: 500;
-            line-height: 18px;
-            border: 1px solid transparent;
-            border-radius: 2em;
-            margin-left: 1em;
-            &.minor {
-              background-color: #fbca04;
-              color: #000000;
-            }
-            &.severe{
-              background-color: #d93f0b;
-              color: #ffffff;
-            }
-        }
-      }
-    }
-    .sortable {
-      font-weight: normal;
-      
-      ul, ol {  
-        text-align: left;
-        border: solid #c6c6c6;
-        border-width: 7px 7px 0 0;
-        padding-bottom: 6em;
-        height: 100%;
-      }
-
-      li {
-          /*list-style-position: inside;*/
-          background-color: #fff;
-          border: 1px solid rgba(0,0,0,.125);
-          margin-bottom: -1px;
-          padding: .2em;
-          .summary:before {
-            content: ' - '
-          }
-      }
-
-      ul li {
-          list-style: none;
-      }
-
-      ol li {
-        list-style: decimal;
-      }
-
-      .col {  
-          width: 100%;
-          margin: 0 20px;
-      }
-      .modButton {
-        float: right;
-        width: 18px;
-        height: 18px;
-        background: #EEE;
-        text-align: center;
-        &:hover {
-          background: #c6c6c6
-        }
-      }
-    }
-
-    .col {
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-    }
-
-    .row {
-      display: flex;
-
     }
   }
 
-</style>
+  ::v-deep .spoilerbox .settings {
+    color: var(--font-log);
+  }
 
+  .navBanner {
+    margin-bottom: 25px;
+  }
+  .card {
+    position: relative;
+    margin-bottom: 50px;
+    padding: 0 50px;
+    border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
+    box-sizing: border-box;
+    width: 950px;
+    background: var(--page-pageContent);
+
+    flex: 0 1 auto;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    align-content: center;
+
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    
+  }
+  .settings {
+    width: 100%;
+    padding: 25px 0;
+
+    &:not(:last-child) {
+      border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
+    }
+    h2 { text-align: center; }
+    p {
+      font-weight: normal;
+      margin: 10px 0 5px 10px;
+      label {
+        font-weight: bolder;
+      }
+    }
+    dt { margin: 20px 0 5px 10px; }
+    .settingDesc {
+      color: var(--page-nav-meta);
+      font-weight: normal;
+    }
+
+    div.subOption { margin-left: 40px; }
+
+    > dd.settingDesc {
+      // Descriptions of whole sections
+      margin-top: 1em;
+    }
+    
+    .system {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: normal;
+    }
+
+    .newReaderInput {
+      margin-top: 20px;
+      text-align: center;
+
+      button {
+          margin-bottom: 1em;
+      }
+      input {
+        border: 1px solid #777;
+        width: 70px;
+        font-size: 110%;
+        border-radius: 2px;
+        padding: 2px 3px;
+        margin: 5px;
+
+        &.invalid:not(:disabled):not(.empty) {
+          background: pink;
+          border-color: rgb(187, 0, 37);
+          box-shadow: 0 0 3px 1px red;
+        }
+        &.changed {
+          border-color: #ffaa00;
+          box-shadow: 0 0 3px 1px red;
+        }
+      }
+    }
+
+    &.mod button.reload {
+      margin: 0.5em;
+      padding: 0.5em;
+      min-width: 140px;
+    }
+
+    button {
+      font-size: 110%;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--page-nav-meta);
+      button {
+        font-size: 1em;
+        padding: 0 4px;
+      }
+    }
+    .themeSelector, .fontSelector {
+      font-size: 16px;
+    }
+    .themeSelector + dt {
+      display: inline;
+    }
+    // Little ones
+    &.retcons dl {
+      column-count: 2;
+      dt:first-child {
+        margin-top: 0;
+      }
+    }
+    .textOverrideSettings {
+      margin-top: 16px;
+      text-align: center;
+          
+      .textOptions label {
+        display: block;
+      }
+
+      .textpreviews {
+        border: 6px solid var(--page-pageFrame);
+        padding: 6px;
+        position: relative;
+        left: 0;
+      }
+
+      .knobs {
+        width: 75%;
+        margin: 0 auto 16px;
+        text-align: left;
+        select {
+          margin: 5px 0;
+        }
+        input[type="range"] {
+          width: 100%;
+        }
+      }
+      div.examplePrattle, p.examplePrattle {
+        margin-bottom: 16px;
+      }
+      .examplePrattle {
+        margin: 0 auto;
+
+        ::v-deep .text{
+          // text-align: center;
+        }
+        &.bold {
+          font-weight: bold;
+        }
+      }
+    }
+    .ccPageNos {
+      font-weight: normal;
+    }
+
+    span.cw {
+      padding: 0 7px;
+      font-size: 12px;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI;
+      font-weight: 500;
+      line-height: 18px;
+      border: 1px solid transparent;
+      border-radius: 2em;
+      margin-left: 1em;
+      &.minor {
+        background-color: #fbca04;
+        color: #000000;
+      }
+      &.severe{
+        background-color: #d93f0b;
+        color: #ffffff;
+      }
+    }
+  }
+  .sortable {
+    font-weight: normal;
+    margin: 1em 0;
+    
+    ul, ol {  
+      text-align: left;        
+      border: solid var(--page-pageBorder, var(--page-pageFrame));
+      border-width: 5px 5px 0 0;
+      padding-bottom: 6em;
+      height: 100%;
+      max-height: 70vh;
+      overflow: auto;
+    }
+
+    li {
+      // TODO Use a background color here from the theme that isn't log-bg
+      background-color: var(--page-log-bg);
+      border: 1px solid rgba(0,0,0,.125);
+      margin-bottom: -1px;
+      padding: .2em;
+      .summary:before {
+        content: ' - '
+      }
+    }
+
+    ul li {
+        list-style: none;
+    }
+
+    ol li {
+      list-style: decimal;
+    }
+
+    .col {  
+      width: 100%;
+      margin: 0 20px;
+    }
+    .modButton {
+      float: right;
+      width: 18px;
+      height: 18px;
+      background: var(--saves-tab);
+      text-align: center;
+      &:hover {
+        background: var(--saves-tabHover)
+      }
+    }
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .row {
+    display: flex;
+  }
+
+</style>

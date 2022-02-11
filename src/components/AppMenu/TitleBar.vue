@@ -55,25 +55,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
   #titleBar{
+    position: relative;
+    --title-bar-height: 22px;
+    --title-button-margin: 0px;
+
     background: var(--header-bg);
     color: var(--font-header);
 
-    min-height: 18px;
-    margin-top: 4px;
+    // Margin gives mouse room to resize window
+    margin-top: 1px;
+    height: calc(var(--title-bar-height) - 1px);
     -webkit-app-region: drag;
 
     * {
       user-select: none;
     }
   }
-  #titleBarText{
+  #titleBarText {
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     width: 85%;
     margin: 0 auto;
+    padding-top: 4px;
     padding-bottom: 2px;
+    font-size: 14px;
   }
   #titleBarButtons {
     -webkit-app-region: no-drag;
@@ -84,17 +92,16 @@ export default {
     .systemButton {
       display: inline-block;
       pointer-events: auto;
-      width: 25px;
-      height: 22px;
+      width: calc((8 / 7) * var(--title-bar-height));
+      height: var(--title-bar-height);
 
-      line-height: 24px;
+      line-height: var(--title-bar-height);
       padding: 0 2px;
+      margin: var(--title-button-margin);
     }
-    #closeButton{
-      &:hover {
-        color: white;
-				background: rgb(255, 73, 73);
-			}
-    }
+    #closeButton:hover {
+      color: white;
+			background: rgb(255, 73, 73);
+		}
   }
 </style>

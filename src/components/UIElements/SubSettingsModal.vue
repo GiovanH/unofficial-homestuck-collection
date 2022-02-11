@@ -195,7 +195,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.85);
   position: fixed;
 
-  width: 100%;
+  width: 100%;  
   height: calc(100% - var(--headerHeight));
   left: 0;
   overflow: hidden;
@@ -268,6 +268,7 @@ export default {
 
   .settings {
     font-weight: bold;
+    margin: 1em 0;
 
     dt {
       margin: 10px 0 5px 10px;
@@ -312,9 +313,10 @@ export default {
       background: #008C45;
     }
     ul {
-      padding: 0 0.5em;;
+      padding: 0 0.5em;
       list-style: inside;
       background: white;
+      color: black;
     }
   }
 

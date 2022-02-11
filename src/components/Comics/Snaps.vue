@@ -289,11 +289,11 @@ export default {
               width: 120px; 
               height: 200px;
               margin: 2px;
-              filter: opacity(0.8);
+              opacity: 0.8;
               transition: all 0.15s;
               
               &:hover {
-                filter: opacity(1);
+                opacity: 1.0;
               }
 
               img {

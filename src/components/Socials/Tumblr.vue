@@ -95,10 +95,12 @@ export default {
   },
   updated(){
     this.filterLinksAndImages(this.$el.querySelector('.content'))
+    this.filterLinksAndImagesInternetArchive(this.$el.querySelector('.content'), '2012')
   },
   mounted(){
     this.jumpToClass(this.routeParams.id)
     this.filterLinksAndImages(this.$el.querySelector('.content'))
+    this.filterLinksAndImagesInternetArchive(this.$el.querySelector('.content'), '2012')
   }
 }
 </script>

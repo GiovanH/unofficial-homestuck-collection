@@ -87,7 +87,7 @@ export default {
             case 1:
               this.$el.style.transition = 'background-position 0.15s ease'
               this.$el.style.backgroundPosition = 'right bottom'
-              this.$parent.gameOverThemeOverride = 'default'
+              this.$parent.gameOverThemeOverride = 'mspa'
               this.$parent.setTitle()
               break
             // Swipe to A6A6A3
@@ -99,7 +99,7 @@ export default {
             // Swipe to A6A6I3
             case 3:
               this.$el.style.backgroundPosition = 'right bottom'
-              this.$parent.gameOverThemeOverride = 'default'
+              this.$parent.gameOverThemeOverride = 'mspa'
               this.$parent.setTitle()
               break
             // Fade to dark
