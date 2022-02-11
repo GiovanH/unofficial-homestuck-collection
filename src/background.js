@@ -793,11 +793,11 @@ async function createWindow () {
     win = null
   })
 
-  var current_icon // = "build/icons/icon"
+  var current_icon // = "@/icons/icon"
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
-    new_icon = new_icon || "build/icons/icon"
+    new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
     if (new_icon && new_icon != current_icon) {
       try {
         if (process.platform == "win32") {
