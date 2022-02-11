@@ -7,7 +7,7 @@
         </div>
         <Footnotes :pageId="thisPage.pageId" preface />
         <div class="vid">
-          <Media :url="thisPage.media[0]" />
+          <Media :url="thisPage.media[0]" autoplay="true" ref="embed" />
         </div>      
         <div class="links">
           <FlashCredit  :pageId="thisPage.pageId" />

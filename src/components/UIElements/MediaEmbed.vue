@@ -1,7 +1,7 @@
 <template>
   <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
-  <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
+  <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt :autoplay="autoplay" @loadeddata="onVideoLoaded" />
   <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
@@ -24,7 +24,7 @@ import Resources from "@/resources.js"
 
 export default {
   name: "MediaEmbed",
-  props: ['url', 'gifmode', 'webarchive'],
+  props: ['url', 'gifmode', 'webarchive', 'autoplay'],
   emits: ['blockedevent'], 
   data() {
     return {
@@ -215,6 +215,9 @@ export default {
         'A6A6I1': -100,
         'darkcage': 350,
       },
+      pauseAt: {
+        "08080": 18
+      },
       audio: [],
       source: undefined,
       lastStartedAudio: undefined,
@@ -311,6 +314,21 @@ export default {
     }
   },
   methods: {
+    onVideoLoaded(event) {
+      const pauseAt = this.pauseAt[this.flashProps.id]
+      if (pauseAt) {
+        const pause = function(){
+          if (this.currentTime > pauseAt) {
+            console.log("pausing video at", this.currentTime)
+            this.controls = true
+            this.pause()
+            this.removeEventListener("timeupdate", pause)
+          }
+        }
+        event.srcElement.controls = false
+        event.srcElement.addEventListener("timeupdate", pause)
+      }
+    },
     initHtmlFrame(event) {
       if (this.frameType == 'webview') {
         const webview = event.srcElement
