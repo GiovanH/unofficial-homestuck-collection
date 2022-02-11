@@ -425,7 +425,7 @@ export default {
         {
           model: "arrowNav",
           label: "Enable arrow key navigation",
-          desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys."
+          desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys, and open textboxes with space."
         }, {
           model: "openLogs",
           label: "Automatically open logs",

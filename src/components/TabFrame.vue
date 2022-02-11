@@ -10,6 +10,7 @@
         v-if="isLoaded"
         @keyup.left="leftKeyPress"
         @keyup.right="rightKeyPress"
+        @keyup.space="spaceBarPress"
         @keyup.f5="reload"
         ref="tabFrame"
     >
@@ -438,10 +439,39 @@ export default {
             })
         },
         leftKeyPress(e) {
-            if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('left', e)
+            if (this.$localData.settings.arrowNav && 
+                this.$refs.page.keyNavEvent && 
+                !e.altKey && 
+                document.activeElement.tagName != 'INPUT') {
+                if (this.$el.scrollLeft == 0) {
+                    // Only send event if scrolling doesn't happen
+                    this.$refs.page.keyNavEvent('left', e)
+                }
+            }
         },
         rightKeyPress(e) {
-            if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('right', e)
+            if (this.$localData.settings.arrowNav && 
+                this.$refs.page.keyNavEvent && 
+                !e.altKey && 
+                document.activeElement.tagName != 'INPUT') {
+                const frameEl = this.$el
+                if (frameEl.scrollLeft + frameEl.clientWidth == frameEl.scrollWidth) {
+                    // Only send event if scrolling doesn't happen
+                    this.$refs.page.keyNavEvent('right', e)
+                }
+            }
+        },
+        spaceBarPress(e) {
+            if (this.$localData.settings.arrowNav && 
+                this.$refs.page.spaceBarEvent && 
+                document.activeElement.tagName != 'INPUT') {
+                const frameEl = this.$el
+                this.$logger.info(frameEl.scrollTop, frameEl.clientHeight, frameEl.scrollHeight)
+                if (frameEl.scrollTop + frameEl.clientHeight == frameEl.scrollHeight) {
+                    // Only send event if scrolling doesn't happen
+                    this.$refs.page.spaceBarEvent(e)   
+                }
+            }
         },
         toggleBookmarks() {
             this.$refs.bookmarks.toggle()
