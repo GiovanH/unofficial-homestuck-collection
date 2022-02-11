@@ -27,7 +27,7 @@
         </div>
         <div class="description">
           <p><em>A story about some kids who are friends over the internet. They decide to play a game together. There are major consequences.</em></p><br>
-          <p>The fourth, final, and most famous of the MS Paint Adventures. While it begun as a "mock-game" following reader commands like the previous adventures, they were phased out as the story unfolded into a mixed-media barrage of mid-2000's internet culture satire, interpersonal drama, and Weird Plot Shit [sic].</p></br>
+          <p>The fourth, final, and most famous of the MS Paint Adventures. While it began as a "mock-game" following reader commands like the previous adventures, they were phased out as the story unfolded into a mixed-media barrage of mid-2000's internet culture satire, interpersonal drama, and Weird Plot Shit [sic].</p></br>
           <p>One-upping Problem Sleuth's action-packed GIFs, Homestuck spiced up pivotal moments with Flash animations scored by a lively team of composers. Over time, the music team produced dozens of albums across a variety of genres.</p>
           <div class="links">
             <div class="left bigLink">

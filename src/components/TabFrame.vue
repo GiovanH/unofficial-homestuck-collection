@@ -503,9 +503,11 @@ export default {
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up
-        let iframes = this.$el.querySelectorAll(`iframe`)
-        for (var i = 0; i < iframes.length; i++) {
-            iframes[i].parentNode.removeChild(iframes[i])
+        if (this.$el) {
+            const iframes = this.$el.querySelectorAll(`iframe`)
+            for (var i = 0; i < iframes.length; i++) {
+                iframes[i].parentNode.removeChild(iframes[i])
+            }
         }
     }
 }
