@@ -280,10 +280,10 @@ export default {
       display: block;
       margin: auto;
       height: 100%;
-      opacity: 40%;
+      opacity: 0.4;
     }
     &.active > svg {
-      opacity: 100%;
+      opacity: 1.0;
     }
 
     .badge {
