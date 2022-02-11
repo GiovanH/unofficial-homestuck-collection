@@ -8,7 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -23,7 +23,7 @@ log.transports.console.format = '[{level}] {text}';
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
