@@ -69,7 +69,7 @@
           }
           return page_theme
         } else {
-          this.$logger.warn("No tabs! Using default")
+          this.$logger.warn("App.vue:tabTheme: No active tab! Using default")
           return {defined: 'default', rendered: 'default'}
         }
       },
@@ -90,7 +90,9 @@
               theme = set_theme
             } else {
               // Page takes priority over setting
-              theme = this.tabTheme.rendered
+              theme = this.tabTheme.defined
+              // If this were this.tabThem.rendered, you would get
+              // page themes escaping to become app themes.
             }
           } else {
             // User specified a theme, page did not
