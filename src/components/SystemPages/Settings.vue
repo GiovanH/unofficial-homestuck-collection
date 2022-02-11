@@ -452,7 +452,7 @@ export default {
         }, {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
-          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Requires restart.</strong>"
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
