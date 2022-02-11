@@ -15,7 +15,8 @@
             display: inline-block;
             white-space: pre-wrap;
           }          
-          .log .logContent span + span {
+          .log .logContent span + span, 
+          .log .logContent br + br + span {
             padding: initial;
             display: inline !important;
           }
@@ -31,7 +32,8 @@
             display: inline-block;
             white-space: pre-wrap;
           }
-          .authorlog .logContent span + span {
+          .authorlog .logContent span + span, 
+          .authorlog .logContent br + br + span {
             padding: initial;
             display: inline !important;
           }

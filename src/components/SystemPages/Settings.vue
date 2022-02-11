@@ -145,7 +145,7 @@
               <div class="textpreviews">
                 <!-- PageText usually require a tab change to recalculate theme. -->
                 <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
-                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
+                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
                 <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
                 <!-- v-if="!this.$pageIsSpoiler('001926')" -->
