@@ -308,7 +308,8 @@ export default {
     padding: 2px var(--padding);
   }
   .historyButton, .sysActionButton {
-    &[disabled] { color: var(--font-disabled); }
+      color: var(--font-default);
+      &[disabled] { color: var(--font-disabled); }
 
       height: var(--address-bar-height);
       width: calc(var(--address-bar-height) * (8/7));
