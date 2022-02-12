@@ -90,7 +90,7 @@ function extractimods(){
 
   const outpath = path.join(assetDir, "archive")
   const temp_tar_path = path.join(outpath, '_imods.tar')
-  console.log("Saving imods tar to ", temp_tar_path)
+  logger.info("Saving imods tar to ", temp_tar_path)
   // sorry! this is very silly but javascript refuses to let me
   // wait for a promise before returning, so here we are
   fs.writeFileSync(temp_tar_path, tar_buffer)
@@ -100,9 +100,9 @@ function extractimods(){
     cwd: outpath
   })
   fs.unlink(temp_tar_path, err => {
-    if (err) console.log(err)
+    if (err) logger.error(err)
   })
-  console.log("Extracting imods to ", outpath)
+  logger.info("Extracting imods to ", outpath)
 }
 
 function removeModsFromEnabledList(responsible_mods) {
@@ -121,11 +121,14 @@ function removeModsFromEnabledList(responsible_mods) {
       // probably pre-window, don't need to worry here
       logger.warn("Don't have win!")
     }
-  } else {
+  } else if (window.vm) {
     logger.info("Changing modlist from vm")
     window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
     logger.info(window.vm.$localData.settings["modListEnabled"])
     window.vm.$localData.VM.saveLocalStorage()
+  } else {
+    logger.info("Trying to change modlist before vm")
+    store.set(store_modlist_key, new_enabled_mods)
   }
 }
 
@@ -310,7 +313,7 @@ function getEnabledModsJs() {
     return []
   }
   try {
-    return getEnabledMods().map((dir) => getModJs(dir))
+    return getEnabledMods().map((dir) => getModJs(dir)).filter(Boolean)
   } catch (e) {
     logger.error("Couldn't load enabled mod js'", e)
     return []
@@ -401,7 +404,7 @@ function getModJs(mod_dir, options={}) {
 
     let is_singlefile = false
     if (mod_dir.endsWith(".js")) {
-      console.log(mod_dir, "is explicit singlefile.")
+      logger.debug(mod_dir, "is explicit singlefile.")
       is_singlefile = true
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
@@ -410,12 +413,12 @@ function getModJs(mod_dir, options={}) {
         const is_directory = fs.lstatSync(path.join(thisModsDir, mod_dir)).isDirectory()
         if (!is_directory) throw new Error("Not a directory")
 
-        console.log(mod_dir, "confirmed as directory.")
+        logger.debug(mod_dir, "confirmed as directory.")
         is_singlefile = false
         modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
       } catch (e) {
         // Mod isn't an explicit singlefile or a directory
-        console.log(mod_dir, "must be singlefile.")
+        logger.debug(mod_dir, "must be singlefile.")
         is_singlefile = true
         modjs_path = path.join(thisModsDir, mod_dir + ".js")
       }
@@ -485,8 +488,9 @@ function getModJs(mod_dir, options={}) {
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
     if (e1_is_notfound) {
       // Tried singlefile, missing
-      logger.error("Missing file")
-      onModLoadFail([mod_dir], e1)
+      logger.error("Missing file", mod_dir)
+      removeModsFromEnabledList([mod_dir])
+      return null
     } else {
       // Singlefile found, other error
       logger.error("File found, other error")
@@ -894,7 +898,7 @@ if (ipcMain) {
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir, {liteload: true})
-        if (js.hidden === true)
+        if (js === null || js.hidden === true)
           return acc // continue
 
         acc[dir] = jsToChoice(js, dir)
