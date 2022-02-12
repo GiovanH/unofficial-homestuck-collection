@@ -347,6 +347,8 @@
           <br>
           <strong>{{$localData.assetDir || 'None selected'}}</strong>
           <br><br>
+          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
+          <br><br>
           <button @click="locateAssets()">Relocate assets</button>
           <br><br>
           <button @click="factoryReset()">Factory reset</button>
@@ -367,6 +369,7 @@ import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
+const log = require('electron-log')
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -382,6 +385,7 @@ export default {
   title: () => "Settings",
   data: function() {
     return {
+      log,
       settingListBoolean: [
         {
           model: "showAddressBar",
