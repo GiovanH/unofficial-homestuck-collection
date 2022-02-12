@@ -352,9 +352,9 @@
     <div v-if="modHomeRowItems.length" class="card unsortedCard noHeaderCard">
       <div class="cardContent cardRows">
         <HomeRowItem
-          v-for="item in modHomeRowItems"
+          v-for="item, i in modHomeRowItems"
           class="rowItem"
-          :key="item.href"
+          :key="`${i}-${item.href}`"
           :href="item.href"
           :thumbsrc="item.thumbsrc"
           :afterpage="item.afterpage"

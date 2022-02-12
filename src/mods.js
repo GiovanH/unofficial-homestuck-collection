@@ -90,7 +90,7 @@ function extractimods(){
 
   const outpath = path.join(assetDir, "archive")
   const temp_tar_path = path.join(outpath, '_imods.tar')
-  console.log("Extracting imods to ", temp_tar_path)
+  console.log("Saving imods tar to ", temp_tar_path)
   // sorry! this is very silly but javascript refuses to let me
   // wait for a promise before returning, so here we are
   fs.writeFileSync(temp_tar_path, tar_buffer)
@@ -195,7 +195,7 @@ if (ipcMain) {
         <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
         These have been disabled for safety.</p>
         <pre>${sanitizeHTML(e)}</pre>
-        <input type="button" value="1. Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
+        <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
         <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
         <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
         <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
@@ -383,15 +383,15 @@ function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
+  let modjs_path
+  var mod
+
   try {
-    let modjs_path
-    var mod
+    // const use_webpack_require = false
 
     // Global, but let us overwrite it for some cases
     let thisModsDir = modsDir
     let thisModsAssetRoot = modsAssetsRoot
-
-    let use_webpack_require = false
 
     if (mod_dir.startsWith("_")) {
       // use_webpack_require = true
@@ -399,50 +399,70 @@ function getModJs(mod_dir, options={}) {
       thisModsAssetRoot = imodsAssetsRoot
     } 
 
-    if (options.singlefile) {
+    let is_singlefile = false
+    if (mod_dir.endsWith(".js")) {
+      console.log(mod_dir, "is explicit singlefile.")
+      is_singlefile = true
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
-      modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
-    }
-
-    if (use_webpack_require) {
-      console.log(modjs_path)
-      mod = require(modjs_path)
-    } else {
-      // eslint-disable-next-line no-undef
-      if (__non_webpack_require__.cache[modjs_path])
-        // eslint-disable-next-line no-undef
-        delete __non_webpack_require__.cache[modjs_path]
-
+      // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
       try {
-        // eslint-disable-next-line no-undef
-        mod = __non_webpack_require__(modjs_path)
+        const is_directory = fs.lstatSync(path.join(thisModsDir, mod_dir)).isDirectory()
+        if (!is_directory) throw new Error("Not a directory")
+
+        console.log(mod_dir, "confirmed as directory.")
+        is_singlefile = false
+        modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
       } catch (e) {
-        // imod AND this is the second attempt at importing it
-        if (mod_dir.startsWith("_")) {
-          console.log("Caught error importing imod")
-          if (fs.existsSync(path.join(assetDir, "archive"))) {
-            console.log("Couldn't load imod, trying re-extract")
-            extractimods()
-          } else {
-            console.log('Asset pack not found.');
-            throw e
-          }
-          console.log("Retrying import")
-          // eslint-disable-next-line no-undef
-          mod = __non_webpack_require__(modjs_path)
-        } else {
-          // console.log("mod", mod_dir, "is not imod, unrecoverable require error")
-          throw e
-        }
+        // Mod isn't an explicit singlefile or a directory
+        console.log(mod_dir, "must be singlefile.")
+        is_singlefile = true
+        modjs_path = path.join(thisModsDir, mod_dir + ".js")
       }
     }
 
+    // if (use_webpack_require) {
+    //   console.log(modjs_path)
+    //   mod = require(modjs_path)
+    // } else {
+    // eslint-disable-next-line no-undef
+    if (__non_webpack_require__.cache[modjs_path])
+      // eslint-disable-next-line no-undef
+      delete __non_webpack_require__.cache[modjs_path]
+
+    try {
+      // eslint-disable-next-line no-undef
+      mod = __non_webpack_require__(modjs_path)
+    } catch (e) {
+      // imod 
+      if (mod_dir.startsWith("_")) {
+        console.log("Caught error importing imod")
+        if (options.noReextractImods) {
+          console.log("Already tried to re-extract imods, refusing to infinite loop")
+          throw e
+        }
+        if (fs.existsSync(path.join(assetDir, "archive"))) {
+          console.log("Couldn't load imod, trying re-extract")
+          extractimods()
+        } else {
+          console.log('Asset pack not found.')
+          throw e
+        }
+        console.log("Retrying import")
+        // eslint-disable-next-line no-undef
+        return getModJs(mod_dir, {...options, noReextractImods: true})
+      } else {
+        console.log("mod", mod_dir, "is not imod, unrecoverable require error")
+        throw e
+      }
+    }
+    // }
+
     mod._id = mod_dir
-    mod._singlefile = options.singlefile
+    mod._singlefile = is_singlefile
     mod._internal = mod_dir.startsWith("_")
 
-    if (!options.singlefile) {
+    if (!is_singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
@@ -462,38 +482,14 @@ function getModJs(mod_dir, options={}) {
 
     return mod
   } catch (e1) {
-    // elaborate error checking w/ afllback
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
-    if (options.singlefile) {
-      if (e1_is_notfound) {
-        // Tried singlefile, missing
-        throw e1
-      } else {
-        // Singlefile found, other error
-        logger.error("Singlefile found, other error 1")
-        onModLoadFail([mod_dir], e1)
-        throw e1
-      }
-    } else if (e1_is_notfound) {
-      // Tried dir/mod.js, missing
-      try {
-        // Try to find singlefile
-        options.singlefile = true
-        return getModJs(mod_dir, options)
-      } catch (e2) {
-        const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
-        if (e2_is_notfound) {
-          // Singlefile not found either
-          onModLoadFail([mod_dir], e1)
-        } else {
-          logger.error("Singlefile found, other error 2")
-          onModLoadFail([mod_dir], e2)
-        } 
-        // finally
-        throw e2
-      }
+    if (e1_is_notfound) {
+      // Tried singlefile, missing
+      logger.error("Missing file")
+      onModLoadFail([mod_dir], e1)
     } else {
-      // dir/mod.js found, other error
+      // Singlefile found, other error
+      logger.error("File found, other error")
       onModLoadFail([mod_dir], e1)
       throw e1
     }

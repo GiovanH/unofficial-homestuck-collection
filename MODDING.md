@@ -400,7 +400,50 @@ Use the `settings` field to define a data model. The archive will automatically 
     + `label`: A short label for this option
     + `desc`: A longer description for this option. Optional.
 
-Note that there is no setting for a default option. Values will always be undefined until the user interacts with the settings screen. You can override this behavior by including logic in your `computed` handler, for example
+A full example:
+
+```js
+  settings: {
+    boolean: [{
+      model: "booltest",
+      label: "Mod bool test",
+      desc: "Mod bool test desc"
+    }],
+    radio: [{
+      model: "radiotest",
+      label: "Mod radio test",
+      desc: "Mod radio test desc",
+      options: [
+        {
+          value: "value_a",
+          label: "Value A",
+          desc: "the a value"
+        },
+        {
+          value: "value_b",
+          label: "Value B",
+          desc: "the b value"
+        }
+      ]
+    },{
+      model: "radiotest2",
+      label: "Mod radio test (Compressed)",
+      desc: "Mod radio test desc 2",
+      options: [
+        {
+          value: "value_a",
+          label: "Value A"
+        },
+        {
+          value: "value_b",
+          label: "Value B"
+        }
+      ]
+    }]
+  }
+```
+
+Note that there is no setting for a default option. Values will always be undefined (falsey) until the user interacts with the settings screen. You can override this behavior by including logic in your `computed` handler, for example
 
 ```js
   computed(api) { 
