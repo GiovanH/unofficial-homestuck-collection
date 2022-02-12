@@ -112,7 +112,13 @@ export default {
         title: url,
         url: url
       })
-      const simple = ['/credits', '/decode', '/map', '/music', '/news', '/sbahj', '/settings', '/settings/mod', '/tso'].map(dumbUrlMap)
+      const simple = [
+        '/credits', '/news', '/settings',  '/settings/mod', 
+        '/help/newreader', '/help/usage', '/help/faq', 
+        '/map', '/log', '/music', '/sbahj', 
+        '/tso', '/jailbreak', '/bard-quest', '/problem-sleuth', '/homestuck', 
+        '/faqs', '/unlock', '/decode'
+      ].map(dumbUrlMap)
       const unlocked = [
         {url: "/formspring", show: this.$pageIsSpoiler('003478')},
         {url: "/tumblr",     show: this.$pageIsSpoiler('006010')},

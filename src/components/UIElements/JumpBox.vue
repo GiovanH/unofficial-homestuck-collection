@@ -30,6 +30,7 @@
 
 <script>
 import VueSimpleSuggest from 'vue-simple-suggest'
+import AddressBar from '@/components/AppMenu/AddressBar.vue'
 
 export default {
   name: 'jumpBox',
@@ -53,24 +54,7 @@ export default {
         return a.concat(t.history)
       }, []))]
     },
-    allUrlSuggestions(){
-      const dumbUrlMap = url => ({
-        title: url,
-        url: url
-      })
-      const simple = ["/music", "/news", "/settings", "/credits"].map(dumbUrlMap)
-      const history = this.allHistory.map(dumbUrlMap)
-
-      const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
-        title: `${bookmark.url} - ${bookmark.name}`,
-        url: bookmark.url
-      }))
-
-      return [...simple, ...bookmarks, ...history].filter((obj, pos, arr) => {
-        // Deduplicate based on 'url' param
-        return arr.map(mapObj => mapObj['url']).indexOf(obj['url']) === pos
-      })
-    }
+    allUrlSuggestions: AddressBar.computed.allUrlSuggestions
   },
   methods: {
 		open() {

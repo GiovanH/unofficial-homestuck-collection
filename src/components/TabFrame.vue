@@ -421,7 +421,7 @@ export default {
             return (theme == 'default' ? 'mspa' : theme)
         },
         forceLoad(){
-            return this.tab.hasAudio
+            return this.tab.hasEmbed
         }
     },
     methods: {
@@ -476,7 +476,7 @@ export default {
     },
     updated(){
       this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
       })
     },
     watch: {
