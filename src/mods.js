@@ -848,6 +848,10 @@ if (ipcMain) {
     // Get the list of mods players can choose to enable/disable
     var mod_folders
     try {
+      if (fs.existsSync(assetDir) && !fs.existsSync(modsDir)){
+        logger.info("Asset pack exists but mods dir doesn't, making empty folder")
+        fs.mkdirSync(modsDir)
+      }
       const tree = crawlFileTree(modsDir, false)
 
       // Extract zips
