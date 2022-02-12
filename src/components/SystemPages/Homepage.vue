@@ -382,22 +382,13 @@ export default {
     NavBanner, Media, HomeRowItem, Logo
   },
   data: function() {
-    return {
-      modHomeRowItems: [
-      // {
-      //   href: "/ryanquest",
-      //   thumbsrc: "/archive/collection/archive_ryanquest.png",
-      //   date: "Oct 2010",
-      //   title: 'Ryanquest',
-      //   description: `<p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>`
-      // }
-      ]
-    }
+    return {}
   },
   title: function(ctx) {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems}
   },
   methods: {
   }

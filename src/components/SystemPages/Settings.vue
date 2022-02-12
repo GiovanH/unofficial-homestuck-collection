@@ -1030,7 +1030,7 @@ export default {
     }
 
     ul li {
-        list-style: none;
+      list-style: none;
     }
 
     ol li {
