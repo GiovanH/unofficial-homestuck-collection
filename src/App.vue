@@ -6,7 +6,7 @@
         
       ]" v-if="$archive && $root.loadState !== 'ERROR'">
       <AppHeader :class="theme" ref="appheader" />
-      <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
+      <TabFrame v-for="key in tabList" :key="key" :ref="key" :tabKey="key" :style="{zoom: zoomLevelCss}"/>
       <Notifications :class="theme" ref="notifications" />
       <ContextMenu :class="theme" ref="contextMenu" />
       <Updater ref="Updater" />
@@ -43,6 +43,7 @@
     data() {
       return {
         zoomLevel: 0,
+        useCssZoom: true,
         needCheckTheme: false,
         stylesheets: [] // Mod optimization
       }
@@ -50,6 +51,9 @@
     computed: {
       tabList() {
         return this.$localData.tabData.tabList
+      },
+      zoomLevelCss(){
+        return this.useCssZoom ? ((this.zoomLevel)/5 + 1) : 'normal'
       },
       activeTabComponent() {
         this.needCheckTheme; // what a truly awful hack. vue's fault
@@ -105,7 +109,7 @@
     methods: {
       resetZoom() {
         this.zoomLevel = 0
-        electron.webFrame.setZoomLevel(this.zoomLevel)
+        if (!this.useCssZoom) electron.webFrame.setZoomLevel(this.zoomLevel)
       },
       checkTheme() {
         this.needCheckTheme = !this.needCheckTheme;
@@ -113,13 +117,13 @@
       zoomIn() {
         if (this.zoomLevel < 5) {
           this.zoomLevel += 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          if (!this.useCssZoom) electron.webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       zoomOut() {
         if (this.zoomLevel > -5) {
           this.zoomLevel -= 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          if (!this.useCssZoom) electron.webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       openJumpbox() {
