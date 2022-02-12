@@ -40,7 +40,7 @@ class LocalData {
       }
     }
 
-    let initSettings = {
+    const initSettings = {
       newReader: {
         current: '001901',
         limit: '001902'
