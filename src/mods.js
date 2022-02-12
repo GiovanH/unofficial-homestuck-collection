@@ -89,16 +89,17 @@ function extractimods(){
   let tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")
-  console.log("Extracting imods to ", outpath)
+  const temp_tar_path = path.join(outpath, '_imods.tar')
+  console.log("Extracting imods to ", temp_tar_path)
   // sorry! this is very silly but javascript refuses to let me
   // wait for a promise before returning, so here we are
-  fs.writeFileSync('_imods.tar', tar_buffer)
+  fs.writeFileSync(temp_tar_path, tar_buffer)
   Tar.extract({
-    file: '_imods.tar',
+    file: temp_tar_path,
     sync: true,
     cwd: outpath
   })
-  fs.unlink('_imods.tar', err => {
+  fs.unlink(temp_tar_path, err => {
     if (err) console.log(err)
   })
   console.log("Extracting imods to ", outpath)
