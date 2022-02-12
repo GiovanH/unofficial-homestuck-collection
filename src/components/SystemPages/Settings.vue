@@ -458,6 +458,10 @@ export default {
           label: "Enable hardware acceleration",
           desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
         }, {
+          model: "useSystemWindowDecorations",
+          label: "Use system window decorations",
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
+        }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
           desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is."
@@ -702,6 +706,11 @@ export default {
       }
       if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
         this.queueArchiveReload()
+      }
+
+      if (setting == 'useSystemWindowDecorations') {
+        this.$localData.root.saveLocalStorage()
+        this.$nextTick(() => {ipcRenderer.invoke('restart')})
       }
 
       // Unforce if theme just changed to auto
