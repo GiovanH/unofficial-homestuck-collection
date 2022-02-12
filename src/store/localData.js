@@ -48,8 +48,8 @@ class LocalData {
       notifications: true,
       subNotifications: false,
 
-      showAddressBar: false,
-      urlTooltip: false,
+      showAddressBar: true,
+      urlTooltip: true,
       switchToNewTabs: false,
       forceScrollBar: true,
       hideFullscreenHeader: false,
@@ -79,7 +79,6 @@ class LocalData {
       hqAudio: true,
       jsFlashes: true,
       credits: true,
-      footnotes: false,
 
       fastForward: false,
 
