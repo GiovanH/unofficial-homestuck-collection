@@ -400,6 +400,19 @@ ipcMain.on('STARTUP_GET_INFO', (event) => {
   event.returnValue = {port: port, appVersion: APP_VERSION}
 })
 
+ipcMain.handle('check-archive-version', async (event, payload) => {
+  try {
+    const versionJson = JSON.parse(fs.readFileSync(
+      path.join(payload.assetDir, 'archive/data/version.json'),
+      'utf8'
+    ))
+    return versionJson.version
+  } catch (e) {
+    logger.error(e)
+    return undefined
+  }
+})
+
 if (assetDir) {
   // App version checks
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
