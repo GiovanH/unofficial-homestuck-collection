@@ -747,59 +747,66 @@ function getMixins(){
       return null
     }
 
+    const vueHooksByName = {}
+    const vueHooksMatchFn = []
+
     // Precompute as much as possible since mixins run everywhere
     vueHooks.forEach((hook) => {
-      // Shorthand
-      if (hook.matchName)
-        hook.match = (c) => (c.$options.name == hook.matchName)
+      // Not actually horthand
+      if (hook.matchName) {
+        vueHooksByName[hook.matchName] = (vueHooksByName[hook.matchName] || [])
+        vueHooksByName[hook.matchName].push(hook)
+      } else {
+        vueHooksMatchFn.push(hook)
+      }
     })
 
     const mixin =  {
       created() {
         const vueComponent = this
 
+        this._uhc_matching_hooks = [
+          ...vueHooksMatchFn.filter(hook => hook.match(this)), // Complex hooks
+          ...(vueHooksByName[this.$options.name] || [])        // named hooks 
+        ]
+
+        // Hook things
         // Normally mixins are ignored on name collision
         // We need to do the opposite of that, so we hook `created`
-        vueHooks.forEach((hook) => {          
-          if (hook.match(this)) {
-            // Literal created hook
-            if (hook.created)
-              hook.created.bind(this)()
+        this._uhc_matching_hooks.forEach(hook => {
+          // Literal created hook
+          if (hook.created)
+            hook.created.bind(this)()
 
-            for (const dname in (hook.data || {})) {
-              const value = hook.data[dname]
-              this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
-            }
-            // Computed
-            for (const cname in (hook.computed || {})) {
-              // Precomputed super function
-              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
-              Object.defineProperty(this, cname, {
-                get: hook.computed[cname].bind(vueComponent, sup),
-                configurable: true
-              })
-            }
-            // Methods w/ optional super argument
-            for (const mname in (hook.methods || {})) {
-              const sup = this[mname] || nop
-              const bound = hook.methods[mname].bind(vueComponent)
-              this[mname] = function(){return bound(...arguments, sup)}
-            }
+          for (const dname in (hook.data || {})) {
+            const value = hook.data[dname]
+            this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+          }
+          // Computed
+          for (const cname in (hook.computed || {})) {
+            // Precomputed super function
+            const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
+            Object.defineProperty(this, cname, {
+              get: hook.computed[cname].bind(vueComponent, sup),
+              configurable: true
+            })
+          }
+          // Methods w/ optional super argument
+          for (const mname in (hook.methods || {})) {
+            const sup = this[mname] || nop
+            const bound = hook.methods[mname].bind(vueComponent)
+            this[mname] = function(){return bound(...arguments, sup)}
           }
         })
       },
       updated() {
-        vueHooks.forEach((hook) => {
-          if (hook.updated && hook.match(this)) {
-            hook.updated.bind(this)()
-          }
+        this._uhc_matching_hooks.filter(hook => hook.updated).forEach(hook => {
+          hook.updated.bind(this)()
         })
       },
       mounted() {
-        vueHooks.forEach((hook) => {
-          if (hook.mounted && hook.match(this)) {
-            hook.mounted.bind(this)()
-          }
+        this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
+          hook.mounted.bind(this)()
         })
       }
     }

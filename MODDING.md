@@ -42,7 +42,6 @@ Some changes don't require any sort of reload at all. Some require a soft reload
 
 Basically, anything that requires the main process to reload requires an application restart. This is usually if you change an actual file in the mods directory. Anything that modifies vue or adds CSS requires a soft reload, and stuff that just modifies the archive or adds footnotes can reload within vue. 
 
-
 ## API specification
 
 As per [Installing mods](#installing-mods) above, there are two forms of mods: single-file scripts and mod folders. 
@@ -94,6 +93,9 @@ edit(archive) {
 ```
 
 Here, the specific phrase "the 13th of April, 2009, " is replaced, and any other text in `content` is left to pass through. 
+
+The `archive` object is the main data object that drives the story. It's defined in src/background.js:loadArchiveData, and stores the information from the json files in archive/data.
+So `archive.mspa` is `mspa.json`, etc.
 
 ### Routes
 
@@ -415,8 +417,8 @@ Vue hooks are the most complicated and the most powerful method of modifying the
 
 Each `VueHook` has the following properties:
 
-- `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state.
-- `matchName` (string, optional): Shorthand for `match(c) {return c.$options.name == "pageText"}`. Helpful for matching specific `.vue` files by name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
+- `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state. Try to use `matchName` instead, though:
+- `matchName` (string, optional): Works like `match(c) {return c.$options.name == "pageText"}`, but is *much* more performant. Helpful for matching specific `.vue` files by their vue name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
 
 Ways to hook Vue data, in order from most to least recommended:
 
