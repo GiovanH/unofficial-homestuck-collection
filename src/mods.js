@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 
-const {ipcMain, ipcRenderer, dialog, app} = require('electron')
+const {ipcMain, ipcRenderer, dialog} = require('electron')
 const sass = require('sass')
 const unzipper = require("unzipper")
 const Tar = require('tar');

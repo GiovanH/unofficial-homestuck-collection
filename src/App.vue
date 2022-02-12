@@ -289,7 +289,7 @@
           if (event.defaultPrevented) return
 
           // don't handle if `target="_blank"`
-          const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
+          // const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
           // don't handle right clicks
           if (button !== undefined && button !== 1) return
 

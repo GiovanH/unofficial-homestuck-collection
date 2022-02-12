@@ -255,7 +255,7 @@
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
 <!--           </p>
           <p> -->
-            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
 <!--           </p>
           <p> -->
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>

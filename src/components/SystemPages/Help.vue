@@ -50,8 +50,8 @@
       </div>
       <div class="cardContent" v-if="cardSelection == 'usage'">
         <section>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug" target="_blank" class="anchorButton bugreport">Report a bug</a>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement" target="_blank" class="anchorButton">Request a feature</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
         <section>
           <h2>GENERAL NAVIGATION</h2>
@@ -133,8 +133,8 @@
           <p>Still having trouble? Reach out to us:</p>
         </section>
         <section>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug" target="_blank" class="anchorButton bugreport">Report a bug</a>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement" target="_blank" class="anchorButton">Request a feature</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
       </div>
     </div>
