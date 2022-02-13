@@ -101,6 +101,9 @@
           <dt>What kind of accessibility options are there?</dt>
           <dd>There are several options on the <a href='/settings/enhancements' target='_blank'>Settings page, under Enhancements</a>. You should find options that can help you fine-tune Homestuck's text to be more readable, such as font adjustments and high-contrast colours. There is also a dark mode, if the default shades of grey are straining your eyes.</dd>
 
+          <dt>I turned on dark mode, but now I can't read anything!</dt>
+          <dd>Most of the colored text in Homestuck is optimized to be read against the default grey MSPA background, so dark text colors will become very hard to read against a dark background. If you're using dark mode, we recommend also turning on <b>High contrast text</b> in settings under Text Override.</dd>
+
           <dt>How can I share or find mods?</dt>
           <dd><a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods">We have a wiki page dedicated to shining a light on various mods developed by the community.</a>. If you've created a mod and want to share it, please add a link to the list! <strong v-if="$isNewReader">Be careful - this list is likely to contain unmarked spoilers.</strong></dd>
 
