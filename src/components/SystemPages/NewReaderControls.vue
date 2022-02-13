@@ -1,7 +1,6 @@
 <template>
   <div class="newReaderControls">
     <template v-if="featureList.includes('pagenumber')">
-      <!-- <span v-if="$localData.settings['devMode']" v-text="newReaderPage" /> -->
       <div class="newReaderInput">
         <!-- Settings for adjusting new reader mode -->
         <template v-if="$isNewReader">
@@ -116,13 +115,13 @@
         </div>
       </div>
 
-      <pre v-if="$localData.settings.devMode">
+      <!-- <pre v-if="$localData.settings.devMode">
         newReaderPageInput: {{newReaderPageInput}} 
         newReaderPage: {{newReaderPage}} {{$getChapter(newReaderPage)}}
         $newReaderCurrent: {{$newReaderCurrent}} {{$getChapter($newReaderCurrent)}}
         isValidPageSet: {{isValidPageSet}}
         vizStory: {{vizStory}}
-      </pre>
+      </pre> -->
 
       <div v-if="promptMspaMode" class="settings application" >
         <dl>
@@ -220,7 +219,7 @@ export default {
       return this.features.toLowerCase().split(" ")
     },
     newReaderPage() {
-      // The actual MSPA number corresponding to the inpupt box. Immutable. May be invalid. May be undefined, if there's no validl way to set a page.
+      // The actual MSPA number corresponding to the input box. Immutable. May be invalid. May be undefined, if there's no validl way to set a page.
       if (!this.newReaderPageInput) {
         return undefined
       }
@@ -389,10 +388,6 @@ export default {
         box-shadow: 0 0 5px 1px royalblue;
       }  }
 
-      // border-radius: 3px;
-      // border-color: #ffaa00;
-      // background: #ffaa00;
-      // border-style: hidden;
       animation: 0.5s linear 0s infinite alternate urgent;
     }
 
@@ -411,12 +406,6 @@ export default {
       border-radius: 2px;
       padding: 2px 3px;
       margin: 5px;
-
-      // &.invalid:not(:disabled):not(.empty) {
-      //   background: pink;
-      //   border-color: rgb(187, 0, 37);
-      //   box-shadow: 0 0 3px 1px red;
-      // }
     }
 
     .bigButtonRow {

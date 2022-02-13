@@ -851,5 +851,4 @@ a.hijack {
     100% { transform: translate(-100%, 0); }
 }
 
-
 </style>
