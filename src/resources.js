@@ -94,12 +94,13 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") // Linked from a few flashes
     .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") // Covers for 99% of flashes that link to other pages
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
+    .replace(/.*mspaintadventures.com\/extras\/(.+?)\.html/, "/unlock/$1") // Links to unlock pages
     .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") // Link from CD rack flash
     .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1") // TODO double-check this regex
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
-    .replace('http://www.whatpumpkin.com/squiddles.htm', '/squiddles/credits')
+    .replace(/^http(s{0,1}):\/\/www.whatpumpkin\.com\/squiddles\.htm(l)?/, '/squiddles/credits')
 
   if (resource_url != request_url)
     // logger.debug("[getResU prelim]", request_url, "to", resource_url)
@@ -396,6 +397,7 @@ async function testArchiveComic(archive){
 
 function testResolution(){
   const libGetResourceUrl = {
+    "http://www.mspaintadventures.com/extras/ps000015.html": "/unlock/ps000015",
     "/advimgs/jb/mspaintadventure08.gif": "assets://advimgs/jb/mspaintadventure08.gif",
     "/archive/collection/archive_beta.png": "assets://archive/collection/archive_beta.png",
     "/archive/collection/archive_vigilprince.png": "assets://archive/collection/archive_vigilprince.png",
@@ -584,7 +586,7 @@ function testResolution(){
     "http://www.spxpo.com/about": "http://www.spxpo.com/about",
     "http://www.timelesschaos.com/teambffcomics/": "http://www.timelesschaos.com/teambffcomics/",
     "http://www.whatpumpkin.com/": "http://www.whatpumpkin.com/",
-    "http://www.whatpumpkin.com/squiddles.html": "http://www.whatpumpkin.com/squiddles.html",
+    "http://www.whatpumpkin.com/squiddles.html": "/squiddles/credits",
     "http://www.whatpumpkin.com/store/main.html": "http://www.whatpumpkin.com/store/main.html",
     "http://www.whatpumpkin.com/store/trollshirts.html": "http://www.whatpumpkin.com/store/trollshirts.html",
     "http://www.whatpumpkin.com/videos/squiddletrailer.html": "http://www.whatpumpkin.com/videos/squiddletrailer.html",
