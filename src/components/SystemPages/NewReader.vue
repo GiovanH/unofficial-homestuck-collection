@@ -44,8 +44,8 @@
 
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import Media from '@/components/UIElements/MediaEmbed.vue'
 import Logo from '@/components/UIElements/Logo.vue'
+// import Media from '@/components/UIElements/MediaEmbed.vue'
 
 export default {
   name: 'newReader',

@@ -168,7 +168,7 @@ export default {
     border-top: none;
     padding: 10px 10px 5px 10px;
     position: fixed;
-    right: 25px;
+    left: 25px;
 
     .systemButton {
       color: var(--font-default);

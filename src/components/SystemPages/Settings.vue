@@ -145,7 +145,7 @@
               <div class="textpreviews">
                 <!-- PageText usually require a tab change to recalculate theme. -->
                 <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
-                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
+                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
                 <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
                 content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
                 <!-- v-if="!this.$pageIsSpoiler('001926')" -->
@@ -255,7 +255,7 @@
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
 <!--           </p>
           <p> -->
-            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
 <!--           </p>
           <p> -->
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
@@ -347,6 +347,8 @@
           <br>
           <strong>{{$localData.assetDir || 'None selected'}}</strong>
           <br><br>
+          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
+          <br><br>
           <button @click="locateAssets()">Relocate assets</button>
           <br><br>
           <button @click="factoryReset()">Factory reset</button>
@@ -367,6 +369,7 @@ import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
+const log = require('electron-log')
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -382,6 +385,7 @@ export default {
   title: () => "Settings",
   data: function() {
     return {
+      log,
       settingListBoolean: [
         {
           model: "showAddressBar",
@@ -571,7 +575,7 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key])
+        this.$modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
       return Object.values(this.$modChoices).filter((choice) => 

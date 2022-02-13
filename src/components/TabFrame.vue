@@ -21,7 +21,7 @@
             ref="page"
         />
         
-        <Bookmarks  :tab="tab" ref="bookmarks" />
+        <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
         <FindBox    :tab="tab" ref="findbox"/>
         <JumpBox    :tab="tab" ref="jumpbox" />
@@ -265,17 +265,17 @@ export default {
                     let num = parseInt(this.routeParams.cid)
                     if (!num || num < 0 || num > 54 || num == 39) component = 'Error404'
                     break
-				}
-				case 'PXS': {
-					if (this.$pageIsSpoiler('008753')) component = 'Spoiler'
-					// else if (this.routeParams.cid) {
-					// 	let p = parseInt(this.routeParams.pid)
-					// 	let data = this.$archive.comics.pxs.comics[this.routeParams.cid]
-					// 	if (this.routeParams.cid && (!this.$archive.comics.pxs.list.includes(this.routeParams.cid) || !data || !Number.isInteger(p) || data.pages.length < p || p < 1)) component = 'Error404'
-					// }
-					break
-				}
-				case 'TSO': {
+                }
+                case 'PXS': {
+                    if (this.$pageIsSpoiler('008753')) component = 'Spoiler'
+                    else if (this.routeParams.cid) {
+                        let p = parseInt(this.routeParams.pid)
+                        let data = this.$archive.comics.pxs.comics[this.routeParams.cid]
+                        if (this.routeParams.cid && (!this.$archive.comics.pxs.list.includes(this.routeParams.cid) || !data || !Number.isInteger(p) || data.pages.length < p || p < 1)) component = 'Error404'
+                    }
+                    break
+                }
+                case 'TSO': {
                     if (this.routeParams.cid) {
                         let p = parseInt(this.routeParams.pid)
                         let validComics = this.$archive.comics.tso.list.map(x => typeof(x) === 'object' ? x.list : x).flat()
@@ -421,7 +421,7 @@ export default {
             return (theme == 'default' ? 'mspa' : theme)
         },
         forceLoad(){
-            return this.tab.hasAudio
+            return this.tab.hasEmbed
         }
     },
     methods: {
@@ -476,7 +476,7 @@ export default {
     },
     updated(){
       this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
       })
     },
     watch: {
