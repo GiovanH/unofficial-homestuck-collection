@@ -23,8 +23,8 @@
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
-        <FindBox    :tab="tab" ref="findbox"/>
-        <JumpBox    :tab="tab" ref="jumpbox" />
+        <FindBox    :tab="tab" ref="findbox" :class="theme"/>
+        <JumpBox    :tab="tab" ref="jumpbox" :class="theme" />
     </div>
 </template>
 
