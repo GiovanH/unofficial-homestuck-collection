@@ -123,38 +123,38 @@
           <dd>
             <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
               <br>If you want to zoom the entire application, try ctrl -/+ (or ⌘ -/+)!</span><br>
-            <div class="textOverrideSettings">
-              <div class="knobs">
-                <label>Font family:<br>
-                  <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
-                    <option v-for="font in fonts" :value="font.value">
-                      {{ font.text }}
-                    </option>
-                  </select>
-                </label>
-                <div class="textOptions">
-                  <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                  <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
-                  <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
-                </div>
-                <br><br>
-                <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
-                <br><br>
-                <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
-              </div>
-              <div class="textpreviews">
-                <!-- PageText usually require a tab change to recalculate theme. -->
-                <PageText class="examplePrattle" 
-                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
-                <PageText class="examplePrattle" 
-                content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
-                <!-- v-if="!this.$pageIsSpoiler('001926')" -->
-                <PageText class="examplePrattle" 
-                v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
-                content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
-              </div>
-            </div>
           </dd>
+          <div class="textOverrideSettings">
+            <div class="knobs">
+              <label>Font family:<br>
+                <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
+                  <option v-for="font in fonts" :value="font.value">
+                    {{ font.text }}
+                  </option>
+                </select>
+              </label>
+              <div class="textOptions">
+                <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
+                <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+              </div>
+              <br><br>
+              <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
+              <br><br>
+              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+            </div>
+            <div class="textpreviews">
+              <!-- PageText usually require a tab change to recalculate theme. -->
+              <PageText class="examplePrattle" 
+              content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
+              <PageText class="examplePrattle" 
+              content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
+              <!-- v-if="!this.$pageIsSpoiler('001926')" -->
+              <PageText class="examplePrattle" 
+              v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
+              content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
+            </div>
+          </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
             <dt :key="boolSetting.model"><label>
