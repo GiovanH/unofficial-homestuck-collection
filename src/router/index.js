@@ -254,6 +254,19 @@ const routes = [
     path: '/pxs/:cid',
     props: true,
     children: [
+      // {
+      //   path: '',
+      //   redirect: '1'
+      // },
+      {
+        path: ':pid',
+      },
+    ]
+  },
+  {
+    path: '/pxs/:cid',
+    props: true,
+    children: [
       {
         path: '',
         redirect: '1'

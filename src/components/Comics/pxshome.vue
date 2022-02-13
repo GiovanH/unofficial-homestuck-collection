@@ -6,11 +6,11 @@
       </div>
       <!-- Thought: tabs? -->
       <div class="tabContainer">
-        <a class="tabButton" :class="{selected: homeTab=='archive'}" @click="homeTab = 'archive'">Stories</a>
-        <a class="tabButton" :class="{selected: homeTab=='contributors'}" @click="homeTab = 'contributors'">Contributors</a>
-        <a class="tabButton" :class="{selected: homeTab=='news'}" @click="homeTab = 'news'">News</a>
+        <a class="tabButton" :class="{selected: homeTab=='archive'}" href="/pxs/archive">Stories</a>
+        <a class="tabButton" :class="{selected: homeTab=='credits'}" href="/pxs/credits">Contributors</a>
+        <a class="tabButton" :class="{selected: homeTab=='news'}" href="/pxs/news">News</a>
       </div>
-      <div class="storyContainer" v-if="homeTab=='archive'">
+      <div class="storyContainer" v-if="homeTab === undefined || homeTab=='archive'">
         <div v-for="story in $archive.comics.pxs.list" :key="story">
           <div class="storyButtonContainer">
             <div class="storyButton" @click="openStory(story)">
@@ -31,7 +31,7 @@
           </div>
         </div>
       </div> <!-- End Stories -->
-      <div class="contributorsContainer" v-if="homeTab=='contributors'">
+      <div class="contributorsContainer" v-if="homeTab=='credits'">
         <div class="panel-heading" />
         <div v-for="c, name in $archive.comics.pxs.contributors" :key="name" class="contributor">
           <span class="name" v-text="name" />
@@ -79,14 +79,14 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 export default {
   name: 'ParadoxSpace',
   props: [
+    'homeTab'
   ],
   components: {
     Media
   },
   data: function() {
     return {
-      selectedStory: undefined,
-      homeTab: 'archive'
+      selectedStory: undefined
     }
   },
   methods: {

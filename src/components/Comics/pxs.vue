@@ -1,7 +1,7 @@
 <template>
   <div class="pageBody">
     <NavBanner />
-    <PXSHome v-if="!routeParams.cid" />
+    <PXSHome v-if="!routeParams.cid || ['archive', 'news', 'credits'].includes(routeParams.cid)" :homeTab="routeParams.cid" />
     <div class="pageFrame comic" v-else>
       <div class="pageContent">
         <div class="logo">
@@ -28,7 +28,7 @@
         </div>
         <div class="mediaContent" >
           <a :href="nextPage || false">
-            <Media :url="comicPage" :title="titleText[routeParams.pid]" :key="comicPage" />
+            <Media :url="comicPage" :title="titleText[page_num]" :key="comicPage" />
           </a>
         </div>
         <div class="nav bottomNav" v-if="!is404">
@@ -79,7 +79,7 @@ export default {
     NavBanner, Media, PXSHome
   },
   title(ctx) {
-    if (!ctx.routeParams.cid)
+    if (!ctx.routeParams.cid || ['archive', 'news', 'credits'].includes(ctx.routeParams.cid))
       return 'Paradox Space' 
     else {
       try {
@@ -123,12 +123,12 @@ export default {
           ]
         }
         // Set the current (zero-index) page to be a 404 image.
-        comic.pages[this.routeParams.pid - 1] = randomChoice(this.pages404)
+        comic.pages[this.page_num - 1] = randomChoice(this.pages404)
         return comic
       }
     },
     page_num(){
-      return this.routeParams.pid
+      return this.routeParams.pid || 1
     },
     comicPage() {
       return this.comic.pages[this.page_num - 1]
