@@ -126,7 +126,7 @@ export default {
         {url: "/pxs",        show: this.$pageIsSpoiler('008753')},
         {url: "/snaps",      show: !this.isNewReader}
       ].filter(t => t.show).map(t => t.url).map(dumbUrlMap)
-      const history = this.$localData.allHistory.map(dumbUrlMap)
+      const history = [] // this.$localData.allHistory.map(dumbUrlMap)
 
       const bookmarks = Object.values(this.$localData.saveData.saves).map(bookmark => ({
         title: `${bookmark.url} - ${bookmark.name}`,
