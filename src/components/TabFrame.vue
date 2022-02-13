@@ -303,7 +303,7 @@ export default {
                     break
                 }
                 case 'UNLOCK': {
-                    if (this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
+                    if (this.routeParams.p && this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
                     else if (this.routeParams.p in this.$archive.mspa.psExtras) {
                         if ((this.routeParams.p == 'ps000039' && this.$pageIsSpoiler('003655')) || (this.routeParams.p == 'ps000040' && this.$pageIsSpoiler('003930'))) component = 'Spoiler'
                         else component = 'ExtrasPage'
