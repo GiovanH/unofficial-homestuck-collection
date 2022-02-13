@@ -233,7 +233,8 @@ function bakeRoutes() {
 
           const treeroutes = getTreeRoutes(crawlFileTree(path.join(js._mod_root_dir, mod_tree), true))
           treeroutes.forEach(route => {
-            all_mod_routes[asset_tree + route] =
+            const route_href = new URL(asset_tree + route).href
+            all_mod_routes[route_href] =
               new URL(path.posix.join(mod_tree, route), js._mod_root_url).href
           })
         }
