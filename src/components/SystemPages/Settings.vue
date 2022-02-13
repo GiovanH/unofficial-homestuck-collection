@@ -1024,11 +1024,18 @@ export default {
     li {
       // TODO Use a background color here from the theme that isn't log-bg
       background-color: var(--page-log-bg);
-      border: 1px solid rgba(0,0,0,.125);
+      // border: 1px solid rgba(0,0,0,.125);
+      border: 1px solid var(--page-pageBorder);
       margin-bottom: -1px;
       padding: .2em;
       .summary:before {
         content: ' - '
+      }
+      &:hover {
+        cursor: grab;
+      }
+      &:active {
+        cursor: grabbing;
       }
     }
 
