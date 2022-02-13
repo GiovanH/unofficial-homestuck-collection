@@ -99,7 +99,7 @@
             <div class="center">
               <button @click="locateAssets()">Locate Assets</button>
               <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
-              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
+              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
             </div>
             
             <div class="center">
