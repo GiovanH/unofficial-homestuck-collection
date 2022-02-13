@@ -388,7 +388,7 @@ export default {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
-    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems}
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []}
   },
   methods: {
   }
