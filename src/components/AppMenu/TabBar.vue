@@ -307,7 +307,9 @@ export default {
   .sysActionButtons {
     // --padding: 4px;
     // padding: 2px var(--padding);
-    width: 38px;
+    .sysActionButton {
+      width: 38px;
+    }
   }
   .historyButton, .sysActionButton {
       color: var(--font-default);

@@ -157,7 +157,7 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
+          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snaps">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
         },
         {
           name: "Anthony Bailey",

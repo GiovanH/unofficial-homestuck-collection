@@ -767,6 +767,7 @@ function getMixins(){
         const vueComponent = this
 
         this._uhc_matching_hooks = [
+          ...(this._uhc_matching_hooks || []), // existing hooks
           ...vueHooksMatchFn.filter(hook => hook.match(this)), // Complex hooks
           ...(vueHooksByName[this.$options.name] || [])        // named hooks 
         ]
