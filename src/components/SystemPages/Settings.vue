@@ -392,10 +392,10 @@ export default {
           label: "Show address bar",
           desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access the jump bar by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
-          model: "mspaMode",
-          label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
-        }, {
+        //   model: "mspaMode",
+        //   label: "Use MSPA page numbers",
+        //   desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        // }, {
           model: "switchToNewTabs",
           label: "Auto-switch to new tabs",
           desc: "Opening any link in a new tab will automatically switch you to that tab."
