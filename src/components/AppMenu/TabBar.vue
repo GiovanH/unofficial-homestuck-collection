@@ -421,6 +421,7 @@ export default {
 
     .newTabButton {
       font-family: Arial, Helvetica, sans-serif;
+      color: var(--font-header);
       height: var(--tab-height);
       width: calc(var(--tab-height) * (8/7));
       font-size: 24px;
