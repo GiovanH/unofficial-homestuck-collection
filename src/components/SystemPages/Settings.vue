@@ -390,7 +390,7 @@ export default {
         {
           model: "showAddressBar",
           label: "Show address bar",
-          desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
+          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access the jump bar by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
           model: "mspaMode",
           label: "Use MSPA page numbers",
@@ -406,7 +406,7 @@ export default {
         }, {
           model: 'hideFullscreenHeader', 
           label: "Hide fullscreen header", 
-          desc: "Hide header content (such as the jump box, title and tab bars) in fullscreen mode (F11)."
+          desc: "Hide header content (such as the jump bar, title and tab bars) in fullscreen mode (F11)."
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",

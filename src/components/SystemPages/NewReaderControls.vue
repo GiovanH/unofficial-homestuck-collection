@@ -126,7 +126,7 @@
         vizStory: {{vizStory}}
       </pre> -->
 
-      <div v-if="promptMspaMode" class="settings application" >
+      <div v-if="promptMspaMode" class="settings" >
         <dl>
           <template v-for="boolSetting in settingListBoolean">
             <dt :key="boolSetting.model"><label>
@@ -144,7 +144,7 @@
       </div>
     </template>
 
-    <div v-if="featureList.includes('fastforward')" class="settings application" >
+    <div v-if="featureList.includes('fastforward')" class="settings" >
       <h3>Reading Experience</h3>
       <dl class="fastForwardSelection">
         <dt>
