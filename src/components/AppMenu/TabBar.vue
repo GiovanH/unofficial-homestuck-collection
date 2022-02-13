@@ -32,6 +32,7 @@
           :ref="'tab_' + key" 
           @mousedown.left.native="initDrag()" />
       </transition-group>
+      <!-- TODO: Replace this with an svg so it's consistent across systems -->
       <button class="systemButton newTabButton" @click="newTab()" title="New tab">
         <span>＋</span></button>
       <div class="sysActionButtons">
@@ -304,8 +305,9 @@ export default {
     padding: 0px var(--padding);
   }
   .sysActionButtons {
-    --padding: 4px;
-    padding: 2px var(--padding);
+    // --padding: 4px;
+    // padding: 2px var(--padding);
+    width: 38px;
   }
   .historyButton, .sysActionButton {
       color: var(--font-default);
