@@ -211,12 +211,12 @@ export default {
                     // Construct canonical story name and page number
                     let story_id
                     let page_num
+                    const is_ryanquest = this.routeParams.base === 'ryanquest'
                     if (this.$isVizBase(this.routeParams.base)) {
                         const {s, p} = this.$vizToMspa(this.routeParams.base, this.routeParams.p)
                         story_id = s
                         page_num = p
                     } else {
-                        const is_ryanquest = this.routeParams.base === 'ryanquest'
                         page_num = this.routeParams.p
                         const tryLookup = this.$mspaToViz(page_num, is_ryanquest)
                         if (tryLookup) {
@@ -225,6 +225,11 @@ export default {
                             story_id = undefined // MSPA number does not map to valid viz story
                         }
                     }
+
+                    // Lock ryanquest to mspa numbers for now
+                    // if (is_ryanquest) {
+                    //     page_num = this.$vizToMspa(this.routeParams.base, page_num).p
+                    // }
 
                     if (!(page_num && story_id)) component = 'Error404'
                     else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
