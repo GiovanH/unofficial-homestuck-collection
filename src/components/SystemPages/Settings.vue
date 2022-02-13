@@ -559,7 +559,6 @@ export default {
       ],
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
-      clearThemesForNewReader: false,
       needReload: false,
       modsDir: Mods.modsDir
     }
@@ -613,7 +612,7 @@ export default {
         // eslint-disable-next-line no-return-assign
       this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
-      if (this.clearThemesForNewReader) {
+      if (this.$archive.tweaks.clearThemesForNewReader) {
         this.$localData.settings.themeOverride = "default"
         this.$localData.settings.themeOverrideUI = "default"
         this.$localData.settings.forceThemeOverride = false
