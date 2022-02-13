@@ -753,7 +753,7 @@ function getMixins(){
 
     // Precompute as much as possible since mixins run everywhere
     vueHooks.forEach((hook) => {
-      // Not actually horthand
+      // Not actually shorthand
       if (hook.matchName) {
         vueHooksByName[hook.matchName] = (vueHooksByName[hook.matchName] || [])
         vueHooksByName[hook.matchName].push(hook)
