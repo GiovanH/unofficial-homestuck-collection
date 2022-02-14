@@ -56,7 +56,6 @@ export default {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
-      forceKeyboardEnable: false, // overridden by oddities
       showMetadata: false
     }
   },
@@ -78,7 +77,7 @@ export default {
     }
     const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
 
-    if (ctx.gameOverThemeOverride == 'default') title = "ACT 6 ACT 6 INTERMISSION 3"
+    if (ctx.gameOverThemeOverride == 'mspa') title = "ACT 6 ACT 6 INTERMISSION 3"
     else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
       title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
     } else {
@@ -208,7 +207,7 @@ export default {
     },
     keyNavEvent(dir) {
       // If navigation is hidden, abort now (unless force is on)
-      if (this.hideNav && !this.forceKeyboardEnable)
+      if (this.hideNav && !this.$archive.tweaks.forceKeyboardEnable)
         return
 
       if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)

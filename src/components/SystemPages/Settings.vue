@@ -123,38 +123,38 @@
           <dd>
             <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
               <br>If you want to zoom the entire application, try ctrl -/+ (or ⌘ -/+)!</span><br>
-            <div class="textOverrideSettings">
-              <div class="knobs">
-                <label>Font family:<br>
-                  <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
-                    <option v-for="font in fonts" :value="font.value">
-                      {{ font.text }}
-                    </option>
-                  </select>
-                </label>
-                <div class="textOptions">
-                  <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                  <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
-                  <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
-                </div>
-                <br><br>
-                <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
-                <br><br>
-                <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
-              </div>
-              <div class="textpreviews">
-                <!-- PageText usually require a tab change to recalculate theme. -->
-                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
-                content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only today he will be given a name!<br><br>What will the name of this young man be?"/>
-                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
-                content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
-                <!-- v-if="!this.$pageIsSpoiler('001926')" -->
-                <PageText :forcetheme="$localData.settings.themeOverride" class="examplePrattle" 
-                v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
-                content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
-              </div>
-            </div>
           </dd>
+          <div class="textOverrideSettings">
+            <div class="knobs">
+              <label>Font family:<br>
+                <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
+                  <option v-for="font in fonts" :value="font.value">
+                    {{ font.text }}
+                  </option>
+                </select>
+              </label>
+              <div class="textOptions">
+                <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
+                <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
+                <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+              </div>
+              <br><br>
+              <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
+              <br><br>
+              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+            </div>
+            <div class="textpreviews">
+              <!-- PageText usually require a tab change to recalculate theme. -->
+              <PageText class="examplePrattle" 
+              content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
+              <PageText class="examplePrattle" 
+              content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
+              <!-- v-if="!this.$pageIsSpoiler('001926')" -->
+              <PageText class="examplePrattle" 
+              v-if="$localData.settings['devMode'] && !this.$pageIsSpoiler('007378')"
+              content="|AUTHORLOG|<br /><span style=&quot;color: #323232&quot;>HEY.</span><br /><span style=&quot;color: #323232&quot;>VOICE IN MY HEAD.</span><br /><span style=&quot;color: #000000&quot;>Yes?</span><br /><span style=&quot;color: #323232&quot;>SHUT UP.</span>"/>
+            </div>
+          </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
             <dt :key="boolSetting.model"><label>
@@ -252,10 +252,10 @@
 
         <section class="modPrattle">
           <p class="settingDesc">
-            Content, patches, and localization. Add mods to your local <a :href="modsDir">mods directory</a>.
+            Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
 <!--           </p>
           <p> -->
-            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/uhsc-mod-repo'>Mod Repo</a> github page.
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
 <!--           </p>
           <p> -->
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
@@ -320,6 +320,20 @@
     <div class="card">
       <div class="settings system">
         <h2>System Settings</h2>
+        <dl>
+          <template v-for="boolSetting in settingListSystem">
+            <dt :key="boolSetting.model"><label>
+              <input type="checkbox" 
+                :name="boolSetting.model" 
+                v-model="$localData.settings[boolSetting.model]" 
+                @click="toggleSetting(boolSetting.model)"
+              >{{boolSetting.label}}</label></dt> 
+              <!-- the spacing here is made of glass -->
+            <label :for="boolSetting.model">
+              <dd class="settingDesc" v-html="boolSetting.desc" />
+            </label>
+          </template>
+        </dl>
         <div class="system">
           <span class="hint">Application version:</span> <strong>v{{$data.$appVersion}}</strong>
           <br><br>
@@ -332,6 +346,8 @@
           <span class="hint">Asset pack directory:</span>
           <br>
           <strong>{{$localData.assetDir || 'None selected'}}</strong>
+          <br><br>
+          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
           <br><br>
           <button @click="locateAssets()">Relocate assets</button>
           <br><br>
@@ -353,6 +369,7 @@ import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
+const log = require('electron-log')
 const { ipcRenderer } = require('electron')
 
 export default {
@@ -368,16 +385,17 @@ export default {
   title: () => "Settings",
   data: function() {
     return {
+      log,
       settingListBoolean: [
         {
           model: "showAddressBar",
           label: "Show address bar",
-          desc: "Embeds the jump box at the top of the window, just like a regular address bar. When this is disabled, you can access the jump box by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
+          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access the jump bar by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
         }, {
-          model: "mspaMode",
-          label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
-        }, {
+        //   model: "mspaMode",
+        //   label: "Use MSPA page numbers",
+        //   desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+        // }, {
           model: "switchToNewTabs",
           label: "Auto-switch to new tabs",
           desc: "Opening any link in a new tab will automatically switch you to that tab."
@@ -388,7 +406,7 @@ export default {
         }, {
           model: 'hideFullscreenHeader', 
           label: "Hide fullscreen header", 
-          desc: "Hide header content (such as the jump box, title and tab bars) in fullscreen mode (F11)."
+          desc: "Hide header content (such as the jump bar, title and tab bars) in fullscreen mode (F11)."
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
@@ -400,11 +418,7 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/newreader'>New reader</a>"
-        }, {
-          model: "devMode",
-          label: "Enable Developer Mode",
-          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
         }
       ],
       enhancementListBoolean: [
@@ -421,10 +435,6 @@ export default {
           label: "Enable high quality Flash audio",
           desc: "This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems."
         }, {
-          model: "jsFlashes",
-          label: "Enable enhanced Flash effects",
-          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
-        }, {
           model: "credits",
           label: "Show inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
@@ -432,6 +442,21 @@ export default {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
           desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+        }
+      ],
+      settingListSystem: [
+        {
+          model: "devMode",
+          label: "Enable Developer Mode",
+          desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
+        }, {
+          model: "jsFlashes",
+          label: "Enable enhanced Flash effects",
+          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
+        }, {
+          model: "enableHardwareAcceleration",
+          label: "Enable hardware acceleration",
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
@@ -534,7 +559,6 @@ export default {
       ],
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
-      clearThemesForNewReader: false,
       needReload: false,
       modsDir: Mods.modsDir
     }
@@ -550,7 +574,7 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key])
+        this.$modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
       return Object.values(this.$modChoices).filter((choice) => 
@@ -588,7 +612,7 @@ export default {
         // eslint-disable-next-line no-return-assign
       this.allControversial.forEach(key => this.$localData.settings[key] = false)
 
-      if (this.clearThemesForNewReader) {
+      if (this.$archive.tweaks.clearThemesForNewReader) {
         this.$localData.settings.themeOverride = "default"
         this.$localData.settings.themeOverrideUI = "default"
         this.$localData.settings.forceThemeOverride = false
@@ -796,14 +820,16 @@ export default {
     flex: 1 0 auto;
     align-items: center;
 
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
     
     ::v-deep a {
       color: var(--page-links);
     }
+  }
+
+  ::v-deep .spoilerbox .settings {
+    color: var(--font-log);
   }
 
   .navBanner {
@@ -998,11 +1024,18 @@ export default {
     li {
       // TODO Use a background color here from the theme that isn't log-bg
       background-color: var(--page-log-bg);
-      border: 1px solid rgba(0,0,0,.125);
+      // border: 1px solid rgba(0,0,0,.125);
+      border: 1px solid var(--page-pageBorder);
       margin-bottom: -1px;
       padding: .2em;
       .summary:before {
         content: ' - '
+      }
+      &:hover {
+        cursor: grab;
+      }
+      &:active {
+        cursor: grabbing;
       }
     }
 

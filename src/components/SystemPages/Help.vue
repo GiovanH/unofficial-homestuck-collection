@@ -59,12 +59,17 @@
           <p>Got new reader mode enabled? Wondering about the mysterious question marks plastered everywhere? How do you find out what they are? By reading Homestuck! The goal of new reader mode is to provide a safe place for you to make your way through the story, while reducing the risk of learning anything in advance. This means that as long as certain content is considered a "spoiler", you will be prevented from accessing it.</p>
           <p>Don't feel like you have to remember when each thing is scheduled to unlock, though! When something becomes available in the archive, you'll be alerted by a small notification at the bottom of the screen.</p>
         </section>
-        <section>
+        <section v-if="$localData.settings.showAddressBar">
           <h2>THE JUMP BAR</h2>
-          <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! Open it up by clicking the JUMP button nexto the tab bar, or by hitting <strong>CTRL+L</strong> (that's <strong>⌘+L</strong> if you're on MacOS).</p>
+          <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! It functions just like the address bar in your browser, because it pretty much is one!</p>
+          <p>Just like an address bar, you can press <strong>CTRL+L</strong> to immediately focus your cursor on it. (that's <strong>⌘+L</strong> if you're on MacOS). If you want to hide it while you're not using it, there's an option for that on <a href="/settings/application">the settings page.</a></p>
+        </section>
+        <section v-else>
+          <h2>THE JUMP BAR</h2>
+          <p>Is the homepage just not cutting it? You can jump to any page you know the URL for with the JUMP BAR! Open it up by clicking the JUMP button next to the tab bar, or by hitting <strong>CTRL+L</strong> (that's <strong>⌘+L</strong> if you're on MacOS).</p>
           <Media url="/archive/collection/userguide_jumpbtn.png" />
           <Media url="/archive/collection/userguide_jumpbar.png" />
-          <p>It functions just like the address bar in your browser, because it pretty much is one! If you really miss having it embedded in the header at all times, there's an option for that at the top of <a href="/settings">the settings page.</a></p>
+          <p>It functions just like the address bar in your browser, because it pretty much is one! If you miss having it visible at all times, there's an option for that on <a href="/settings/application">the settings page.</a></p>
         </section>
         <section>
           <h2>SAVING and LOADING your "game"</h2>
@@ -91,10 +96,19 @@
         <section>
         <dl class="faq">
           <dt>Some panels/images/media aren't loading at all!</dt>
-          <dd>This is usually caused by a faulty asset pack install. Try re-downloading and re-extracting the asset pack.</dd>
+          <dd>This is usually caused by a faulty asset pack. Try re-downloading and re-extracting the asset pack, then try again.</dd>
 
-          <dt>Is there a dark mode?</dt>
-          <dd>Yes: in the <a href='/settings/enhancements' target='_blank'>Settings page, under Enhancements.</a></dd>
+          <dt>What kind of accessibility options are there?</dt>
+          <dd>There are several options on the <a href='/settings/enhancements' target='_blank'>Settings page, under Enhancements</a>. You should find options that can help you fine-tune Homestuck's text to be more readable, such as font adjustments and high-contrast colours. There is also a dark mode, if the default shades of grey are straining your eyes.</dd>
+
+          <dt>I turned on dark mode, but now I can't read anything!</dt>
+          <dd>Most of the colored text in Homestuck is optimized to be read against the default grey MSPA background, so dark text colors will become very hard to read against a dark background. If you're using dark mode, we recommend also turning on <b>High contrast text</b> in settings under Text Override.</dd>
+
+          <dt>How can I share or find mods?</dt>
+          <dd><a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods">We have a wiki page dedicated to shining a light on various mods developed by the community.</a>. If you've created a mod and want to share it, please add a link to the list! <strong v-if="$isNewReader">Be careful - this list is likely to contain unmarked spoilers.</strong></dd>
+
+          <dt>How can I install mods?</dt>
+          <dd>Installing mods is simple - once you've downloaded one, just drag it into the "mods" folder in your asset pack. It will appear <a href='/settings/mod' target='_blank'>in this list of "Inactive" mods</a> once you refresh the application. To enable a mod, drag it over to the "Active" column. If any active mods conflict with each other, whichever one is higher on the list will take priority.</dd>
 
           <dt>Can I see that list of content warnings from the setup page again?</dt>
           <dd>Sure!</dd>
@@ -107,25 +121,22 @@
             </div>
           </SpoilerBox>
 
-          <dt>How does this collection handle [controversial material that was later replaced by What Pumpkin]?</dt>
-          <dd>The collection includes all the original material in controversial content, but it is disabled by default. Controls for enabling it are in <a href='/settings/controversial' target='_blank'>Settings</a>.</dd>
+          <dt>How does this collection handle controversial material that was later replaced by What Pumpkin?</dt>
+          <dd>The collection includes granular options to view this content, but it is disabled by default. You can find controls for it on <a href='/settings/controversial' target='_blank'>the settings page</a>.</dd>
+
+          <dt>Can you port this to Chromebooks or smartphones?</dt>
+          <dd>Due to compatibility issues with Flash, and the browser engine the collection runs on, the only platforms we can support are Windows/Mac/Linux. These problems may be solved in the distant future, but right now our hands are tied.</dd>
 
           <dt>Why does the collection have two different version numbers? How does that work?</dt>
           <dd>
             <p>The collection is composed of two parts: the main app, and the Asset Pack. The main app handles the code and logic and processing, and the asset pack stores the data.
             </p>
-            <p>For a couple of different reasons (namely, the Asset Pack is very large and also not GPL licensed) we distribute the Asset Pack and the collection separately. The app has a version number that looks like {{$data.$appVersion}} (that's me!), and the asset pack just has one version number (you're on v{{$archive.version}})</p>
-            <p>The good news is the collection can be updated with bugfixes and features without requiring a new Asset Pack! We use semver, so if you were on 1.0.0, an update to 1.0.X would be a bugfix, and an update to 1.X.X would mean bugfixes and new features. Only an update to X.X.X would require re-downloading a new asset pack.</p>
+            <p>For a couple of different reasons (namely, the Asset Pack is very large and also not GPL licensed) we distribute the Asset Pack and the collection separately. The app has a version number that looks like {{$data.$appVersion}} (that's me!), and the asset pack just has one version number (you're on v{{$archive.version}}).</p>
+            <p>The good news is the collection can be updated with bugfixes and features without requiring a new Asset Pack! We use semantic versioning, so if you were on 1.0.0, an update to 1.0.X would be a bugfix, and an update to 1.X.X would mean bugfixes and new features. Only an update to X.X.X would require re-downloading a new asset pack.</p>
           </dd>
 
-          <dt>What's all this I hear about mods?</dt>
-          <dd>Version 2.0 of the collection has mod support so it can easily be extended with commentary or other tweaks. More information including links to documentation and other resources is available in the <a href='/settings/mod' target='_blank'>Settings page under Mod Settings.</a></dd>
-
-          <dt>Can you port this to [phones/chromebooks]?</dt>
-          <dd>Right now due to the way electron works and the collection's Flash requirements, we're not able to port this beyond PC/Mac/Linux. With things like Ruffle, though, it might be possible someday!</dd>
-
           <dt>[Legal question]</dt>
-          <dd>Legal info can be found under <a href='/credits' target='_blank'>Archive Credits</a></dd>
+          <dd>All legal info can be found under <a href='/credits' target='_blank'>Archive Credits</a>.</dd>
         </dl>
         </section>
 
@@ -222,16 +233,14 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
 
     font-family: Verdana,Arial,Helvetica,sans-serif;
     font-weight: normal;
 
     color: var(--font-default);
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
   }
@@ -299,7 +308,7 @@ export default {
       font-size: 1.2em;
       dt {
         padding-top: 1em;
-        font-style: italic;
+        font-weight: bold;
       }
     }  
     div.scrollbox {

@@ -10,9 +10,15 @@
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
          v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
         <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .log .logContent span:not(:last-child) {
-            padding-bottom: 0.5em;
+          .log .logContent span:not(:first-child) {
+            padding-top: 1em;
             display: inline-block;
+            white-space: pre-wrap;
+          }          
+          .log .logContent span + span, 
+          .log .logContent br + br + span {
+            padding: initial;
+            display: inline !important;
           }
         </component>
 	</div>
@@ -21,9 +27,15 @@
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
             v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
         <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .authorlog .logContent span:not(:last-child) {
-            padding-bottom: 0.5em;
+          .authorlog .logContent span:not(:first-child) {
+            padding-top: 1em;
             display: inline-block;
+            white-space: pre-wrap;
+          }
+          .authorlog .logContent span + span, 
+          .authorlog .logContent br + br + span {
+            padding: initial;
+            display: inline !important;
           }
         </component>
 	</div>
@@ -180,10 +192,11 @@ export default {
                         }
 
                         const saturationExtrema = 0.5
-                        const needClampsaturation = (textcolor.getSaturation() < saturationExtrema)
+                        const needClampsaturation = (textcolor.getSaturation() < saturationExtrema) && textcolor.getHue()
 
                         if (needClampsaturation) {
                             e.setAttribute("data-orig-color", textcolor.toString())
+                            e.setAttribute("data-orig-hue", textcolor.getHue())
                             textcolor = textcolor.saturation(saturationExtrema)
                             e.style.color = textcolor.toString()
                         }
@@ -313,7 +326,7 @@ export default {
         button {
             text-transform: capitalize;
             position: inherit;
-            z-index: 10;
+            z-index: 0;
         }
         
         .logContent{
@@ -321,14 +334,13 @@ export default {
             padding: 15px 5%;
             text-align: left;
             position: inherit;
-            z-index: 5;
+            z-index: 0;
         }
 
         &.logHidden {
             .logContent, .bgshade {
                 display: none; 
             }
-
         }
 
         .bgshade {
@@ -338,7 +350,7 @@ export default {
             pointer-events: none;
             top: 0;
             left: 0;
-            z-index: 0;
+            z-index: -1;
         }
     }
 </style>

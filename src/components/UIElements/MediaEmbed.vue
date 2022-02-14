@@ -353,6 +353,7 @@ document.addEventListener('click', function (e) {
       this.$el.contentWindow.vm = this
     },
     resolveFrameUrl(url){
+      this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
       return Resources.resolveURL(url)
     },
     invokeFromFlash(func) {
@@ -438,10 +439,13 @@ document.addEventListener('click', function (e) {
 
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
+            this.$logger.info("Initializing dynamic game over page")
             this.gameOver.count = 0
             this.startTimer(() => {
-              if (Date.now() >= this.timer.start + this.gameOver.steps[this.gameOver.count]) {
+              const next_step = this.gameOver.steps[this.gameOver.count]
+              if (Date.now() >= this.timer.start + next_step) {
                 this.gameOver.count++
+                this.$logger.info("Game over: reached count", this.gameOver.count, "at", next_step)
 
                 if (this.gameOver.count >= this.gameOver.steps.length) {
                   clearInterval(this.timer.interval)

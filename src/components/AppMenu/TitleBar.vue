@@ -64,7 +64,9 @@ export default {
     background: var(--header-bg);
     color: var(--font-header);
 
-    height: var(--title-bar-height);
+    // Margin gives mouse room to resize window
+    margin-top: 1px;
+    height: calc(var(--title-bar-height) - 1px);
     -webkit-app-region: drag;
 
     * {

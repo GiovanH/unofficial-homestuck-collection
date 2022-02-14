@@ -7,7 +7,7 @@
       </a>
       <div class="cardContent collection">
         <!-- <div class="links">
-          <a href="/newreader" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
+          <a href="/help" >New readers</a> | <a href="/userguide" >How to navigate the collection</a> | <a href="/settings" >Settings</a>
         </div> -->
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
@@ -21,13 +21,13 @@
       <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspa/6" ><Media url="/images/archive_hs.gif" /></a>
-          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 167px;" v-if="$root.tabTheme === 'A6A6'" >
+          <img src="assets://archive/collection/a6a6_latestpages.png" class="a6a6graffiti" style="left: 34px; top: 74px;" v-if="$root.tabTheme.rendered === 'A6A6'" >
           <p class="date">Apr 2009 - Apr 2016</p>
           <p class="date">8,130 pages</p>
         </div>
         <div class="description">
           <p><em>A story about some kids who are friends over the internet. They decide to play a game together. There are major consequences.</em></p><br>
-          <p>The fourth, final, and most famous of the MS Paint Adventures. While it begun as a "mock-game" following reader commands like the previous adventures, they were phased out as the story unfolded into a mixed-media barrage of mid-2000's internet culture satire, interpersonal drama, and Weird Plot Shit [sic].</p></br>
+          <p>The fourth, final, and most famous of the MS Paint Adventures. While it began as a "mock-game" following reader commands like the previous adventures, they were phased out as the story unfolded into a mixed-media barrage of mid-2000's internet culture satire, interpersonal drama, and Weird Plot Shit [sic].</p></br>
           <p>One-upping Problem Sleuth's action-packed GIFs, Homestuck spiced up pivotal moments with Flash animations scored by a lively team of composers. Over time, the music team produced dozens of albums across a variety of genres.</p>
           <div class="links">
             <div class="left bigLink">
@@ -61,7 +61,7 @@
           <template v-slot:title>Music</template>
           <p>Explore the entire discography of official Homestuck music.</p>
         </HomeRowItem>
-        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 399px;" v-if="$root.tabTheme === 'A6A6'" >
+        <img src="assets://archive/collection/a6a6_sponsors.png" class="a6a6graffiti" style="left: 563px; top: 280px;" v-if="$root.tabTheme.rendered === 'A6A6'" >
         <HomeRowItem
           class="rowItem"
           href="/sbahj"
@@ -131,57 +131,59 @@
     
     <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
-      <div class="cardContent cardEntry">
-        <div class="icon">
-          <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
-          <p class="date">Sep 2006 - Feb 2007</p>
-          <p class="date">134 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/1" >Jailbreak</a></h2>
-          <p><em href="/mspa/1">A guy tries to escape from prison.</em></p><br>
-          <p>The very first MS Paint Adventure. Andrew Hussie ran it as a game on his personal forum, with a rule that forced him to follow the first command suggested after each post. This resulted in barely controlled chaos.</p><br>
-          <p>Jailbreak was the origin point of several long running jokes that would later return in Homestuck.</p>
-          <div class="links">
-            > <a href="/log/1" >Adventure Log</a>
+      <div class="cardContent mainSection">
+        <div class="cardContent cardEntry jbCard">
+          <div class="icon">
+            <a href="/mspa/1" ><Media url="/images/archive_jb.gif" /></a>
+            <p class="date">Sep 2006 - Feb 2007</p>
+            <p class="date">134 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/1" >Jailbreak</a></h2>
+            <p><em href="/mspa/1">A guy tries to escape from prison.</em></p><br>
+            <p>The very first MS Paint Adventure. Andrew Hussie ran it as a game on his personal forum, with a rule that forced him to follow the first command suggested after each post. This resulted in barely controlled chaos.</p><br>
+            <p>Jailbreak was the origin point of several long running jokes that would later return in Homestuck.</p>
+            <div class="links">
+              > <a href="/log/1" >Adventure Log</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="cardContent cardEntry bqCard">
-        <div class="icon">
-          <a href="/mspa/2" ><Media url="/images/archive_bq.gif" /></a>
-          <p class="date">Jun - Jul 2007</p>
-          <p class="date">47 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/2" >Bard Quest</a></h2>
-          <p><em>A young bard's endeavor to slay some dragons. Branching "choose your own adventure" style.</em></p><br>
-          <p>The second MS Paint Adventure. The branching paths were an experiement that ultimately proved too complex to manage, dooming it to an early cancellation.</p>
-          <div class="links">
-            > <a href="/log/2" >Adventure Log</a>
+        <div class="cardContent cardEntry bqCard">
+          <div class="icon">
+            <a href="/mspa/2" ><Media url="/images/archive_bq.gif" /></a>
+            <p class="date">Jun - Jul 2007</p>
+            <p class="date">47 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/2" >Bard Quest</a></h2>
+            <p><em>A young bard's endeavor to slay some dragons. Branching "choose your own adventure" style.</em></p><br>
+            <p>The second MS Paint Adventure. The branching paths were an experiement that ultimately proved too complex to manage, dooming it to an early cancellation.</p>
+            <div class="links">
+              > <a href="/log/2" >Adventure Log</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="cardContent cardEntry psCard">
-        <div class="icon">
-          <a href="/mspa/4" ><Media url="/images/archive_ps.gif" /></a>
-          <p class="date">Mar 2008 - Apr 2009</p>
-          <p class="date">1,674 pages</p>
-        </div>
-        <div class="description">
-          <h2><a href="/mspa/4" >Problem Sleuth</a></h2>
-          <p><em>An adventure about a hard boiled detective in his office.</em></p><br>
-          <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
-          <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
-          <div class="links">
-            <div class="left">
-              &gt; <a href="/unlock/ps_titlescreen" >Title screen</a>
-            </div>
-            <div class="center">
-              &gt; <a href="/log/4" >Adventure Log</a><br>
-            </div>
-            <div class="right">
-              &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
+        <div class="cardContent cardEntry psCard">
+          <div class="icon">
+            <a href="/mspa/4" ><Media url="/images/archive_ps.gif" /></a>
+            <p class="date">Mar 2008 - Apr 2009</p>
+            <p class="date">1,674 pages</p>
+          </div>
+          <div class="description">
+            <h2><a href="/mspa/4" >Problem Sleuth</a></h2>
+            <p><em>An adventure about a hard boiled detective in his office.</em></p><br>
+            <p>The third MS Paint Adventure. An absurd pastiche of adventure games and JRPG mechanics, all involving absolutely no detective work whatsoever.</p><br>
+            <p> With its rampant escalation of chaos and the gradual inclusion of strikingly animated GIFs, Problem Sleuth proved to be MSPA's first major hit.</p>
+            <div class="links">
+              <div class="left">
+                &gt; <a href="/unlock/PS_titlescreen" >Title screen</a>
+              </div>
+              <div class="center">
+                &gt; <a href="/log/4" >Adventure Log</a><br>
+              </div>
+              <div class="right">
+                &gt; <a href="/map/4" v-if="!$pageIsSpoiler('001840')">Adventure Map</a><a disabled v-else>??????</a>
+              </div>
             </div>
           </div>
         </div>
@@ -260,7 +262,7 @@
     <div class="card newsCard">
       <div class="logo newsLogo cardContent">
         <Media url="assets://archive/collection/news_logo.png" />
-        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme === 'A6A6'" >
+        <img src="assets://archive/collection/a6a6_news.png" class="a6a6graffiti"  v-if="$root.tabTheme.rendered === 'A6A6'" >
       </div>
       <div class="cardContent">
         <div class="description">
@@ -350,9 +352,9 @@
     <div v-if="modHomeRowItems.length" class="card unsortedCard noHeaderCard">
       <div class="cardContent cardRows">
         <HomeRowItem
-          v-for="item in modHomeRowItems"
+          v-for="item, i in modHomeRowItems"
           class="rowItem"
-          :key="item.href"
+          :key="`${i}-${item.href}`"
           :href="item.href"
           :thumbsrc="item.thumbsrc"
           :afterpage="item.afterpage"
@@ -380,22 +382,13 @@ export default {
     NavBanner, Media, HomeRowItem, Logo
   },
   data: function() {
-    return {
-      modHomeRowItems: [
-      // {
-      //   href: "/ryanquest",
-      //   thumbsrc: "/archive/collection/archive_ryanquest.png",
-      //   date: "Oct 2010",
-      //   title: 'Ryanquest',
-      //   description: `<p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>`
-      // }
-      ]
-    }
+    return {}
   },
   title: function(ctx) {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []}
   },
   methods: {
   }
@@ -410,11 +403,9 @@ export default {
     flex-flow: column;
     flex: 1 0 auto;
     align-items: center;
-    background: url(assets://archive/collection/homebg_right.png) repeat-y, url(assets://archive/collection/homebg_left.png) repeat-y;
-    background-position: left top, right top;
-    background-color: #35bfff;
-    background-attachment: fixed;
-
+    background: var(--system-background);
+    background-color: var(--system-skycolor);
+      
     color: var(--font-default);
     padding-bottom: 50px;
   }
@@ -506,6 +497,8 @@ export default {
         flex-flow: row nowrap;
         align-items: flex-start;
 
+        z-index: 1;
+
         .icon {
           text-align: center;
 
@@ -546,9 +539,13 @@ export default {
       }
       &.cardRows {
         margin-bottom: -10px;
+        margin-top: -10px;
         display: flex;
         flex-flow: row wrap;
         width: 100%;
+
+        // Keep margin behind adventure links
+        z-index: 0;
 
         ::v-deep .comicsans {
           font-family: "Comic Sans MS", "Comic Sans", cursive;

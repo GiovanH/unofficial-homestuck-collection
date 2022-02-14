@@ -25,7 +25,7 @@ module.exports = {
                     category: "entertainment"
                 },
                 linux: {
-                    target: "tar.gz",
+                    target: ["AppImage", "tar.gz"],
                     category: "game"
                 }
             }

@@ -1,6 +1,6 @@
 #app > *, .tabFrame > div {
 
-	--app-icon: "build/icons/icon.ico";
+	--app-icon: "@/icons/icon";
 
 	--font-default: #000000;
 	--font-header: #000000;
@@ -33,6 +33,11 @@
 	--page-links: #0000EE;
 	--page-links-visited: #6300c0;
 
+	--system-skycolor: #35bfff;
+	--system-background: 
+		url(assets://archive/collection/homebg_right.png) left top repeat-y fixed,
+      	url(assets://archive/collection/homebg_left.png) right top repeat-y fixed;
+
 	--ctx-bg: #EEEEEE;
 	--ctx-frame: #535353;
 	--ctx-shadow: #000000;
@@ -58,6 +63,7 @@
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
 		--font-ctx: #ffffff;
+		--font-log: #ffffff;
 
 		--header-bg: #262626;
 		--header-tabSection: #404040;
@@ -70,14 +76,17 @@
 		--page-pageFrame: #262626;
 		--page-pageContent: #393939;
 		--page-pageBorder: #6a6a6a;
-		--page-nav-divider: #0066ff;
+		--page-nav-divider: #5599ff;
 		--page-nav-meta: #979797;
-		--page-links: #0066ff;
+		--page-links: #5599ff;
 		--page-log-bg: #000000;
+
+		--system-background: none;
+		--system-skycolor: #222;
 		
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
-		--ctx-select: #0066ff;
+		--ctx-select: #5599ff;
 		--ctx-divider: #ffffff;
 
 		--saves-bg: #454545;
@@ -89,7 +98,7 @@
 	}
 
 	&.retro {
-		--app-icon: "build/icons/default.ico";
+		--app-icon: "@/icons/default";
 		
 		--nav-bg: #000000;
 		--nav-link: #CCCCCC;
@@ -112,7 +121,7 @@
 	}
 
 	&.scratch {
-		--app-icon: "build/icons/scratch.ico";
+		--app-icon: "@/icons/scratch";
 
 		--font-default: #ffffff;
 		--font-header: #ffffff;
@@ -143,6 +152,9 @@
 		--page-links: #2cff4b;
 		--page-links-visited: #2cff4b;
 
+		--system-background: none;
+		--system-skycolor: #000000;
+
 		--ctx-bg: #0e4603;
 		--ctx-frame: #082a00;
 		--ctx-shadow: #000000;
@@ -158,7 +170,7 @@
 	}
 
 	&.sbahj {
-		--app-icon: "build/icons/sbahj.ico";
+		--app-icon: "@/icons/sbahj";
 
 		--font-disabled: #00000060;
 		--font-family-ui: "Comic Sans MS", "Comic Sans", cursive;
@@ -203,6 +215,7 @@
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
 		--font-ctx: #ffffff;
+		--font-log: #ffffff;
 
 		--header-bg: #262626;
 		--header-tabSection: #404040;
@@ -215,14 +228,17 @@
 		--page-pageFrame: #262626;
 		--page-pageContent: #262626;
 		--page-pageBorder: #6a6a6a;
-		--page-nav-divider: #0066ff;
 		--page-nav-meta: #0066ff;
-		--page-links: #0066ff;
+		--page-nav-divider: #5599ff;
+		--page-links: #5599ff;
 		--page-log-bg: #000000;
 		
+		--system-skycolor: #1D1D1D;
+		--system-background: linear-gradient(0.25turn, #752020, #1D1D1D, #252C77);
+
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
-		--ctx-select: #0066ff;
+		--ctx-select: #5599ff;
 		--ctx-divider: #ffffff;
 
 		--saves-bg: #454545;
@@ -260,12 +276,16 @@
 		--ctx-select: red;
 		--ctx-divider: #ffffff;
 
+		--system-background: none;
+		--system-skycolor: #000000;
+
 		--saves-bg: #454545;
 		--saves-tab: #262626;
 		--saves-tabHover: #3c3c3c;
 		--saves-border: #363636;
 		--saves-scroll: #5a5a5a;
 		--saves-scrollHover: #6a6a6a;
+
 	}
 
 	&.tso {
@@ -274,6 +294,7 @@
 		--font-highlight: #000000;
 		--font-disabled: rgba(255, 255, 255, 0.2);
 		--font-ctx: #ffffff;
+		--font-log: #A1EE26;
 
 		--header-bg: #111111;
 		--header-tabSection: #2f2f2f;
@@ -291,11 +312,15 @@
 		--page-nav-divider: #A1EE26;
 		--page-nav-meta: #A1EE26;
 		--page-links: #A1EE26;
+		--page-log-bg: #2f2f2f;
 		
 		--ctx-bg: #2f2f2f;
 		--ctx-frame: #000000;
 		--ctx-select: #111111;
 		--ctx-divider: #ffffff;
+
+		--system-background: none;
+		--system-skycolor: #111111;
 
 		--saves-bg: #2f2f2f;
 		--saves-tab: #111111;
@@ -306,7 +331,7 @@
 	}
 
 	&.trickster {
-		--app-icon: "build/icons/sucker.ico";
+		--app-icon: "@/icons/sucker";
 		--font-default: #f9fd6b;
 		--font-header: #f9fd6b;
 		--font-highlight: #000000;
@@ -359,7 +384,7 @@
 	}
 
 	&.A6A6 {
-		--app-icon: "build/icons/cherub.ico";
+		--app-icon: "@/icons/cherub";
 		--font-default: #2ed73a;
 		--font-header: #ffffff;
 		--font-highlight: #000000;
@@ -407,7 +432,7 @@
 	}
 
 	&.pxs {
-		--app-icon: "build/icons/pxs.ico";
+		--app-icon: "@/icons/pxs";
 
 		--font-default: #ffffff;
 		--font-header: #ffffff;

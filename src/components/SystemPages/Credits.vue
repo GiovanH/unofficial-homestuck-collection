@@ -132,7 +132,12 @@ export default {
         {
           name: "Hadron",
           link: "https://hadronus.com",
-          desc: "For helping to create the fantastic new animated logo."
+          desc: "For creating the fantastic new animated logo."
+        },
+        {
+          name: "sassacre",
+          link: "https://sassac.re/",
+          desc: "For ironing out some difficult issues related to macOS."
         },
         {
           name: "SplitSuns",
@@ -140,7 +145,7 @@ export default {
           desc: `For using their godlike audio magic powers to absolutely save my life during the process of editing the high quality flash audio.`
         },
         {
-          name: "Wheals",
+          name: "wheals",
           link: "https://wheals.github.io",
           desc: `For archiving all the old social media accounts, that I proceeded to cram into this thing.`
         },
@@ -152,12 +157,17 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snap">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
+          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snaps">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
         },
         {
           name: "Anthony Bailey",
           link: "http://readmspa.org",
           desc: `For making the original offline Homestuck archive that sent me off down this rabbit hole to begin with!`
+        },
+        {
+          name: "Each of our GitHub contributors",
+          link: "https://github.com/Bambosh/unofficial-homestuck-collection/graphs/contributors",
+          desc: "Every single change you guys make leaves a lasting impact on this project. We wouldn't be here without you!"
         }
       ],
       artCredits: [
@@ -306,7 +316,7 @@ export default {
     > img {
       align-self: center;
     }
-    a {
+    ::v-deep a {
       color: var(--page-links);
     }
 

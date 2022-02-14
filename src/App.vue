@@ -1,20 +1,22 @@
 <template>
-  <div id="app" :class="[
-    // $root.loadState != 'DONE' ? 'busy' : '',
-    $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
-      theme
-    ]" v-if="$archive && $root.loadState !== 'ERROR'">
-    <AppHeader :class="theme" ref="appheader" />
-    <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
-    <Notifications :class="theme" ref="notifications" />
-    <ContextMenu :class="theme" ref="contextMenu" />
-    <Updater ref="Updater" />
-    <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
-    <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
-  </div>
-  <div id="app" class="mspa"  v-else>
-    <Setup />
-    <ContextMenu ref="contextMenu" />
+  <div id="window" :class="theme">
+    <div id="app" :class="[
+      // $root.loadState != 'DONE' ? 'busy' : '',
+      $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        
+      ]" v-if="$archive && $root.loadState !== 'ERROR'">
+      <AppHeader :class="theme" ref="uistyle" />
+      <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
+      <Notifications :class="theme" ref="notifications" />
+      <ContextMenu :class="theme" ref="contextMenu" />
+      <Updater ref="Updater" />
+      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+      <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
+    </div>
+    <div id="app" class="mspa"  v-else>
+      <Setup ref="uistyle" />
+      <ContextMenu ref="contextMenu" />
+    </div>
   </div>
 </template>
 
@@ -67,7 +69,7 @@
           }
           return page_theme
         } else {
-          this.$logger.warn("No tabs! Using default")
+          this.$logger.warn("App.vue:tabTheme: No active tab! Using default")
           return {defined: 'default', rendered: 'default'}
         }
       },
@@ -88,7 +90,9 @@
               theme = set_theme
             } else {
               // Page takes priority over setting
-              theme = this.tabTheme.rendered
+              theme = this.tabTheme.defined
+              // If this were this.tabThem.rendered, you would get
+              // page themes escaping to become app themes.
             }
           } else {
             // User specified a theme, page did not
@@ -124,18 +128,21 @@
         } else {
           this.activeTabComponent.$refs.jumpbox.toggle()
         }
-      }
-    },
-    watch: {
-      'theme'(to, from) {
+      },
+      updateAppIcon(){ 
         this.$nextTick(() => {
-          let app_icon_var = window.getComputedStyle(this.$refs["appheader"].$el).getPropertyValue('--app-icon')
+          if (!this.$refs["uistyle"]) {
+            this.$logger.warn("trying to updateAppIcon, but no uistyle (appheader/setup) element yet")
+            setTimeout(() => this.updateAppIcon(), 2000)
+            return
+          }
+          let app_icon_var = window.getComputedStyle(this.$refs["uistyle"].$el).getPropertyValue('--app-icon')
           let match
           // eslint-disable-next-line no-cond-assign
-          if (match = / url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
+          if (match = /url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
             app_icon_var = this.$mspaFileStream(match[1].replace(/\\/g, ''))
           // eslint-disable-next-line no-cond-assign
-          } else if (match = / "(.+)"/.exec(app_icon_var)) {
+          } else if (match = /"(.+)"/.exec(app_icon_var)) {
             app_icon_var = match[1]
           } else {
             this.$logger.error(`Couldn't match '${app_icon_var}'`)
@@ -144,9 +151,16 @@
           this.$logger.info("Requesting icon change to", app_icon_var)
           electron.ipcRenderer.send('set-sys-icon', app_icon_var)
         })
+      }
+    },
+    watch: {
+      'theme'(to, from) {
+        this.updateAppIcon()
       } 
     },
     mounted () {
+      this.$nextTick(() => this.updateAppIcon())
+
       this.$localData.root.TABS_SWITCH_TO()
 
       electron.webFrame.setZoomFactor(1)
@@ -257,8 +271,10 @@
           this.$refs.contextMenu.open(event, target)
           return
         } else if (button == 3) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_BACK()
         } else if (button == 4) {
+          event.preventDefault()
           this.$localData.root.TABS_HISTORY_FORWARD()
         }
         while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
@@ -273,7 +289,7 @@
           if (event.defaultPrevented) return
 
           // don't handle if `target="_blank"`
-          const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
+          // const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
           // don't handle right clicks
           if (button !== undefined && button !== 1) return
 
@@ -293,6 +309,12 @@
 @import "@/css/fa/scss/solid.scss";
 
 @import '@/css/mspaThemes.scss';
+
+  #window {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
 
   #app.busy {
     cursor: progress;

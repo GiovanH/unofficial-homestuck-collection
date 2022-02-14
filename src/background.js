@@ -29,7 +29,13 @@ const gotTheLock = app.requestSingleInstanceLock()
 
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
-app.disableHardwareAcceleration()
+
+if (!store.get('localData.settings.enableHardwareAcceleration')) {
+  console.log("Disabling hardware acceleration")
+  app.disableHardwareAcceleration()
+} else {
+  console.log("Not disabling hardware acceleration")
+}
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -148,6 +154,20 @@ var menuTemplate = [
         accelerator: 'CmdOrCtrl+Shift+Tab',
         click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
       },
+      {
+        label: 'Next Tab (Alternate)',
+        accelerator: 'CmdOrCtrl+PageDown',
+        visible: false,   
+        acceleratorWorksWhenHidden: true,
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: 1})}
+      },
+      {
+        label: 'Previous Tab (Alternate)',
+        accelerator: 'CmdOrCtrl+PageUp',
+        visible: false,   
+        acceleratorWorksWhenHidden: true,
+        click: () => {if (win) win.webContents.send('TABS_CYCLE', {amount: -1})}
+      },
       { type: 'separator' },
       {
         label: 'Duplicate Tab',
@@ -187,6 +207,7 @@ function loadArchiveData(){
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
+  if (!fs.existsSync(assetDir)) throw Error("Asset directory is missing!")
 
   let data
 
@@ -377,6 +398,19 @@ try {
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {
   event.returnValue = {port: port, appVersion: APP_VERSION}
+})
+
+ipcMain.handle('check-archive-version', async (event, payload) => {
+  try {
+    const versionJson = JSON.parse(fs.readFileSync(
+      path.join(payload.assetDir, 'archive/data/version.json'),
+      'utf8'
+    ))
+    return versionJson.version
+  } catch (e) {
+    logger.error(e)
+    return undefined
+  }
 })
 
 if (assetDir) {
@@ -714,6 +748,20 @@ async function createWindow () {
   win.webContents.on('will-navigate', (event) => {
     event.preventDefault()
   })
+  //  ;[
+  //   'will-navigate',
+  //   'did-navigate-in-page',
+  //   'did-start-navigation',
+  //   'will-redirect',
+  //   'did-redirect-navigation',
+  //   'did-navigate',
+  //   'did-frame-navigate'
+  // ].forEach(eventName => {
+  //   win.webContents.on(eventName, (event) => {
+  //     logger.info("blocking", eventName)
+  //     event.preventDefault()
+  //   })
+  // })
 
   win.webContents.on('update-target-url', (event, new_url) => {
     win.webContents.send('update-target-url', new_url)
@@ -778,15 +826,24 @@ async function createWindow () {
     win = null
   })
 
-  var current_icon // = "build/icons/icon.ico"
+  var current_icon // = "@/icons/icon"
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
-    new_icon = new_icon || "build/icons/icon.ico"
+    new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
     if (new_icon && new_icon != current_icon) {
-      win.setIcon(new_icon)
-      logger.info("Changing icon to", new_icon)
-      current_icon = new_icon
+      try {
+        if (process.platform == "win32") {
+          new_icon += ".ico"
+        } else {
+          new_icon += ".png"
+        }
+        logger.info("Changing icon to", new_icon, process.platform)
+        win.setIcon(new_icon)
+        current_icon = new_icon
+      } catch (e) {
+        logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
+      }
     }
   })
 

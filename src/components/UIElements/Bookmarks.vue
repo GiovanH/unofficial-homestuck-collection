@@ -268,6 +268,9 @@ export default {
     overflow-x: hidden;
     pointer-events: none;
 
+    display: flex;
+    flex-direction: row-reverse;
+
     color: var(--font-header);
 
     ::-webkit-scrollbar {
@@ -490,11 +493,11 @@ export default {
     transition: all .1s;
   }
   .bookmarks-enter, .bookmarks-leave-to {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
 
   .bookmark-list-enter, .bookmark-list-leave-to {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
   .bookmark-list-enter-active, .bookmark-list-leave-active {
     transition: transform 0.1s;

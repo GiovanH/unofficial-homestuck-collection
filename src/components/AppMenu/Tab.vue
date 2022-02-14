@@ -6,7 +6,7 @@
       <div class="tabTitle" :class="{titleFade}" ref="title" >
         <span v-text="title" ref="titleText"/>
       </div>
-      <fa-icon v-if="hasAudio" icon="music" />
+      <span v-if="hasAudio && !stubAudioIcon" class='music'><fa-icon icon="music" /></span>
       <transition name="fade">
         <div class="systemButton closeTabButton" @mousedown.stop="" @click="closeTab()"  v-if="tabCount > 1">✕</div>
       </transition>
@@ -28,8 +28,11 @@ export default {
     }
   },
   computed: {
+    stubAudioIcon(){
+      return !this.$localData.settings.devMode
+    },
     hasAudio() {
-      return this.tab.hasAudio
+      return this.tab.hasEmbed
     },
     isActiveTab() {
       return this.tab.key === this.$localData.tabData.activeTabKey
@@ -38,8 +41,7 @@ export default {
       return this.$localData.tabData.tabList.length
     },
     title() {
-        let result = !!this.tab.title ? this.tab.title : this.tab.url
-        return result
+        return this.tab.title || this.tab.url
     }
   },
   methods: {
@@ -54,10 +56,10 @@ export default {
       this.$localData.root.TABS_CLOSE(this.tab.key)
     },
     onResize() { 
-      let titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
-      let titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
+      const titleWidth = this.$refs.title.getBoundingClientRect().width - 5 // Offsets 5px of padding on left
+      const titleTextWidth = this.$refs.titleText.getBoundingClientRect().width
       
-      this.titleFade = titleWidth < titleTextWidth
+      this.titleFade = (titleWidth < titleTextWidth)
     }
   },
   watch: {
@@ -91,6 +93,7 @@ export default {
   min-width: 0;
   height: var(--tab-height);
   cursor: default;
+  padding-right: 8px;
 
   &:not(.activeTab) {
     &:hover {
@@ -118,17 +121,25 @@ export default {
     }
   }
 
-  .closeTabButton {
-    float: right;
-    padding: 0;
-    margin-right: 5px;
-
+  .music, .closeTabButton {
     flex: 0 0 auto;
     width: 21px;
     height: 21px;
+  }
+
+  .closeTabButton {
+    float: right;
+    padding: 0;
+    margin-right: -2px;
 
     line-height: 22px;
     font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .music {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

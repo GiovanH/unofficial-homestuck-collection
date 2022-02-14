@@ -41,8 +41,10 @@ export default {
                     return ['/images/mspalogo_a6a6.png', '/images/mspalogo_a6a6.png']
                 case 'pxs':
                     return ['/images/mspalogo_pxs.png', '/images/mspalogo_pxs.png']
-                default:
+                case undefined:
                     this.$logger.warn("Couldn't read root theme?", this.$root.tabTheme.rendered)
+                // eslint-disable-next-line no-fallthrough
+                default:
                     return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
             }
         }

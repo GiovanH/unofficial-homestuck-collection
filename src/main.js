@@ -112,7 +112,7 @@ Vue.mixin({
     $openLink(url, auxClick = false) {
       const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
 
-      if (urlObject.protocol == "assets:" && !/\.html$/i.test(url)) {
+      if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
@@ -514,3 +514,15 @@ window.vm = new Vue({
     }
   }
 }).$mount('#app')
+
+// Even though we cancel the auxclick, reallly *really* cancel mouse navigation.
+window.addEventListener("mouseup", (e) => {
+  if (e.button === 3 || e.button === 4){
+    window.vm.$logger.info("blocking mouse navigation")
+    e.preventDefault()
+  }
+})
+
+// Expose for debugging
+window.Resources = Resources
+window.Mods = Mods

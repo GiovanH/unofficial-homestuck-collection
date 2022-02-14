@@ -21,10 +21,10 @@
             ref="page"
         />
         
-        <Bookmarks  :tab="tab" ref="bookmarks" />
+        <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
-        <FindBox    :tab="tab" ref="findbox"/>
-        <JumpBox    :tab="tab" ref="jumpbox" />
+        <FindBox    :tab="tab" ref="findbox" :class="theme"/>
+        <JumpBox    :tab="tab" ref="jumpbox" :class="theme" />
     </div>
 </template>
 
@@ -147,7 +147,6 @@ export default {
     },
     data() {
         return {
-            forceLoad: false,
             gameOverThemeOverride: false,
             modBrowserPages: {}
         }
@@ -209,15 +208,40 @@ export default {
             if (!this.routeParams.base) component = 'Homepage'
             switch (component) {
                 case 'PAGE': {
-                    let convertedPage = this.$isVizBase(this.routeParams.base) ? this.$vizToMspa(this.routeParams.base, this.routeParams.p) : this.routeParams
-                    let p = convertedPage.p ? convertedPage.p : undefined
-                    if (!p || this.$pageIsSpoiler(p, true)) component = 'Spoiler'
-                    else if ((this.routeParams.base === 'ryanquest' && !(p in this.$archive.mspa.ryanquest)) || (this.routeParams.base !== 'ryanquest' && !(p in this.$archive.mspa.story))) component = 'Error404'
+                    // Construct canonical story name and page number
+                    let story_id
+                    let page_num
+                    const is_ryanquest = this.routeParams.base === 'ryanquest'
+                    if (this.$isVizBase(this.routeParams.base)) {
+                        const {s, p} = this.$vizToMspa(this.routeParams.base, this.routeParams.p)
+                        story_id = s
+                        page_num = p
+                    } else {
+                        page_num = this.routeParams.p
+                        const tryLookup = this.$mspaToViz(page_num, is_ryanquest)
+                        if (tryLookup) {
+                            story_id = tryLookup.s
+                        } else {
+                            story_id = undefined // MSPA number does not map to valid viz story
+                        }
+                    }
+
+                    // Lock ryanquest to mspa numbers for now
+                    // if (is_ryanquest) {
+                    //     page_num = this.$vizToMspa(this.routeParams.base, page_num).p
+                    // }
+
+                    if (!(page_num && story_id)) component = 'Error404'
+                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (
+                        (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
+                        (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))
+                    ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(p)
+                        if (this.$isNewReader) this.$updateNewReader(page_num)
                         
-                        let flag = this.$archive.mspa.story[p].flag
+                        const flag = this.$archive.mspa.story[page_num].flag
                         
                         if (flag.includes('X2COMBO')) component = 'x2Combo'
                         else if (flag.includes('FULLSCREEN') || flag.includes('DOTA') || flag.includes('GAMEOVER') || flag.includes('SHES8ACK')) component = 'fullscreenFlash'
@@ -281,9 +305,10 @@ export default {
                 }
                 case 'SQUIDDLES': {
                     if (this.$pageIsSpoiler('004432')) component = 'Spoiler'
+                    break
                 }
                 case 'UNLOCK': {
-                    if (this.routeParams.p === 'ps_titlescreen') component = 'PS_titlescreen'
+                    if (this.routeParams.p && this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
                     else if (this.routeParams.p in this.$archive.mspa.psExtras) {
                         if ((this.routeParams.p == 'ps000039' && this.$pageIsSpoiler('003655')) || (this.routeParams.p == 'ps000040' && this.$pageIsSpoiler('003930'))) component = 'Spoiler'
                         else component = 'ExtrasPage'
@@ -399,6 +424,9 @@ export default {
               }
             }
             return (theme == 'default' ? 'mspa' : theme)
+        },
+        forceLoad(){
+            return this.tab.hasEmbed
         }
     },
     methods: {
@@ -453,15 +481,12 @@ export default {
     },
     updated(){
       this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
       })
     },
     watch: {
         'tabIsActive'(to, from) {
-            if (to)
-            // Prevents tab from unloading if there's anything that might need to run in the background
-            if (!to) this.forceLoad = document.querySelectorAll(`[id='${this.tab.key}'] iframe, [id='${this.tab.key}'] video, [id='${this.tab.key}'] audio`).length > 0
-            else if (this.forceLoad) {
+            if (to && this.forceLoad) {
                 // Iframes kept freezing content after switching tabs. Presumably they thought they were supposed to be inactive?
                 // Easiest hack I found to get them moving again was to force the browser to redraw them. I apologise for nothing. 
                 this.$el.style.borderTop = 'solid 1px #000000FF'
@@ -469,15 +494,6 @@ export default {
                     this.$el.style.borderTop = ''
                 }, 10)
             }
-        },
-        '$localData.settings.hqAudio'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.jsFlashes'() {
-            this.forceLoad = false
-        },
-        '$localData.settings.bolin'() {
-            this.forceLoad = false
         }
     },
     mounted(){
@@ -492,9 +508,11 @@ export default {
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up
-        let iframes = document.querySelectorAll(`[id='${this.tab.key}'] iframe`)
-        for (var i = 0; i < iframes.length; i++) {
-            iframes[i].parentNode.removeChild(iframes[i])
+        if (this.$el) {
+            const iframes = this.$el.querySelectorAll(`iframe`)
+            for (var i = 0; i < iframes.length; i++) {
+                iframes[i].parentNode.removeChild(iframes[i])
+            }
         }
     }
 }
