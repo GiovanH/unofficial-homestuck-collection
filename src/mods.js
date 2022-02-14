@@ -411,7 +411,7 @@ function getModJs(mod_dir, options={}) {
     } else {
       // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
       try {
-        const is_directory = fs.lstatSync(path.join(thisModsDir, mod_dir)).isDirectory()
+        const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
         if (!is_directory) throw new Error("Not a directory")
 
         logger.debug(mod_dir, "confirmed as directory.")
@@ -658,9 +658,10 @@ function getMixins(){
 
   const enabledModsJs = getEnabledModsJs()
 
-  var mixables = enabledModsJs.reverse()
+  // List of mods
+  var mixable_mods = enabledModsJs.reverse()
 
-  // Custom themes
+  // Add mod that contains custom themes
   var newThemes = enabledModsJs.reverse().reduce((themes, js) => {
     if (!js.themes) return themes
     return themes.concat(js.themes.map((theme, i) => 
@@ -668,7 +669,8 @@ function getMixins(){
       ))
   }, [])
   if (newThemes) {
-    mixables.push({
+    mixable_mods.push({
+      name: "!themes",
       vueHooks: [{
         matchName: "settings",
         data: {themes($super) {return $super.concat(newThemes)}}
@@ -676,6 +678,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom pages
   var newPages = enabledModsJs.reverse().reduce((pages, js) => {
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
@@ -685,7 +688,8 @@ function getMixins(){
     for (let k in newPages)
       pageComponents[k] = newPages[k].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!pages",
       vueHooks: [{
         matchName: "TabFrame",
         data: {modBrowserPages($super) {return {...newPages, ...$super}}},
@@ -696,6 +700,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom browser actions
   var newBrowserActions = enabledModsJs.reverse().reduce((actions, js) => {
     if (js.browserActions) {
       for (let k in js.browserActions) {
@@ -710,7 +715,8 @@ function getMixins(){
     for (let ck in newBrowserActions)
       actionComponents[ck] = newBrowserActions[ck].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!actions",
       vueHooks: [{
         matchName: "addressBar",
         // browserActions are raw components
@@ -719,6 +725,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom browser toolbars
   var newBrowserToolbars = enabledModsJs.reverse().reduce((toolbars, js) => {
     if (js.browserToolbars) {
       for (let k in js.browserToolbars) {
@@ -733,7 +740,8 @@ function getMixins(){
     for (let ck in newBrowserToolbars)
       toolbarComponents[ck] = newBrowserToolbars[ck].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!toolbars",
       vueHooks: [{
         matchName: "tabBar",
         // browserToolbars are raw components
@@ -742,14 +750,17 @@ function getMixins(){
     })
   }
 
-  var mixins = mixables.map((js) => {
+  // mixable_mods is now a list of mods that may add mixins.
+  logger.info(mixable_mods)
+
+  const vueHooksByName = {}
+  const vueHooksMatchFn = []
+
+  mixable_mods.forEach((js) => {
     const vueHooks = js.vueHooks || []
     if (vueHooks.length == 0) {
       return null
     }
-
-    const vueHooksByName = {}
-    const vueHooksMatchFn = []
 
     // Precompute as much as possible since mixins run everywhere
     vueHooks.forEach((hook) => {
@@ -761,62 +772,60 @@ function getMixins(){
         vueHooksMatchFn.push(hook)
       }
     })
+  })
 
-    const mixin =  {
-      created() {
-        const vueComponent = this
+  const mixin =  {
+    created() {
+      const vueComponent = this
 
-        this._uhc_matching_hooks = [
-          ...(this._uhc_matching_hooks || []), // existing hooks
-          ...vueHooksMatchFn.filter(hook => hook.match(this)), // Complex hooks
-          ...(vueHooksByName[this.$options.name] || [])        // named hooks 
-        ]
+      this._uhc_matching_hooks = [
+        ...(this._uhc_matching_hooks || []), // existing hooks
+        ...vueHooksMatchFn.filter(hook => hook.match(this)), // Complex hooks
+        ...(vueHooksByName[this.$options.name] || [])        // named hooks 
+      ]
 
-        // Hook things
-        // Normally mixins are ignored on name collision
-        // We need to do the opposite of that, so we hook `created`
-        this._uhc_matching_hooks.forEach(hook => {
-          // Literal created hook
-          if (hook.created)
-            hook.created.bind(this)()
+      // Hook things
+      // Normally mixins are ignored on name collision
+      // We need to do the opposite of that, so we hook `created`
+      this._uhc_matching_hooks.forEach(hook => {
+        // Literal created hook
+        if (hook.created)
+          hook.created.bind(this)()
 
-          for (const dname in (hook.data || {})) {
-            const value = hook.data[dname]
-            this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
-          }
-          // Computed
-          for (const cname in (hook.computed || {})) {
-            // Precomputed super function
-            const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
-            Object.defineProperty(this, cname, {
-              get: hook.computed[cname].bind(vueComponent, sup),
-              configurable: true
-            })
-          }
-          // Methods w/ optional super argument
-          for (const mname in (hook.methods || {})) {
-            const sup = this[mname] || nop
-            const bound = hook.methods[mname].bind(vueComponent)
-            this[mname] = function(){return bound(...arguments, sup)}
-          }
-        })
-      },
-      updated() {
-        this._uhc_matching_hooks.filter(hook => hook.updated).forEach(hook => {
-          hook.updated.bind(this)()
-        })
-      },
-      mounted() {
-        this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
-          hook.mounted.bind(this)()
-        })
-      }
+        for (const dname in (hook.data || {})) {
+          const value = hook.data[dname]
+          this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+        }
+        // Computed
+        for (const cname in (hook.computed || {})) {
+          // Precomputed super function
+          const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
+          Object.defineProperty(this, cname, {
+            get: hook.computed[cname].bind(vueComponent, sup),
+            configurable: true
+          })
+        }
+        // Methods w/ optional super argument
+        for (const mname in (hook.methods || {})) {
+          const sup = this[mname] || nop
+          const bound = hook.methods[mname].bind(vueComponent)
+          this[mname] = function(){return bound(...arguments, sup)}
+        }
+      })
+    },
+    updated() {
+      this._uhc_matching_hooks.filter(hook => hook.updated).forEach(hook => {
+        hook.updated.bind(this)()
+      })
+    },
+    mounted() {
+      this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
+        hook.mounted.bind(this)()
+      })
     }
+  }
 
-    return mixin
-  }).filter(Boolean)
-
-  return mixins
+  return [mixin]
 }
 
 // Runtime
