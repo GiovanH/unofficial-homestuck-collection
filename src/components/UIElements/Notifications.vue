@@ -138,7 +138,7 @@ export default {
         return mid // Near where to start. (Should be mid-1?)
       }
 
-      // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
+      // this.$logger.info("Searching between", time1, this.formatTimestamp(time1), "&", time2, this.formatTimestamp(time2))
 
       let ret = []
       let newst = -1
@@ -182,17 +182,22 @@ export default {
           npageid => this.$archive.mspa.story[npageid].timestamp
         ))
 
+        if (!nextTimestamp || nextTimestamp === Infinity) {
+          this.$logger.info("No next timestamp for page", this.$archive.mspa.story[pageId])
+          return
+        }
+
         const notif_timestamps_between = this.timestampsBetween(
           latestTimestamp, nextTimestamp, 
           this.notifCollectionTimestampsIndex
         )
-        this.$logger.info("notif_timestamps_between", notif_timestamps_between)
+        this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
 
         const notifications_between = notif_timestamps_between
             .map(t => this.notifCollectionTimestamps[t])
             .flat() // would be a List<List<notif>> otherwise b/c multi timestamps
             .filter(this.filterNotifBySetting)
-        this.$logger.info("notifications_between", notifications_between)
+        this.$logger.debug("notifications_between", notifications_between)
 
         // Group newsposts if too many
         if (notif_timestamps_between.length <= this.maxActiveNotifs) {
