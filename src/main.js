@@ -339,6 +339,8 @@ Vue.mixin({
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
           }
 
+          // else if ('000373' == thisPageId) nextLimit = '000375' // Problem sleuth multiple options
+
           // End of problem sleuth
           else if (thisPageId == '001892') nextLimit  = '001902'
 
