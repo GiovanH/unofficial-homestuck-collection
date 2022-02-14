@@ -81,6 +81,8 @@ export default {
     margin: 0 auto;
     padding: 4px;
 
+    z-index: 5;
+
     border: 2px solid yellow;
     box-shadow: 0 0 0 4px #ff9000;
 
