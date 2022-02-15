@@ -128,7 +128,7 @@
         </div>
         <p v-text="loadText"></p>
         <!-- Preloader -->
-        <Logo class="hidden"/>
+        <!-- <Logo class="hidden"/> -->
       </div>
 
       <div class="card" v-else>
@@ -187,7 +187,7 @@
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
-import Logo from '@/components/UIElements/Logo.vue'
+// import Logo from '@/components/UIElements/Logo.vue'
 
 // import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
@@ -195,7 +195,7 @@ const { ipcRenderer } = require('electron')
 export default {
   name: 'setup',
   components: {
-    TitleBar, NewReaderControls, SpoilerBox, Logo
+    TitleBar, NewReaderControls, SpoilerBox //, Logo
   },
   data: function() {
     return {

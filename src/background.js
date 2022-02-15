@@ -413,7 +413,7 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
-if (assetDir) {
+if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
