@@ -35,7 +35,7 @@ function giveWindow(new_win) {
 let validatedState = false
 function expectWorkingState(){
   if (validatedState) return true
-  validatedState = (assetDir && fs.existsSync(assetDir))
+  validatedState = (assetDir && fs.existsSync(path.join(assetDir, "archive")))
   return validatedState
 }
 
@@ -82,11 +82,15 @@ function getTreeRoutes(tree, parent=""){
 }
 
 function extractimods(){
+  if (!expectWorkingState()) {
+    logger.info("Not yet in working state, not extracting imods.")
+    return
+  }
   // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   // eslint-disable-next-line import/no-webpack-loader-syntax
   const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
-  let tar_buffer = Buffer.from(base64, 'base64')
+  const tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")
   const temp_tar_path = path.join(outpath, '_imods.tar')
@@ -445,7 +449,7 @@ function getModJs(mod_dir, options={}) {
           console.log("Already tried to re-extract imods, refusing to infinite loop")
           throw e
         }
-        if (fs.existsSync(path.join(assetDir, "archive"))) {
+        if (expectWorkingState()) {
           console.log("Couldn't load imod, trying re-extract")
           extractimods()
         } else {
