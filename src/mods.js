@@ -751,7 +751,7 @@ function getMixins(){
   }
 
   // mixable_mods is now a list of mods that may add mixins.
-  logger.info(mixable_mods)
+  // logger.info(mixable_mods)
 
   const vueHooksByName = {}
   const vueHooksMatchFn = []
