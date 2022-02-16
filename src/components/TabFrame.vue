@@ -231,8 +231,10 @@ export default {
                     //     page_num = this.$vizToMspa(this.routeParams.base, page_num).p
                     // }
 
+                    const isTzPassword = (this.$archive.tweaks.tzPasswordPages.includes(page_num))
+                    
                     if (!(page_num && story_id)) component = 'Error404'
-                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (this.$pageIsSpoiler(page_num, true) && !isTzPassword) component = 'Spoiler'
                     else if (
                         (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
                         (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))

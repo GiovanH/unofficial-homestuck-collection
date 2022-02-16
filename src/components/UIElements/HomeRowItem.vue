@@ -71,6 +71,9 @@ export default {
   .thumbnail {
     img {
       display: block;
+      max-width: 65px;
+      max-height: 65px;
+      object-fit: contain;
     }
     &:after {
       display: none;

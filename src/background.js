@@ -233,7 +233,12 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
   // We pre-build this here so mods have access to it
+  // TODO: This is unused now, remove it
   data.search = Object.values(data.mspa.story).map(storypage => {
     return {
       key: storypage.pageId,
@@ -413,7 +418,7 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
-if (assetDir) {
+if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
@@ -786,14 +791,29 @@ async function createWindow () {
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
       const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      callback({redirectURL})
+      if (details.url == redirectURL) {
+        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+        callback({redirectURL})
+      }
     } else {
       const destination_url = Resources.resolveURL(details.url)
-      if (details.resourceType == "subFrame")
-        win.webContents.send('TABS_PUSH_URL', destination_url)
-      else callback({
-        redirectURL: destination_url
-      })
+      if (details.url == destination_url) {
+        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // Okay
+        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+        if (details.resourceType == "subFrame")
+          win.webContents.send('TABS_PUSH_URL', destination_url)
+        else callback({
+          redirectURL: destination_url
+        })
+      }
     }
   })
 
