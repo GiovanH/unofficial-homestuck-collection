@@ -38,7 +38,7 @@
       <div class="sysActionButtons">
         <button class="systemButton sysActionButton jumpBoxButton" 
          v-if="!$localData.settings.showAddressBar" 
-         @click="toggleJumpBox" title="Jump box">
+         @click="toggleJumpBox" title="Jump bar">
           <fa-icon icon="terminal"></fa-icon></button>
         <button class="systemButton sysActionButton bookmarksButton" @click="toggleBookmarks" title="Bookmarks">
           <fa-icon icon="bookmark"></fa-icon></button>

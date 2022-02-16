@@ -390,7 +390,7 @@ export default {
         {
           model: "showAddressBar",
           label: "Show address bar",
-          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access the jump bar by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
+          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access it by clicking the jump bar button in the tab bar, or with ctrl+L (⌘+L on MacOS)."
         }, {
         //   model: "mspaMode",
         //   label: "Use MSPA page numbers",
