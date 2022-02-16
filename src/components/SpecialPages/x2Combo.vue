@@ -132,7 +132,12 @@ export default {
     }
   },
   methods: {
-    keyNavEvent: PAGE.methods.keyNavEvent
+    keyNavEvent(dir) {
+      if (dir == 'left') 
+        this.$pushURL(this.$refs.pageNav1.backUrl)
+      else if (dir == 'right') 
+        this.$pushURL(this.$refs.pageNav2.nextUrl(this.nextPagesArray[1][0]))
+    }
   }
 }
 </script>
