@@ -233,7 +233,12 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
   // We pre-build this here so mods have access to it
+  // TODO: This is unused now, remove it
   data.search = Object.values(data.mspa.story).map(storypage => {
     return {
       key: storypage.pageId,

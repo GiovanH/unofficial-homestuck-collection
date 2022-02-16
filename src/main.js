@@ -362,6 +362,11 @@ Vue.mixin({
             }
             nextLimit = nextPageId
           }
+
+          else if (this.$archive.tweaks.tzPasswordPages.includes(thisPageId)) {
+            this.$logger.info("Not advancing to terezi page")
+            return
+          }
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time
           else nextLimit = [...this.$archive.mspa.story[thisPageId].next].sort()[0]
