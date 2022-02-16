@@ -786,14 +786,29 @@ async function createWindow () {
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
       const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      callback({redirectURL})
+      if (details.url == redirectURL) {
+        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+        callback({redirectURL})
+      }
     } else {
       const destination_url = Resources.resolveURL(details.url)
-      if (details.resourceType == "subFrame")
-        win.webContents.send('TABS_PUSH_URL', destination_url)
-      else callback({
-        redirectURL: destination_url
-      })
+      if (details.url == destination_url) {
+        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // Okay
+        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+        if (details.resourceType == "subFrame")
+          win.webContents.send('TABS_PUSH_URL', destination_url)
+        else callback({
+          redirectURL: destination_url
+        })
+      }
     }
   })
 

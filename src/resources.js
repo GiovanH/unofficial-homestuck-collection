@@ -99,7 +99,7 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1") // TODO double-check this regex
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
-    .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
+    .replace(/^http(s{0,1}):\/\/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
     .replace(/^http(s{0,1}):\/\/www.whatpumpkin\.com\/squiddles\.htm(l)?/, '/squiddles/credits')
 
   if (resource_url != request_url)
@@ -397,6 +397,9 @@ async function testArchiveComic(archive){
 
 function testResolution(){
   const libGetResourceUrl = {
+    "http://www.turner.com/planet/mp3/cp_close.mp3": "assets://storyfiles/hs2/00338/cp_close.mp3",
+    "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3": "assets://storyfiles/hs2/00338/Ghostbusters.mp3",
+    "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3": "assets://storyfiles/hs2/00338/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3",
     "http://www.mspaintadventures.com/extras/ps000015.html": "/unlock/ps000015",
     "/advimgs/jb/mspaintadventure08.gif": "assets://advimgs/jb/mspaintadventure08.gif",
     "/archive/collection/archive_beta.png": "assets://archive/collection/archive_beta.png",
