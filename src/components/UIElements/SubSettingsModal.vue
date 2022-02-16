@@ -166,7 +166,8 @@ export default {
       store.set(this.storeKey, this.buffer)
     },
     clearAll() {
-      store.clear(this.storeKey)
+      this.$logger.info("Clearing mod store key", this.storeKey)
+      store.set(this.storeKey, {})
       this.buffer = store.get(this.storeKey) || {}
     },
     forceReload() {
