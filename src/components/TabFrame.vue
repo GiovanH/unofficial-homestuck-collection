@@ -10,7 +10,7 @@
         v-if="isLoaded"
         @keyup.left="leftKeyPress"
         @keyup.right="rightKeyPress"
-        @keyup.space="spaceBarPress"
+        @keydown.space="spaceBarPress"
         @keyup.f5="reload"
         ref="tabFrame"
     >
