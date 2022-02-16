@@ -366,7 +366,7 @@ function buildApi(mod) {
       clear: () => store.clear(getModStoreKey(mod._id, null))
     }, 
     readFile(asset_path) {
-      let data = readFileSyncLocal(asset_path, "readJson")
+      let data = readFileSyncLocal(asset_path, "readFile")
       return data
     },
     readJson(asset_path) {
