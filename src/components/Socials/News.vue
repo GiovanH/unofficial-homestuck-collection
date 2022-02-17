@@ -144,6 +144,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  ::v-deep .post {
+    > table[style] {
+      // Fixes /news/4-14-13 in dark mode, possibly others
+      color: black;
+    }
+  }
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);
