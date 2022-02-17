@@ -10,13 +10,11 @@ Implementation of the modding API can be found at or near [`/src/mods.js`](https
 
 Mods can be written according to the [API specification](#API-specification) below.
 
-...
-
 ### Distributing mods
 
 Mods should be distributed as either single-file `.js` scripts or as compressed archives containing a mod folder. 
 
-...
+There is a wiki page, [Third Party Mods](https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods), that collects an index of mods people have written. If you write a (public, appropriate) mod, feel free to link it there. 
 
 ### Installing mods
 
@@ -96,6 +94,27 @@ Here, the specific phrase "the 13th of April, 2009, " is replaced, and any other
 
 The `archive` object is the main data object that drives the story. It's defined in src/background.js:loadArchiveData, and stores the information from the json files in archive/data.
 So `archive.mspa` is `mspa.json`, etc.
+
+There are some other objects exposed by the archive used to tweak behavior that is not found directly in json files, usually in `archive.tweaks`.
+
+`archive.tweaks.modHomeRowItems` is a list of extra icons to be added to the home screen. A brief example:
+
+```js
+edit(archive) {
+    const myIcon = {
+        href: "/zombo", // linked page
+        thumbsrc: "assets://archive/collection/archive_ryanquest.png", // icon src
+        date: "", // string
+        title: 'Zombocom', // short title
+        description: `<p>You can do anything</p>` // HTML description
+    }
+    archive.tweaks.modHomeRowItems.unshift(myIcon)
+}
+```
+
+`unshift` is used here because `modHomeRowItems` is a list, and mods at the top of the list are applied last, so `unshift` puts icons from mods at the top of the list at the top of the homescreen card.
+
+**Caution: `archive.music` is currently scheduled to be restructured, and should be considered unstable.**
 
 ### Routes
 
@@ -454,6 +473,8 @@ Note that there is no setting for a default option. Values will always be undefi
 
 ### Vue Hooks
 
+**VueHooks are a bare-metal way to make changes, and should be considered highly unstable.** Using stable, supported API methods like `edit(archive)` is highly preferred whenever posssible, as VueHooks are liable to break with even minor patch versions.
+
 Vue hooks are the most complicated and the most powerful method of modifying the collection, and modify the Vue.js pages directly using mixins. 
 
 `vueHooks`: `List<VueHook>`
@@ -575,6 +596,57 @@ Note that the `component` object has two special page functions that take, as th
 
 - `title` (`function(ctx)`): A function that should return the tab title of the page.
 - `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
+
+`browserActions`: `Map<Name: BrowserAction>`
+
+Like browserPages, but define a vue component to be used as a browserAction (address bar button).
+
+`BrowserAction.component`: the main vue component.
+
+An example BrowserAction, from oddities:
+
+```js
+const browserActions = {
+    HQAudioToggle: {
+      component: {
+        methods: {
+          toggle() {
+            this.$localData.settings.hqAudio = !this.$localData.settings.hqAudio
+          }
+        },
+        render: function(){with (this) {
+          return _c(
+            // Main component: a div with the systemButton class.
+            "div",
+            { staticClass: "systemButton",
+              // Specify what property makes the button "active":
+              class: { active: $localData.settings.hqAudio },
+              // Specify the action onClick
+              on: { click: toggle }
+            },
+            // Graphic used in the icon. Here is a fontAwesome icon
+            [ _c("fa-icon", {
+                attrs: { icon: "music" }
+              }),
+              // An optional badge, to display additional information
+              _c("span", { staticClass: "badge" }, 
+                [_v($localData.settings.hqAudio ? "HQ" : "LQ")]
+              )
+            ], 1
+          )
+        }}
+      }
+    }
+}
+```
+
+`browserToolbars`: `Map<Name: BrowserToolbar>`
+
+Like browserActions, but define a vue component to be used as a toolbar.
+
+`BrowserToolbar.component`: the main vue component.
+
+Toolbar components should have a main div element.
 
 ### Misc
 
