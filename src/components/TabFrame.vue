@@ -466,7 +466,6 @@ export default {
                 this.$refs.page.spaceBarEvent && 
                 document.activeElement.tagName != 'INPUT') {
                 const frameEl = this.$el
-                this.$logger.info(frameEl.scrollTop, frameEl.clientHeight, frameEl.scrollHeight)
                 if (frameEl.scrollTop + frameEl.clientHeight == frameEl.scrollHeight) {
                     // Only send event if scrolling doesn't happen
                     this.$refs.page.spaceBarEvent(e)   
