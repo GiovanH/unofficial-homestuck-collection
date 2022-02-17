@@ -357,6 +357,7 @@
           :key="`${i}-${item.href}`"
           :href="item.href"
           :thumbsrc="item.thumbsrc"
+          :class="item.class"
           :afterpage="item.afterpage"
           :date="item.date">
           <template v-slot:title>{{ item.title }}</template>
