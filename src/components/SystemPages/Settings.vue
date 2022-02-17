@@ -738,11 +738,11 @@ export default {
       // Calculte needReload
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
-      if (diff.some(key => this.$modChoices[key].needsreload)) {
+      if (diff.some(key => this.$modChoices[key].needsHardReload)) {
         this.$logger.info("List change requires hard reload", diff)
         this.needReload = true
       }
-      if (diff.some(key => this.$modChoices[key].needsreload)) {
+      if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
         this.$logger.info("List change requires archive reload", diff)
         this.queueArchiveReload()
       }

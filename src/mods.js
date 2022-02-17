@@ -482,8 +482,12 @@ function getModJs(mod_dir, options={}) {
 
     // Computed properties don't automatically require a reload because
     // the object has been assigned any computed properties by now.
-    mod._needsreload = [
-      'styles', 'vueHooks', 'themes',
+    mod._needsArchiveReload = [
+      'edit', 'mspfa'
+    // eslint-disable-next-line no-prototype-builtins
+    ].some(k => mod.hasOwnProperty(k))
+    mod._needsHardReload = [
+      'styles', 'vueHooks', 'themes', 
       'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
     ].some(k => mod.hasOwnProperty(k))
@@ -844,7 +848,8 @@ function jsToChoice(js, dir){
     locked: js.locked,
 
     hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
-    needsreload: js._needsreload,
+    needsArchiveReload: js._needsArchiveReload,
+    needsHardReload: js._needsHardReload,
     settingsmodel: js.settings,
     key: dir,
 
