@@ -1,40 +1,40 @@
 <template>
   <div class="pageBody customStyles">
-    <Banner :id="tab.key" :page="thisPage[0]"/>
+    <Banner :id="tab.key" :page="thisPages[0]"/>
     <div class="navBanners">
       <NavBanner class="leftNavBanner" useCustomStyles="true" />
       <div class="navSpacer" />
       <NavBanner class="rightNavBanner" useCustomStyles="true" />
     </div>
     <div class="pageFrame">
-      <Metadata v-if="showMetadata" :thisPage="thisPage[0]" />
+      <Metadata v-if="showMetadata" :thisPage="thisPages[0]" />
       <div class="pageContent leftPage">
-        <Footnotes :pageId="thisPage[0].pageId" preface />
+        <Footnotes :pageId="thisPages[0].pageId" preface />
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage[0].title" />
+              <h2 class="pageTitle" v-text="thisPages[0].title" />
               <div class="media">
                   <Media v-for="url in pageMedia[0]" :key="url" :url="url" class="panel"/>
               </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPage[0].pageId" :content="thisPage[0].content"/>
-              <PageNav :thisPage="thisPage[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
+              <TextContent :key="thisPages[0].pageId" :content="thisPages[0].content"/>
+              <PageNav :thisPage="thisPages[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
           </div>
-        <Footnotes :pageId="thisPage[0].pageId" />
+        <Footnotes :pageId="thisPages[0].pageId" />
       </div>
       <div class="pageContent rightPage">
-        <Footnotes :pageId="thisPage[1].pageId" preface />
+        <Footnotes :pageId="thisPages[1].pageId" preface />
           <div class="mediaContent">
-              <h2 class="pageTitle" v-html="thisPage[1].title" />
+              <h2 class="pageTitle" v-html="thisPages[1].title" />
               <div class="media">
                   <Media v-for="url in pageMedia[1]" :key="url" :url="url" class="panel"/>
               </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPage[1].pageId" :content="thisPage[1].content"/>
-              <PageNav :thisPage="thisPage[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
+              <TextContent :key="thisPages[1].pageId" :content="thisPages[1].content"/>
+              <PageNav :thisPage="thisPages[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
           </div>
-        <Footnotes :pageId="thisPage[1].pageId" />
+        <Footnotes :pageId="thisPages[1].pageId" />
       </div>
     </div>
     <PageFooter pageWidth="1660px" />
@@ -64,18 +64,18 @@ export default {
   },
   data: function() {
     return {
-      preload: [],
-      showMetadata: false
+      ...PAGE.data()
     }
   },
   theme: PAGE.theme,
   title: PAGE.title,
   computed: {
-    pageNum: PAGE.computed.pageNum,  // Page number of the left page
+    pageNum: PAGE.computed.pageNum,  // Page number of one of the two pages (usually the left one)
     storyId: PAGE.computed.storyId,
     isRyanquest: PAGE.computed.isRyanquest,
     pageCollection: PAGE.computed.pageCollection,
-    thisPage() {
+    thisPage: PAGE.computed.thisPage,
+    thisPages() {
       let thisPageId = this.pageNum
       let leftPageId, rightPageId
       if (parseInt(thisPageId) % 2 == 0) {
@@ -117,15 +117,15 @@ export default {
         })
       })
 
-      return [this.thisPage[0].media, this.thisPage[1].media]
+      return [this.thisPages[0].media, this.thisPages[1].media]
     },
     nextPagesArray() {
-      this.$logger.info(`${this.tab.url} - ${this.thisPage[1].title}`)
+      this.$logger.info(`${this.tab.url} - ${this.thisPages[1].title}`)
       let nextPages = [[], []]
-      this.thisPage[0].next.forEach(nextID => {
+      this.thisPages[0].next.forEach(nextID => {
         nextPages[0].push(this.$archive.mspa.story[nextID])
       })
-      this.thisPage[1].next.forEach(nextID => {
+      this.thisPages[1].next.forEach(nextID => {
         nextPages[1].push(this.$archive.mspa.story[nextID])
       })
       return nextPages

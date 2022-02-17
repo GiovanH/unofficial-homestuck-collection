@@ -38,6 +38,7 @@ export default {
   title: PAGE.title,
   data: function() {
     return {
+      ...PAGE.data(),
     }
   },
   computed: {

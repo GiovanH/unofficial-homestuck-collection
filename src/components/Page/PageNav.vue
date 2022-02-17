@@ -57,8 +57,8 @@ export default {
     },
     pageIdText() {
       if (!this.thisPage.pageId) return
-      let id = this.thisPage.pageId
-      let story = this.mspaBase // this.thisPage.storyId
+      const id = this.thisPage.pageId
+      const story = this.mspaBase // this.thisPage.storyId
       return this.$resolvePath(`${story}/${id}`)    
     },
     vizLink() {
@@ -91,7 +91,8 @@ export default {
           return this.DateTime.fromSeconds(Number(this.thisPage.timestamp))
             .setZone("America/New_York")
             .toFormat("MM/dd/yyyy, t ZZZZ")
-        } catch {
+        } catch (e) {
+          this.$logger.error(e)
           return "Invalid Date"
         }
       }

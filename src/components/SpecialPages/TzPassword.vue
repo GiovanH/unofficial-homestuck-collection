@@ -50,6 +50,7 @@ export default {
   title: PAGE.title,
   data: function() {
     return {
+      ...PAGE.data(),
       inputText: '',
       passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`,
       failText: "&lt;- <b>WRONG!</b> GO B4CK!!!",
