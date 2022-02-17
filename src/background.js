@@ -37,6 +37,9 @@ if (!store.get('localData.settings.enableHardwareAcceleration')) {
   console.log("Not disabling hardware acceleration")
 }
 
+// Log settings, for debugging
+logger.info(store.get('localData.settings'))
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },

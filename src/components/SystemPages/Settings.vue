@@ -796,13 +796,17 @@ export default {
       }
     },
     '$localData.tabData.activeTabKey'(to, from) {
-      if (this.needReload) {
-        this.forceReload()
-        // forceReload includes archiveReload
-      } else if (this.debounce) {
-        clearTimeout(this.debounce)
-        this.debounce = false
-        this.archiveReload()
+      if (to == this.tab.key || from == this.tab.key) {
+        // Log settings, for debugging
+        this.$logger.info(this.$localData.settings)
+        if (this.needReload) {
+          this.forceReload()
+          // forceReload includes archiveReload
+        } else if (this.debounce) {
+          clearTimeout(this.debounce)
+          this.debounce = false
+          this.archiveReload()
+        }
       }
     }
   }
