@@ -112,7 +112,7 @@ export default {
     },
     jumpFromUrl(){
       if (this.routeParams.id) {
-        const year = /\d+$/.exec(this.routeParams.id)[0]
+        const year = /(\d+)[a-z]?$/.exec(this.routeParams.id)[1]
         if (year in this.newsposts) {
           this.activeYear = year
           this.$nextTick(()=>{
