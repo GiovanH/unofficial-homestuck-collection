@@ -210,8 +210,9 @@ export default {
       if (this.hideNav && !this.$archive.tweaks.forceKeyboardEnable)
         return
 
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
+      if (dir == 'left' && 'previous' in this.thisPage) 
+        this.$pushURL(this.$refs.pageNav.backUrl)
+      else if (dir == 'right') {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
         else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
       }

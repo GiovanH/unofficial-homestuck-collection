@@ -146,11 +146,9 @@ export default {
 
             if (/^\|AUTHORLOG\|/.test(content)){
                 return "authorlog"
-            }
-            else if (/^\|.*?\|/.test(content)){
+            } else if (/^\|.*?\|/.test(content)){
                 return "log"
-            }
-            else{
+            } else {
                 return "prattle"
             }
         },

@@ -33,9 +33,9 @@
 </template>
 
 <script>
-  import PAGENAV from '@/components/Page/PageNav.vue'
+import PAGENAV from '@/components/Page/PageNav.vue'
 
-  export default {
+export default {
     name: "x2ComboNav",
     props: [
     'thisPage', 'nextPages'
