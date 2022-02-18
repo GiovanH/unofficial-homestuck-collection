@@ -54,10 +54,7 @@ Mods.getMixins().forEach((m) => Vue.mixin(m))
 Number.prototype.pad = function(size) {
   if (isNaN(this))
     return undefined
-  var s = String(this)
-  while (s.length < (size || 2)) 
-    s = "0" + s
-  return s
+  return this.toString().padStart(size || 2, '0')
 }
 
 Vue.mixin(Memoization.mixin)
