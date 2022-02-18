@@ -328,6 +328,25 @@ export default {
         event.srcElement.controls = false
         event.srcElement.addEventListener("timeupdate", pause)
       }
+      if (this.flashProps.id == "08080") {
+        // Collide hijinks
+        const collide = function(){
+          if (this.currentTime > 22) {
+            this.style.transition = "width 1.5s cubic-bezier(0, 0, 0, 1)"
+            // this.style.height = "650px"
+            this.style.width = "950px"
+            this.removeAttribute("controls")
+            setTimeout(() => this.setAttribute("controls", "true"), 6000)
+            this.removeEventListener("timeupdate", collide)
+          }
+        }
+        event.srcElement.style.objectFit = "cover"
+        event.srcElement.style.objectPosition = "top"
+        event.srcElement.style.height = "650px"
+        event.srcElement.style.width = "650px"
+        event.srcElement.addEventListener("timeupdate", collide)
+        // event.srcElement.currentTime = 17 // debug helper
+      }
     },
     initHtmlFrame(event) {
       if (this.frameType == 'webview') {
