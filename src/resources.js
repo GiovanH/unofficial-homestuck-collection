@@ -5,7 +5,8 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
-// const Memoization = require('@/memoization.js').default
+// ====================================
+// Asset resolution
 
 var assets_root = undefined
 
@@ -245,6 +246,10 @@ const UrlFilterMixin = {
   }
 }
 
+// ====================================
+// Story logic
+
+// Pure
 function getChapter(key) {
   // Just putting this here because both processes need this logic.
   let p = parseInt(key)
@@ -338,6 +343,9 @@ function getChapter(key) {
     return c
   }
 }
+
+// ====================================
+// Tests
 
 async function testArchiveMusic(archive){
   archive = archive || window.vm.archive
@@ -762,6 +770,9 @@ function testResolution(){
     logger.info(kind.name, "tests:", fail, "fail,", ok, "ok")
   })
 }
+
+// ====================================
+// Export
 
 module.exports = {
   init(settings){

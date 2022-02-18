@@ -39,6 +39,9 @@ function expectWorkingState(){
   return validatedState
 }
 
+// ====================================
+// Routing
+
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
   if (k) {return `mod.${mod_id}.${k}`}
@@ -80,6 +83,9 @@ function getTreeRoutes(tree, parent=""){
   }
   return routes
 }
+
+// ====================================
+// Installation and list managment
 
 function extractimods(){
   if (!expectWorkingState()) {
@@ -511,6 +517,7 @@ function getModJs(mod_dir, options={}) {
 
 const footnote_categories = ['story']
 
+// ====================================
 // Interface
 
 function editArchive(archive) {
