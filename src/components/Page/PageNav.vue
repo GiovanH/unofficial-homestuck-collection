@@ -49,7 +49,7 @@ export default {
       return this.$resolvePath(`${this.mspaBase}/${this.thisPage.previous}`)
     },
     startOverUrl() {
-      return this.$resolvePath(`${this.mspaBase}/${this.$getStory(this.thisPage.pageId)}`)
+      return this.$resolvePath(`${this.mspaBase}/${this.$getStoryNum(this.thisPage.pageId)}`)
     },
     pageNumber() {
       if (this.mspaBase == 'ryanquest') return {s: 'ryanquest', p: parseInt(this.thisPage.pageId)}
