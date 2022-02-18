@@ -728,8 +728,9 @@ async function createWindow () {
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: false,
+    frame: store.get('localData.settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
@@ -863,6 +864,10 @@ async function createWindow () {
         logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
       }
     }
+  })
+
+  ipcMain.on('set-title', (event, new_title) => {
+    win.setTitle(new_title)
   })
 
   // Give mods a reference to the window object so it can reload 
