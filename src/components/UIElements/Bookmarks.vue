@@ -263,7 +263,7 @@ export default {
     user-select: none;
     position: fixed;
     width: 100%;
-    height: 100%;
+    height: calc(100% - var(--headerHeight));
     overflow-y: hidden;
     overflow-x: hidden;
     pointer-events: none;
@@ -274,7 +274,7 @@ export default {
     color: var(--font-header);
 
     ::-webkit-scrollbar {
-    width: 6px;
+    width: 12px;
     }
     ::-webkit-scrollbar-track {
       background: var(--saves-border);
