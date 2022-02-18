@@ -26,9 +26,7 @@ export default {
       return navigator.appVersion.indexOf('Macintosh') == -1
     },
     activeTabTitle() {
-      let title = this.$archive ? this.$localData.tabData.tabs[this.activeTabKey].title : 'The Unofficial Homestuck Collection'
-      document.title = title
-      return title
+      return this.$archive ? this.$localData.tabData.tabs[this.activeTabKey].title : 'The Unofficial Homestuck Collection'
     },
     activeTabKey() {
       return this.$localData.tabData.activeTabKey
@@ -50,6 +48,12 @@ export default {
     }
   },
   mounted() {
+  },
+  watch: {
+    activeTabTitle(to, from){
+      ipcRenderer.send('set-title', to)
+      document.title = to
+    }
   }
 }
 </script>
