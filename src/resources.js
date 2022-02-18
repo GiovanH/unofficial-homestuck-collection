@@ -46,7 +46,7 @@ function resolveURL(url) {
 
   if (resource_url.startsWith("assets://")) {
     // logger.debug("[resvUrl]", url, "to", resource_url, "to", resolveAssetsProtocol(resource_url))
-    resource_url = resolveAssetsProtocol(resource_url) 
+    resource_url = resolveAssetsProtocol(resource_url)
   } else {
     // logger.debug("[resvUrl]", "no change for", resource_url)
   }
@@ -118,7 +118,7 @@ function getResourceURL(request_url){
       .replace(/\/Sfiles/, "")
       .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:[0-9]+\//, "assets://")
       .replace(/^http(s{0,1}):\/\/localhost:[0-9]+\//, "assets://")  // TODO if this accidently catches localhost:8080 we're boned
-          
+
     // if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))
     //     // files like 'archive/xxx'
     //     resource_url = "assets://" + resource_url
@@ -132,8 +132,8 @@ function getResourceURL(request_url){
     // waywardvagabond has assets in its folder but we redirect some paths to vue
     resource_url = resource_url
       .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
-  
-    if (resource_url != request_url) 
+
+    if (resource_url != request_url)
       // logger.debug("[getResU nonas]", request_url, "to", resource_url)
     request_url = resource_url
   }
@@ -180,14 +180,14 @@ const UrlFilterMixin = {
     filterLinksAndImages(el){
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
-      if (!el) { 
+      if (!el) {
         if (this.$el.nodeType === 8) return
         else el = this.$el.querySelector('.pageContent')
       }
 
       // Check if this is a comment
       if (el.nodeType === 8) return
-      
+
       // else
       el.querySelectorAll("A").forEach((link) => {
         if (link.href) {
@@ -199,11 +199,11 @@ const UrlFilterMixin = {
         }
       })
 
-      // Normally, this process would be handled by the MediaEmbed component. 
+      // Normally, this process would be handled by the MediaEmbed component.
       // Gotta get the behaviour into all them images somehow!
 
       // Internal links in the renderer already have the localhost:8080 prefix, which is different
-      // than how the other resources are handled. 
+      // than how the other resources are handled.
       const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
       for (let i = 0; i < media.length; i++) {
@@ -213,7 +213,7 @@ const UrlFilterMixin = {
           logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
         }
 
-        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  
+        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
           media[i].ondragstart = (e) => {
             e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'
@@ -226,14 +226,14 @@ const UrlFilterMixin = {
     filterLinksAndImagesInternetArchive(el, best_date=1){
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
-      if (!el) { 
+      if (!el) {
         if (this.$el.nodeType === 8) return
         else el = this.$el.querySelector('.pageContent')
       }
 
       // Check if this is a comment
       if (el.nodeType === 8) return
-      
+
       // else
       el.querySelectorAll("a[href]").forEach((link) => {
         const input_href = link.href
@@ -349,7 +349,7 @@ function getChapter(key) {
 
 async function testArchiveMusic(archive){
   archive = archive || window.vm.archive
-  
+
   // logger.info("Flash art")
   // // from discography.vue
   // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
@@ -381,7 +381,7 @@ async function testArchiveMusic(archive){
 
 async function testArchiveComic(archive){
   archive = archive || window.vm.archive
-  
+
   // logger.info("Flash art")
   // // from discography.vue
   // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
@@ -771,6 +771,157 @@ function testResolution(){
   })
 }
 
+function testStoryLogic() {
+  const libGetStory = {
+    "sentinal": undefined,
+    134: 1,
+    135: 1,
+    '000135': 1,
+    136: 2,
+    215: 2,
+    216: 2,
+    '000216': 2,
+    217: undefined,
+    "mc0000": undefined,
+    "mc0001": 3,
+    "mc0002": undefined,
+    1891: 4,
+    1892: 4,
+    '001892': 4,
+    1893: 5,
+    1899: 5,
+    1900: 5,
+    '001900': 5,
+    1901: 6,
+    10029: 6,
+    10030: 6,
+    '010030': 6,
+    10031: undefined
+  }
+
+  const libAllPages = {
+    '1': 134,
+    '2': 47,
+    '3': 1,
+    '4': 1673,
+    '5': 8,
+    '6': 8124,
+    '7': 0,
+    'ryanquest': 15
+  }
+  const libAllPagesSec = { ...libAllPages, '6': 8128 }
+
+  /* eslint-disable key-spacing */
+  const libVizToMspa = {
+    "jailbreak 1":         JSON.stringify({s: 1, p: "000002"}),
+    "jailbreak 134":       JSON.stringify({s: 1, p: "000135"}),
+    "jailbreak 135":       JSON.stringify({s: 1, p: "jb2_000000"}),
+    "jailbreak 136":       JSON.stringify({}),
+    "bard-quest 1":        JSON.stringify({s: 2, p: "000136"}),
+    "bard-quest 136":      JSON.stringify({}),
+    "bard-quest 169":      JSON.stringify({}),
+    "blood-spade 1":       JSON.stringify({s: 3, p: "mc0001"}),
+    "problem-sleuth 1":    JSON.stringify({s: 4, p: "000219"}),
+    "problem-sleuth 218":  JSON.stringify({s: 4, p: "000436"}),
+    "problem-sleuth 1673": JSON.stringify({s: 4, p: "001891"}),
+    "problem-sleuth 1674": JSON.stringify({s: 4, p: "001892"}),
+    "problem-sleuth 1675": JSON.stringify({}),
+    "beta 1":              JSON.stringify({s: 5, p: "001893"}),
+    "homestuck 1":         JSON.stringify({s: 6, p: "001901"}),
+    "homestuck 1900":      JSON.stringify({s: 6, p: "003800"}),
+    "homestuck 1902":      JSON.stringify({s: 6, p: "003802"}),
+
+    "homestuck 7363":      JSON.stringify({s: 6, p: "009263"}),
+    "homestuck 7364":      JSON.stringify({s: 6, p: "009264"}),
+    "homestuck 7365":      JSON.stringify({s: 6, p: "009265"}),
+
+    "homestuck 3742":      JSON.stringify({s: 6, p: "005642"}),
+    "homestuck 3743":      JSON.stringify({s: 6, p: "005643"}),
+    "homestuck 3744":      JSON.stringify({s: 6, p: "005644"}),
+
+    "homestuck 8129":      JSON.stringify({s: 6, p: "010029"}),
+    "homestuck 8130":      JSON.stringify({s: 6, p: "010030"}),
+    "homestuck 8131":      JSON.stringify({}),
+    "homestuck darkcage":  JSON.stringify({s: 6, p: "darkcage"}),
+    "homestuck pony3":     JSON.stringify({}),
+    "ryanquest 1":         JSON.stringify({s: 'ryanquest', p: "000001"}),
+    "ryanquest 15":        JSON.stringify({s: 'ryanquest', p: "000015"}),
+    "ryanquest 16":        JSON.stringify({})
+  }
+  const libMspaToViz = {
+    "000002":              JSON.stringify({s: 'jailbreak', p: "1"}),
+    "000135":              JSON.stringify({s: 'jailbreak', p: "134"}),
+    "jb2_000000":          JSON.stringify({s: 'jailbreak', p: "135"}),
+    "jailbreak 136":       undefined,
+    "000136":              JSON.stringify({s: 'bard-quest', p: "1"}),
+    "bard-quest 136":      undefined,
+    "mc0001":              JSON.stringify({s: 'blood-spade', p: "1"}),
+    "000219":              JSON.stringify({s: 'problem-sleuth', p: "1"}),
+    "000436":              JSON.stringify({s: 'problem-sleuth', p: "218"}),
+    "001891":              JSON.stringify({s: 'problem-sleuth', p: "1673"}),
+    "001892":              JSON.stringify({s: 'problem-sleuth', p: "1674"}),
+    "problem-sleuth 1675": undefined,
+    "001893":              JSON.stringify({s: 'beta', p: "1"}),
+    "001901":              JSON.stringify({s: 'homestuck', p: "1"}),
+    "003800":              JSON.stringify({s: 'homestuck', p: "1900"}),
+    "003802":              JSON.stringify({s: 'homestuck', p: "1902"}),
+    "009263":              JSON.stringify({s: 'homestuck', p: "7363"}),
+    "009264":              JSON.stringify({s: 'homestuck', p: "7364"}),
+    "009265":              JSON.stringify({s: 'homestuck', p: "7365"}),
+    "005642":              JSON.stringify({s: 'homestuck', p: "3742"}),
+    "005643":              JSON.stringify({s: 'homestuck', p: "3743"}),
+    "005644":              JSON.stringify({s: 'homestuck', p: "3744"}),
+    "010029":              JSON.stringify({s: 'homestuck', p: "8129"}),
+    "010030":              JSON.stringify({s: 'homestuck', p: "8130"}),
+    "pony3":               undefined,
+    "darkcage":            JSON.stringify({s: 'homestuck', p: "darkcage"}),
+    "homestuck pony3":     undefined,
+    // "000001":              JSON.stringify({s: 'ryanquest', p: 1}),
+    // "000015":              JSON.stringify({s: 'ryanquest', p: 15}),
+  }
+
+  ;[
+    {
+      fun: window.vm.$getStory,
+      library: libGetStory,
+      name: 'getStory'
+    },
+    {
+      fun: (story) => window.vm.$getAllPagesInStory(story, false).length,
+      library: libAllPages,
+      name: 'getAllPagesInStory'
+    },
+    {
+      fun: (story) => window.vm.$getAllPagesInStory(story, true).length,
+      library: libAllPagesSec,
+      name: 'getAllPagesInStory inclSecret'
+    },
+    {
+      fun: (t) => {const [b, p] = t.split(" "); return JSON.stringify(window.vm.$vizToMspa(b, p))},
+      library: libVizToMspa,
+      name: 'vizToMspa'
+    },
+    {
+      fun: (p) => JSON.stringify(window.vm.$mspaToViz(p)),
+      library: libMspaToViz,
+      name: 'mspaToViz'
+    }
+  ].forEach(kind => {
+    let [ok, fail] = [0, 0]
+    for (const query in kind.library) {
+      const expected = kind.library[query]
+      const result = kind.fun(query)
+      if (result != expected) {
+        logger.error(`Testing ${kind.name}: Assertion failed!\nQuery:    ${query}\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(result)}`)
+        fail += 1
+      } else {
+        ok += 1
+      }
+    }
+    logger.info(kind.name, "tests:", fail, "fail,", ok, "ok")
+  })
+}
+
 // ====================================
 // Export
 
@@ -791,5 +942,6 @@ module.exports = {
   testResolution,
   testArchiveMusic,
   testArchiveComic,
+  testStoryLogic,
   linkIsOutlink
 }
