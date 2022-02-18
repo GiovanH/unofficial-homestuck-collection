@@ -779,6 +779,7 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+      this.queueArchiveReload()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
