@@ -1,5 +1,5 @@
 <template>
-  <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
+  <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="$onDragStart($event)" alt />
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
   <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
@@ -636,11 +636,6 @@ document.addEventListener('click', function (e) {
         default:
           return 'img'
       }
-    },
-    drag(e) {
-      e.preventDefault()
-      e.dataTransfer.effectAllowed = 'copy'
-      require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
     }
   },
   updated() {

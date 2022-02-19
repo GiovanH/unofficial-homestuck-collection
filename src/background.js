@@ -708,14 +708,6 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
   }
 })
 
-// Hook onto image drag events to allow images to be dragged into other programs
-ipcMain.on('ondragstart', (event, filePath) => {
-  event.sender.startDrag({
-    file: filePath,
-    icon: `${__static}/img/dragSmall.png`
-  })
-})
-
 let openedWithUrl
 const OPENWITH_PROTOCOL = 'mspa'
 

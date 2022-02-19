@@ -162,11 +162,7 @@ export default {
                 let images = this.$el.getElementsByTagName('IMG')
                 for (let i = 0; i < images.length; i++) {
                     images[i].src = this.$getResourceURL(images[i].src)
-                    images[i].ondragstart = (e) => {
-                        e.preventDefault()
-                        e.dataTransfer.effectAllowed = 'copy'
-                        require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-                    }
+                    images[i].ondragstart = this.$onDragStart
                 }
                 if (this.$localData.settings.textOverride.highContrast) {
                     this.$el.querySelectorAll("span[style]").forEach(e => {

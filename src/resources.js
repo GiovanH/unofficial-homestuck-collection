@@ -214,12 +214,7 @@ const UrlFilterMixin = {
         }
 
         if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
-          media[i].ondragstart = (e) => {
-            e.preventDefault()
-            e.dataTransfer.effectAllowed = 'copy'
-            const fileStreamPath = this.$mspaFileStream(media[i].src)
-            require('electron').ipcRenderer.send('ondragstart', fileStreamPath)
-          }
+          media[i].ondragstart = onDragStart
         }
       }
     },
@@ -244,6 +239,12 @@ const UrlFilterMixin = {
       })
     }
   }
+}
+
+function onDragStart(event) {
+    event.dataTransfer.setData('text/uri-list', this.$mspaFileStream(this.url))
+    event.dataTransfer.setData('text/plain', this.$mspaFileStream(this.url))
+    event.dataTransfer.effectAllowed = 'copy'
 }
 
 // ====================================
@@ -937,6 +938,7 @@ module.exports = {
   resolveURL,
   resolvePath,
   getResourceURL,
+  onDragStart,
   getChapter,
   resolveAssetsProtocol,
   testResolution,

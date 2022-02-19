@@ -138,6 +138,7 @@ Vue.mixin({
     },
     $getResourceURL: Resources.getResourceURL,
     $getChapter: Resources.getChapter,
+    $onDragStart: Resources.onDragStart,
     $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
       const url = this.$resolvePath(to)
