@@ -13,9 +13,9 @@
                   <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
               </div>
           </div>
-          <div class="textContent" ref="textContent">
+          <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
               <PageNav :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
                 :class="{'hidden': hideNav}" />
