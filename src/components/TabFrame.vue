@@ -83,6 +83,7 @@ import TSO from '@/components/Comics/tso.vue'
 import SNAPS from '@/components/Comics/Snaps.vue'
 
 import TESTS from '@/components/Extras/tests.vue'
+import EDITOR from '@/components/CustomContent/PageEditor.vue'
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
@@ -143,7 +144,8 @@ export default {
         TSO,
         SNAPS,
 
-        TESTS
+        TESTS,
+        EDITOR
     },
     data() {
         return {

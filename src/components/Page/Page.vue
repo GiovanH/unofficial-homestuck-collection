@@ -8,12 +8,12 @@
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
+              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
               <div class="media" ref="media">
                   <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
               </div>
           </div>
-          <div class="textContent">
+          <div class="textContent" ref="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
               <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
               <PageNav :thisPage="thisPage" 
@@ -127,12 +127,14 @@ export default {
       this.deretcon(media)
       var mediakey = media[0]
 
-      if (this.audioData) {
-        const flashPath = mediakey.substring(0, mediakey.length - 4)
-        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
-        media[0] = `${flashPath}_hq.swf`
-      } else if (mediakey.includes(".swf")) {
-        this.$logger.info("Found no audio for", mediakey, this.audioData)
+      if (mediakey) {
+        if (this.audioData) {
+          const flashPath = mediakey.substring(0, mediakey.length - 4)
+          this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+          media[0] = `${flashPath}_hq.swf`
+        } else if (mediakey.includes(".swf")) {
+          this.$logger.info("Found no audio for", mediakey, this.audioData)
+        }
       }
 
       return media
