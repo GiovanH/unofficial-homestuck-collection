@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
@@ -482,6 +482,15 @@ ipcMain.on('win-close-sync', (e) => {
   e.returnValue = true;
 })
 
+ipcMain.handle('copy-image', async (event, payload) => {
+  logger.info(payload.url)
+  Sharp(payload.url).png().toBuffer().then(buffer => {
+    logger.info(buffer)
+    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+    logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+    clipboard.writeImage(sharpNativeImage)
+  })
+})
 
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {

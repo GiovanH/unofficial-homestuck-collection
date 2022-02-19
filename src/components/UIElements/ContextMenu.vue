@@ -33,6 +33,7 @@
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
       <li @mouseup="googleSearch()">Search with Google</li>  
+      <li v-if="selectionToUrl" @mouseup="$openLink(selectionToUrl, true)">Goto {{selectionToUrl}}</li>
       <li v-for="(action, index) in actionsText" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
     </ul>
     <template v-if="tags.includes('Input')">
@@ -64,6 +65,7 @@
       <li @mouseup="resetZoom()">Reset Zoom</li>
     </ul>
     <ul v-if="$localData.settings.devMode">
+      <li v-if="tags.includes('Image')" @mouseup="copyAssetSrc()">Copy asset url</li>
       <li @mouseup="inspectElement()">Inspect</li>
     </ul>
   </div>
@@ -93,6 +95,10 @@ export default {
           cb() { clipboard.writeText(this.$mspaFileStream(this.target.src)) }
         }, 
         {
+          title: "Copy Static Image",
+          cb() { ipcRenderer.invoke('copy-image', {url: this.$mspaFileStream(this.target.src)}) }
+        },
+        {
           title: "Save Image",
           cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
         }
@@ -107,6 +113,17 @@ export default {
     }
   },
   computed: {
+    selectionToUrl(){
+      this.target;
+      const query = window.getSelection().toString().trim().replace(/[^ -~]+/g, "")
+      let match
+      this.$logger.info(query)
+      if (match = /^(\d\/)?(\d{6})$/.exec(query)) return `app://./mspa/${match[2]}`
+      if (query.startsWith('http')) return query
+      if (query.startsWith('/')) return `app://.${query}`
+      if (/^([a-z]+)\/([a-z0-9]+)$/.test(query)) return `app://./${query}`
+      return false // `app://./${query}`
+    },
   },
   methods: {
     bind(cb, $event){
@@ -171,6 +188,9 @@ export default {
     },
     copyLinkText(){
       clipboard.writeText(this.target.innerText)
+    },
+    copyAssetSrc(){
+      clipboard.writeText(this.target.src)
     },
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
