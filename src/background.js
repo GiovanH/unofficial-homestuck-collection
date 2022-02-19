@@ -9,6 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -709,11 +710,29 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
+const Sharp = require('sharp')
 ipcMain.on('ondragstart', (event, filePath) => {
-  event.sender.startDrag({
-    file: filePath,
-    icon: `${__static}/img/dragSmall.png`
-  })
+  // logger.info("Dragging file", filePath)
+  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+  try {
+    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+    // if (!nativeIconFromPath.isEmpty()) {
+    //   logger.info("Native icon from path", nativeIconFromPath)
+    //   cb(nativeIconFromPath)
+    // } else {
+      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+      .png().toBuffer().then(buffer => {
+        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+        cb(sharpNativeImage)
+      })
+    // }
+  } catch (err) {
+    logger.error("Couldn't process image", err)
+    // eslint-disable-next-line no-undef
+    cb(`${__static}/img/dragSmall.png`)
+  }
 })
 
 let openedWithUrl
