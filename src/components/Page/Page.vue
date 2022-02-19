@@ -23,6 +23,7 @@
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
       <div class="hidden">
+        <!-- Preload images -->
         <Media v-for="url in nextPagesMedia" :key="url" :url="url" class="panel"/>
       </div>
     </div>
@@ -281,6 +282,23 @@ export default {
       }
       .pageFrame {
         width: 940px;
+      }
+    }
+
+    //Small screen check
+    @media only screen and (max-width: 850px) {
+      &{
+        overflow-x: hidden;
+        height: max-content;
+        .navBanner {
+          max-width: 100%;
+        }
+        .pageFrame {
+          max-width: 100%;
+        }
+        ::v-deep div.footer {
+          max-width: 100%;
+        }
       }
     }
 
