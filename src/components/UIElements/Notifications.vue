@@ -32,8 +32,6 @@ export default {
   },
   data: function() {
     return {
-      notifData,
-      notifPages,
       notifDuration: 10000,
       activeNotifs: [],
       queue: [],
@@ -43,17 +41,63 @@ export default {
     }
   },
   computed: {
-    newspostsByTimestamp() {
-      return Object.values(this.$archive.news).reduce(function(acc, y){
-        return acc.concat(y)
-      }, []).reduce(function(acc, n){
-        acc[n.timestamp] = n
-        return acc
+    notifCollectionPages(){
+      // Map<mspa_num: List<notif>>
+      let notifs_by_page = {}
+      Object.keys(notifPages).forEach(page_num => {
+        notifPages[page_num].forEach(notif_id => {
+          notifData[notif_id].notif_level = 'major'
+          if (!notifs_by_page[page_num]) notifs_by_page[page_num] = []
+          notifs_by_page[page_num].push(notifData[notif_id])
+        })
       })
+
+      let page_num
+      for (const modKey in this.$modChoices) {
+        const modChoice = this.$modChoices[modKey]
+        // eslint-disable-next-line no-cond-assign
+        if (page_num = modChoice.locked) {
+          if (!notifs_by_page[page_num]) notifs_by_page[page_num] = []
+          notifs_by_page[page_num].push({
+            title: 'NEW MOD UNLOCKED',
+            desc: modChoice.label,
+            url: `/settings/mod`,
+            thumb: '/archive/collection/archive_desktops.png'
+          })
+        }
+      }
+      return notifs_by_page
     },
-    sortedNewspostTimestamps() {
-      return Object.keys(this.newspostsByTimestamp).map(Number).sort()
-    }    
+    // notifCollectionPagesIndex() {
+    //   return Object.keys(this.notifCollectionPages).map(Number).sort()
+    // },
+    notifCollectionTimestamps(){
+      // Map<timestamp: List<notif>>
+      let notifs_by_timestamp = {}
+      Object.values(this.$archive.news).reduce(function(acc, y){
+        return acc.concat(y)
+      }, []).forEach(newspost => {
+        // Calculate truncated description
+        const d = document.createElement("div")
+        const desc_length = 140
+        d.innerHTML = newspost.html
+        const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
+
+        if (!notifs_by_timestamp[newspost.timestamp])
+          notifs_by_timestamp[newspost.timestamp] = []
+        notifs_by_timestamp[newspost.timestamp].push({
+          title: 'News posted',
+          desc: desc,
+          notif_level: 'minor',
+          url: `/news/${newspost.id}`,
+          thumb: '/archive/collection/archive_news.png'
+        })
+      })
+      return notifs_by_timestamp
+    },
+    notifCollectionTimestampsIndex() {
+      return Object.keys(this.notifCollectionTimestamps).map(Number).sort()
+    }
   },
   methods: {
     formatTimestamp(timestamp){
@@ -94,7 +138,7 @@ export default {
         return mid // Near where to start. (Should be mid-1?)
       }
 
-      // this.$logger.info("Searching between", this.formatTimestamp(time1), "&", this.formatTimestamp(time2))
+      // this.$logger.info("Searching between", time1, this.formatTimestamp(time1), "&", time2, this.formatTimestamp(time2))
 
       let ret = []
       let newst = -1
@@ -107,83 +151,74 @@ export default {
 
       return ret
     },
-    makeNewsNotif(newspost){
-      let d = document.createElement("div")
-      const desc_length = 140
-      d.innerHTML = newspost.html
-      const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
-
-      return {
-        title: 'News posted',
-        desc: desc,
-        url: `/news/${newspost.id}`,
-        thumb: '/archive/collection/archive_news.png'
-      }
-    },
-    makeModUnlockNotif(modChoice){
-      return {
-        title: 'NEW MOD UNLOCKED',
-        desc: modChoice.label,
-        url: `/settings/mod`,
-        thumb: '/archive/collection/archive_desktops.png'
+    filterNotifBySetting(notif) {
+      if (this.$localData.settings.subNotifications) {
+        return true
+      } else {
+        return (notif.notif_level == 'major')
       }
     },
     queueFromPageId(pageId) {
+      // Page-based notifications
       if (pageId == '010030') {
         if (this.allowEOH) {
           this.allowEOH = false
-          this.notifPages['010030'].forEach(notifId => this.queueNotif(notifData[notifId]))
+          this.notifCollectionPages['010030']
+            .filter(this.filterNotifBySetting)
+            .forEach(notif => this.queueNotif(notif))
         } 
-      } else if (pageId in this.notifPages) {
-        this.notifPages[pageId].forEach(notifId => this.queueNotif(notifData[notifId]))
-      }
-
-      for (const modKey in this.$modChoices) {
-        const modChoice = this.$modChoices[modKey]
-        if (modChoice.locked == pageId) {
-            this.queueNotif(this.makeModUnlockNotif(modChoice))
-        }
+      } else if (pageId in this.notifCollectionPages) {
+        this.notifCollectionPages[pageId]
+          .filter(this.filterNotifBySetting)
+          .forEach(notif => this.queueNotif(notif))
       }
 
       // Timestamp-based notifications
-      
-      if (this.$localData.settings.subNotifications) {
-        try {
-          // See also $timestampIsSpoiler
-          // but we can't reuse that logic because we're passing an explicit time point here
-          const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
-          const nextTimestamp = Math.min(...this.$archive.mspa.story[pageId].next.map(
-            npageid => this.$archive.mspa.story[npageid].timestamp
-          ))
+      try {
+        // See also $timestampIsSpoiler
+        // but we can't reuse that logic because we're passing an explicit time point here
+        const latestTimestamp = this.$archive.mspa.story[pageId].timestamp
+        const nextTimestamp = Math.min(...this.$archive.mspa.story[pageId].next.map(
+          npageid => this.$archive.mspa.story[npageid].timestamp
+        ))
 
-          // Newsposts
-          const news_between = this.timestampsBetween(
-            latestTimestamp, nextTimestamp, 
-            this.sortedNewspostTimestamps
-          )
-          // Group newsposts if too many
-          if (news_between.length <= this.maxActiveNotifs) { 
-            news_between.forEach(newst => {
-              this.queueNotif(this.makeNewsNotif(this.newspostsByTimestamp[newst]))
-            })
-          } else {
-            const newspost_0 = this.newspostsByTimestamp[news_between[0]]
-            this.$logger.info(newspost_0)
-            this.queueNotif({
-              title: 'New news posts',
-              desc: `${news_between.length} new news posts`,
-              url: `/news/${newspost_0.id}`,
-              thumb: '/archive/collection/archive_news.png'
-            })
-          }
-        } catch (e) {
-          this.$logger.warn("Couldn't compute timestamp", e)
+        if (!nextTimestamp || nextTimestamp === Infinity) {
+          this.$logger.info("No next timestamp for page", this.$archive.mspa.story[pageId])
+          return
         }
+
+        const notif_timestamps_between = this.timestampsBetween(
+          latestTimestamp, nextTimestamp, 
+          this.notifCollectionTimestampsIndex
+        )
+        this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
+
+        const notifications_between = notif_timestamps_between
+            .map(t => this.notifCollectionTimestamps[t])
+            .flat() // would be a List<List<notif>> otherwise b/c multi timestamps
+            .filter(this.filterNotifBySetting)
+        this.$logger.debug("notifications_between", notifications_between)
+
+        // Group newsposts if too many
+        if (notif_timestamps_between.length <= this.maxActiveNotifs) {
+          notifications_between.forEach(notif => this.queueNotif(notif)) 
+        } else {
+          const newspost_0 = notifications_between[0]
+          this.$logger.info(newspost_0)
+          this.queueNotif({
+            title: 'New news posts',
+            desc: `${notif_timestamps_between.length} new news posts`,
+            url: `/news/${newspost_0.id}`,
+            thumb: '/archive/collection/archive_news.png'
+          })
+        }
+      } catch (e) {
+        this.$logger.warn("Couldn't compute timestamp", e)
       }
     },
     queueNotif(notif) {
       // Add notification to the queue and fire it if there's room to display it.
-      let key = Math.random().toString(36).substring(2, 5) + Date.now()
+      const key = Math.random().toString(36).substring(2, 5) + Date.now()
       const notifEntry = {...notif, key} // Add key to notif object
 
       if (this.activeNotifs.length < this.maxActiveNotifs) this.fireNotif(notifEntry)
@@ -191,7 +226,7 @@ export default {
     },
     fireNotif(queuedNotif) {
       // Add notification to activeNotifs and also queue its removal
-      let timer = setTimeout(()=>{
+      const timer = setTimeout(() => {
         this.clearNotif(queuedNotif.key)
       }, this.notifDuration)
       this.activeNotifs.push({...queuedNotif, timer}) // Add timer to notif object
@@ -199,7 +234,7 @@ export default {
     clearNotif(key) {
       // Remove notification with key `key` from activeNotifs
       // If there are more notifications in the queue, process the queue.
-      let notif = this.activeNotifs.findIndex(notif => notif.key == key)
+      const notif = this.activeNotifs.findIndex(notif => notif.key == key)
       if (notif > -1) {
         clearTimeout(this.activeNotifs[notif].timer)
         this.activeNotifs.splice(notif, 1)
