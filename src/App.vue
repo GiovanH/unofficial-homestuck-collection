@@ -390,6 +390,15 @@
         line-height: inherit;
       }
     }
+    &[href^="https://web.archive.org/web/"] {
+      &::after{
+        @extend %fa-icon;
+        @extend .fas;
+        content: fa-content($fa-var-calendar) !important;
+        margin: 0 1px 0 2px;
+        line-height: inherit;
+      }
+    }
     &[href$=".jpg"],&[href$=".png"],&[href$=".gif"],&[href$=".swf"],&[href$=".txt"],&[href$=".mp3"],&[href$=".wav"],&[href$=".mp4"],&[href$=".webm"]{
       &::after{
         @extend %fa-icon;
