@@ -3,7 +3,7 @@
     <div class="nextArrow" v-if="nextPages.length > 0">
       <div v-for="page in nextPages" :key="page.pageId">
         <p v-if="('pageId' in page && 'title' in page)">
-          &gt; <a :href="$resolvePath(`${mspaBase}/${page.pageId}`)" class="nextArrowLink" v-html="commandText(page)" />
+          &gt; <a :href="$resolvePath(`${mspaBase}/${page.pageId}`)" class="nextArrowLink" v-html="commandText(page)" @click="$updateNewReader(page.pageId)" />
         </p>
       </div>
     </div>
