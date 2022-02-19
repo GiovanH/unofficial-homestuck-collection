@@ -25,6 +25,10 @@ const routes = [
     props: true
   },
   {
+    path: '/search/:query',
+    props: true
+  },
+  {
     path: '/credits/:mode',
     props: true,
     children: [

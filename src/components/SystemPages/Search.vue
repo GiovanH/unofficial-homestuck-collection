@@ -6,14 +6,19 @@
         <div class="search">
           <h1>Search:</h1>
           <div class="searchBox">
-            <input class="searchInput" type="text" spellcheck="false" @keydown.enter="search()" v-model="inputText" />
-            <button class="searchButton" @click="search()"><fa-icon icon="search"></fa-icon></button>
+            <input ref="input" class="searchInput" type="text" spellcheck="false" @keydown.enter="query = inputText" v-model="inputText" />
+            <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
           </div>
           <div class="results">
-            <div v-if="!freshStart && results.length < 1" class="result noResult"> 
+            <div v-if="freshStart"><p>First search may take a few seconds!</p></div>
+            <div v-else-if="results.length < 1" class="result noResult">
               <h2>No results found.</h2>
             </div>
-            <div v-if="freshStart"><p>First search may take a few seconds!</p></div>
+            <div class="result" v-else>
+              <p>Searching for "{{lastSearch.input}}" sorting by date {{lastSearch.sort}}</p>
+              <!--  in {{lastSearch.filter}} -->
+              <h2>{{results.length == 1000 ? '999+' : results.length}} results.</h2>
+            </div>
             <div v-for="(page, i) in results" :key="page.key" class="result">
               <h2>
                 <StoryPageLink titleOnly :mspaId='page.mspa_num'></StoryPageLink>
@@ -54,125 +59,31 @@ export default {
       results: [],
       freshStart: true,
       inputText: '',
-      query: '',
-      chapters: {
-        "JB": [0],
-        "BQ": [1],
-
-        "PS":   [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
-        "PS1":  [2],
-        "PS2":  [3],
-        "PS3":  [4],
-        "PS4":  [5],
-        "PS5":  [7],
-        "PS7":  [8],
-        "PS8":  [9],
-        "PS9":  [10],
-        "PS10": [11],
-        "PS11": [12],
-        "PS12": [13],
-        "PS13": [14],
-        "PS14": [15],
-        "PS15": [16],
-        "PS16": [17],
-        "PS17": [18],
-        "PS18": [19],
-        "PS19": [20],
-        "PS20": [21],
-        "PS21": [22],
-        "PS22": [23],
-        "PSE":  [24],
-
-        "BETA": [99],
-
-        "HS": [100, 200, 300, 350, 400, 510, 520, 530, 550, 610, 615, 620, 630, 635, 640, 645, 651, 652, 653, 655, 700, 710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760, 800],
-        "SIDE1": [100, 200, 300, 350, 400, 510, 520, 530, 550],
-        "PART1": [100, 200, 300, 350, 400],
-        "A1": [100],
-        "A2": [200],
-        "A3": [300],
-        "I":  [350],
-        "I1": [350],
-        "A4": [400],
-        "PART2": [510, 520, 530, 550],
-        "A5": [510, 520, 530],
-        "A5A1": [510],
-        "A5A2": [520, 530],
-        "A5O": [530],
-        "I2": [550],
-        "SIDE2": [610, 615, 620, 630, 635, 640, 645, 651, 652, 653, 655, 700, 710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760, 800],
-        "A6": [610, 615, 620, 630, 635, 640, 645, 651, 652, 653, 655, 700, 710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760],
-        "PART3": [610, 615, 620, 630, 635, 640, 645, 651, 652, 653, 655],
-        "A6A1": [610],
-        "A6I1": [615],
-        "A6A2": [620],
-        "A6I2": [625],
-        "A6A3": [630],
-        "A6I3": [635],
-        "A6A4": [640],
-        "A6I4": [645],
-        "A6A5": [651, 652, 653],
-        "A6A5A1": [651, 653],
-        "A6A5A2": [652],
-        "A6A5A1X2": [653],
-        "A6A5X2": [653],
-        "A6I5": [655, 656, 657, 658, 659, 660, 661, 662],
-        "A6I5I1": [656],
-        "A6I5I2": [657],
-        "A6I5IF": [658],
-        "A6I5I3": [659],
-        "A6I5I4": [660],
-        "A6I5I5": [661],
-        "A6I5I6": [662],
-        "PART4": [710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760],
-        "A6A6": [710, 715, 720, 725, 730, 735, 740, 745, 750, 755, 760],
-        "A6A6A1": [710],
-        "A6A6I1": [715],
-        "A6A6A2": [720],
-        "A6A6I2": [725],
-        "A6A6A3": [730],
-        "A6A6I3": [735],
-        "A6A6A4": [740],
-        "A6A6I4": [745],
-        "A6A6A5": [750],
-        "A6A6I5": [755],
-        "A6A6A6": [760],
-        "A7": [800]
-      }
+      lastSearch: {}
     }
   },
   computed: {
+    query: {
+      get() {
+        return decodeURIComponent(this.routeParams.query) || ''
+      },
+      set(newQuery) {
+        this.$root.app.$pushURL(`/search/${encodeURIComponent(newQuery)}`)
+      }
+    }
   },
   mounted(){
-    // Fire a search request to populate the index
-    // ipcRenderer.invoke('search') 
+    if (this.query) {
+      this.inputText = this.query
+      this.search()
+    }
   },
   methods: {
     invokeSearch(params){
       return ipcRenderer.invoke('search', params)
     },
     async search() {
-      let input = this.inputText
-
-      let sort = 'rel'
-      let filter = []
-
-      const tags = input.match(/(sort|order|in):\w*/gi) || []
-      for (let i = 0; i < tags.length; i++) {
-        const [setting, value] = tags[i].toUpperCase().split(':')
-        input = input.replace(tags[i], '')
-
-        if (setting == 'SORT' || setting == 'ORDER') {
-          if (value == 'ASC' || value == 'ASCENDING') sort = 'asc'
-          if (value == 'DESC' || value == 'DESCENDING') sort = 'desc'
-        } else if (setting == 'IN') {
-          // TODO: Now that chapters are strings, rewrite this
-          if (value in this.chapters) filter = filter.concat(this.chapters[value])
-        }
-      }
-      filter = [...new Set(filter)] // remove duplicates
-
-      this.query = input
+      let input = this.query // this.inputText
         .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
         .replace(/</g, "&lt;")
@@ -181,14 +92,44 @@ export default {
         .replace(/=/g, "&#61;")
         .replace(/\[/g, "&#91;")
         .replace(/\]/g, "&#93;")
-      this.invokeSearch({input: this.query, sort, filter}).then(results => {
+
+      let sort = 'rel'
+      let filter = []
+
+      this.$logger.info("Input 1", input)
+      const tags = input.match(/(sort|order|in):\w*/gi) || []
+      for (let i = 0; i < tags.length; i++) {
+        const [setting, value] = tags[i].toUpperCase().split(':')
+        input = input.replace(tags[i], '')
+
+        if (setting == 'SORT' || setting == 'ORDER') {
+          if (value == 'ASC' || value == 'ASCENDING') sort = 'asc'
+          if (value == 'DESC' || value == 'DESCENDING') sort = 'desc'
+        }
+      // else if (setting == 'IN') {
+      //     // TODO: Now that chapters are strings, rewrite this
+      //     if (value in this.chapters) filter = filter.concat(this.chapters[value])
+      //   }
+      }
+      filter = [...new Set(filter)] // remove duplicates
+      input = input.trim()
+
+      this.lastSearch = {input, sort, filter}
+
+      this.$logger.info({input, sort, filter})
+      this.invokeSearch({input, sort, filter}).then(results => {
         this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
-        // TODO: Trim long pages to only show relevant context in search
-        this.freshStart = false
+          this.freshStart = false
+          this.$nextTick(() => {
+            this.$refs.input.blur()
+            this.$nextTick(() => {
+              this.$refs.input.focus()
+            })
+          })
       })
     },
     htmlEscape(str) {
-      const queries = this.query
+      const queries = this.lastSearch.input
         .split(/[^\w&#;]/g)
         .filter(word => word.length > 1)
         .map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -197,6 +138,14 @@ export default {
       if (!queries) return str
       return str
         .replace(new RegExp(`(${queries})`, 'gi'), `<span class="match">$1</span>`)
+    }
+  },
+  watch: {
+    query(to, from){
+      if (to) {
+        this.inputText = to
+        this.search()
+      }
     }
   }
 }
