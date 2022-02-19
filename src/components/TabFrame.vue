@@ -241,7 +241,7 @@ export default {
                     ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(page_num)
+                        this.$updateNewReader(page_num)
                         
                         const flag = this.$archive.mspa.story[page_num].flag
                         

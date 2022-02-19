@@ -322,6 +322,9 @@ Vue.mixin({
       }
     },
     $updateNewReader(thisPageId, forceOverride = false) {
+      if (!this.$isNewReader && !forceOverride)
+        return // don't reset non-new reader back to new-reader mode unless explicitly forced
+
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
       const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
