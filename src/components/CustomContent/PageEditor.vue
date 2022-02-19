@@ -104,7 +104,7 @@ export default {
   ],
   components: {LivePage, StoryPageLink, PageFooter},
   theme: function(ctx) {
-    const theme = ctx.$refs.page ? ctx.$refs.page.livePage.theme : 'default'
+    const theme = ctx.$refs.page && ctx.$refs.page.livePage ? ctx.$refs.page.livePage.theme : 'default'
     ctx.$logger.info("Editor current theme is ", theme)
     return theme
   },
