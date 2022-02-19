@@ -33,10 +33,16 @@
         <span>
           Load page:
           <input style="width: 6em;" v-model="pginput"
-            @keydown.enter="livePage = $archive.mspa.story[pginput]" />
-          <Button @click="livePage = $archive.mspa.story[pginput]">
+            @keydown.enter="livePage = {...$archive.mspa.story[pginput]}" />
+          <Button @click="livePage = {...$archive.mspa.story[pginput]}">
             <StoryPageLink titleOnly :mspaId='pginput' style="pointer-events: none; color: black;"/>
           </Button>
+        </span>
+        <span>
+          <label>
+            <input type="checkbox" v-model="jsonPatchMode" />
+            Patch mode
+          </label>
         </span>
       </div>
       <div class="page">
@@ -95,7 +101,8 @@ export default {
       scroll: 0,
       pginput: "001904",
       bboxes: undefined,
-      livePage: window.vm.$archive.mspa.story['001904'],
+      jsonPatchMode: false,
+      livePage: {...window.vm.$archive.mspa.story['001904']},
       themes: Settings.data().themes
     }
   },
@@ -115,16 +122,15 @@ export default {
     handleScroll () {
       if (this.scroll != this.tabFrame.$el.scrollTop) {
         this.scroll = this.tabFrame.$el.scrollTop
-        this.$nextTick(() => {
-          setTimeout(this.reloadBboxes(), 100)
-        })
+        // this.$nextTick(() => {
+        //   setTimeout(this.reloadBboxes(), 100)
+        // })
       }
     },
     reloadBboxes(){
     //   setTimeout(this._reloadBboxes(), 100)
     // },
     // _reloadBboxes(){
-      this.$logger.info("reloadBboxes")
       if (!this.$refs.LivePage) {
         this.$logger.warn("Deferring height reload")
         this.$nextTick(() => {
@@ -163,7 +169,19 @@ export default {
       return this.$root.app.$refs[this.tab.key][0]
     },
     jsonDump(){
-      return JSON.stringify(this.livePage, undefined, 2)
+      const pageJson = {...this.livePage}
+      if (!this.jsonPatchMode) {
+        return JSON.stringify(pageJson, undefined, 2)
+      } else {
+        const reference = this.$archive.mspa.story[this.pginput]
+        for (const key in this.livePage) {
+          this.$logger.info(key, pageJson[key], reference[key])
+          if (JSON.stringify(pageJson[key]) == JSON.stringify(reference[key])) {
+            delete pageJson[key]
+          }
+        }
+        return pageJson
+      }
     }
   },
   watch: {
@@ -239,6 +257,7 @@ export default {
     textarea {
       width: 100%;
       max-width: 100%;
+      resize: horizontal;
     }
     textarea, input, pre, select {
       background-color: white;
@@ -268,7 +287,6 @@ export default {
       height: 100%; /* inside a div */
     }
     .textContent textarea {
-      resize: horizontal;
       font-size: 1em;
       line-height: 1.15;
       font-weight: bold;
