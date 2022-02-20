@@ -294,6 +294,8 @@ function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
 
+  list.push("_twoToThree")
+
   if (store.get('localData.settings.unpeachy'))
     list.push("_unpeachy")
   if (store.get('localData.settings.pxsTavros'))
