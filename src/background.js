@@ -241,16 +241,6 @@ function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  // We pre-build this here so mods have access to it
-  // TODO: This is unused now, remove it
-  data.search = Object.values(data.mspa.story).map(storypage => {
-    return {
-      key: storypage.pageId,
-      chapter: Resources.getChapter(storypage.pageId),
-      content: `${storypage.title}###${storypage.content}`
-    }
-  })
-
   win.webContents.send('SET_LOAD_STAGE', "MODS")
   logger.info("Loading mods")
 
