@@ -416,7 +416,7 @@ function getModJs(mod_dir, options={}) {
 
     let is_singlefile = false
     if (mod_dir.endsWith(".js")) {
-      logger.debug(mod_dir, "is explicit singlefile.")
+      // logger.debug(mod_dir, "is explicit singlefile.")
       is_singlefile = true
       modjs_name = mod_dir
       modjs_path = path.join(thisModsDir, mod_dir)
@@ -426,13 +426,13 @@ function getModJs(mod_dir, options={}) {
         const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
         if (!is_directory) throw new Error("Not a directory")
 
-        logger.debug(mod_dir, "confirmed as directory.")
+        // logger.debug(mod_dir, "confirmed as directory.")
         is_singlefile = false
         modjs_name = path.join(mod_dir, "mod.js")
         modjs_path = path.join(thisModsDir, modjs_name)
       } catch (e) {
         // Mod isn't an explicit singlefile or a directory
-        logger.debug(mod_dir, "must be singlefile.")
+        // logger.debug(mod_dir, "must be singlefile.")
         is_singlefile = true
         modjs_name = mod_dir + ".js"
         modjs_path = path.join(thisModsDir, modjs_name)
@@ -445,10 +445,10 @@ function getModJs(mod_dir, options={}) {
     // } else {
     /* eslint-disable no-undef */
     if (__non_webpack_require__.cache[modjs_path]) {
-      logger.info("Removing cached version", modjs_path)
+      // logger.info("Removing cached version", modjs_path)
       delete __non_webpack_require__.cache[modjs_path]
     } else {
-      logger.info(modjs_name, modjs_path, "not in cache")
+      // logger.info(modjs_name, modjs_path, "not in cache")
       Object.keys(__non_webpack_require__.cache)
         .filter(cachepath => cachepath.endsWith(modjs_name))
         .forEach(cachepath => {
