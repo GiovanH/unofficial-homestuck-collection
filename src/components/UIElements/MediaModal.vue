@@ -6,7 +6,7 @@
           <MediaEmbed :url="url" ref="media" webarchive="true" @blockedevent="onBlockedEvent"/>
         </div>
         <div class="modalLinks">
-          <span v-text="splitPath[0]" @click.prevent="openItemInFolder" /> - <span v-text="splitPath[1].replace(/%20/g, ' ')" @click.prevent="openItem" />
+          <span v-text="splitPath[0]" @click.prevent="openItemInFolder" /> - <span v-text="splitPath[1]" @click.prevent="openItem" />
         </div>
         <FlashCredit :pageId="this.contentId"/>
       </div>
@@ -34,8 +34,13 @@ export default {
   },
   computed: {
     splitPath() {
+      const filteredUrl = this.url
+        .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:[0-9]+/, '')
+        .replace(/^assets:\/\//, '')
+      const filePath = filteredUrl.slice(0, filteredUrl.lastIndexOf('/'))
+      const fileName = filteredUrl.slice(filteredUrl.lastIndexOf('/')+1).replace(/%20/g, ' ')
       // Returns folder that the file is stored in, and the filename itself
-      return [this.url.slice(0, this.url.lastIndexOf('/')), this.url.slice(this.url.lastIndexOf('/')+1)]
+      return [filePath, fileName]
     },
     contentId() {
       return this.$getResourceURL(this.url)
