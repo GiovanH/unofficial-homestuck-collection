@@ -122,31 +122,30 @@
 
       <div v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
         <div class="loadcard" >
-<svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg">
-  <!-- <circle cx="260" cy="260" r="2" fill="red"/> -->
-  <g > <!-- transform="translate(50 405)'"> -->
-    <g v-for="tf, gi in ['translate(285 405)', 'translate(235 405) scale(-1 1)']" :key="`g${gi}`" :transform="tf" 
-      fill="none" stroke="#38f43d" stroke-linecap="round" stroke-linejoin="round" stroke-width="8.0">
-      <!-- <circle cx="0" cy="0" r="2" fill="red"/> -->
+<svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
+  <g>
+    <!-- <circle cx="0" cy="0" r="3" fill="orange"/> -->
+    <g v-for="cls, gi in ['left', 'right']" :key="`g${gi}`" :class="cls">
+      <!-- <circle cx="0" cy="0" r="2" fill="blue"/> -->
       <path 
       v-for="n in 10"  :key="`g${gi}p${n}`"
       :transform="`rotate(${(n - 1) * (360/10)})`"
-      :d="spiroPos[0]"
+      :d="spiroPos[testindex]"
       >
-      <!-- Each position doubled to hold the keyframe -->
       <animate
         attributeName="d"
         :values="spiroPosDoubled.join('; \n')"
         :keyTimes="Array.from(spiroPosDoubled, (_, i) => (i/(spiroPosDoubled.length - 1)).toFixed(2)).join(';')"
         dur="4s" begin="0s" repeatCount="indefinite" />
-
-      <!-- '; '.join(map(lambda n: f"{(n/15):.02}", range(16))) -->
       </path>
     </g>
   </g>
+    <!-- <circle cx="0" cy="0" r="4" fill="red"/> -->
 </svg>
           <p v-text="loadText"></p>
         </div>
+<!--         <select v-model="testindex"><option v-for="v, i in spiroPos" :key="i" :value="i" v-text="i" /></select>
+        <textarea v-model="spiroPos[testindex]" style="width: 100%; height: 80px" /> -->
       </div>
 
       <div class="card" v-else>
@@ -219,6 +218,7 @@ export default {
     return {
       newReaderCardIndex: 0,
       lastNewReaderCard: 4,
+      testindex: 0,
       newReaderCardNames: [
         "Intro",
         "Content Warnings",
@@ -279,13 +279,21 @@ export default {
         "PATCHES": "Applying spackle"
       },
       spiroPos: [
-        "M0.0     -61.3   Q-10.85  -10.45  -74.5   -1.35   -138.15 -7.8    -181.15 -45.15  -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3 ",
-        "M-6.5    -81.8   Q-20.9   -10.45  -84.5   -1.35   -148.1  -7.8    -186.1  -45.15  -224.1  -98.05  -206.4  -156.1  -188.7  -214.1  -203.4  -269.3 ",
+        // 0
+        "M3     -61.3   Q-10.85  -10.45  -74.5   -1.35   -138.15 -7.8    -181.15 -45.15  -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3 ",
+        // 1
+        "M-3    -81.8   Q-20.9   -10.45  -84.5   -1.35   -148.1  -7.8    -186.1  -45.15  -224.1  -98.05  -206.4  -156.1  -188.7  -214.1  -203.4  -275 ",
+        // 2
         "M-25.5   -140.3  Q-63.3   -95.15  -103.9  -78.9   -144.45 -62.65  -181.9  -84.3   -219.35 -105.9  -218.65 -160.0  -217.9  -214.1  -184.95 -258.3 ",
+        // 3
         "M-14.0   -102.8  Q-64.65  -101.15 -107.4  -66.9   -150.1  -32.65  -184.75 -69.3   -219.35 -105.9  -218.65 -160.0  -217.9  -214.1  -184.95 -258.3 ",
-        "M-2.5    -53.8   Q-9.8    -6.3    -67.5   -1.3    -125.2  -8.95   -120.8  -53.7   -116.4  -116.35 -166.0  -165.25 -215.6  -214.15 -180.45 -253.3 ",
-        "M-8.0    -88.3   Q-9.8    -6.3    -72.15  -2.85   -134.45 -12.0   -172.5  -21.9   -210.5  -55.75  -210.9  -123.3  -211.25 -190.8  -160.45 -239.8 ",
-        "M-50.5   -217.3  Q-41.4   -52.9   -99.0   -35.35  -156.6  -17.75  -190.35 -57.9   -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -165.95 -244.3 ",
+        // 4
+        "M5    -53.8   Q-9.8    -6.3    -67.5   -1.3    -125.2  -8.95   -120.8  -53.7   -116.4  -116.35 -166.0  -165.25 -215.6  -214.15 -180.45 -260 ",
+        // 5
+        "M-6.0    -88.3   Q-9.8    -6.3    -72.15  -2.85   -134.45 -12.0   -172.5  -21.9   -210.5  -55.75  -210.9  -123.3  -211.25 -190.8  -160.45 -242 ",
+        // 6
+        "M-47.5   -217.3  Q-41.4   -52.9   -99.0   -35.35  -156.6  -17.75  -190.35 -57.9   -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -165.95 -255 ",
+        // 7
         "M0.0     -61.3   Q-10.85  -10.45  -74.5   -1.35   -138.15 -7.8    -181.15 -45.15  -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3 "
       ]
     }
@@ -633,117 +641,40 @@ export default {
     animation-duration: 8000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    g:nth-child(2) {
-      display: none;
-      display: inherit;
-    }
-    g path {
-    transform-origin: -24px -145px;
-      &:nth-child(3),
-      &:nth-child(4),
-      &:nth-child(5),
+    > g {
+    // container
+      transform: translate(0, 145px);
+      > g { // Spirograph half
+        height: 520px;
+        width: 520px;
+        stroke: rgb(56, 244, 61);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8;
+        fill: transparent;
+        &.left { // Left
+          transform: translate(24px, 0);
+          // stroke: orange;
+        }
+        &.right { // Right
+          transform: translate(-24px, 0) scale(-1, 1);
+        }
+        path {
+          transform-origin: -24px -145px;
+          &:nth-child(3),
+          &:nth-child(4),
+          &:nth-child(5),
 
-      &:nth-child(8),
-      &:nth-child(9),
-      &:nth-child(10), { 
-        display: none;
-        display: inherit;
-      }
+          &:nth-child(8),
+          &:nth-child(9),
+          &:nth-child(10), {
+            display: none;
+            display: inherit;
+          }
+        }
+      } // end half
     }
-    g path {
-      &:nth-child(2),
-      &:nth-child(7), { 
-        display: none;
-        display: inherit;
-      }
-    }
-  }
-
-  // adapted from https://loading.io/css/
-  .lds-spinner {
-    $size: 120px;
-    $halfsize: calc(#{$size} / 2);
-
-    color: official;
-    display: block;
-    position: relative;
-    width: $size;
-    height: $size;
-    margin: auto;
-
-    div {
-      transform-origin: $halfsize $halfsize;
-      animation: lds-spinner 1.2s linear infinite;
-
-      &:nth-child(1) {
-        transform: rotate(0deg);
-        animation-delay: -1.1s;
-      }
-      &:nth-child(2) {
-        transform: rotate(30deg);
-        animation-delay: -1s;
-      }
-      &:nth-child(3) {
-        transform: rotate(60deg);
-        animation-delay: -0.9s;
-      }
-      &:nth-child(4) {
-        transform: rotate(90deg);
-        animation-delay: -0.8s;
-      }
-      &:nth-child(5) {
-        transform: rotate(120deg);
-        animation-delay: -0.7s;
-      }
-      &:nth-child(6) {
-        transform: rotate(150deg);
-        animation-delay: -0.6s;
-      }
-      &:nth-child(7) {
-        transform: rotate(180deg);
-        animation-delay: -0.5s;
-      }
-      &:nth-child(8) {
-        transform: rotate(210deg);
-        animation-delay: -0.4s;
-      }
-      &:nth-child(9) {
-        transform: rotate(240deg);
-        animation-delay: -0.3s;
-      }
-      &:nth-child(10) {
-        transform: rotate(270deg);
-        animation-delay: -0.2s;
-      }
-      &:nth-child(11) {
-        transform: rotate(300deg);
-        animation-delay: -0.1s;
-      }
-      &:nth-child(12) {
-        transform: rotate(330deg);
-        animation-delay: 0s;
-      }
-    }
-    div:after {
-      content: " ";
-      display: block;
-      position: absolute;
-      top: 3px;
-      left: calc(#{$size} / 2 - 3px);
-      width: 6px;
-      height: calc(#{$size} / 4 - 2px);
-      border-radius: 20%;
-      background: #fff;
-    }
-  }
-  @keyframes lds-spinner {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
+  } // end svg
 }
 
 </style>
