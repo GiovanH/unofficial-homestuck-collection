@@ -699,12 +699,18 @@ ipcMain.handle('search', async (event, payload) => {
 
   const foundText = []
   for (const page of results) {
-    const flex = new FlexSearch()
-    const page_lines = page.content.split('<br />')
+    const intraPageSearch = new FlexSearch()
+    const page_lines = page.content.split('<br />').map(line => {
+      if (line.length > 160) {
+        return line.split(/(?<=\. )/) // non-consuming split
+      } else {
+        return [line]
+      }
+    }).flat()
     for (let i = 0; i < page_lines.length; i++) {
-      flex.add(i, page_lines[i])
+      intraPageSearch.add(i, page_lines[i])
     }
-    const indexes = flex.search(payload.input)
+    const indexes = intraPageSearch.search(payload.input)
     indexes.push(0) // always include first line
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
