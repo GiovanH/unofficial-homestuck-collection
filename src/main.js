@@ -144,7 +144,7 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
-      return Resources.resolvePath(url, this.$localData.assetDir)
+      return Resources.toFilePath(url, this.$localData.assetDir)
     },
     $getStory(pageNumber){
       pageNumber = parseInt(pageNumber) || pageNumber

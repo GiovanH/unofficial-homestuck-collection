@@ -40,7 +40,8 @@ function fileIsAsset(url) {
 
 // NOT PURE
 function resolveURL(url) {
-  // The main logic
+  // The main logic. Takes an input url (that may be from old data) and
+  // resolves it to... whatever url is appropriate. Resolves the assets protocol.
   let resource_url = getResourceURL(url)
   // logger.debug("Got resource URL", resource_url)
 
@@ -55,7 +56,7 @@ function resolveURL(url) {
 }
 
 // Pure(?)
-function resolvePath(url, root_dir) {
+function toFilePath(url, root_dir) {
   // Like resolveURL, but returns an os-path and not a file URL
   let resource_path = getResourceURL(url)
 
@@ -939,7 +940,7 @@ module.exports = {
   },
   UrlFilterMixin,
   resolveURL,
-  resolvePath,
+  toFilePath,
   getResourceURL,
   getChapter,
   resolveAssetsProtocol,
