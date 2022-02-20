@@ -48,7 +48,7 @@ var Color = require('ts-color-class')
 
 export default {
     name: 'pageText',
-    props: ['pageId', 'content', 'forcetheme'],
+    props: ['pageId', 'content', 'forcetheme', 'startopen'],
     data() {
         return {
             usePurpleLinks: false,
@@ -218,7 +218,7 @@ export default {
         },
     },
     mounted() {
-        if (this.$localData.settings.openLogs) {
+        if (this.$localData.settings.openLogs || this.startopen) {
             // Manual exception for pre-ministrife fakeout
             this.logHidden = this.pageId == '007326' 
         }

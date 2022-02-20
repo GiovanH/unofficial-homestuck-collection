@@ -616,7 +616,7 @@ function buildChapterIndex(){
       key: page_num,
       mspa_num: page_num,
       chapter: Resources.getChapter(page_num),
-      content: `${page.title}<br />${page.content}`
+      content: page.content
     }
   })
 
@@ -665,18 +665,32 @@ ipcMain.handle('search', async (event, payload) => {
 
   let filteredIndex
   if (payload.filter[0]) {
-    const items = chapterIndex.where(function(item) {
-      return payload.filter.includes(item.chapter)
-    })
-    limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({
-      doc: {
-        id: 'key', 
-        field: ['mspa_num', 'content']
-      }
-    }).add(items)
+    // Filter currently non-functional
+
+    // const items = chapterIndex.where(function(item) {
+    //   return payload.filter.includes(item.chapter)
+    // })
+    // limit = items.length < 1000 ? items.length : 1000
+    // filteredIndex = new FlexSearch({
+    //   doc: {
+    //     id: 'key',
+    //     field: ['mspa_num', 'content']
+    //   }
+  // }).add(items)
   } else {
     filteredIndex = chapterIndex
+  }
+
+  function separateNonConsecutive(array, delimiter) {
+    let next_v = array[0]
+    let newarray = []
+    for (const i in array) {
+      const v = array[i]
+      if (v != next_v) newarray.push(delimiter)
+      newarray.push(v)
+      next_v = v + 1
+    }
+    return newarray
   }
 
   const results = (payload.sort == 'asc' || payload.sort == 'desc') 
@@ -691,6 +705,7 @@ ipcMain.handle('search', async (event, payload) => {
       flex.add(i, page_lines[i])
     }
     const indexes = flex.search(payload.input)
+    indexes.push(0) // always include first line
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
         const spread = 2;
@@ -700,7 +715,9 @@ ipcMain.handle('search', async (event, payload) => {
         return acc
       }, new Set())
     ).sort()
-    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
+
+    const matching_lines = separateNonConsecutive(spread_indexes.filter(i => page_lines[i]), "...")
+      .map(i => i == '...' ? i : page_lines[i])
 
     if (matching_lines.length > 0){
       foundText.push({

@@ -9,13 +9,13 @@
             <input ref="input" class="searchInput" type="text" spellcheck="false" @keydown.enter="query = inputText" v-model="inputText" />
             <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
           </div>
-          <div class="results">
+          <div class="results" ref="markup">
             <div v-if="freshStart"><p>First search may take a few seconds!</p></div>
             <div v-else-if="results.length < 1" class="result noResult">
               <h2>No results found.</h2>
             </div>
             <div class="result" v-else>
-              <p>Searching for "{{lastSearch.input}}" sorting by date {{lastSearch.sort}}</p>
+              <p>Searching for "<span v-text="lastSearch.input" />" sorting by <span v-text="sortDictionary[lastSearch.sort] || lastSearch.sort" /></p>
               <!--  in {{lastSearch.filter}} -->
               <h2>{{results.length == 1000 ? '999+' : results.length}} results.</h2>
             </div>
@@ -25,7 +25,8 @@
               </h2>
               <div class="chapter" v-html="`${$getChapter(page.mspa_num)} - ${$mspaOrVizNumber(page.mspa_num)}`" />
               <div class="match">
-                <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="htmlEscape(line)" class="line" />
+                <!-- <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="line" class="line" /> -->
+                <PageText startopen="true" :content="page.lines.join('<br />')" />
               </div>
             </div>
           </div>
@@ -40,10 +41,12 @@
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import PageText from '@/components/Page/PageText.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 // import FlexSearch from 'flexsearch'
 const { ipcRenderer } = require('electron')
+const Mark = require('../../../node_modules/mark.js/dist/mark.js')
 
 export default {
   name: 'search',
@@ -51,7 +54,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageFooter, StoryPageLink
+    NavBanner, PageFooter, StoryPageLink, PageText
   },
   title: () => "Search",
   data: function() {
@@ -59,13 +62,27 @@ export default {
       results: [],
       freshStart: true,
       inputText: '',
-      lastSearch: {}
+      lastSearch: {},
+      mark: undefined,
+      sortDictionary: {
+        "rel": "relevance",
+        "asc": "date, ascending",
+        "desc": "date, descending"
+      },
+      markOpts: {
+        "separateWordSearch": true,
+        "diacritics": true,
+        "ignoreJoiners": true,
+        "acrossElements": true,
+        "iframes": true,
+        "className": 'highlight'
+      }
     }
   },
   computed: {
     query: {
       get() {
-        return decodeURIComponent(this.routeParams.query) || ''
+        return this.routeParams.query ? decodeURIComponent(this.routeParams.query) || '' : ''
       },
       set(newQuery) {
         this.$root.app.$pushURL(`/search/${encodeURIComponent(newQuery)}`)
@@ -73,6 +90,11 @@ export default {
     }
   },
   mounted(){
+    this.$nextTick(() => {
+      console.log(this.$refs)
+      console.assert(this.$refs.markup)
+      this.mark = new Mark(this.$refs.markup)
+    })
     if (this.query) {
       this.inputText = this.query
       this.search()
@@ -119,25 +141,18 @@ export default {
       this.$logger.info({input, sort, filter})
       this.invokeSearch({input, sort, filter}).then(results => {
         this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
-          this.freshStart = false
-          this.$nextTick(() => {
-            this.$refs.input.blur()
-            this.$nextTick(() => {
-              this.$refs.input.focus()
-            })
-          })
+        this.onSearchDone()
       })
     },
-    htmlEscape(str) {
-      const queries = this.lastSearch.input
-        .split(/[^\w&#;]/g)
-        .filter(word => word.length > 1)
-        .map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-        .join('|')
-      
-      if (!queries) return str
-      return str
-        .replace(new RegExp(`(${queries})`, 'gi'), `<span class="match">$1</span>`)
+    onSearchDone(){
+      this.freshStart = false
+      this.$nextTick(() => {
+        this.$refs.input.blur()
+        this.$nextTick(() => {
+          this.$refs.input.focus()
+          this.mark.unmark().mark(this.lastSearch.input, this.markOpts)
+        })
+      })
     }
   },
   watch: {
@@ -180,6 +195,10 @@ export default {
     display: flex;
     justify-content: center;
 
+    ::v-deep a:not([disabled]) {
+      color: var(--page-links);
+    }
+
     .pageContent {
       background: var(--page-pageContent);
 
@@ -196,6 +215,11 @@ export default {
       
       a {
         color: var(--page-links);
+      }
+
+      ::v-deep .highlight {
+        background: var(--find--highlight);
+        color: var(--font-highlight, var(--font-default));
       }
 
       .searchBox {
@@ -243,7 +267,7 @@ export default {
             // font-weight: normal;
           }
 
-          .match {
+          ::v-deep .match {
             padding-top: 10px;
 
             &:before {
@@ -253,13 +277,6 @@ export default {
               display: block;
               width: 400px;
               content: '';
-            }
-          }
-
-          .line {
-            ::v-deep .match {
-              background: var(--find--highlight);
-              color: var(--font-highlight, var(--font-default));
             }
           }
         }
