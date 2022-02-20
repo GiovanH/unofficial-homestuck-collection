@@ -91,16 +91,16 @@ export default {
           cb() { shell.showItemInFolder(this.$mspaFileStream(this.target.src)) }
         },
         {
-          title: "Copy local path",
-          cb() { clipboard.writeText(this.$mspaFileStream(this.target.src)) }
-        }, 
+          title: "Save Image",
+          cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
+        },
         {
-          title: "Copy Static Image",
+          title: "Copy Image",
           cb() { ipcRenderer.invoke('copy-image', {url: this.$mspaFileStream(this.target.src)}) }
         },
         {
-          title: "Save Image",
-          cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
+          title: "Copy Image Path",
+          cb() { clipboard.writeText(this.$mspaFileStream(this.target.src)) }
         }
       ],
       actionsLink: [],
