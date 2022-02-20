@@ -377,6 +377,7 @@ export default {
   props: [
     'tab', 'routeParams'
   ],
+  /* eslint-disable object-property-newline */
   components: {
     NavBanner, SubSettingsModal, 
     PageText, SpoilerBox, StoryPageLink, 
