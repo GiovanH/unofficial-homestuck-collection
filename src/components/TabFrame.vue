@@ -231,15 +231,17 @@ export default {
                     //     page_num = this.$vizToMspa(this.routeParams.base, page_num).p
                     // }
 
+                    const isTzPassword = (this.$archive.tweaks.tzPasswordPages.includes(page_num))
+                    
                     if (!(page_num && story_id)) component = 'Error404'
-                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (this.$pageIsSpoiler(page_num, true) && !isTzPassword) component = 'Spoiler'
                     else if (
                         (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
                         (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))
                     ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(page_num)
+                        this.$updateNewReader(page_num)
                         
                         const flag = this.$archive.mspa.story[page_num].flag
                         
