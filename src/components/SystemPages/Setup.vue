@@ -227,7 +227,7 @@ export default {
         "Getting Started"
       ],
       newReaderToggle: true,
-      timeout: false,
+      loadingTooLongTimeout: false,
       assetDir: undefined,
       isExpectedAssetVersion: undefined,
       selectedAssetVersion: undefined,
@@ -339,7 +339,7 @@ export default {
   },
   mounted() {
     setTimeout(function() {
-      this.timeout = true
+      this.loadingTooLongTimeout = true
     }.bind(this), 8000)
   },
   methods: {
@@ -373,7 +373,7 @@ export default {
       this.$localData.settings["modListEnabled"] = []
       this.$localData.VM.saveLocalStorage()
 
-      this.timeout = false
+      this.loadingTooLongTimeout = false
 
       this.modSoftRestart()
     },
