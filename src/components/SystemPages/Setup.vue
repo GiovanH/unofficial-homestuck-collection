@@ -121,12 +121,16 @@
       </div>
 
       <div class="loadcard" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
-        <div class="lds-spinner">
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
+        <div class="sburbSpirograph">
+          <div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div><div>
+            <div><div><div><div><div><div><div><div><div><div><div></div></div></div></div></div></div></div></div>
+            </div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>
+          </div></div></div></div></div></div></div>
         </div>
-        <p v-text="loadText"></p>
+        <div class="loadText">
+          <p v-text="loadText"></p>
+          <p v-text="sburbLoadText"></p>
+        </div>
         <!-- Preloader -->
         <!-- <Logo class="hidden"/> -->
       </div>
@@ -259,7 +263,242 @@ export default {
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
         "PATCHES": "Applying spackle"
-      }
+      },
+      sburbLoadText: "Awaiting reactivity",
+      sburbStages: [
+        "Transforming Soffits",
+        "Reorganizing Keys",
+        "Formalizing Immersion Joints",
+        "Justifying Kick Extractors",
+        "Advising Aggregates",
+        "Managing Elbows",
+        "Recasting Connectors",
+        "Achieving Aluminum Trowels",
+        "Officiating Disks",
+        "Exhibiting Absolute Spigots",
+        "Progressing Coil Hydrants",
+        "Jerry-building Reflectors",
+        "Informing Casters",
+        "Inventing Rubber Hoists",
+        "Performing Wrenches",
+        "Judging Chalk Adapters",
+        "Upgrading Ignition Paths",
+        "Regrowing Flashing",
+        "Recommending Ratchets",
+        "Approving Barriers",
+        "Sweeping Impact Fillers",
+        "Sewing Mirrors",
+        "Detailing Collectors",
+        "Enforcing Measures",
+        "Distributing Systems",
+        "Presenting Plugs",
+        "Interwinding Registers",
+        "Piloting Ash Diffusers",
+        "Gathering Cranks",
+        "Supplying Eave Pockets",
+        "Undertaking Scroll Stops",
+        "Accelerating Straps",
+        "Designing Fittings",
+        "Protecting Diamond Boilers",
+        "Logging Downspouts",
+        "Correlating Shingles",
+        "Uniting Mallets",
+        "Qualifying Electrostatic Lifts",
+        "Sharing Clamps",
+        "Obtaining Circular Fluids",
+        "Ranking Foundation Gauges",
+        "Sensing Miter Brackets",
+        "Originating Space Networks",
+        "Translating Drills",
+        "Regulating Guards",
+        "Selecting Gable Padding",
+        "Utilizing Pellet Dowels",
+        "Reconciling Artifacts",
+        "Altering Pulleys",
+        "Shedding Space Filters",
+        "Determining Vents",
+        "Representing Mortar",
+        "Remaking Flash Rakers",
+        "Supporting Funnels",
+        "Typecasting Rotary Chocks",
+        "Expressing Junctures",
+        "Resetting Auxiliary Vises",
+        "Professing Strip Treads",
+        "Inlaying Matter Trowels",
+        "Questioning Drivers",
+        "Forming Edge Fittings",
+        "Sketching Blanks",
+        "Overshooting Spark Breakers",
+        "Rewriting Controls",
+        "Playing Tunnels",
+        "Inventorying Buttons",
+        "Enduring Joist Handles",
+        "Effecting Ratchet Bibbs",
+        "Unwinding Couplings",
+        "Forsaking Vapor Conduits",
+        "Defining Sockets",
+        "Calculating Heaters",
+        "Raising Grids",
+        "Administering Tiles",
+        "Measuring Resources",
+        "Installing Ignition Remotes",
+        "Extracting Corners",
+        "Manufacturing Ventilators",
+        "Delegating Consoles",
+        "Treating Mounting Stones",
+        "Enacting Jig Deflectors",
+        "Intensifying Alleys",
+        "Improvising Cargo",
+        "Pinpointing Bobs",
+        "Prescribing Arc Masonry",
+        "Structuring Metal Chucks",
+        "Symbolizing Lathes",
+        "Activating Plumb Kits",
+        "Adapting Coatings",
+        "Fixing Channels",
+        "Expediting Cordage",
+        "Planning Compressors",
+        "Enlisting Hangers",
+        "Restructuring Keyhole Augers",
+        "Shearing Ridge Hardware",
+        "Collecting Reciprocating Bolts",
+        "Maintaining Corrugated Dimmers",
+        "Whetting Hole Collars",
+        "Conducting Mandrels",
+        "Comparing Assets",
+        "Compiling Sealants",
+        "Completing Paths",
+        "Composing Equivocation Wheels",
+        "Computing Dampers",
+        "Conceiving Electrostatic Treatment",
+        "Ordering Cotter Grates",
+        "Organizing Ties",
+        "Orienting Ladders",
+        "Exceeding Materials",
+        "Targeting Thermocouples",
+        "Demonstrating Emery Stock",
+        "Expanding Latch Bases",
+        "Training Wardrobe Adhesives",
+        "Overcomming Fasteners",
+        "Streamlining Storm Anchors",
+        "Navigating Springs",
+        "Perfecting Turnbuckles",
+        "Verifying Gate Pegs",
+        "Arbitrating Arithmetic Lifts",
+        "Negotiating Outlets",
+        "Normalizing Strips",
+        "Building Surface Foggers",
+        "Checking Key Torches",
+        "Knitting Grinders",
+        "Mowing Planers",
+        "Offsetting Stencils",
+        "Acquiring Bulbs",
+        "Adopting Rivets",
+        "Observing Avenues",
+        "Ascertaining Coaxial Grommets",
+        "Slinging Wing Winches",
+        "Instituting Circuit Generators",
+        "Instructing Wicks",
+        "Integrating Pry Shutters",
+        "Interpreting Immersion Lumber",
+        "Clarifying Coils",
+        "Classifying Wood Bits",
+        "Closing Cogs",
+        "Cataloging Matter Strips",
+        "Charting Holders",
+        "Conceptualizing Push Terminals",
+        "Stimulating Supports",
+        "Overthrowing Shaft Spacers",
+        "Quick-freezing Connectors",
+        "Unbinding Ground Hooks",
+        "Analyzing Eyes",
+        "Anticipating Gateways",
+        "Controlling Proposition Rollers",
+        "Converting Power Angles",
+        "Coordinating Staples",
+        "Correcting Benders",
+        "Counseling Joist Gaskets",
+        "Recording Gutter Pipes",
+        "Recruiting Drains",
+        "Rehabilitating Rafter Tubes",
+        "Reinforcing Washers",
+        "Reporting Guard Valves",
+        "Naming Freize Sprues",
+        "Nominating Rings",
+        "Noting Straps",
+        "Doubling Nailers",
+        "Drafting Circuit Hoses",
+        "Dramatizing Flanges",
+        "Splitting Framing Compounds",
+        "Refitting Stems",
+        "Interweaving Patch Unions",
+        "Placing Sillcocks",
+        "Sorting Slot Threads",
+        "Securing Mode Cutters",
+        "Diverting Catharsis Plates",
+        "Procuring Load Thresholds",
+        "Transferring Syllogism Twine",
+        "Directing Switch Nuts",
+        "Referring Time Spools",
+        "Diagnosing Knobs",
+        "Discovering Locks",
+        "Dispensing Hinges",
+        "Displaying Hasps",
+        "Resending Arc Binders",
+        "Retreading Grooves",
+        "Retrofitting Aesthetics Portals",
+        "Seeking Stocks",
+        "Shrinking Wormholes",
+        "Assembling Blocks",
+        "Assessing Divets",
+        "Attaining Lug Boxes",
+        "Auditing Nescience Passages",
+        "Conserving Strikes",
+        "Constructing Braces",
+        "Contracting Saw Catches",
+        "Serving Instantiation Irons",
+        "Recognizing Fluxes",
+        "Consolidating Fuse Calipers",
+        "Mapping Shims",
+        "Reviewing Chop Groovers",
+        "Scheduling Lag Drives",
+        "Simplifying Hoists",
+        "Engineering Levels",
+        "Enhancing Tack Hollows",
+        "Establishing Finishing Blocks",
+        "Estimating Adhesives",
+        "Evaluating Mortar",
+        "Examining Auto Turnbuckles",
+        "Processing Foggers",
+        "Servicing Avenues",
+        "Transcribing Existence Rivets",
+        "Revising Consoles",
+        "Separating Absolute Stencils",
+        "Budgeting Sheet Grommets",
+        "Preparing Kits",
+        "Realigning Cartesian Mandrels",
+        "Painting Fasteners",
+        "Filing Grout Hangers",
+        "Finalizing Atma Augers",
+        "Formulating Couplings",
+        "Identifying Sillcocks",
+        "Imagining Materials",
+        "Inducing Shutters",
+        "Influencing Wheels",
+        "Licensing Chocks",
+        "Lifting Extrinsic Mallets",
+        "Overdrawing Ratchets",
+        "Overlaying Ventilators",
+        "Overriding Cardinal Soffits",
+        "Specifying Element Aggregates",
+        "Systemizing Divets",
+        "Shaping Pockets",
+        "Publicizing Aether Remotes",
+        "Reducing Slot Stops",
+        "Governing Archetype Dimmers",
+        "Monitoring Assets",
+        "Launching Manifestation Systems"
+      ]
     }
   },
   computed: {
@@ -298,10 +537,16 @@ export default {
         this.$modChoices[key]).filter(val => !!val)
     }
   },
+  created() {
+    this.shiftSburbLoadText()
+  },
   mounted() {
     setTimeout(function() {
       this.timeout = true
     }.bind(this), 8000)
+  },
+  destroyed() {
+    this.clearSburbLoadText()
   },
   methods: {
     wizardNextPage(direction){
@@ -351,6 +596,17 @@ export default {
     },
     modSoftRestart() {
       ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+    },
+    shiftSburbLoadText() {
+      const self = this
+      this.sburbLoadInterval = setInterval(function(){
+          self.sburbLoadText = self.sburbStages[Math.floor(Math.random() * self.sburbStages.length)]
+      }, 100)
+    },
+    clearSburbLoadText() {
+      if (this.sburbLoadInterval) {
+        clearInterval(this.sburbLoadInterval)
+      }
     }
   },
   watch: {
@@ -584,91 +840,40 @@ export default {
     font-weight: initial;
     font-size: 16px;
     color: white;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000000;
   }
 
-  // adapted from https://loading.io/css/
-  .lds-spinner {
-    $size: 120px;
-    $halfsize: calc(#{$size} / 2);
-
-    color: official;
-    display: block;
-    position: relative;
-    width: $size;
-    height: $size;
+  .sburbSpirograph {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     margin: auto;
+    width: 400px;
+    height: 233px;
+    border-radius: 100%;
 
     div {
-      transform-origin: $halfsize $halfsize;
-      animation: lds-spinner 1.2s linear infinite;
-
-      &:nth-child(1) {
-        transform: rotate(0deg);
-        animation-delay: -1.1s;
-      }
-      &:nth-child(2) {
-        transform: rotate(30deg);
-        animation-delay: -1s;
-      }
-      &:nth-child(3) {
-        transform: rotate(60deg);
-        animation-delay: -0.9s;
-      }
-      &:nth-child(4) {
-        transform: rotate(90deg);
-        animation-delay: -0.8s;
-      }
-      &:nth-child(5) {
-        transform: rotate(120deg);
-        animation-delay: -0.7s;
-      }
-      &:nth-child(6) {
-        transform: rotate(150deg);
-        animation-delay: -0.6s;
-      }
-      &:nth-child(7) {
-        transform: rotate(180deg);
-        animation-delay: -0.5s;
-      }
-      &:nth-child(8) {
-        transform: rotate(210deg);
-        animation-delay: -0.4s;
-      }
-      &:nth-child(9) {
-        transform: rotate(240deg);
-        animation-delay: -0.3s;
-      }
-      &:nth-child(10) {
-        transform: rotate(270deg);
-        animation-delay: -0.2s;
-      }
-      &:nth-child(11) {
-        transform: rotate(300deg);
-        animation-delay: -0.1s;
-      }
-      &:nth-child(12) {
-        transform: rotate(330deg);
-        animation-delay: 0s;
-      }
-    }
-    div:after {
-      content: " ";
-      display: block;
-      position: absolute;
-      top: 3px;
-      left: calc(#{$size} / 2 - 3px);
-      width: 6px;
-      height: calc(#{$size} / 4 - 2px);
-      border-radius: 20%;
-      background: #fff;
+      transform-style: preserve-3d;
+      height: 100%;
+      width: 100%;
+      border-radius: 100%;
+      box-sizing: border-box;
+      border-bottom: 2px solid transparent;
+      border-top: 2px solid transparent;
+      border-left: 2px solid #00ff00;
+      border-right: 2px solid #00ff00;
+      animation: spin 120s infinite linear;
     }
   }
-  @keyframes lds-spinner {
-    0% {
-      opacity: 1;
+  @keyframes spin {
+    from {
+      transform: rotate(50deg);
     }
-    100% {
-      opacity: 0;
+    to {
+      transform: rotate(410deg);
     }
   }
 }
