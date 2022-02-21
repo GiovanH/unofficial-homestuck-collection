@@ -50,19 +50,20 @@ export default {
   title: PAGE.title,
   data: function() {
     return {
+      ...PAGE.data(),
       inputText: '',
       passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`,
       failText: "&lt;- <b>WRONG!</b> GO B4CK!!!",
       passwords: {
-        // "TESTPASS": '/mspa/6',
-        "HOME": '/mspa/009059',
-        "R3UN1ON": '/mspa/009110',
-        "FR4M3D": '/mspa/009136',
-        "MOM3NT": '/mspa/009151',
-        "MURD3R": '/mspa/009189',
-        "JUST1C3": '/mspa/009205',
-        "HONK": '/mspa/009223',
-        "FL1P": '/mspa/009264'
+        // "TESTPASS": '6',
+        "HOME": '009059',
+        "R3UN1ON": '009110',
+        "FR4M3D": '009136',
+        "MOM3NT": '009151',
+        "MURD3R": '009189',
+        "JUST1C3": '009205',
+        "HONK": '009223',
+        "FL1P": '009264'
       }
     }
   },
@@ -78,10 +79,17 @@ export default {
   },
   methods: {
     submitPassword(){
-      let url = this.passwords[this.inputText.toUpperCase()]
+      const page_num = this.passwords[this.inputText.toUpperCase()]
 
-      if (url){
-        this.$pushURL(url)
+      if (page_num){
+        const prev_real_page = (page_num - 2).pad(6, '0') // haha. javascript
+        if (!this.$pageIsSpoiler(prev_real_page)) {
+          this.$logger.info(`Password ${this.inputText} leads to ${page_num}, and reader is up to ${prev_real_page}. Advancing plot`)
+          this.$updateNewReader(page_num)
+        } else {
+          this.$logger.info(`Password ${this.inputText} leads to ${page_num}, but reader is not up to ${prev_real_page} yet. Still a spoiler.`)
+        }
+        this.$pushURL(`/mspa/${page_num}`)
       } else {
         document.getElementById('passwordFailure').innerHTML = this.failText
       }

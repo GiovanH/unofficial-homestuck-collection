@@ -77,7 +77,7 @@
                 </template>
               </dl>
             </div>
-            <p v-if="modopt.needsreload">Changed settings <b>require</b> a reload to apply.</p>
+            <p v-if="modopt.needsHardReload">Changed settings <b>require</b> a reload to apply.</p>
             <p v-else>Changing some settings may require a reload.</p>
             <div class="buttonbox">
               <button @click="clearAll">Clear All</button>
@@ -153,9 +153,12 @@ export default {
       this.storeKey = undefined
       this.info_only = undefined
 
-      // Don't do this unless we know settings have been changed,
-      // which we don't track yet.
-      // if (this.modopt.needsreload) {
+      if (this.modopt.needsArchiveReload) {
+        this.queueArchiveReload()
+      }
+      // TODO: Track if options have been changed, and hardreload
+      // if a reload is required & options have changed requiring it
+      // if (this.modopt.needsHardReload && settingsHaveChanged) {
       //   ipcRenderer.invoke('reload')
       // }
     },
@@ -166,7 +169,8 @@ export default {
       store.set(this.storeKey, this.buffer)
     },
     clearAll() {
-      store.clear(this.storeKey)
+      this.$logger.info("Clearing mod store key", this.storeKey)
+      store.set(this.storeKey, {})
       this.buffer = store.get(this.storeKey) || {}
     },
     forceReload() {

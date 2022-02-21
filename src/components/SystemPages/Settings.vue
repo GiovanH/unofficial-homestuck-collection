@@ -377,6 +377,7 @@ export default {
   props: [
     'tab', 'routeParams'
   ],
+  /* eslint-disable object-property-newline */
   components: {
     NavBanner, SubSettingsModal, 
     PageText, SpoilerBox, StoryPageLink, 
@@ -390,7 +391,7 @@ export default {
         {
           model: "showAddressBar",
           label: "Show address bar",
-          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access the jump bar by clicking the JUMP button in the navigation banner, and with ctrl+L (or ⌘+L)."
+          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access it by clicking the jump bar button in the tab bar, or with ctrl+L (⌘+L on MacOS)."
         }, {
         //   model: "mspaMode",
         //   label: "Use MSPA page numbers",
@@ -457,6 +458,10 @@ export default {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
           desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
+        }, {
+          model: "useSystemWindowDecorations",
+          label: "Use system window decorations",
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
@@ -703,6 +708,11 @@ export default {
         this.queueArchiveReload()
       }
 
+      if (setting == 'useSystemWindowDecorations') {
+        this.$localData.root.saveLocalStorage()
+        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+      }
+
       // Unforce if theme just changed to auto
       if (setting == 'themeOverride' && this.$localData.settings.themeOverride == "default")
         this.$localData.settings.forceThemeOverride = false
@@ -738,11 +748,11 @@ export default {
       // Calculte needReload
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
-      if (diff.some(key => this.$modChoices[key].needsreload)) {
+      if (diff.some(key => this.$modChoices[key].needsHardReload)) {
         this.$logger.info("List change requires hard reload", diff)
         this.needReload = true
       }
-      if (diff.some(key => this.$modChoices[key].needsreload)) {
+      if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
         this.$logger.info("List change requires archive reload", diff)
         this.queueArchiveReload()
       }
@@ -779,6 +789,7 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
+      this.queueArchiveReload()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
@@ -796,13 +807,17 @@ export default {
       }
     },
     '$localData.tabData.activeTabKey'(to, from) {
-      if (this.needReload) {
-        this.forceReload()
-        // forceReload includes archiveReload
-      } else if (this.debounce) {
-        clearTimeout(this.debounce)
-        this.debounce = false
-        this.archiveReload()
+      if (to == this.tab.key || from == this.tab.key) {
+        // Log settings, for debugging
+        this.$logger.info(this.$localData.settings)
+        if (this.needReload) {
+          this.forceReload()
+          // forceReload includes archiveReload
+        } else if (this.debounce) {
+          clearTimeout(this.debounce)
+          this.debounce = false
+          this.archiveReload()
+        }
       }
     }
   }
@@ -1023,6 +1038,7 @@ export default {
 
     li {
       // TODO Use a background color here from the theme that isn't log-bg
+      color: var(--font-log);
       background-color: var(--page-log-bg);
       // border: 1px solid rgba(0,0,0,.125);
       border: 1px solid var(--page-pageBorder);

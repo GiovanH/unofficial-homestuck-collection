@@ -3,7 +3,7 @@
     <div class="nextArrow" v-if="nextPages.length > 0">
       <div v-for="page in nextPages" :key="page.pageId">
         <p v-if="('pageId' in page && 'title' in page)">
-          &gt; <a :href="$resolvePath(`${mspaBase}/${page.pageId}`)" class="nextArrowLink" v-html="commandText(page)" />
+          &gt; <a :href="$resolvePath(`${mspaBase}/${page.pageId}`)" class="nextArrowLink" v-html="commandText(page)" @click="$updateNewReader(page.pageId)" />
         </p>
       </div>
     </div>
@@ -57,8 +57,8 @@ export default {
     },
     pageIdText() {
       if (!this.thisPage.pageId) return
-      let id = this.thisPage.pageId
-      let story = this.mspaBase // this.thisPage.storyId
+      const id = this.thisPage.pageId
+      const story = this.mspaBase // this.thisPage.storyId
       return this.$resolvePath(`${story}/${id}`)    
     },
     vizLink() {
@@ -91,7 +91,8 @@ export default {
           return this.DateTime.fromSeconds(Number(this.thisPage.timestamp))
             .setZone("America/New_York")
             .toFormat("MM/dd/yyyy, t ZZZZ")
-        } catch {
+        } catch (e) {
+          this.$logger.error(e)
           return "Invalid Date"
         }
       }

@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
@@ -9,6 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -36,6 +37,9 @@ if (!store.get('localData.settings.enableHardwareAcceleration')) {
 } else {
   console.log("Not disabling hardware acceleration")
 }
+
+// Log settings, for debugging
+logger.info(store.get('localData.settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -233,7 +237,12 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
   // We pre-build this here so mods have access to it
+  // TODO: This is unused now, remove it
   data.search = Object.values(data.mspa.story).map(storypage => {
     return {
       key: storypage.pageId,
@@ -413,7 +422,7 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
-if (assetDir) {
+if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
@@ -478,6 +487,15 @@ ipcMain.on('win-close-sync', (e) => {
   e.returnValue = true;
 })
 
+ipcMain.handle('copy-image', async (event, payload) => {
+  logger.info(payload.url)
+  Sharp(payload.url).png().toBuffer().then(buffer => {
+    logger.info(buffer)
+    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+    logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+    clipboard.writeImage(sharpNativeImage)
+  })
+})
 
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {
@@ -706,11 +724,29 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
+const Sharp = require('sharp')
 ipcMain.on('ondragstart', (event, filePath) => {
-  event.sender.startDrag({
-    file: filePath,
-    icon: `${__static}/img/dragSmall.png`
-  })
+  // logger.info("Dragging file", filePath)
+  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+  try {
+    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+    // if (!nativeIconFromPath.isEmpty()) {
+    //   logger.info("Native icon from path", nativeIconFromPath)
+    //   cb(nativeIconFromPath)
+    // } else {
+      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+      .png().toBuffer().then(buffer => {
+        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+        cb(sharpNativeImage)
+      })
+    // }
+  } catch (err) {
+    logger.error("Couldn't process image", err)
+    // eslint-disable-next-line no-undef
+    cb(`${__static}/img/dragSmall.png`)
+  }
 })
 
 let openedWithUrl
@@ -725,8 +761,9 @@ async function createWindow () {
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: false,
+    frame: store.get('localData.settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
@@ -786,14 +823,29 @@ async function createWindow () {
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
       const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      callback({redirectURL})
+      if (details.url == redirectURL) {
+        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+        callback({redirectURL})
+      }
     } else {
       const destination_url = Resources.resolveURL(details.url)
-      if (details.resourceType == "subFrame")
-        win.webContents.send('TABS_PUSH_URL', destination_url)
-      else callback({
-        redirectURL: destination_url
-      })
+      if (details.url == destination_url) {
+        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // Okay
+        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+        if (details.resourceType == "subFrame")
+          win.webContents.send('TABS_PUSH_URL', destination_url)
+        else callback({
+          redirectURL: destination_url
+        })
+      }
     }
   })
 
@@ -845,6 +897,10 @@ async function createWindow () {
         logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
       }
     }
+  })
+
+  ipcMain.on('set-title', (event, new_title) => {
+    win.setTitle(new_title)
   })
 
   // Give mods a reference to the window object so it can reload 

@@ -166,6 +166,17 @@ routes: {
 
 Just reroute the first file's path to another's. (Note that it is possible to use this syntax to create an infinite loop, which the collection will detect and treat as an error.)
 
+The left-hand side of a route *does not need to point to a file that exists in the asset pack.* You can use this behavior to create "pseudo-files" that you can reference from anywhere.
+
+The test mod does this explicitly:
+
+```json
+  routes: {
+    'assets://storyfiles/hs2/05235/toxic1.mp3': './toxic1.mp3',
+    'assets://storyfiles/hs2/01940/cascade.mp3': './cascadebeta.mp3'
+  },
+```
+
 ### Treeroutes
 
 You might have a case where you want to patch a large number of files at once without manually typing in each route pair yourself. While it is entirely legal to programatically generate your own `routes` object, there is a convenience system to handle this for you: **Treeroutes**
@@ -327,8 +338,6 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
 ```js
     footnotes: "./footnotes.json"
 ```
-
-As yet another option, your `footnotes` field can point to a function that *returns* a footnotes object. This is a good way to make programatic changes to your footnotes object that require runtime resources, like the settings store.
 
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 

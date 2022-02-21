@@ -22,7 +22,9 @@ module.exports = {
                     target: "zip"
                 },
                 mac: {
-                    category: "entertainment"
+                    target: ["dmg"],
+                    category: "entertainment",
+                    identity: null
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],

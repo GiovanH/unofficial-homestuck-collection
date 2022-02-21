@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - Program version
  - Asset Pack Version
- - OS: [e.g. iOS]
+ - OS: [Windows/Mac/Linux version X.XX]
 
 **Additional context**
 Add any other context about the problem here.

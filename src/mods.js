@@ -35,9 +35,12 @@ function giveWindow(new_win) {
 let validatedState = false
 function expectWorkingState(){
   if (validatedState) return true
-  validatedState = (assetDir && fs.existsSync(assetDir))
+  validatedState = (assetDir && fs.existsSync(path.join(assetDir, "archive")))
   return validatedState
 }
+
+// ====================================
+// Routing
 
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
@@ -81,12 +84,19 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
+// ====================================
+// Installation and list managment
+
 function extractimods(){
+  if (!expectWorkingState()) {
+    logger.info("Not yet in working state, not extracting imods.")
+    return
+  }
   // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   // eslint-disable-next-line import/no-webpack-loader-syntax
   const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
-  let tar_buffer = Buffer.from(base64, 'base64')
+  const tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")
   const temp_tar_path = path.join(outpath, '_imods.tar')
@@ -284,6 +294,8 @@ function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
 
+  list.push("_twoToThree")
+
   if (store.get('localData.settings.unpeachy'))
     list.push("_unpeachy")
   if (store.get('localData.settings.pxsTavros'))
@@ -362,7 +374,7 @@ function buildApi(mod) {
       clear: () => store.clear(getModStoreKey(mod._id, null))
     }, 
     readFile(asset_path) {
-      let data = readFileSyncLocal(asset_path, "readJson")
+      let data = readFileSyncLocal(asset_path, "readFile")
       return data
     },
     readJson(asset_path) {
@@ -387,7 +399,8 @@ function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
-  let modjs_path
+  let modjs_path // full path to js file
+  let modjs_name // relative path to js file from mods dir
   var mod
 
   try {
@@ -405,8 +418,9 @@ function getModJs(mod_dir, options={}) {
 
     let is_singlefile = false
     if (mod_dir.endsWith(".js")) {
-      logger.debug(mod_dir, "is explicit singlefile.")
+      // logger.debug(mod_dir, "is explicit singlefile.")
       is_singlefile = true
+      modjs_name = mod_dir
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
       // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
@@ -414,14 +428,16 @@ function getModJs(mod_dir, options={}) {
         const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
         if (!is_directory) throw new Error("Not a directory")
 
-        logger.debug(mod_dir, "confirmed as directory.")
+        // logger.debug(mod_dir, "confirmed as directory.")
         is_singlefile = false
-        modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
+        modjs_name = path.join(mod_dir, "mod.js")
+        modjs_path = path.join(thisModsDir, modjs_name)
       } catch (e) {
         // Mod isn't an explicit singlefile or a directory
-        logger.debug(mod_dir, "must be singlefile.")
+        // logger.debug(mod_dir, "must be singlefile.")
         is_singlefile = true
-        modjs_path = path.join(thisModsDir, mod_dir + ".js")
+        modjs_name = mod_dir + ".js"
+        modjs_path = path.join(thisModsDir, modjs_name)
       }
     }
 
@@ -429,10 +445,19 @@ function getModJs(mod_dir, options={}) {
     //   console.log(modjs_path)
     //   mod = require(modjs_path)
     // } else {
-    // eslint-disable-next-line no-undef
-    if (__non_webpack_require__.cache[modjs_path])
-      // eslint-disable-next-line no-undef
+    /* eslint-disable no-undef */
+    if (__non_webpack_require__.cache[modjs_path]) {
+      // logger.info("Removing cached version", modjs_path)
       delete __non_webpack_require__.cache[modjs_path]
+    } else {
+      // logger.info(modjs_name, modjs_path, "not in cache")
+      Object.keys(__non_webpack_require__.cache)
+        .filter(cachepath => cachepath.endsWith(modjs_name))
+        .forEach(cachepath => {
+        logger.info("Removing partial match from cache", cachepath)
+        delete __non_webpack_require__.cache[cachepath]
+      })
+    }
 
     try {
       // eslint-disable-next-line no-undef
@@ -445,7 +470,7 @@ function getModJs(mod_dir, options={}) {
           console.log("Already tried to re-extract imods, refusing to infinite loop")
           throw e
         }
-        if (fs.existsSync(path.join(assetDir, "archive"))) {
+        if (expectWorkingState()) {
           console.log("Couldn't load imod, trying re-extract")
           extractimods()
         } else {
@@ -478,8 +503,12 @@ function getModJs(mod_dir, options={}) {
 
     // Computed properties don't automatically require a reload because
     // the object has been assigned any computed properties by now.
-    mod._needsreload = [
-      'styles', 'vueHooks', 'themes',
+    mod._needsArchiveReload = [
+      'edit', 'mspfa'
+    // eslint-disable-next-line no-prototype-builtins
+    ].some(k => mod.hasOwnProperty(k))
+    mod._needsHardReload = [
+      'styles', 'vueHooks', 'themes', 
       'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
     ].some(k => mod.hasOwnProperty(k))
@@ -503,6 +532,7 @@ function getModJs(mod_dir, options={}) {
 
 const footnote_categories = ['story']
 
+// ====================================
 // Interface
 
 function editArchive(archive) {
@@ -751,7 +781,7 @@ function getMixins(){
   }
 
   // mixable_mods is now a list of mods that may add mixins.
-  logger.info(mixable_mods)
+  // logger.info(mixable_mods)
 
   const vueHooksByName = {}
   const vueHooksMatchFn = []
@@ -822,6 +852,11 @@ function getMixins(){
       this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
         hook.mounted.bind(this)()
       })
+    },
+    destroyed() {
+      this._uhc_matching_hooks.filter(hook => hook.destroyed).forEach(hook => {
+        hook.destroyed.bind(this)()
+      })
     }
   }
 
@@ -840,7 +875,8 @@ function jsToChoice(js, dir){
     locked: js.locked,
 
     hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
-    needsreload: js._needsreload,
+    needsArchiveReload: js._needsArchiveReload,
+    needsHardReload: js._needsHardReload,
     settingsmodel: js.settings,
     key: dir,
 
