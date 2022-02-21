@@ -19,7 +19,13 @@ module.exports = {
                     buildResources: "build"
                 },
                 win: {
-                    target: "zip"
+                    target: {
+                        target: "zip",
+                        arch: [
+                            "x64",
+                            "ia32"
+                        ]
+                    }
                 },
                 mac: {
                     target: ["dmg"],
