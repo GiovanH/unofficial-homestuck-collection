@@ -34,7 +34,10 @@ module.exports = {
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],
-                    category: "game"
+                    category: "game",
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 }
             }
         }
