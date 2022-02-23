@@ -488,11 +488,11 @@ ipcMain.on('win-close-sync', (e) => {
 })
 
 ipcMain.handle('copy-image', async (event, payload) => {
-  logger.info(payload.url)
+  // logger.info(payload.url)
   Sharp(payload.url).png().toBuffer().then(buffer => {
-    logger.info(buffer)
+    // logger.info(buffer)
     const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-    logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+    // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
     clipboard.writeImage(sharpNativeImage)
   })
 })
@@ -521,7 +521,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     try {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
-      logger.info(assetDir)
+      logger.info("New asset directory", assetDir)
       loadArchiveData()
 
       let flashPath = getFlashPath()
@@ -882,8 +882,9 @@ async function createWindow () {
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
+    // eslint-disable-next-line no-undef
     new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
-    if (new_icon && new_icon != current_icon) {
+    if (new_icon && (new_icon != current_icon)) {
       try {
         if (process.platform == "win32") {
           new_icon += ".ico"
