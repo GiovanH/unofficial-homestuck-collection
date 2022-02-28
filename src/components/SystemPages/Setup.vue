@@ -125,20 +125,21 @@
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
     <!-- <circle cx="0" cy="0" r="3" fill="orange"/> -->
-    <g v-for="cls, gi in ['left', 'right']" :key="`g${gi}`" :class="cls">
+    <g id="halfSpiro" class="left">
       <!-- <circle cx="0" cy="0" r="2" fill="blue"/> -->
-      <path 
-      v-for="n in 10"  :key="`g${gi}p${n}`"
-      :transform="`rotate(${(n - 1) * (360/10)})`"
-      :d="spiroPos[testindex]"
-      >
-      <animate
-        attributeName="d"
-        :values="spiroPosDoubled.join('; \n')"
-        :keyTimes="Array.from(spiroPosDoubled, (_, i) => (i/(spiroPosDoubled.length - 1)).toFixed(2)).join(';')"
-        dur="4s" begin="0s" repeatCount="indefinite" />
+      <path id="thePath"
+      :d="spiroPos[testindex]" >
+        <animate
+          attributeName="d"
+          :values="spiroPosDoubled.join('; \n')"
+          :keyTimes="Array.from(spiroPosDoubled, (_, i) => (i/(spiroPosDoubled.length - 1)).toFixed(2)).join(';')"
+          dur="4s" begin="0s" repeatCount="indefinite" />
       </path>
+      <use href="#thePath"
+        v-for="n in 9"  :key="`p${n}`"
+        :style="{transform: `rotate(${(n) * (360/10)}deg)`}"/>
     </g>
+    <use href="#halfSpiro" class="right" />
   </g>
     <!-- <circle cx="0" cy="0" r="4" fill="red"/> -->
 </svg>
@@ -641,10 +642,10 @@ export default {
     animation-duration: 8000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    > g {
+    > g, use {
     // container
       transform: translate(0, 145px);
-      > g { // Spirograph half
+      > g, use { // Spirograph half
         height: 520px;
         width: 520px;
         stroke: rgb(56, 244, 61);
@@ -657,9 +658,10 @@ export default {
           // stroke: orange;
         }
         &.right { // Right
-          transform: translate(-24px, 0) scale(-1, 1);
+          // transform: translate(-24px, 0) scale(-1, 1);
+          transform: scale(-1, 1);
         }
-        path {
+        path, use {
           transform-origin: -24px -145px;
           &:nth-child(3),
           &:nth-child(4),
