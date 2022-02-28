@@ -35,8 +35,8 @@
 
 	--system-skycolor: #35bfff;
 	--system-background: 
-		url(assets://archive/collection/homebg_right.png) left top repeat-y fixed,
-      	url(assets://archive/collection/homebg_left.png) right top repeat-y fixed;
+		url('../src/assets/homebg_right.png') left top repeat-y fixed,
+      	url('../src/assets/homebg_left.png') right top repeat-y fixed;
 
 	--ctx-bg: #EEEEEE;
 	--ctx-frame: #535353;
@@ -81,9 +81,9 @@
 		--page-links: #5599ff;
 		--page-log-bg: #000000;
 
-		--system-background: 
-			url(assets://archive/collection/themes/night_homebg_right.png) left top repeat-y fixed,
-			url(assets://archive/collection/themes/night_homebg_left.png) right top repeat-y fixed;
+		--system-background:
+			url('../src/assets/themes/night_homebg_right.png') left top repeat-y fixed,
+			url('../src/assets/themes/night_homebg_left.png') right top repeat-y fixed;
 		--system-skycolor: #1e1e1e;
 		
 		--ctx-bg: #262626;
@@ -113,8 +113,8 @@
 
 		--nav-candyCornContent: "";
 
-		--system-background:    
-			url(assets://archive/collection/themes/retrobg.png) left top repeat fixed;		
+		--system-background:
+			url('../src/assets/themes/retrobg.png') left top repeat fixed;
 		--system-skycolor: #DDDDDD;
 
 		--ctx-bg: #FFFFFF;
@@ -158,8 +158,8 @@
 		--page-links: #2cff4b;
 		--page-links-visited: #2cff4b;
 
-		--system-background: 
-			url(assets://archive/collection/themes/scratchbg.png) center top repeat fixed;
+		--system-background:
+			url('../src/assets/themes/scratchbg.png') center top repeat fixed;
 		--system-skycolor: #0E4603;
 
 		--ctx-bg: #0e4603;
@@ -194,21 +194,21 @@
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
 
-		--system-background:     
-			url(assets://archive/collection/themes/sbahjbigman.png) 82% -10px no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjbottomleft.png) left bottom no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjbottomright.png) right bottom no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjtopleft.png) left top no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjtopright.png) right top no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjbottom.png) center bottom repeat-x fixed,
-			url(assets://archive/collection/themes/sbahjright.png) right center repeat-y fixed,
-			url(assets://archive/collection/themes/sbahjleft.png) left center repeat-y fixed,
-			url(assets://archive/collection/themes/sbahjsideleft.png) left center repeat-y fixed,
-			url(assets://archive/collection/themes/sbahjsideright.png) right center repeat-y fixed,   
-			url(assets://archive/collection/themes/sbahjseamleft.png) left top no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjseamright.png) right top no-repeat fixed,
-			url(assets://archive/collection/themes/sbahjtop.png) center top repeat-x fixed,
-			url(assets://archive/collection/themes/sbahjbg.png) left top repeat fixed;
+		--system-background:
+			url('../src/assets/themes/sbahjbigman.png') 82% -10px no-repeat fixed,
+			url('../src/assets/themes/sbahjbottomleft.png') left bottom no-repeat fixed,
+			url('../src/assets/themes/sbahjbottomright.png') right bottom no-repeat fixed,
+			url('../src/assets/themes/sbahjtopleft.png') left top no-repeat fixed,
+			url('../src/assets/themes/sbahjtopright.png') right top no-repeat fixed,
+			url('../src/assets/themes/sbahjbottom.png') center bottom repeat-x fixed,
+			url('../src/assets/themes/sbahjright.png') right center repeat-y fixed,
+			url('../src/assets/themes/sbahjleft.png') left center repeat-y fixed,
+			url('../src/assets/themes/sbahjsideleft.png') left center repeat-y fixed,
+			url('../src/assets/themes/sbahjsideright.png') right center repeat-y fixed,
+			url('../src/assets/themes/sbahjseamleft.png') left top no-repeat fixed,
+			url('../src/assets/themes/sbahjseamright.png') right top no-repeat fixed,
+			url('../src/assets/themes/sbahjtop.png') center top repeat-x fixed,
+			url('../src/assets/themes/sbahjbg.png') left top repeat fixed;
 		--system-skycolor: #fff;
 
 		--ctx-bg: #f400ec;
@@ -344,9 +344,9 @@
 		--ctx-select: #111111;
 		--ctx-divider: #ffffff;
 
-		--system-background: 
-			url(assets://archive/collection/themes/tsobg.png) left top repeat-y fixed,
-			url(assets://archive/collection/themes/tsobg.png) right 500px repeat-y fixed;
+		--system-background:
+			url('../src/assets/themes/tsobg.png') left top repeat-y fixed,
+			url('../src/assets/themes/tsobg.png') right 500px repeat-y fixed;
 		--system-skycolor: #111;
 
 		--saves-bg: #2f2f2f;
@@ -385,8 +385,8 @@
 		--page-links-visited: #f9fd6b;
 
 		--system-background:
-			url(assets://images/trickster_sitegraphics/Z2.gif) top left repeat-y fixed,			
-			url(assets://archive/collection/themes/Z2right.gif) top right repeat-y fixed,			
+			url(assets://images/trickster_sitegraphics/Z2.gif) top left repeat-y fixed,
+			url('../src/assets/themes/Z2right.gif') top right repeat-y fixed,
 			url(assets://images/trickster_sitegraphics/bluetile.gif) fixed;
 		--system-skycolor: #FFD800;
 
@@ -447,9 +447,9 @@
 		--page-nav-meta: #2ed73a;
 		--page-links: #2ed73a;
 
-		--system-background:    
-			url(assets://archive/collection/themes/homosuckbg_left.png) left top no-repeat fixed,
-			url(assets://archive/collection/themes/homosuckbg_right.png) right top no-repeat fixed;
+		--system-background:
+			url('../src/assets/themes/homosuckbg_left.png') left top no-repeat fixed,
+			url('../src/assets/themes/homosuckbg_right.png') right top no-repeat fixed;
 		--system-skycolor: #042300;
 
 		--ctx-bg: #073c00;
@@ -501,8 +501,8 @@
 		--page-links: #72abd2;
 		--page-links-visited: #ffffff;
 
-		--system-background: 
-			url(assets://archive/collection/themes/pxsbg.png) center top repeat fixed;
+		--system-background:
+			url('../src/assets/themes/pxsbg.png') center top repeat fixed;
 		--system-skycolor: #095486;
 
 		--ctx-bg: #003b64;
