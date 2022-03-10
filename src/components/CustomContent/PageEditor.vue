@@ -30,6 +30,8 @@
         </div>
         <p>JSON output:</p>
         <pre class="code" v-text="jsonDump" @click="selectText" />
+        <p><a :href="singlepageLink">Singlepage Link</a></p>
+        <!-- <pre class="code" v-text="singlepageLink" @click="selectText" /> -->
         <span>
           Load page:
           <input style="width: 6em;" v-model="pginput"
@@ -57,6 +59,7 @@
 <script>
 // @ is an alias to /src
 import VanillaPage from '@/components/Page/Page.vue'
+import SinglePage from '@/components/Page/SinglePage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Settings from '@/components/SystemPages/Settings.vue'
@@ -133,9 +136,9 @@ export default {
     // _reloadBboxes(){
       if (!this.$refs.LivePage) {
         this.$logger.warn("Deferring height reload")
-        this.$nextTick(() => {
-          setTimeout(this.reloadBboxes(), 100)
-        })
+        // this.$nextTick(() => {
+        //   setTimeout(this.reloadBboxes(), 500)
+        // })
       } else {
         const liverefs = this.$refs.LivePage.$refs
         this.bboxes = {
@@ -182,6 +185,11 @@ export default {
         }
         return pageJson
       }
+    },
+    singlepageLink(){
+      return SinglePage.methods.makeUrl.bind({
+        ...SinglePage.data()
+      })(this.livePage)
     }
   },
   watch: {
@@ -205,7 +213,7 @@ export default {
     this.$logger.info("Created")
     this.$nextTick(() => {
       this.tabFrame.$el.addEventListener('scroll', this.handleScroll)
-      setTimeout(this.reloadBboxes(), 500)
+      setTimeout(this.reloadBboxes(), 2000)
     })
   },
   destroyed () {
