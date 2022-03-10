@@ -25,12 +25,18 @@ module.exports = {
                             "x64",
                             "ia32"
                         ]
-                    }
+                    },
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 mac: {
                     target: ["dmg"],
                     category: "entertainment",
-                    identity: null
+                    identity: null,
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],
