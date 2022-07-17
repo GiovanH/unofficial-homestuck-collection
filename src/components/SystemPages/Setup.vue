@@ -671,7 +671,7 @@ export default {
 
           &:nth-child(8),
           &:nth-child(9),
-          &:nth-child(10), {
+          &:nth-child(10) {
             display: none;
             display: inherit;
           }
