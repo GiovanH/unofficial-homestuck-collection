@@ -1,35 +1,59 @@
 <template>
   <div class="pageBody">
-    <div class="editor">
-      <div class="linked" v-if="bboxes"
-       :style="{height: bboxes.textContent.top + bboxes.textContent.height + scroll + 'px'}">
-        <div :style="{marginTop: bboxes.pageTitle.top + 'px'}">
-          <input v-model="livePage.title" class="title" />
+    <div class="split">
+      <div class="editor">
+        <div class="linked" v-if="bboxes"
+         :style="{height: bboxes.textContent.top + bboxes.textContent.height + scroll + 'px'}">
+          <div class="title" :style="{marginTop: bboxes.pageTitle.top + 'px'}">
+            <input v-model="livePage.title"/>
+            <p class="hint">Both the page title and text of links to this page</p>
+          </div>
+          <div class="media" :style="{marginTop: bboxes.media.top + 'px', height: bboxes.media.height + 'px'}">
+            <textarea v-model="editMedia" />
+            <p class="hint">One URL per line. <code>assets://</code> urls recommended.</p>
+          </div>
+          <div class="textContent" :style="{marginTop: bboxes.textContent.top + 'px', height: bboxes.textContent.height + 'px'}">
+            <textarea v-model="editContent" />
+            <p class="hint">MSPA text content. See <a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/MSPA-Story-Format">Reference</a></p>
+          </div>
         </div>
-        <div :style="{marginTop: bboxes.media.top + 'px'}">
-          <input v-model="editMedia" />
+        <div class="meta">
+          <span>Next Page(s): <input v-model="editNext" /></span>
+          <span>Flags: <input v-model="editFlag" /></span>
+          <span>Theme:
+            <select class="themeSelector" v-model="livePage.theme" >
+              <option v-for="theme in themes" :value="theme.value" :key="theme.value">
+                {{ theme.text }}
+              </option>
+            </select>
+          </span>
         </div>
-        <div :style="{marginTop: bboxes.textContent.top + 'px', height: bboxes.textContent.height + 'px'}">
-          <textarea class="textContent" v-model="editContent" />
-        </div>
+        <p>JSON output:</p>
+        <pre class="code" v-text="jsonDump" @click="selectText" />
+        <span>
+          Load page:
+          <input style="width: 6em;" v-model="pginput"
+            @keydown.enter="livePage = $archive.mspa.story[pginput]" />
+          <Button @click="livePage = $archive.mspa.story[pginput]">
+            <StoryPageLink titleOnly :mspaId='pginput' style="pointer-events: none; color: black;"/>
+          </Button>
+        </span>
       </div>
-      <div class="meta">
-        <p>Next Page(s): <input v-model="editNext" /></p>
-        <p>Flags: <input v-model="editFlag" /></p>
+      <div class="page">
+        <LivePage ref="LivePage"
+          :thisPage="livePage" @update="reloadBboxes()" />
       </div>
-      <p>JSON output:</p>
-      <pre class="code" v-text="jsonDump" />
     </div>
-    <div class="page">
-      <LivePage ref="LivePage"
-        :thisPage="livePage" @update="reloadBboxes" />
-    </div>
+    <PageFooter pageWidth="1400px" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import VanillaPage from '@/components/Page/Page.vue'
+import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import PageFooter from '@/components/Page/PageFooter.vue'
+import Settings from '@/components/SystemPages/Settings.vue'
 
 const LivePage = {
   ...VanillaPage,
@@ -57,10 +81,10 @@ const LivePage = {
 }
 delete LivePage.computed.thisPage
 
-function listEditor(prop) {
+function listEditor(prop, joiner=",") {
   return {
-    get() {return this.livePage[prop].join(",")},
-    set(newValue) {this.livePage[prop] = newValue ? newValue.split(",") : []}
+    get() {return this.livePage[prop].join(joiner)},
+    set(newValue) {this.livePage[prop] = newValue ? newValue.split(joiner) : []}
   }
 }
 
@@ -69,31 +93,37 @@ export default {
   data: function() {
     return {
       scroll: 0,
+      pginput: "001904",
       bboxes: undefined,
-      livePage: window.vm.$archive.mspa.story['001904']
+      livePage: window.vm.$archive.mspa.story['001904'],
+      themes: Settings.data().themes
     }
   },
   props: [
     'tab', 'routeParams'
   ],
-  components: {LivePage},
+  components: {LivePage, StoryPageLink, PageFooter},
   theme: function(ctx) {
-    const args = {} // urlToArgObj(ctx.tab.url)
-    return args.th || 'default'
+    const theme = ctx.$refs.page ? ctx.$refs.page.livePage.theme : 'default'
+    ctx.$logger.info("Editor current theme is ", theme)
+    return theme
   },
   title: function(ctx) {
-    const args = {} // urlToArgObj(ctx.tab.url)
-    return args.c || 'SinglePage'
+    return 'Live Editor'
   },
   methods: {
     handleScroll () {
-      // this.$logger.info("scrolled", this.tabFrame.scrollTop)
-      this.scroll = this.tabFrame.scrollTop
-      this.$nextTick(() => {
-        setTimeout(this.reloadBboxes(), 100)
-      })
+      if (this.scroll != this.tabFrame.$el.scrollTop) {
+        this.scroll = this.tabFrame.$el.scrollTop
+        this.$nextTick(() => {
+          setTimeout(this.reloadBboxes(), 100)
+        })
+      }
     },
     reloadBboxes(){
+    //   setTimeout(this._reloadBboxes(), 100)
+    // },
+    // _reloadBboxes(){
       this.$logger.info("reloadBboxes")
       if (!this.$refs.LivePage) {
         this.$logger.warn("Deferring height reload")
@@ -108,7 +138,16 @@ export default {
           textContent: liverefs.textContent.$el.getBoundingClientRect(),
           pageNav: liverefs.pageNav.$el.getBoundingClientRect()
         }
-        // this.$logger.info(this.bboxes.textContent)
+      }
+    },
+    selectText(event) {
+      const node = event.srcElement
+      const selection = window.getSelection()
+      if (selection.isCollapsed) {
+        const range = document.createRange()
+        range.selectNodeContents(node)
+        selection.removeAllRanges()
+        selection.addRange(range)
       }
     }
   },
@@ -118,45 +157,57 @@ export default {
       set(newValue) {this.livePage.content = newValue.replace(/\n/g, "<br />")}
     },
     editNext: listEditor('next'),
-    editMedia: listEditor('media'),
+    editMedia: listEditor('media', '\n'),
     editFlag: listEditor('flag'),
     tabFrame(){
-      return this.$root.app.$refs[this.tab.key][0].$el
+      return this.$root.app.$refs[this.tab.key][0]
     },
     jsonDump(){
       return JSON.stringify(this.livePage, undefined, 2)
     }
   },
   watch: {
+    'livePage.content'(to, from){
+      // Force logs open
+      this.$refs.LivePage.$refs.textContent.logHidden = false
+    },
+    'livePage.theme'(to, from){
+      if (to == 'default') {
+        this.livePage.theme = undefined
+      }
+      this.tabFrame._computedWatchers.contentTheme.run()
+      this.tabFrame._computedWatchers.theme.run()
+      this.tabFrame.$forceUpdate()
+    },
     'scroll'(to, from) {
-      this.$logger.info("scrolled", to)
       this.reloadBboxes()
     }
   },
   created () {
     this.$logger.info("Created")
     this.$nextTick(() => {
-      this.tabFrame.addEventListener('scroll', this.handleScroll)
-      this.reloadBboxes()
+      this.tabFrame.$el.addEventListener('scroll', this.handleScroll)
+      setTimeout(this.reloadBboxes(), 500)
     })
   },
   destroyed () {
-    this.tabFrame.removeEventListener('scroll', this.handleScroll)
+    this.tabFrame.$el.removeEventListener('scroll', this.handleScroll)
   }
 }
 </script>
 
 <style scoped lang="scss">
-  .pageBody {
+  .split {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
   }
   .editor {
-    // margin-top: calc(var(--headerHeight) + 17px);
+    // Various position hacks
     width: 650px;
     padding: 0 25px;
     position: relative;
     border-top: solid black 17px;
+    padding-bottom: 2em;
     // margin-bottom: 110px;
 
     text-align: center;
@@ -171,53 +222,91 @@ export default {
         width: inherit;
       }
     }
-
+  }
+  .editor {
+    // Actual control styles
+    color: var(--font-log);
     div {
       width: inherit;
       min-height: 1em;
     }
-    .title {
-      line-height: 1.1;
-      font-size: 32px;
+    p {
+      margin-top: 1em;
+    }
+    span {
+      display: block;
     }
     textarea {
       width: 100%;
-      &.textContent {
-        resize: none;
-        height: 100%; /* inside a div */
-        font-size: 1em;
-        line-height: 1.15;
-        font-weight: bold;
-      }
-
+      max-width: 100%;
+    }
+    textarea, input, pre, select {
+      background-color: white;
+      color: black;
+      // background: var(--page-log-bg);
+      // color: var(--font-log);
+    }
+    input {
+      // For some reason, setting an input's background breaks the border in weird ways.
+      border-width: thin;
+    }
+    a {
+      color: var(--page-links);
+    }
+    .hint {
+      margin-top: 0;
+      font-family: sans-serif;
+      color: gray;
+      font-weight: normal;
+    }
+    .title input {
+      line-height: 1.1;
+      font-size: 32px;
+    }
+    .media textarea,
+    .textContent textarea {
+      height: 100%; /* inside a div */
+    }
+    .textContent textarea {
+      resize: horizontal;
+      font-size: 1em;
+      line-height: 1.15;
+      font-weight: bold;
     }
     .code {
+      margin-top: 0;
       text-align: left;
-      background: white;
       resize: auto;
       white-space: pre-wrap;
       height: auto;
     }
   }
-  ::v-deep .page {
-    flex-grow: 1;
-    .pageFrame {
-      max-width: 950px;
-      width: auto;
-    }
+  .page {
+    // flex-grow: 1;
+    width: 650px;
+    ::v-deep & {
+      .pageFrame {
+        max-width: 950px;
+        width: auto;
+      }
 
-    .navBanner {
-      max-width: 950px;
-      width: auto;
-    }
+      .navBanner {
+        max-width: 950px;
+        width: auto;
+      }
 
-    .pageBody {
-      max-width: 950px;
-      width: auto;
-    }
+      .pageBody {
+        max-width: 950px;
+        width: auto;
+      }
 
-    .footer {
-      display: none;
+      .footer {
+        display: none;
+      }
+      a:not([target]) {
+        opacity: 0.4;
+        pointer-events: none;
+      }
     }
   }
 </style>
