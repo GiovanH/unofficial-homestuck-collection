@@ -63,15 +63,14 @@ function toFilePath(url, root_dir) {
   if (resource_path.startsWith("assets://")) {
     resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
-  }  
-  else if (resource_path.startsWith(assets_root)) {
+  } else if (resource_path.startsWith(assets_root)) {
     resource_path = path.join(root_dir, resource_path.replace(assets_root, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
   } else {
     // logger.debug("[resPath]", "no change for", resource_path)
   }
 
-  return resource_path
+  return decodeURI(resource_path)
 }
 
 // Pure
