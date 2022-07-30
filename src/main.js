@@ -144,7 +144,7 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
-      return Resources.resolvePath(url, this.$localData.assetDir)
+      return Resources.toFilePath(url, this.$localData.assetDir)
     },
     $getStoryNum: Resources.getStoryNum,
     $getAllPagesInStory: Resources.getAllPagesInStory,
@@ -196,6 +196,9 @@ Vue.mixin({
         : this.$mspaToViz(mspaId).p
     },
     $updateNewReader(thisPageId, forceOverride = false) {
+      if (!this.$isNewReader && !forceOverride)
+        return // don't reset non-new reader back to new-reader mode unless explicitly forced
+
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
       const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
@@ -212,6 +215,8 @@ Vue.mixin({
           if (offByOnePages.includes(thisPageId)) {
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
           }
+
+          // else if ('000373' == thisPageId) nextLimit = '000375' // Problem sleuth multiple options
 
           // End of problem sleuth
           else if (thisPageId == '001892') nextLimit  = '001902'
@@ -233,6 +238,11 @@ Vue.mixin({
               nextPageId = nextPageOver
             }
             nextLimit = nextPageId
+          }
+
+          else if (this.$archive.tweaks.tzPasswordPages.includes(thisPageId)) {
+            this.$logger.info("Not advancing to terezi page")
+            return
           }
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time

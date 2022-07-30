@@ -60,6 +60,7 @@ class LocalData {
       allowSysUpdateNotifs: true,
       devMode: false,
       enableHardwareAcceleration: false,
+      useSystemWindowDecorations: false,
 
       themeOverride: "default",
       themeOverrideUI: "default",

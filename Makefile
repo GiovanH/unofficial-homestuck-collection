@@ -5,6 +5,7 @@ install: package.json yarn.lock
 	touch install
 
 clean:
+	rm install
 	rm -r src/imods.tar
 
 lint: install 

@@ -377,6 +377,7 @@ export default {
   props: [
     'tab', 'routeParams'
   ],
+  /* eslint-disable object-property-newline */
   components: {
     NavBanner, SubSettingsModal, 
     PageText, SpoilerBox, StoryPageLink, 
@@ -457,6 +458,10 @@ export default {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
           desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
+        }, {
+          model: "useSystemWindowDecorations",
+          label: "Use system window decorations",
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
@@ -701,6 +706,11 @@ export default {
       }
       if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
         this.queueArchiveReload()
+      }
+
+      if (setting == 'useSystemWindowDecorations') {
+        this.$localData.root.saveLocalStorage()
+        this.$nextTick(() => {ipcRenderer.invoke('restart')})
       }
 
       // Unforce if theme just changed to auto
@@ -1028,6 +1038,7 @@ export default {
 
     li {
       // TODO Use a background color here from the theme that isn't log-bg
+      color: var(--font-log);
       background-color: var(--page-log-bg);
       // border: 1px solid rgba(0,0,0,.125);
       border: 1px solid var(--page-pageBorder);
