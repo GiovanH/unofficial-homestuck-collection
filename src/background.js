@@ -818,6 +818,7 @@ async function createWindow () {
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
       "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://asset.uhc/*",
       "*://*.sweetcred.com/*"
     ]
   }, (details, callback) => {
