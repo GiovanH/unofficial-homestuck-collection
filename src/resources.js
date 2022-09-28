@@ -109,8 +109,8 @@ function getResourceURL(request_url){
     .replace(/^http(s{0,1}):\/\/www.whatpumpkin\.com\/squiddles\.htm(l)?/, '/squiddles/credits')
     .replace(/^http(s{0,1}):\/\/asset\.uhc\//, 'assets://')
 
-  if (resource_url != request_url)
-    // logger.debug("[getResU prelim]", request_url, "to", resource_url)
+  // if (resource_url != request_url)
+  //   logger.debug("[getResU prelim]", request_url, "to", resource_url)
 
   request_url = resource_url
 
@@ -131,16 +131,18 @@ function getResourceURL(request_url){
     if (!resource_url.startsWith("assets://"))
       resource_url = resource_url.replace(/^(?=\w)/, "assets://")
 
-    if (resource_url != request_url)
-      // logger.debug("[getResU asset]", request_url, "to", resource_url)
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU asset]", request_url, "to", resource_url)
+
     request_url = resource_url
   } else {
     // waywardvagabond has assets in its folder but we redirect some paths to vue
     resource_url = resource_url
       .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
 
-    if (resource_url != request_url)
-      // logger.debug("[getResU nonas]", request_url, "to", resource_url)
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU nonas]", request_url, "to", resource_url)
+
     request_url = resource_url
   }
   return resource_url
@@ -199,9 +201,9 @@ const UrlFilterMixin = {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
           link.href = getResourceURL(pseudLinkHref)
-          if (link.href != pseudLinkHref) {
-            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
-          }
+          // if (link.href != pseudLinkHref) {
+          //   logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+          // }
         }
       })
 
@@ -215,9 +217,9 @@ const UrlFilterMixin = {
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
         media[i].src = resolveURL(pseudMediaSrc)
-        if (media[i].src != pseudMediaSrc) {
-          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
-        }
+        // if (media[i].src != pseudMediaSrc) {
+        //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+        // }
 
         if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
           media[i].ondragstart = (e) => {
