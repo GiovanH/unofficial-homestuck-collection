@@ -304,41 +304,7 @@ function loadArchiveData(){
   return data
 }
 
-function getFlashPath(){
-  let flashPlugin
-  switch (process.platform) {
-    case 'win32':
-      flashPlugin = `archive/data/plugins/pepflashplayer${process.arch.replace('x', '')}.dll`
-      break
-    case 'darwin':
-      flashPlugin = 'archive/data/plugins/PepperFlashPlayer.plugin'
-      break
-    case 'linux':
-      flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
-      break
-    default:
-      throw Error("Unknown platform", process.platform)
-  }
-  let flashPath = path.join(assetDir, flashPlugin)
-
-  if (process.platform == "win32" && !fs.existsSync(flashPath)) {
-    // On a windows install with the old asset pack and a unified DLL
-    flashPlugin = 'archive/data/plugins/pepflashplayer.dll'
-    flashPath = path.join(assetDir, flashPlugin)
-  }
-  return flashPath
-}
-
-try {
-  // Pick the appropriate flash plugin for the user's platform
-  const flashPath = getFlashPath()
-
-  if (fs.existsSync(flashPath)) {
-    app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-    if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
-  } else throw Error(`Flash plugin not located at ${flashPath}`)
-  
+try {  
   // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
     return handler(request, response, {
@@ -524,9 +490,6 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       logger.info(assetDir)
       loadArchiveData()
 
-      let flashPath = getFlashPath()
-      // logger.info(assetDir, flashPlugin, flashPath)
-      if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
       logger.error(error)
       validated = false
