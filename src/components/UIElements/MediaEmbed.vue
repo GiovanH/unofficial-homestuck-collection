@@ -2,8 +2,7 @@
   <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
   <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
-  <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
-  <!-- HTML iframes must not point to assets :c -->
+  <div    v-else-if="getMediaType(url) === 'swf'" class="swf-renderer"></div>
 
   <component v-else-if="getMediaType(url) === 'html'"
   :is="frameType"
@@ -26,6 +25,38 @@ export default {
   name: "MediaEmbed",
   props: ['url', 'gifmode', 'webarchive'],
   emits: ['blockedevent'], 
+  mounted() {
+    if(this.$el.classList.contains("swf-renderer")) {
+      window.onhashchange = (e) => {
+        if (window.location.hash != '#/unset') {
+          let hash = window.location.hash.substring(2).split('&')
+          window.location.hash = '#unset';
+          hash.forEach((func)=>{
+            console.log(func);
+            this.invokeFromFlash(func)
+          })
+        }
+      }
+
+      const ruffle = window.RufflePlayer.newest();
+      const player = ruffle.createPlayer();
+
+      this.$el.appendChild(player);
+
+      const data = this.getFileBuffer(`assets:/${this.url}`);
+      const config = {
+                    autoplay: "on",
+                    unmuteOverlay: "hidden",
+                    preloader: false,
+                    letterbox: "on",
+                    contextMenu: false,
+                    quality: "best",
+                    allowScriptAccess: true,
+                };
+
+      player.load({ data, ...config });
+    }
+  },
   data() {
     return {
       indexedFlashProps: {
@@ -269,45 +300,6 @@ export default {
       const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
       this.$logger.info("Getting audio tracks for", this.url, this.url.replace("_hq.swf", ".swf"), ret)
       return ret
-    },
-    flashSrc() {
-      return `
-        <html>
-        <head>
-        <style>
-          body{margin:0;overflow:hidden;background:${this.flashProps.bgcolor}}
-          object{${this.flashProps.rawStyle}}
-        </style>
-        <script>
-          // JS Enhancements: ${this.$localData.settings.jsFlashes}
-          // HQ Audio: ${this.$localData.settings.hqAudio}
-          window.onhashchange = (e) => {
-            if (window.location.hash != '#unset') {
-              let hash = window.location.hash.substr(1).split('&')
-              window.location.hash = '#unset';
-              hash.forEach((func)=>{
-                vm.invokeFromFlash(func)
-              })
-            }
-          }
-        <\/script>
-        </head>
-        <body>
-        <object type="application/x-shockwave-flash" 
-          width="${this.flashProps.width}" 
-          height="${this.flashProps.height}" 
-          data="${this.$getResourceURL(this.url)}">
-            <param name='movie' value="${this.$getResourceURL(this.url)}"/>
-            <param name='play' value="true"/>
-            <param name='loop' value="true"/>
-            <param name='quality' value="high" />
-            <param name='bgcolor' value="${this.flashProps.bgcolor}"/>
-            <param name='devicefont' value="false"/>
-            <param name="allowScriptAccess" value="always" />
-        </object>
-        </body>
-        </html>
-      `
     }
   },
   methods: {
@@ -348,9 +340,6 @@ document.addEventListener('click', function (e) {
           `)
         }
       }
-    },
-    initIframe() {
-      this.$el.contentWindow.vm = this
     },
     resolveFrameUrl(url){
       this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
@@ -614,6 +603,9 @@ document.addEventListener('click', function (e) {
       this.timer.interval = setInterval(this.timer.callback, 20)
     },
 
+    getFileBuffer(url) {
+      return fs.readFileSync(this.$mspaFileStream(url))
+    },
     getFile(url) {
       return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
     },
