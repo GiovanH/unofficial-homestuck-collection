@@ -31,7 +31,7 @@
           <p>One-upping Problem Sleuth's action-packed GIFs, Homestuck spiced up pivotal moments with Flash animations scored by a lively team of composers. Over time, the music team produced dozens of albums across a variety of genres.</p>
           <div class="links">
             <div class="left bigLink">
-              &gt; <a href="/mspa/6" >Begin Adventure</a>
+              &gt; <a href="/mspa/6" >Begin Homestuck</a>
             </div>
             <div class="center">
               &gt; <a href="/log/6" >Adventure Log</a><br>
