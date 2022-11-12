@@ -121,7 +121,7 @@
         }
       },
       zoomOut() {
-        if (this.zoomLevel > -5) {
+        if (this.zoomLevel > -3.5) {
           this.zoomLevel -= 0.5
           if (!this.useCssZoom) electron.webFrame.setZoomLevel(this.zoomLevel)
         }
