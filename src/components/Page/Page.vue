@@ -86,7 +86,7 @@ export default {
       } else {
         title = ctx.$archive.mspa.story[p].title + [
           " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-        ][ctx.$getStory(p) - 1]
+        ][ctx.$getStoryNum(p) - 1]
       }
     }
     return title
@@ -103,7 +103,7 @@ export default {
       }
     },
     storyId() {
-      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+      return this.isRyanquest ? 'ryanquest' : this.$getStoryNum(this.pageNum)
     },
     pageCollection() {
       const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'

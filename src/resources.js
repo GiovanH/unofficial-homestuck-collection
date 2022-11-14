@@ -63,15 +63,14 @@ function toFilePath(url, root_dir) {
   if (resource_path.startsWith("assets://")) {
     resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
-  }  
-  else if (resource_path.startsWith(assets_root)) {
+  } else if (resource_path.startsWith(assets_root)) {
     resource_path = path.join(root_dir, resource_path.replace(assets_root, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
   } else {
     // logger.debug("[resPath]", "no change for", resource_path)
   }
 
-  return resource_path
+  return decodeURI(resource_path)
 }
 
 // Pure
@@ -257,9 +256,165 @@ const UrlFilterMixin = {
 // ====================================
 // Story logic
 
+function getStoryNum(pageNumber) {
+  // Given a MSPA page number, determine the numerical story ID it is associated with.
+  pageNumber = parseInt(pageNumber) || pageNumber
+
+  // JAILBREAK
+  if (pageNumber <= 135 || pageNumber == "jb2_000000")
+    return 1
+  // BARD QUEST
+  else if (pageNumber >= 136 && pageNumber <= 216)
+    return 2
+  // BLOOD SPADE
+  else if (pageNumber == "mc0001")
+    return 3
+  // PROBLEM SLEUTH
+  else if (pageNumber >= 219 && pageNumber <= 1892)
+    return 4
+  // HOMESTUCK BETA
+  else if (pageNumber >= 1893 && pageNumber <= 1900)
+    return 5
+  // HOMESTUCK
+  else if ((pageNumber >= 1901 && pageNumber <= 10030) || 
+    (pageNumber == "pony" || pageNumber == "pony2" || 
+    pageNumber == "darkcage" || pageNumber == "darkcage2"))
+    return 6
+
+  return undefined
+}
+
+function getAllPagesInStory(story_id, incl_secret=false) {
+  const page_nums = []
+  if (story_id == '1'){
+    for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
+    for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
+    page_nums.push("jb2_000000")
+  } else if (story_id == '2'){
+    page_nums.push(Number(136).pad(6))
+    for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '3'){
+    page_nums.push("mc0001")
+  } else if (story_id == '4'){
+    for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
+    for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '5'){
+    for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '6'){
+    for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
+    for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
+    for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
+    for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
+    for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
+    if (incl_secret) {
+      page_nums.push("darkcage")
+      page_nums.push("darkcage2")
+      page_nums.push("pony")
+      page_nums.push("pony2")
+    }
+  } else if (story_id == 'ryanquest'){
+    for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
+  }
+
+  if (story_id == 'snaps') {
+    for (let i = 1; i <= 64; i++) page_nums.push(String(i))
+  }
+  return page_nums
+}
+
+function vizToMspa(vizStory, vizPage) {
+  let mspaPage
+  const vizNum = (!isNaN(vizPage) ? parseInt(vizPage) : undefined)
+  const undef_page = {s: undefined, p: undefined}
+
+  switch (vizStory) {
+    case 'jailbreak':
+      mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).pad(6)
+      if (1 > vizNum || vizNum > 135) return undef_page
+      break
+    case 'bard-quest':
+      mspaPage = (vizNum == 1) ? "000136" : (vizNum + 169).pad(6)
+      if (1 > vizNum || vizNum > 47) return undef_page
+      break
+    case 'blood-spade':
+      if (vizNum == 1) mspaPage = "mc0001"
+      else return undef_page
+      break
+    case 'problem-sleuth':
+      mspaPage = (vizNum + 218).pad(6)
+      if (1 > vizNum || vizNum > 1674) return undef_page
+      break
+    case 'beta':
+      mspaPage = (vizNum + 1892).pad(6)
+      if (1 > vizNum || vizNum > 8) return undef_page
+      break
+    case 'homestuck':
+      mspaPage = vizNum ? (vizNum + 1900).pad(6) : vizPage
+      if (1 > vizNum || vizNum > 8130) return undef_page
+      break
+    case 'ryanquest':
+      mspaPage = vizNum.pad(6)
+      if (1 > vizNum || vizNum > 15) return undef_page
+      break
+  }
+
+  const storyNum = (vizStory == 'ryanquest' ? 'ryanquest' : getStoryNum(mspaPage))
+  if (!storyNum) {
+    logger.error(`Page not in any story: ${mspaPage}`)
+    return undef_page
+  }
+
+  return {s: storyNum, p: mspaPage}
+  // return (storyNum && mspaPage) ? {s: storyNum, p: mspaPage} : undef_page
+}
+
+function mspaToViz(mspaInput, isRyanquest = false) {
+  const mspaPage = mspaInput.padStart(6, '0')
+  const mspaStory = getStoryNum(mspaPage)
+  let vizStory, vizPage
+
+  if (isRyanquest) {
+    return {s: 'ryanquest', p: parseInt(mspaPage).toString() }
+  } else {
+    switch (mspaStory) {
+      case 1:
+        vizStory = "jailbreak"
+        vizPage = (mspaPage == 'jb2_000000') ? '135' : (parseInt(mspaPage) - 1).toString()
+        break
+      case 2:
+        vizStory = "bard-quest"
+        if (parseInt(mspaPage) == 136) vizPage = "1"
+        else vizPage = (parseInt(mspaPage) - 169).toString()
+        break
+      case 3:
+        vizStory = "blood-spade"
+        vizPage = "1"
+        break
+      case 4:
+        vizStory = "problem-sleuth"
+        vizPage = (parseInt(mspaPage) - 218).toString()
+        break
+      case 5:
+        vizStory = "beta"
+        vizPage = (parseInt(mspaPage) - 1892).toString()
+        break
+      case 6:
+        vizStory = "homestuck"
+        vizPage = isNaN(mspaPage) ? mspaPage : (parseInt(mspaPage) - 1900).toString()
+        break
+    }
+    return (vizStory && vizPage) ? {s: vizStory, p: vizPage} : undefined
+  }
+}
+
+function isVizBase(base){
+  return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
+}
+
 // Pure
 function getChapter(key) {
-  // Just putting this here because both processes need this logic.
+  // Given an MSPA page number, return what section of the comic the page is in,
+  // including chapter/act information.
   let p = parseInt(key)
   if (!p) {
     switch (key) {
@@ -851,7 +1006,7 @@ function testStoryLogic() {
     "homestuck 8130":      JSON.stringify({s: 6, p: "010030"}),
     "homestuck 8131":      JSON.stringify({}),
     "homestuck darkcage":  JSON.stringify({s: 6, p: "darkcage"}),
-    "homestuck pony3":     JSON.stringify({}),
+    // "homestuck pony3":     JSON.stringify({}),
     "ryanquest 1":         JSON.stringify({s: 'ryanquest', p: "000001"}),
     "ryanquest 15":        JSON.stringify({s: 'ryanquest', p: "000015"}),
     "ryanquest 16":        JSON.stringify({})
@@ -881,7 +1036,7 @@ function testStoryLogic() {
     "005644":              JSON.stringify({s: 'homestuck', p: "3744"}),
     "010029":              JSON.stringify({s: 'homestuck', p: "8129"}),
     "010030":              JSON.stringify({s: 'homestuck', p: "8130"}),
-    "pony3":               undefined,
+    // "pony3":               undefined,
     "darkcage":            JSON.stringify({s: 'homestuck', p: "darkcage"}),
     "homestuck pony3":     undefined,
     // "000001":              JSON.stringify({s: 'ryanquest', p: 1}),
@@ -890,9 +1045,9 @@ function testStoryLogic() {
 
   ;[
     {
-      fun: window.vm.$getStory,
+      fun: window.vm.$getStoryNum,
       library: libGetStory,
-      name: 'getStory'
+      name: 'getStoryNum'
     },
     {
       fun: (story) => window.vm.$getAllPagesInStory(story, false).length,
@@ -945,11 +1100,18 @@ module.exports = {
   resolveURL,
   toFilePath,
   getResourceURL,
-  getChapter,
+  linkIsOutlink,
   resolveAssetsProtocol,
+
+  getChapter,
+  getStoryNum,
+  getAllPagesInStory,
+  isVizBase,
+  vizToMspa,
+  mspaToViz,
+
   testResolution,
   testArchiveMusic,
   testArchiveComic,
-  testStoryLogic,
-  linkIsOutlink
+  testStoryLogic
 }
