@@ -8,9 +8,10 @@
         }'
         :tabindex="(tabIsActive) ? -1 : false" 
         v-if="isLoaded"
-        @keyup.left="leftKeyPress"
-        @keyup.right="rightKeyPress"
-        @keyup.space="spaceBarPress"
+        @keyup.left="leftKeyUp"
+        @keyup.right="rightKeyUp"
+        @keydown.space="spaceBarDown"
+        @keyup.space="spaceBarUp"
         @keyup.f5="reload"
         ref="tabFrame"
     >
@@ -148,6 +149,7 @@ export default {
     },
     data() {
         return {
+            scrollTopPrev: 0,
             gameOverThemeOverride: false,
             modBrowserPages: {}
         }
@@ -438,7 +440,7 @@ export default {
                 this.tab.url = u
             })
         },
-        leftKeyPress(e) {
+        leftKeyUp(e) {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.keyNavEvent && 
                 !e.altKey && 
@@ -449,7 +451,7 @@ export default {
                 }
             }
         },
-        rightKeyPress(e) {
+        rightKeyUp(e) {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.keyNavEvent && 
                 !e.altKey && 
@@ -461,14 +463,16 @@ export default {
                 }
             }
         },
-        spaceBarPress(e) {
+        spaceBarDown(e) {
+            this.scrollTopPrev = this.$el.scrollTop
+        },
+        spaceBarUp(e) {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.spaceBarEvent && 
                 document.activeElement.tagName != 'INPUT') {
                 const frameEl = this.$el
-                // ScrollTop can return a decimal value on scaled monitors, so allow some wiggle room
-                if (Math.abs(frameEl.scrollTop + frameEl.clientHeight - frameEl.scrollHeight) <= 1) {
-                    // Only send event if scrolling doesn't happen
+                if (frameEl.scrollTop == this.scrollTopPrev) {
+                    // Only send event if scrolling wasn't detected since the keyDown event
                     this.$refs.page.spaceBarEvent(e)   
                 }
             }
