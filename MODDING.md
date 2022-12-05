@@ -245,7 +245,7 @@ Mods can inject custom CSS into the whole app. `styles` declares a list of local
 A CustomStyle has fields
 
 `source`: A relative path to a stylesheet
-`data`: A string with a style body
+`body`: A string with a style body
 
 Use only one of these per style!
 
