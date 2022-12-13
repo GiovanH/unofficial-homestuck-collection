@@ -471,7 +471,8 @@ export default {
         spaceBarUp(e) {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.spaceBarEvent && 
-                document.activeElement.tagName != 'INPUT') {
+                document.activeElement.tagName != 'INPUT' &&
+                document.activeElement.tagName != 'BUTTON') {
                 const frameEl = this.$el
                 if (frameEl.scrollTop == this.scrollTopPrev) {
                     // Only send event if scrolling wasn't detected since the keyDown event
