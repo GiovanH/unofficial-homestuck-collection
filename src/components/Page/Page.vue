@@ -223,7 +223,7 @@ export default {
         return
 
       if (this.$refs.textcontent) {
-        this.$refs.textcontent.loggle()
+        this.$refs.textcontent.open()
       }
     }
   },

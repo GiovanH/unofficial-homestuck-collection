@@ -140,6 +140,9 @@ export default {
         loggle() {
             this.logHidden = !this.logHidden
         },
+        open() {
+          this.logHidden = false
+        },
         getTextType(content) {
             if (!content) return null
 

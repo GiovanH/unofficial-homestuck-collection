@@ -140,10 +140,10 @@ export default {
     },
     spaceBarEvent(e) {
       if (this.$refs.textcontent1) {
-        this.$refs.textcontent1.loggle()
+        this.$refs.textcontent1.open()
       }
       if (this.$refs.textcontent2) {
-        this.$refs.textcontent2.loggle()
+        this.$refs.textcontent2.open()
       }
     }
   }
