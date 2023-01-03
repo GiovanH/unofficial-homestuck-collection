@@ -756,8 +756,8 @@ async function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1280,
-    height: 720,
-    'minWidth': 1000,
+    height: 780,
+    'minWidth': 650,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
