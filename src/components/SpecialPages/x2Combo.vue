@@ -17,7 +17,7 @@
               </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPages[0].pageId" :content="thisPages[0].content"/>
+              <TextContent :key="thisPages[0].pageId" :content="thisPages[0].content" ref="textcontent1"/>
               <PageNav :thisPage="thisPages[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
           </div>
         <Footnotes :pageId="thisPages[0].pageId" />
@@ -31,7 +31,7 @@
               </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPages[1].pageId" :content="thisPages[1].content"/>
+              <TextContent :key="thisPages[1].pageId" :content="thisPages[1].content" ref="textcontent2"/>
               <PageNav :thisPage="thisPages[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
           </div>
         <Footnotes :pageId="thisPages[1].pageId" />
@@ -137,6 +137,14 @@ export default {
         this.$pushURL(this.$refs.pageNav1.backUrl)
       else if (dir == 'right') 
         this.$pushURL(this.$refs.pageNav2.nextUrl(this.nextPagesArray[1][0]))
+    },
+    spaceBarEvent(e) {
+      if (this.$refs.textcontent1) {
+        this.$refs.textcontent1.open()
+      }
+      if (this.$refs.textcontent2) {
+        this.$refs.textcontent2.open()
+      }
     }
   }
 }

@@ -15,7 +15,7 @@
           </div>
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textcontent"/>
               <PageNav :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
                 :class="{'hidden': hideNav}" />
@@ -215,6 +215,15 @@ export default {
       else if (dir == 'right') {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
         else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
+      }
+    },
+    spaceBarEvent(e) {
+      // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.forceKeyboardEnable)
+        return
+
+      if (this.$refs.textcontent) {
+        this.$refs.textcontent.open()
       }
     }
   },
