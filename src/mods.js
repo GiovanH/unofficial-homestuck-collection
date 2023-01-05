@@ -294,6 +294,8 @@ function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
 
+  list.push("_twoToThree")
+
   if (store.get('localData.settings.unpeachy'))
     list.push("_unpeachy")
   if (store.get('localData.settings.pxsTavros'))
@@ -397,7 +399,8 @@ function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
-  let modjs_path
+  let modjs_path // full path to js file
+  let modjs_name // relative path to js file from mods dir
   var mod
 
   try {
@@ -415,8 +418,9 @@ function getModJs(mod_dir, options={}) {
 
     let is_singlefile = false
     if (mod_dir.endsWith(".js")) {
-      logger.debug(mod_dir, "is explicit singlefile.")
+      // logger.debug(mod_dir, "is explicit singlefile.")
       is_singlefile = true
+      modjs_name = mod_dir
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
       // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
@@ -424,14 +428,16 @@ function getModJs(mod_dir, options={}) {
         const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
         if (!is_directory) throw new Error("Not a directory")
 
-        logger.debug(mod_dir, "confirmed as directory.")
+        // logger.debug(mod_dir, "confirmed as directory.")
         is_singlefile = false
-        modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
+        modjs_name = path.join(mod_dir, "mod.js")
+        modjs_path = path.join(thisModsDir, modjs_name)
       } catch (e) {
         // Mod isn't an explicit singlefile or a directory
-        logger.debug(mod_dir, "must be singlefile.")
+        // logger.debug(mod_dir, "must be singlefile.")
         is_singlefile = true
-        modjs_path = path.join(thisModsDir, mod_dir + ".js")
+        modjs_name = mod_dir + ".js"
+        modjs_path = path.join(thisModsDir, modjs_name)
       }
     }
 
@@ -439,10 +445,19 @@ function getModJs(mod_dir, options={}) {
     //   console.log(modjs_path)
     //   mod = require(modjs_path)
     // } else {
-    // eslint-disable-next-line no-undef
-    if (__non_webpack_require__.cache[modjs_path])
-      // eslint-disable-next-line no-undef
+    /* eslint-disable no-undef */
+    if (__non_webpack_require__.cache[modjs_path]) {
+      // logger.info("Removing cached version", modjs_path)
       delete __non_webpack_require__.cache[modjs_path]
+    } else {
+      // logger.info(modjs_name, modjs_path, "not in cache")
+      Object.keys(__non_webpack_require__.cache)
+        .filter(cachepath => cachepath.endsWith(modjs_name))
+        .forEach(cachepath => {
+        logger.info("Removing partial match from cache", cachepath)
+        delete __non_webpack_require__.cache[cachepath]
+      })
+    }
 
     try {
       // eslint-disable-next-line no-undef
@@ -836,6 +851,11 @@ function getMixins(){
     mounted() {
       this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
         hook.mounted.bind(this)()
+      })
+    },
+    destroyed() {
+      this._uhc_matching_hooks.filter(hook => hook.destroyed).forEach(hook => {
+        hook.destroyed.bind(this)()
       })
     }
   }

@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
@@ -9,6 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -236,7 +237,12 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
   // We pre-build this here so mods have access to it
+  // TODO: This is unused now, remove it
   data.search = Object.values(data.mspa.story).map(storypage => {
     return {
       key: storypage.pageId,
@@ -481,6 +487,15 @@ ipcMain.on('win-close-sync', (e) => {
   e.returnValue = true;
 })
 
+ipcMain.handle('copy-image', async (event, payload) => {
+  // logger.info(payload.url)
+  Sharp(payload.url).png().toBuffer().then(buffer => {
+    // logger.info(buffer)
+    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+    // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+    clipboard.writeImage(sharpNativeImage)
+  })
+})
 
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {
@@ -506,7 +521,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     try {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
-      logger.info(assetDir)
+      logger.info("New asset directory", assetDir)
       loadArchiveData()
 
       let flashPath = getFlashPath()
@@ -709,11 +724,29 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
+const Sharp = require('sharp')
 ipcMain.on('ondragstart', (event, filePath) => {
-  event.sender.startDrag({
-    file: filePath,
-    icon: `${__static}/img/dragSmall.png`
-  })
+  // logger.info("Dragging file", filePath)
+  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+  try {
+    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+    // if (!nativeIconFromPath.isEmpty()) {
+    //   logger.info("Native icon from path", nativeIconFromPath)
+    //   cb(nativeIconFromPath)
+    // } else {
+      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+      .png().toBuffer().then(buffer => {
+        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+        cb(sharpNativeImage)
+      })
+    // }
+  } catch (err) {
+    logger.error("Couldn't process image", err)
+    // eslint-disable-next-line no-undef
+    cb(`${__static}/img/dragSmall.png`)
+  }
 })
 
 let openedWithUrl
@@ -728,8 +761,9 @@ async function createWindow () {
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: false,
+    frame: store.get('localData.settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
@@ -784,6 +818,7 @@ async function createWindow () {
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
       "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://asset.uhc/*",
       "*://*.sweetcred.com/*"
     ]
   }, (details, callback) => {
@@ -848,8 +883,9 @@ async function createWindow () {
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
+    // eslint-disable-next-line no-undef
     new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
-    if (new_icon && new_icon != current_icon) {
+    if (new_icon && (new_icon != current_icon)) {
       try {
         if (process.platform == "win32") {
           new_icon += ".ico"
@@ -863,6 +899,10 @@ async function createWindow () {
         logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
       }
     }
+  })
+
+  ipcMain.on('set-title', (event, new_title) => {
+    win.setTitle(new_title)
   })
 
   // Give mods a reference to the window object so it can reload 

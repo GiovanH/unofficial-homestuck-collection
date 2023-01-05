@@ -40,7 +40,8 @@ function fileIsAsset(url) {
 
 // NOT PURE
 function resolveURL(url) {
-  // The main logic
+  // The main logic. Takes an input url (that may be from old data) and
+  // resolves it to... whatever url is appropriate. Resolves the assets protocol.
   let resource_url = getResourceURL(url)
   // logger.debug("Got resource URL", resource_url)
 
@@ -55,12 +56,16 @@ function resolveURL(url) {
 }
 
 // Pure(?)
-function resolvePath(url, root_dir) {
+function toFilePath(url, root_dir) {
   // Like resolveURL, but returns an os-path and not a file URL
   let resource_path = getResourceURL(url)
 
   if (resource_path.startsWith("assets://")) {
     resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
+    // logger.debug("[resPath]", url, "to", resource_path)
+  }  
+  else if (resource_path.startsWith(assets_root)) {
+    resource_path = path.join(root_dir, resource_path.replace(assets_root, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
   } else {
     // logger.debug("[resPath]", "no change for", resource_path)
@@ -102,9 +107,10 @@ function getResourceURL(request_url){
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/^http(s{0,1}):\/\/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
     .replace(/^http(s{0,1}):\/\/www.whatpumpkin\.com\/squiddles\.htm(l)?/, '/squiddles/credits')
+    .replace(/^http(s{0,1}):\/\/asset\.uhc\//, 'assets://')
 
-  if (resource_url != request_url)
-    // logger.debug("[getResU prelim]", request_url, "to", resource_url)
+  // if (resource_url != request_url)
+  //   logger.debug("[getResU prelim]", request_url, "to", resource_url)
 
   request_url = resource_url
 
@@ -125,16 +131,18 @@ function getResourceURL(request_url){
     if (!resource_url.startsWith("assets://"))
       resource_url = resource_url.replace(/^(?=\w)/, "assets://")
 
-    if (resource_url != request_url)
-      // logger.debug("[getResU asset]", request_url, "to", resource_url)
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU asset]", request_url, "to", resource_url)
+
     request_url = resource_url
   } else {
     // waywardvagabond has assets in its folder but we redirect some paths to vue
     resource_url = resource_url
       .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
 
-    if (resource_url != request_url)
-      // logger.debug("[getResU nonas]", request_url, "to", resource_url)
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU nonas]", request_url, "to", resource_url)
+
     request_url = resource_url
   }
   return resource_url
@@ -193,9 +201,9 @@ const UrlFilterMixin = {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
           link.href = getResourceURL(pseudLinkHref)
-          if (link.href != pseudLinkHref) {
-            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
-          }
+          // if (link.href != pseudLinkHref) {
+          //   logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+          // }
         }
       })
 
@@ -209,9 +217,9 @@ const UrlFilterMixin = {
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
         media[i].src = resolveURL(pseudMediaSrc)
-        if (media[i].src != pseudMediaSrc) {
-          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
-        }
+        // if (media[i].src != pseudMediaSrc) {
+        //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+        // }
 
         if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
           media[i].ondragstart = (e) => {
@@ -935,7 +943,7 @@ module.exports = {
   },
   UrlFilterMixin,
   resolveURL,
-  resolvePath,
+  toFilePath,
   getResourceURL,
   getChapter,
   resolveAssetsProtocol,
