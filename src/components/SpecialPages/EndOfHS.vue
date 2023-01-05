@@ -7,7 +7,7 @@
         </div>
         <Footnotes :pageId="thisPage.pageId" preface />
         <div class="vid">
-          <Media :url="thisPage.media[0]" />
+          <Media :url="thisPage.media[0]" :autoplay="pageNum === '009987'" ref="embed" />
         </div>      
         <div class="links">
           <FlashCredit  :pageId="thisPage.pageId" />
@@ -229,6 +229,10 @@ export default {
           display: flex;
           align-items: center;
           flex-flow: column;
+          width: 100%;
+          .collide & {
+            background: #262626;
+          }
         }
 
         .links{
