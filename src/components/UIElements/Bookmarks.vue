@@ -21,10 +21,27 @@
           </div>
         </div>
         <transition-group tag="div" class="bookmarkList" name="bookmark-list" ref="bookmarks">
-          <div v-for="(key, i) in $localData.saveData.saveList" class="bookmark" @focusout="(e)=>{blurBookmark(e, key)}" @mousedown.left="(e)=>{initDrag(e, key)}" tabindex="-1" :key="key" :ref="key">
+          <div class="bookmark" tabindex="-1" key="newreader" v-if="$isNewReader">  
+            <div class="linkMode pinned"> 
+              <a class="link" :href="`/mspa/${$newReaderCurrent}`" :title="`${$archive.mspa.story[$newReaderCurrent].title}\n${$resolvePath(`/mspa/${$newReaderCurrent}`)}`">
+                <span v-text="`${$archive.mspa.story[$newReaderCurrent].title}`" />
+              </a>
+              <div class="options">
+                <span class="bookmarkUrlDisplay"
+                  :href="`/mspa/${$newReaderCurrent}`"
+                  v-text="$resolvePath(`/mspa/${$newReaderCurrent}`)" />
+                <button class="systemButton editButton" @click="$openLink('app://./settings/newReader', true)" ><fa-icon icon="map-pin" ></fa-icon></button>
+              </div>
+            </div>
+          </div>
+          <div v-for="key in $localData.saveData.saveList" 
+            tabindex="-1" :key="key" :ref="key" class="bookmark"
+            @focusout="(e)=>{blurBookmark(e, key)}" 
+            @mousedown.left="(e)=>{initDrag(e, key)}">
 
             <div class="linkMode" :data-key="key" v-if="editKey != key"> 
-              <a class="link" :href="$localData.saveData.saves[key].url" :title="`${unsanitizeHtml($localData.saveData.saves[key].name)}\n${$localData.saveData.saves[key].url}`">
+              <a class="link" :href="$localData.saveData.saves[key].url" 
+                :title="`${unsanitizeHtml($localData.saveData.saves[key].name)}\n${$localData.saveData.saves[key].url}`">
                 <span v-text="unsanitizeHtml($localData.saveData.saves[key].name)" />
               </a>
               <div class="options">
@@ -370,14 +387,21 @@ export default {
           .linkMode:hover {
             background: var(--saves-tabHover);
             transition: background-color 0.1s;
-            .systemButton {
+            .editButton {
               transform: translateX(0px);
               transition: transform 0.05s linear;
               
-              &:hover{
+              &:hover {
                 cursor: pointer;
                 background: var(--header-buttonClickState) !important;
               }
+            }
+          }
+          .linkMode.pinned {
+            background: var(--saves-tabHover);
+            transition: background-color 0.1s;
+            .editButton {
+              transform: translateX(0px);
             }
           }
           .linkMode:active {
@@ -419,6 +443,7 @@ export default {
           position: absolute;
           pointer-events: none;
           bottom: 0;
+          height: 100%;
           left: 7px;
           width: calc(100% - 7px);
           display: flex;
