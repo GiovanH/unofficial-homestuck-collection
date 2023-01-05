@@ -21,7 +21,7 @@
           </div>
         </div>
         <transition-group tag="div" class="bookmarkList" name="bookmark-list" ref="bookmarks">
-          <div class="bookmark" tabindex="-1" key="newreader">  <!-- v-if="$isNewReader" -->
+          <div class="bookmark" tabindex="-1" key="newreader" v-if="$isNewReader">  
             <div class="linkMode pinned"> 
               <a class="link" :href="`/mspa/${$newReaderCurrent}`" :title="`${$archive.mspa.story[$newReaderCurrent].title}\n${$resolvePath(`/mspa/${$newReaderCurrent}`)}`">
                 <span v-text="`${$archive.mspa.story[$newReaderCurrent].title}`" />
