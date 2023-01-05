@@ -556,7 +556,10 @@ export default {
     frameSrc(){
       // We have to do this in MediaEmbed too
       return Resources.resolveURL("assets://archive/namcohigh/game/index2.html")
-    }
+    },
+    tabIsActive() {
+        return this.tab.key == this.$localData.tabData.activeTabKey
+    },
   },
   methods: {
     // The slideshow functions have two modes of operation: Student, and Artist. The bool tells it which box to affect
@@ -579,8 +582,7 @@ export default {
       if (windowWidth < (4/3)*windowHeight) {
         this.gameWidth = windowWidth
         this.gameHeight = (3/4)*windowWidth
-      }
-      else {
+      } else {
         this.gameWidth = (4/3)*windowHeight
         this.gameHeight = windowHeight
       }
@@ -611,6 +613,14 @@ export default {
   beforeDestroy() {
     window.removeEventListener('message', this.handleResize)
     window.removeEventListener('resize', this.handleResize)
+  },
+  watch: {
+    tabIsActive(to, from) {
+      if (to) {
+        // Background tab has 0x0 dimensions, need to reinflate iframe
+        this.$nextTick(() => this.handleResize())
+      }
+    }
   }
 
 }

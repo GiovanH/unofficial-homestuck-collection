@@ -1,7 +1,6 @@
 <template>
   <div class="newReaderControls">
     <template v-if="featureList.includes('pagenumber')">
-      <!-- <span v-if="$localData.settings['devMode']" v-text="newReaderPage" /> -->
       <div class="newReaderInput">
         <!-- Settings for adjusting new reader mode -->
         <template v-if="$isNewReader">
@@ -98,6 +97,9 @@
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number between 000219 and 010029.<br>
           e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
+        <p class="hint" v-else-if="vizStory == 'problem-sleuth'">
+          Enter a <strong>Homestuck.com</strong> page number between 1 and 1673.<br>
+          e.g. www.homestuck.com/problem-sleuth/<strong>570</strong></p>
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
@@ -116,15 +118,15 @@
         </div>
       </div>
 
-      <pre v-if="$localData.settings.devMode">
+      <!-- <pre v-if="$localData.settings.devMode">
         newReaderPageInput: {{newReaderPageInput}} 
         newReaderPage: {{newReaderPage}} {{$getChapter(newReaderPage)}}
         $newReaderCurrent: {{$newReaderCurrent}} {{$getChapter($newReaderCurrent)}}
         isValidPageSet: {{isValidPageSet}}
         vizStory: {{vizStory}}
-      </pre>
+      </pre> -->
 
-      <div v-if="promptMspaMode" class="settings application" >
+      <div v-if="promptMspaMode" class="settings" >
         <dl>
           <template v-for="boolSetting in settingListBoolean">
             <dt :key="boolSetting.model"><label>
@@ -142,7 +144,7 @@
       </div>
     </template>
 
-    <div v-if="featureList.includes('fastforward')" class="settings application" >
+    <div v-if="featureList.includes('fastforward')" class="settings" >
       <h3>Reading Experience</h3>
       <dl class="fastForwardSelection">
         <dt>
@@ -220,7 +222,7 @@ export default {
       return this.features.toLowerCase().split(" ")
     },
     newReaderPage() {
-      // The actual MSPA number corresponding to the inpupt box. Immutable. May be invalid. May be undefined, if there's no validl way to set a page.
+      // The actual MSPA number corresponding to the input box. Immutable. May be invalid. May be undefined, if there's no validl way to set a page.
       if (!this.newReaderPageInput) {
         return undefined
       }
@@ -389,10 +391,6 @@ export default {
         box-shadow: 0 0 5px 1px royalblue;
       }  }
 
-      // border-radius: 3px;
-      // border-color: #ffaa00;
-      // background: #ffaa00;
-      // border-style: hidden;
       animation: 0.5s linear 0s infinite alternate urgent;
     }
 
@@ -411,12 +409,6 @@ export default {
       border-radius: 2px;
       padding: 2px 3px;
       margin: 5px;
-
-      // &.invalid:not(:disabled):not(.empty) {
-      //   background: pink;
-      //   border-color: rgb(187, 0, 37);
-      //   box-shadow: 0 0 3px 1px red;
-      // }
     }
 
     .bigButtonRow {

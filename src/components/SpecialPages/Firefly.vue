@@ -208,6 +208,7 @@ export default {
   margin-left: auto;
   margin-right: auto;
   .fbox {
+    z-index: 5;
     position: absolute;
     height: 150px;
     width: 200px;

@@ -25,10 +25,15 @@ export default {
       this.show = Boolean(new_url)
     },
     getDisplayUrl(new_url){
-      new_url = new_url.replace("http://localhost:8080/", "/")
-      if (new_url.includes('://') && new_url.startsWith("/"))
-        new_url = new_url.slice(1)
-      return this.$resolvePath(new_url)
+      new_url = new_url
+        .replace(/^http:\/\/localhost:8080\//, "/")
+        .replace(/^app:\/\/\.\//, "/")
+
+      if (!new_url.startsWith('http')) {
+        // Not an external link; resolve the path
+        new_url = this.$resolvePath(new_url)
+      }
+      return new_url
     }
   },
   watch: {

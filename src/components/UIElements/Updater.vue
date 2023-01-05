@@ -10,6 +10,8 @@
 <script>
 const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
 
+const tagToSemver = (tag_name) => tag_name.replace(/^[Vv]/, '').replace(/-\w*$/, '')
+
 export default {
   name: 'updater',
   props: [],
@@ -17,11 +19,22 @@ export default {
     return {
       ghOwner: 'bambosh',
       ghRepo: 'unofficial-homestuck-collection',
-      ghReleases: undefined,
+      ghReleasesRaw: undefined,
       dismissed: false
     }
   },
   computed: {
+    ghReleases(){
+      // Visible gh releases.
+      // Excludes prereleases unless app is in dev mode.
+      if (!this.ghReleasesRaw) return undefined
+
+      let releases = this.ghReleasesRaw
+      if (!this.$localData.settings.devMode) 
+        releases = releases.filter(r => !r.prerelease)
+
+      return releases
+    },
     appVersionCurrent(){
       return this.$data.$appVersion
     },
@@ -31,8 +44,7 @@ export default {
     },
     appLatestReleaseSemver(){
       if (!this.ghReleases) return undefined
-      const tag_name = this.appLatestRelease.tag_name
-      return tag_name.replace(/^[Vv]/, '').replace(/-\w*$/, '')
+      return tagToSemver(this.appLatestRelease.tag_name)
     },
     appHasUpdate(){
       if (!this.ghReleases) return undefined
@@ -47,7 +59,7 @@ export default {
     doUpdateCheck(){
       fetch(`https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/releases`)
         .then(response => response.json())
-        .then(data => { this.ghReleases = data })
+        .then(data => { this.ghReleasesRaw = data })
     }
   },
   watch: {
@@ -68,6 +80,8 @@ export default {
     right: 16px;
     margin: 0 auto;
     padding: 4px;
+
+    z-index: 5;
 
     border: 2px solid yellow;
     box-shadow: 0 0 0 4px #ff9000;

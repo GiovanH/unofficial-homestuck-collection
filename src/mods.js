@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import yaml from 'js-yaml'
 
-const {ipcMain, ipcRenderer, dialog, app} = require('electron')
+const {ipcMain, ipcRenderer, dialog} = require('electron')
 const sass = require('sass')
 const unzipper = require("unzipper")
 const Tar = require('tar');
@@ -35,9 +35,12 @@ function giveWindow(new_win) {
 let validatedState = false
 function expectWorkingState(){
   if (validatedState) return true
-  validatedState = (assetDir && fs.existsSync(assetDir))
+  validatedState = (assetDir && fs.existsSync(path.join(assetDir, "archive")))
   return validatedState
 }
+
+// ====================================
+// Routing
 
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
@@ -81,27 +84,35 @@ function getTreeRoutes(tree, parent=""){
   return routes
 }
 
+// ====================================
+// Installation and list managment
+
 function extractimods(){
+  if (!expectWorkingState()) {
+    logger.info("Not yet in working state, not extracting imods.")
+    return
+  }
   // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   // eslint-disable-next-line import/no-webpack-loader-syntax
   const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
-  let tar_buffer = Buffer.from(base64, 'base64')
+  const tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")
-  console.log("Extracting imods to ", outpath)
+  const temp_tar_path = path.join(outpath, '_imods.tar')
+  logger.info("Saving imods tar to ", temp_tar_path)
   // sorry! this is very silly but javascript refuses to let me
   // wait for a promise before returning, so here we are
-  fs.writeFileSync('_imods.tar', tar_buffer)
+  fs.writeFileSync(temp_tar_path, tar_buffer)
   Tar.extract({
-    file: '_imods.tar',
+    file: temp_tar_path,
     sync: true,
     cwd: outpath
   })
-  fs.unlink('_imods.tar', err => {
-    if (err) console.log(err)
+  fs.unlink(temp_tar_path, err => {
+    if (err) logger.error(err)
   })
-  console.log("Extracting imods to ", outpath)
+  logger.info("Extracting imods to ", outpath)
 }
 
 function removeModsFromEnabledList(responsible_mods) {
@@ -120,11 +131,14 @@ function removeModsFromEnabledList(responsible_mods) {
       // probably pre-window, don't need to worry here
       logger.warn("Don't have win!")
     }
-  } else {
+  } else if (window.vm) {
     logger.info("Changing modlist from vm")
     window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
     logger.info(window.vm.$localData.settings["modListEnabled"])
     window.vm.$localData.VM.saveLocalStorage()
+  } else {
+    logger.info("Trying to change modlist before vm")
+    store.set(store_modlist_key, new_enabled_mods)
   }
 }
 
@@ -194,7 +208,7 @@ if (ipcMain) {
         <p>Something went wrong while loading mods <em>${responsible_mods}</em>! 
         These have been disabled for safety.</p>
         <pre>${sanitizeHTML(e)}</pre>
-        <input type="button" value="1. Disable bad mods and Reload" onclick="doErrorRecover()" /><br />
+        <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
         <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
         <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
         <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
@@ -232,7 +246,8 @@ function bakeRoutes() {
 
           const treeroutes = getTreeRoutes(crawlFileTree(path.join(js._mod_root_dir, mod_tree), true))
           treeroutes.forEach(route => {
-            all_mod_routes[asset_tree + route] =
+            const route_href = new URL(asset_tree + route).href
+            all_mod_routes[route_href] =
               new URL(path.posix.join(mod_tree, route), js._mod_root_url).href
           })
         }
@@ -279,6 +294,8 @@ function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
   const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
 
+  list.push("_twoToThree")
+
   if (store.get('localData.settings.unpeachy'))
     list.push("_unpeachy")
   if (store.get('localData.settings.pxsTavros'))
@@ -309,7 +326,7 @@ function getEnabledModsJs() {
     return []
   }
   try {
-    return getEnabledMods().map((dir) => getModJs(dir))
+    return getEnabledMods().map((dir) => getModJs(dir)).filter(Boolean)
   } catch (e) {
     logger.error("Couldn't load enabled mod js'", e)
     return []
@@ -357,7 +374,7 @@ function buildApi(mod) {
       clear: () => store.clear(getModStoreKey(mod._id, null))
     }, 
     readFile(asset_path) {
-      let data = readFileSyncLocal(asset_path, "readJson")
+      let data = readFileSyncLocal(asset_path, "readFile")
       return data
     },
     readJson(asset_path) {
@@ -382,15 +399,16 @@ function getModJs(mod_dir, options={}) {
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
+  let modjs_path // full path to js file
+  let modjs_name // relative path to js file from mods dir
+  var mod
+
   try {
-    let modjs_path
-    var mod
+    // const use_webpack_require = false
 
     // Global, but let us overwrite it for some cases
     let thisModsDir = modsDir
     let thisModsAssetRoot = modsAssetsRoot
-
-    let use_webpack_require = false
 
     if (mod_dir.startsWith("_")) {
       // use_webpack_require = true
@@ -398,50 +416,82 @@ function getModJs(mod_dir, options={}) {
       thisModsAssetRoot = imodsAssetsRoot
     } 
 
-    if (options.singlefile) {
+    let is_singlefile = false
+    if (mod_dir.endsWith(".js")) {
+      // logger.debug(mod_dir, "is explicit singlefile.")
+      is_singlefile = true
+      modjs_name = mod_dir
       modjs_path = path.join(thisModsDir, mod_dir)
     } else {
-      modjs_path = path.join(thisModsDir, mod_dir, "mod.js")
-    }
-
-    if (use_webpack_require) {
-      console.log(modjs_path)
-      mod = require(modjs_path)
-    } else {
-      // eslint-disable-next-line no-undef
-      if (__non_webpack_require__.cache[modjs_path])
-        // eslint-disable-next-line no-undef
-        delete __non_webpack_require__.cache[modjs_path]
-
+      // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
       try {
-        // eslint-disable-next-line no-undef
-        mod = __non_webpack_require__(modjs_path)
+        const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
+        if (!is_directory) throw new Error("Not a directory")
+
+        // logger.debug(mod_dir, "confirmed as directory.")
+        is_singlefile = false
+        modjs_name = path.join(mod_dir, "mod.js")
+        modjs_path = path.join(thisModsDir, modjs_name)
       } catch (e) {
-        // imod AND this is the second attempt at importing it
-        if (mod_dir.startsWith("_")) {
-          console.log("Caught error importing imod")
-          if (fs.existsSync(path.join(assetDir, "archive"))) {
-            console.log("Couldn't load imod, trying re-extract")
-            extractimods()
-          } else {
-            console.log('Asset pack not found.');
-            throw e
-          }
-          console.log("Retrying import")
-          // eslint-disable-next-line no-undef
-          mod = __non_webpack_require__(modjs_path)
-        } else {
-          // console.log("mod", mod_dir, "is not imod, unrecoverable require error")
-          throw e
-        }
+        // Mod isn't an explicit singlefile or a directory
+        // logger.debug(mod_dir, "must be singlefile.")
+        is_singlefile = true
+        modjs_name = mod_dir + ".js"
+        modjs_path = path.join(thisModsDir, modjs_name)
       }
     }
 
+    // if (use_webpack_require) {
+    //   console.log(modjs_path)
+    //   mod = require(modjs_path)
+    // } else {
+    /* eslint-disable no-undef */
+    if (__non_webpack_require__.cache[modjs_path]) {
+      // logger.info("Removing cached version", modjs_path)
+      delete __non_webpack_require__.cache[modjs_path]
+    } else {
+      // logger.info(modjs_name, modjs_path, "not in cache")
+      Object.keys(__non_webpack_require__.cache)
+        .filter(cachepath => cachepath.endsWith(modjs_name))
+        .forEach(cachepath => {
+        logger.info("Removing partial match from cache", cachepath)
+        delete __non_webpack_require__.cache[cachepath]
+      })
+    }
+
+    try {
+      // eslint-disable-next-line no-undef
+      mod = __non_webpack_require__(modjs_path)
+    } catch (e) {
+      // imod 
+      if (mod_dir.startsWith("_")) {
+        console.log("Caught error importing imod")
+        if (options.noReextractImods) {
+          console.log("Already tried to re-extract imods, refusing to infinite loop")
+          throw e
+        }
+        if (expectWorkingState()) {
+          console.log("Couldn't load imod, trying re-extract")
+          extractimods()
+        } else {
+          console.log('Asset pack not found.')
+          throw e
+        }
+        console.log("Retrying import")
+        // eslint-disable-next-line no-undef
+        return getModJs(mod_dir, {...options, noReextractImods: true})
+      } else {
+        console.log("mod", mod_dir, "is not imod, unrecoverable require error")
+        throw e
+      }
+    }
+    // }
+
     mod._id = mod_dir
-    mod._singlefile = options.singlefile
+    mod._singlefile = is_singlefile
     mod._internal = mod_dir.startsWith("_")
 
-    if (!options.singlefile) {
+    if (!is_singlefile) {
       mod._mod_root_dir = path.join(thisModsDir, mod._id)
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
@@ -453,46 +503,27 @@ function getModJs(mod_dir, options={}) {
 
     // Computed properties don't automatically require a reload because
     // the object has been assigned any computed properties by now.
-    mod._needsreload = [
-      'styles', 'vueHooks', 'themes',
+    mod._needsArchiveReload = [
+      'edit', 'mspfa'
+    // eslint-disable-next-line no-prototype-builtins
+    ].some(k => mod.hasOwnProperty(k))
+    mod._needsHardReload = [
+      'styles', 'vueHooks', 'themes', 
       'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
     ].some(k => mod.hasOwnProperty(k))
 
     return mod
   } catch (e1) {
-    // elaborate error checking w/ afllback
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
-    if (options.singlefile) {
-      if (e1_is_notfound) {
-        // Tried singlefile, missing
-        throw e1
-      } else {
-        // Singlefile found, other error
-        logger.error("Singlefile found, other error 1")
-        onModLoadFail([mod_dir], e1)
-        throw e1
-      }
-    } else if (e1_is_notfound) {
-      // Tried dir/mod.js, missing
-      try {
-        // Try to find singlefile
-        options.singlefile = true
-        return getModJs(mod_dir, options)
-      } catch (e2) {
-        const e2_is_notfound = (e2.code && e2.code == "MODULE_NOT_FOUND")
-        if (e2_is_notfound) {
-          // Singlefile not found either
-          onModLoadFail([mod_dir], e1)
-        } else {
-          logger.error("Singlefile found, other error 2")
-          onModLoadFail([mod_dir], e2)
-        } 
-        // finally
-        throw e2
-      }
+    if (e1_is_notfound) {
+      // Tried singlefile, missing
+      logger.error("Missing file", mod_dir)
+      removeModsFromEnabledList([mod_dir])
+      return null
     } else {
-      // dir/mod.js found, other error
+      // Singlefile found, other error
+      logger.error("File found, other error")
       onModLoadFail([mod_dir], e1)
       throw e1
     }
@@ -501,6 +532,7 @@ function getModJs(mod_dir, options={}) {
 
 const footnote_categories = ['story']
 
+// ====================================
 // Interface
 
 function editArchive(archive) {
@@ -656,9 +688,10 @@ function getMixins(){
 
   const enabledModsJs = getEnabledModsJs()
 
-  var mixables = enabledModsJs.reverse()
+  // List of mods
+  var mixable_mods = enabledModsJs.reverse()
 
-  // Custom themes
+  // Add mod that contains custom themes
   var newThemes = enabledModsJs.reverse().reduce((themes, js) => {
     if (!js.themes) return themes
     return themes.concat(js.themes.map((theme, i) => 
@@ -666,7 +699,8 @@ function getMixins(){
       ))
   }, [])
   if (newThemes) {
-    mixables.push({
+    mixable_mods.push({
+      name: "!themes",
       vueHooks: [{
         matchName: "settings",
         data: {themes($super) {return $super.concat(newThemes)}}
@@ -674,6 +708,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom pages
   var newPages = enabledModsJs.reverse().reduce((pages, js) => {
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
@@ -683,7 +718,8 @@ function getMixins(){
     for (let k in newPages)
       pageComponents[k] = newPages[k].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!pages",
       vueHooks: [{
         matchName: "TabFrame",
         data: {modBrowserPages($super) {return {...newPages, ...$super}}},
@@ -694,6 +730,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom browser actions
   var newBrowserActions = enabledModsJs.reverse().reduce((actions, js) => {
     if (js.browserActions) {
       for (let k in js.browserActions) {
@@ -708,7 +745,8 @@ function getMixins(){
     for (let ck in newBrowserActions)
       actionComponents[ck] = newBrowserActions[ck].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!actions",
       vueHooks: [{
         matchName: "addressBar",
         // browserActions are raw components
@@ -717,6 +755,7 @@ function getMixins(){
     })
   }
 
+  // Add mod that contains custom browser toolbars
   var newBrowserToolbars = enabledModsJs.reverse().reduce((toolbars, js) => {
     if (js.browserToolbars) {
       for (let k in js.browserToolbars) {
@@ -731,7 +770,8 @@ function getMixins(){
     for (let ck in newBrowserToolbars)
       toolbarComponents[ck] = newBrowserToolbars[ck].component
 
-    mixables.push({
+    mixable_mods.push({
+      title: "!toolbars",
       vueHooks: [{
         matchName: "tabBar",
         // browserToolbars are raw components
@@ -740,7 +780,13 @@ function getMixins(){
     })
   }
 
-  var mixins = mixables.map((js) => {
+  // mixable_mods is now a list of mods that may add mixins.
+  // logger.info(mixable_mods)
+
+  const vueHooksByName = {}
+  const vueHooksMatchFn = []
+
+  mixable_mods.forEach((js) => {
     const vueHooks = js.vueHooks || []
     if (vueHooks.length == 0) {
       return null
@@ -748,65 +794,73 @@ function getMixins(){
 
     // Precompute as much as possible since mixins run everywhere
     vueHooks.forEach((hook) => {
-      // Shorthand
-      if (hook.matchName)
-        hook.match = (c) => (c.$options.name == hook.matchName)
-    })
-
-    const mixin =  {
-      created() {
-        const vueComponent = this
-
-        // Normally mixins are ignored on name collision
-        // We need to do the opposite of that, so we hook `created`
-        vueHooks.forEach((hook) => {          
-          if (hook.match(this)) {
-            // Literal created hook
-            if (hook.created)
-              hook.created.bind(this)()
-
-            for (const dname in (hook.data || {})) {
-              const value = hook.data[dname]
-              this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
-            }
-            // Computed
-            for (const cname in (hook.computed || {})) {
-              // Precomputed super function
-              const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
-              Object.defineProperty(this, cname, {
-                get: hook.computed[cname].bind(vueComponent, sup),
-                configurable: true
-              })
-            }
-            // Methods w/ optional super argument
-            for (const mname in (hook.methods || {})) {
-              const sup = this[mname] || nop
-              const bound = hook.methods[mname].bind(vueComponent)
-              this[mname] = function(){return bound(...arguments, sup)}
-            }
-          }
-        })
-      },
-      updated() {
-        vueHooks.forEach((hook) => {
-          if (hook.updated && hook.match(this)) {
-            hook.updated.bind(this)()
-          }
-        })
-      },
-      mounted() {
-        vueHooks.forEach((hook) => {
-          if (hook.mounted && hook.match(this)) {
-            hook.mounted.bind(this)()
-          }
-        })
+      // Not actually shorthand
+      if (hook.matchName) {
+        vueHooksByName[hook.matchName] = (vueHooksByName[hook.matchName] || [])
+        vueHooksByName[hook.matchName].push(hook)
+      } else {
+        vueHooksMatchFn.push(hook)
       }
+    })
+  })
+
+  const mixin =  {
+    created() {
+      const vueComponent = this
+
+      this._uhc_matching_hooks = [
+        ...(this._uhc_matching_hooks || []), // existing hooks
+        ...vueHooksMatchFn.filter(hook => hook.match(this)), // Complex hooks
+        ...(vueHooksByName[this.$options.name] || [])        // named hooks 
+      ]
+
+      // Hook things
+      // Normally mixins are ignored on name collision
+      // We need to do the opposite of that, so we hook `created`
+      this._uhc_matching_hooks.forEach(hook => {
+        // Literal created hook
+        if (hook.created)
+          hook.created.bind(this)()
+
+        for (const dname in (hook.data || {})) {
+          const value = hook.data[dname]
+          this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
+        }
+        // Computed
+        for (const cname in (hook.computed || {})) {
+          // Precomputed super function
+          const sup = (() => this._computedWatchers[cname].getter.call(this) || nop)
+          Object.defineProperty(this, cname, {
+            get: hook.computed[cname].bind(vueComponent, sup),
+            configurable: true
+          })
+        }
+        // Methods w/ optional super argument
+        for (const mname in (hook.methods || {})) {
+          const sup = this[mname] || nop
+          const bound = hook.methods[mname].bind(vueComponent)
+          this[mname] = function(){return bound(...arguments, sup)}
+        }
+      })
+    },
+    updated() {
+      this._uhc_matching_hooks.filter(hook => hook.updated).forEach(hook => {
+        hook.updated.bind(this)()
+      })
+    },
+    mounted() {
+      this._uhc_matching_hooks.filter(hook => hook.mounted).forEach(hook => {
+        hook.mounted.bind(this)()
+      })
+    },
+    destroyed() {
+      this._uhc_matching_hooks.filter(hook => hook.destroyed).forEach(hook => {
+        hook.destroyed.bind(this)()
+      })
     }
+  }
 
-    return mixin
-  }).filter(Boolean)
-
-  return mixins
+  return [mixin]
 }
 
 // Runtime
@@ -821,7 +875,8 @@ function jsToChoice(js, dir){
     locked: js.locked,
 
     hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
-    needsreload: js._needsreload,
+    needsArchiveReload: js._needsArchiveReload,
+    needsHardReload: js._needsHardReload,
     settingsmodel: js.settings,
     key: dir,
 
@@ -847,6 +902,10 @@ if (ipcMain) {
     // Get the list of mods players can choose to enable/disable
     var mod_folders
     try {
+      if (fs.existsSync(assetDir) && !fs.existsSync(modsDir)){
+        logger.info("Asset pack exists but mods dir doesn't, making empty folder")
+        fs.mkdirSync(modsDir)
+      }
       const tree = crawlFileTree(modsDir, false)
 
       // Extract zips
@@ -886,7 +945,7 @@ if (ipcMain) {
     var items = mod_folders.reduce((acc, dir) => {
       try {
         const js = getModJs(dir, {liteload: true})
-        if (js.hidden === true)
+        if (js === null || js.hidden === true)
           return acc // continue
 
         acc[dir] = jsToChoice(js, dir)

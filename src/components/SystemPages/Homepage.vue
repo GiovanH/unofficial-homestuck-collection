@@ -12,7 +12,7 @@
         <p class="versionNotice" v-if="$archive.version != $data.$expectedAssetVersion">
           This release of The Unofficial Homestuck Collection is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong> of the asset pack, but it looks like you're currently on <strong>v{{$archive.version}}</strong>.<br><br>
           Things <em>may</em> still work, but you should probably update<br />
-          to asset pack <strong>v{{$archive.version}}</strong> as soon as possible.
+          to asset pack <strong>v{{$data.$expectedAssetVersion}}</strong> as soon as possible.
         </p>
       </div>
     </div>
@@ -352,11 +352,12 @@
     <div v-if="modHomeRowItems.length" class="card unsortedCard noHeaderCard">
       <div class="cardContent cardRows">
         <HomeRowItem
-          v-for="item in modHomeRowItems"
+          v-for="item, i in modHomeRowItems"
           class="rowItem"
-          :key="item.href"
+          :key="`${i}-${item.href}`"
           :href="item.href"
           :thumbsrc="item.thumbsrc"
+          :class="item.class"
           :afterpage="item.afterpage"
           :date="item.date">
           <template v-slot:title>{{ item.title }}</template>
@@ -382,22 +383,13 @@ export default {
     NavBanner, Media, HomeRowItem, Logo
   },
   data: function() {
-    return {
-      modHomeRowItems: [
-      // {
-      //   href: "/ryanquest",
-      //   thumbsrc: "/archive/collection/archive_ryanquest.png",
-      //   date: "Oct 2010",
-      //   title: 'Ryanquest',
-      //   description: `<p><a href="https://www.qwantz.com">Ryan North</a> has had enough of Andrew Hussie's lies. Join him on his quest to do... something.</p>`
-      // }
-      ]
-    }
+    return {}
   },
   title: function(ctx) {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []}
   },
   methods: {
   }

@@ -28,9 +28,6 @@
               <option v-for="fn, label in sortByChoices" :value="label" :key="label" v-text="label" />
             </select>
           </p>
-          <!-- <p>
-            (As with all external links, <em>we recommend staying away from these sites</em> until you've finished the comic, as spoilers abound!)
-          </p> -->
         </section>
 
         <section class="list">

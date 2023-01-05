@@ -24,7 +24,7 @@ import Resources from "@/resources.js"
 
 export default {
   name: "MediaEmbed",
-  props: ['url', 'gifmode', 'webarchive'],
+  props: ['url', 'gifmode', 'webarchive', 'width', 'height'],
   emits: ['blockedevent'], 
   data() {
     return {
@@ -252,8 +252,8 @@ export default {
 
       const defaultProps = {
         id: filename, 
-        width: 650, 
-        height: 450, 
+        width: this.width || 650,
+        height: this.height || 450,
         bgcolor: '#fff',
         rawStyle: ''
       }

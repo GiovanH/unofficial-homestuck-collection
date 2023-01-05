@@ -18,7 +18,7 @@ class LocalData {
             key: "000",
             url: '/',
             title: '',
-            hasAudio: false,
+            hasEmbed: false,
             history: [],
             future: []
           }
@@ -40,7 +40,7 @@ class LocalData {
       }
     }
 
-    let initSettings = {
+    const initSettings = {
       newReader: {
         current: '001901',
         limit: '001902'
@@ -48,8 +48,8 @@ class LocalData {
       notifications: true,
       subNotifications: false,
 
-      showAddressBar: false,
-      urlTooltip: false,
+      showAddressBar: true,
+      urlTooltip: true,
       switchToNewTabs: false,
       forceScrollBar: true,
       hideFullscreenHeader: false,
@@ -59,6 +59,8 @@ class LocalData {
       bandcampEmbed: true,
       allowSysUpdateNotifs: true,
       devMode: false,
+      enableHardwareAcceleration: false,
+      useSystemWindowDecorations: false,
 
       themeOverride: "default",
       themeOverrideUI: "default",
@@ -78,7 +80,6 @@ class LocalData {
       hqAudio: true,
       jsFlashes: true,
       credits: true,
-      footnotes: false,
 
       fastForward: false,
 
@@ -176,7 +177,7 @@ class LocalData {
                 key: "000",
                 url: '/',
                 title: '',
-                hasAudio: false,
+                hasEmbed: false,
                 history: [],
                 future: []
               }
@@ -219,7 +220,7 @@ class LocalData {
             key: key,
             url: url,
             title: '',
-            hasAudio: false,
+            hasEmbed: false,
             history: [],
             future: []
           })
@@ -284,7 +285,7 @@ class LocalData {
               key: key,
               url,
               title: '',
-              hasAudio: false,
+              hasEmbed: false,
               history,
               future
             })
@@ -408,12 +409,12 @@ class LocalData {
           this.saveLocalStorage()
         },
 
-        TABS_SET_HASAUDIO(key, hasAudio) {
+        TABS_SET_HASEMBED(key, hasEmbed) {
           if (!key) {
-            console.warn("Can't set hasAudio of a tab you haven't sent me")
+            console.warn("Can't set hasEmbed of a tab you haven't sent me")
             return
           }
-          this.tabData.tabs[key].hasAudio = hasAudio
+          this.tabData.tabs[key].hasEmbed = hasEmbed
 
           // this.saveLocalStorage()
         },

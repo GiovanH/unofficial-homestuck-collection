@@ -112,7 +112,7 @@ export default {
     },
     jumpFromUrl(){
       if (this.routeParams.id) {
-        const year = /\d+$/.exec(this.routeParams.id)[0]
+        const year = /(\d+)[a-z]?$/.exec(this.routeParams.id)[1]
         if (year in this.newsposts) {
           this.activeYear = year
           this.$nextTick(()=>{
@@ -144,6 +144,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  ::v-deep .post {
+    > table[style] {
+      // Fixes /news/4-14-13 in dark mode, possibly others
+      color: black;
+    }
+  }
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);

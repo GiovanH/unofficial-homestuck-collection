@@ -5,7 +5,7 @@
       $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
         
       ]" v-if="$archive && $root.loadState !== 'ERROR'">
-      <AppHeader :class="theme" ref="appheader" />
+      <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />
       <ContextMenu :class="theme" ref="contextMenu" />
@@ -14,7 +14,7 @@
       <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
     </div>
     <div id="app" class="mspa"  v-else>
-      <Setup />
+      <Setup ref="uistyle" />
       <ContextMenu ref="contextMenu" />
     </div>
   </div>
@@ -131,12 +131,12 @@
       },
       updateAppIcon(){ 
         this.$nextTick(() => {
-          if (!this.$refs["appheader"]) {
-            this.$logger.warn("trying to updateAppIcon, but no appheader element yet")
+          if (!this.$refs["uistyle"]) {
+            this.$logger.warn("trying to updateAppIcon, but no uistyle (appheader/setup) element yet")
             setTimeout(() => this.updateAppIcon(), 2000)
             return
           }
-          let app_icon_var = window.getComputedStyle(this.$refs["appheader"].$el).getPropertyValue('--app-icon')
+          let app_icon_var = window.getComputedStyle(this.$refs["uistyle"].$el).getPropertyValue('--app-icon')
           let match
           // eslint-disable-next-line no-cond-assign
           if (match = /url\(\\\/(.+)\\\/\)/.exec(app_icon_var)) {
@@ -289,7 +289,7 @@
           if (event.defaultPrevented) return
 
           // don't handle if `target="_blank"`
-          const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
+          // const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
           // don't handle right clicks
           if (button !== undefined && button !== 1) return
 

@@ -99,10 +99,12 @@
             <div class="center">
               <button @click="locateAssets()">Locate Assets</button>
               <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
+              <!-- TODO: Unify this warning with the popup you get for entering an incorrect path -->
+              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}.</strong></span>
             </div>
             
             <div class="center">
-              <button class="letsroll" :disabled="!validatePage" @click="validateAndRestart()">All done. Let's roll!</button>
+              <button class="letsroll" :disabled="!validatePage || !isExpectedAssetVersion" @click="validateAndRestart()">All done. Let's roll!</button>
             </div>
           </div>
 
@@ -118,15 +120,35 @@
         </div>
       </div>
 
-      <div class="loadcard" v-else-if="isLoading && !(timeout || $root.loadState === 'ERROR')">
-        <div class="lds-spinner">
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
-          <div></div><div></div><div></div><div></div>
+      <div v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
+        <div class="loadcard" >
+<svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
+  <g>
+    <!-- <circle cx="0" cy="0" r="3" fill="orange"/> -->
+    <g id="halfSpiro" class="left">
+      <!-- <circle cx="0" cy="0" r="2" fill="blue"/> -->
+      <!-- <path v-if="copiedPath" :d="copiedPath" style="stroke: blue; stroke-width: 22px;" /> -->
+      <path id="thePath" :d="spiroPos[spiroTestindex]">
+        <animate v-if="spiroTestAnimate"
+          attributeName="d"
+          :values="spiroPosDoubled.join('; \n')"
+          :keyTimes="Array.from(spiroPosDoubled, (_, i) => (i/(spiroPosDoubled.length - 1)).toFixed(2)).join(';')"
+          dur="5.5s" begin="0s" repeatCount="indefinite" />
+      </path>
+      <use href="#thePath"
+        v-for="n in 9"  :key="`p${n}`"
+        :style="{transform: `rotate(${(n) * (360/10)}deg)`}"/>
+    </g>
+    <use href="#halfSpiro" class="right" />
+  </g>
+    <!-- <circle cx="0" cy="0" r="4" fill="red"/> -->
+</svg>
+          <p v-text="loadText"></p>
         </div>
-        <p v-text="loadText"></p>
-        <!-- Preloader -->
-        <Logo class="hidden"/>
+        <!-- <input type="checkbox" v-model="spiroTestAnimate" />
+        <button @click="copiedPath = spiroPos[spiroTestindex]">Copy</button>
+        <select v-model="spiroTestindex"><option v-for="v, i in spiroPos" :key="i" :value="i" v-text="i" /></select>
+        <textarea v-model="spiroPos[spiroTestindex]" style="width: 100%; height: 80px" /> -->
       </div>
 
       <div class="card" v-else>
@@ -158,18 +180,19 @@
 
           <div class="errorWithoutMods" v-else>
             <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>It looks like something went wrong with your asset pack since the last time you were here. I'm looking for it in:</p><br>
+            <p>It looks like something went wrong with your asset pack since the last time you were here.<br />I'm looking for <strong>v{{$data.$expectedAssetVersion}}</strong> in:</p><br>
             <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
+            <p>If you just updated the app, you might have asset pack <strong>v1</strong> installed already. This version requires <strong>v{{$data.$expectedAssetVersion}}</strong>; if you don't have it already, go to our <a href='https://bambosh.github.io/unofficial-homestuck-collection/'>website</a> for information on downloading it.</p><br>
             <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
-            <p>If you were editing any of the assets and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
-            <p>Also try to make sure that you're using the latest version of the asset pack. This version of the application is tuned around <strong>v{{$data.$expectedAssetVersion}}</strong>. That's not guaranteed to solve any problems, but it might prevent any unexpected weirdness.</p><br>
+            <p>If you were using v2 already but made a change and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
             <div class="center">
-              <button @click="locateAssets()">Locate Assets</button>
+              <button @click="locateAssets()">Locate Asset Pack v{{$data.$expectedAssetVersion}}</button>
               <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
+              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
             </div>
             
             <div class="center">
-              <button class="letsroll" @click="errorModeRestart()">All done. Let's roll!</button>
+              <button class="letsroll" :disabled="!validatePage || !isExpectedAssetVersion" @click="errorModeRestart()">All done. Let's roll!</button>
             </div>
           </div>
         </div>
@@ -184,7 +207,7 @@
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
-import Logo from '@/components/UIElements/Logo.vue'
+// import Logo from '@/components/UIElements/Logo.vue'
 
 // import { parse } from 'querystring'
 const { ipcRenderer } = require('electron')
@@ -192,22 +215,27 @@ const { ipcRenderer } = require('electron')
 export default {
   name: 'setup',
   components: {
-    TitleBar, NewReaderControls, SpoilerBox, Logo
+    TitleBar, NewReaderControls, SpoilerBox //, Logo
   },
   data: function() {
     return {
       newReaderCardIndex: 0,
       lastNewReaderCard: 4,
+      spiroTestindex: 0,
+      copiedPath: undefined,
+      spiroTestAnimate: true,
       newReaderCardNames: [
         "Intro",
         "Content Warnings",
         "New Readers",
         "Reading Experience",
-        "Getting Started"
+        "Getting Started",
       ],
       newReaderToggle: true,
-      timeout: false,
+      loadingTooLongTimeout: false,
       assetDir: undefined,
+      isExpectedAssetVersion: undefined,
+      selectedAssetVersion: undefined,
       contentWarnings: [
         'Slurs',
         'Misogyny, sexism',
@@ -254,10 +282,29 @@ export default {
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
         "PATCHES": "Applying spackle"
-      }
+      },
+      spiroPos: [
+        "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
+        "M-6.5  -81.8  Q-20.9  -10.45  -84.5  -1.35  -148.1  7.8    -186.1  -45.15 -224.1  -98.05  -206.4  -156.1  -188.7  -214.1  -203.4  -275",
+        "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
+        "M-25.5 -140.3 Q-63.3  -95.15  -103.9 -78.9  -144.45 -62.65 -181.9  -84.3  -219.35 -105.9  -218.65 -160.0  -217.9  -214.1  -184.95 -258.3",
+        "M-14.0 -102.8 Q-64.65 -101.15 -107.4 -66.9  -150.1  -32.65 -184.75 -69.3  -219.35 -105.9  -218.65 -160.0  -217.9  -214.1  -184.95 -258.3",
+        "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
+        "M8.0   -40.3  Q-4.85  -7.45   -74.5  -1.35  -138.15 7.8    -181.15 -49.15 -224.1  -98.05  -218.0  -150.1  -217.9  -214.1  -144.95 -228.3",
+        "M4     -57    Q-9.8   -6.3    -67.5  1.3    -125.2  8.95   -120.8  -53.7  -116.4  -116.35 -166.0  -165.25 -215.6  -214.15 -180.45 -260",
+        "M-8.0  -88.3  Q-9.8   -6.3    -72.15 2.85   -134.45 12.0   -172.5  -21.9  -210.5  -55.75  -210.9  -123.3  -211.25 -190.8  -160.45 -239.8",
+        "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
+        "M-47.0 -215.3 Q-40    -70     -95.5  -36.35 -138.15 -17    -185.15 -52.15 -229.1  -100.05 -221.0  -156.1  -217.9  -214.1  -164.95 -245.3",
+        "M-24.0 -135.3 Q-20    -60     -80.5  -36.35 -138.15 -17    -185.15 -52.15 -229.1  -100.05 -207.0  -146.1  -187.9  -196.1  -114.95 -205.3",
+        "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3"
+      ]
+// cat * | grep "<path d" | sed -E "s/.+?d=\"([^\"]+?)\".+/\"\1\",/g" | sed -E 's/([A-Z ])-([0-9])/\1_\2/g' | sed -E 's/([A-Z ])([0-9])/\1-\2/g' | sed -E 's/([A-Z ])_([0-9])/\1\2/g'
     }
   },
   computed: {
+    spiroPosDoubled(){
+      return this.spiroPos.reduce((acc, i) => [...acc, i, i], [])
+    },
     wizardForwardButtonDisabled(){
       const pagename = this.newReaderCardNames[this.newReaderCardIndex]
       if (pagename == 'New Readers') {
@@ -295,7 +342,7 @@ export default {
   },
   mounted() {
     setTimeout(function() {
-      this.timeout = true
+      this.loadingTooLongTimeout = true
     }.bind(this), 8000)
   },
   methods: {
@@ -313,15 +360,23 @@ export default {
       this.newReaderCardIndex = next_index
     },
     locateAssets(){
-      ipcRenderer.invoke('locate-assets', {restart: false}).then( result => {
+      ipcRenderer.invoke('locate-assets', {restart: false}).then(result => {
         this.assetDir = result || this.assetDir
+        this.checkAssetVersion(this.assetDir)
+      })
+    },
+    checkAssetVersion(assetDir){
+      ipcRenderer.invoke('check-archive-version', {assetDir}).then(result => {
+        this.selectedAssetVersion = result
+        this.isExpectedAssetVersion = (result == this.$data.$expectedAssetVersion)
+        this.$logger.info("Version check: got", result, "eq?", this.$data.$expectedAssetVersion, this.isExpectedAssetVersion)
       })
     },
     clearEnabledMods(){
       this.$localData.settings["modListEnabled"] = []
       this.$localData.VM.saveLocalStorage()
 
-      this.timeout = false
+      this.loadingTooLongTimeout = false
 
       this.modSoftRestart()
     },
@@ -410,6 +465,10 @@ export default {
         display: block;
         font-size: 13px;
         color: #888888;
+      }
+      .error, .hint.error {
+        color: crimson !important;
+        font-weight: bold;
       }
     }
     hr {
@@ -564,96 +623,62 @@ export default {
   margin: auto;
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: initial;
     font-size: 16px;
     color: white;
+
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px black;
   }
 
-  // adapted from https://loading.io/css/
-  .lds-spinner {
-    $size: 120px;
-    $halfsize: calc(#{$size} / 2);
-
-    color: official;
-    display: block;
-    position: relative;
-    width: $size;
-    height: $size;
-    margin: auto;
-
-    div {
-      transform-origin: $halfsize $halfsize;
-      animation: lds-spinner 1.2s linear infinite;
-
-      &:nth-child(1) {
+  svg.spiro {
+    @keyframes spin {
+      from {
         transform: rotate(0deg);
-        animation-delay: -1.1s;
       }
-      &:nth-child(2) {
-        transform: rotate(30deg);
-        animation-delay: -1s;
-      }
-      &:nth-child(3) {
-        transform: rotate(60deg);
-        animation-delay: -0.9s;
-      }
-      &:nth-child(4) {
-        transform: rotate(90deg);
-        animation-delay: -0.8s;
-      }
-      &:nth-child(5) {
-        transform: rotate(120deg);
-        animation-delay: -0.7s;
-      }
-      &:nth-child(6) {
-        transform: rotate(150deg);
-        animation-delay: -0.6s;
-      }
-      &:nth-child(7) {
-        transform: rotate(180deg);
-        animation-delay: -0.5s;
-      }
-      &:nth-child(8) {
-        transform: rotate(210deg);
-        animation-delay: -0.4s;
-      }
-      &:nth-child(9) {
-        transform: rotate(240deg);
-        animation-delay: -0.3s;
-      }
-      &:nth-child(10) {
-        transform: rotate(270deg);
-        animation-delay: -0.2s;
-      }
-      &:nth-child(11) {
-        transform: rotate(300deg);
-        animation-delay: -0.1s;
-      }
-      &:nth-child(12) {
-        transform: rotate(330deg);
-        animation-delay: 0s;
+      to {
+        transform: rotate(360deg);
       }
     }
-    div:after {
-      content: " ";
-      display: block;
-      position: absolute;
-      top: 3px;
-      left: calc(#{$size} / 2 - 3px);
-      width: 6px;
-      height: calc(#{$size} / 4 - 2px);
-      border-radius: 20%;
-      background: #fff;
+    animation-name: spin;
+    animation-duration: 8000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    > g, use {
+    // container
+      transform: translate(0, 145px);
+      > g, use { // Spirograph half
+        height: 520px;
+        width: 520px;
+        stroke: rgb(56, 244, 61);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8;
+        fill: transparent;
+        &.left { // Left
+          transform: translate(24px, 0);
+          // stroke: orange;
+        }
+        &.right { // Right
+          // transform: translate(-24px, 0) scale(-1, 1);
+          transform: scale(-1, 1);
+        }
+        path, use {
+          transform-origin: -24px -145px;
+          &:nth-child(3),
+          &:nth-child(4),
+          &:nth-child(5),
+
+          &:nth-child(8),
+          &:nth-child(9),
+          &:nth-child(10) {
+            display: none;
+            display: inherit;
+          }
+        }
+      } // end half
     }
-  }
-  @keyframes lds-spinner {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
+  } // end svg
 }
 
 </style>

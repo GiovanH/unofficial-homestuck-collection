@@ -19,14 +19,31 @@ module.exports = {
                     buildResources: "build"
                 },
                 win: {
-                    target: "zip"
+                    target: {
+                        target: "zip",
+                        arch: [
+                            "x64",
+                            "ia32"
+                        ]
+                    },
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 mac: {
-                    category: "entertainment"
+                    target: ["dmg"],
+                    category: "entertainment",
+                    identity: null,
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],
-                    category: "game"
+                    category: "game",
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 }
             }
         }

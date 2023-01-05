@@ -182,7 +182,7 @@ export default {
         .replace(/\[/g, "&#91;")
         .replace(/\]/g, "&#93;")
       this.invokeSearch({input: this.query, sort, filter}).then(results => {
-        this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.key)) : results
+        this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
         // TODO: Trim long pages to only show relevant context in search
         this.freshStart = false
       })

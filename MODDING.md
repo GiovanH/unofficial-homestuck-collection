@@ -10,13 +10,11 @@ Implementation of the modding API can be found at or near [`/src/mods.js`](https
 
 Mods can be written according to the [API specification](#API-specification) below.
 
-...
-
 ### Distributing mods
 
 Mods should be distributed as either single-file `.js` scripts or as compressed archives containing a mod folder. 
 
-...
+There is a wiki page, [Third Party Mods](https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods), that collects an index of mods people have written. If you write a (public, appropriate) mod, feel free to link it there. 
 
 ### Installing mods
 
@@ -41,7 +39,6 @@ Installed mods will be available in the `SETTINGS` page (jump `/settings`), unde
 Some changes don't require any sort of reload at all. Some require a soft reload, and some require a full application restart.
 
 Basically, anything that requires the main process to reload requires an application restart. This is usually if you change an actual file in the mods directory. Anything that modifies vue or adds CSS requires a soft reload, and stuff that just modifies the archive or adds footnotes can reload within vue. 
-
 
 ## API specification
 
@@ -95,6 +92,30 @@ edit(archive) {
 
 Here, the specific phrase "the 13th of April, 2009, " is replaced, and any other text in `content` is left to pass through. 
 
+The `archive` object is the main data object that drives the story. It's defined in src/background.js:loadArchiveData, and stores the information from the json files in archive/data.
+So `archive.mspa` is `mspa.json`, etc.
+
+There are some other objects exposed by the archive used to tweak behavior that is not found directly in json files, usually in `archive.tweaks`.
+
+`archive.tweaks.modHomeRowItems` is a list of extra icons to be added to the home screen. A brief example:
+
+```js
+edit(archive) {
+    const myIcon = {
+        href: "/zombo", // linked page
+        thumbsrc: "assets://archive/collection/archive_ryanquest.png", // icon src
+        date: "", // string
+        title: 'Zombocom', // short title
+        description: `<p>You can do anything</p>` // HTML description
+    }
+    archive.tweaks.modHomeRowItems.unshift(myIcon)
+}
+```
+
+`unshift` is used here because `modHomeRowItems` is a list, and mods at the top of the list are applied last, so `unshift` puts icons from mods at the top of the list at the top of the homescreen card.
+
+**Caution: `archive.music` is currently scheduled to be restructured, and should be considered unstable.**
+
 ### Routes
 
 An obvious use for modding is replacing files and images with new ones you provide. **If the image is a new one you're adding, you do not need to use `edit()` for this**. A naive way to replace the first image of Homestuck, for example, would be this:
@@ -144,6 +165,17 @@ routes: {
 ```
 
 Just reroute the first file's path to another's. (Note that it is possible to use this syntax to create an infinite loop, which the collection will detect and treat as an error.)
+
+The left-hand side of a route *does not need to point to a file that exists in the asset pack.* You can use this behavior to create "pseudo-files" that you can reference from anywhere.
+
+The test mod does this explicitly:
+
+```json
+  routes: {
+    'assets://storyfiles/hs2/05235/toxic1.mp3': './toxic1.mp3',
+    'assets://storyfiles/hs2/01940/cascade.mp3': './cascadebeta.mp3'
+  },
+```
 
 ### Treeroutes
 
@@ -307,8 +339,6 @@ Optionally, your `footnotes` field can instead be set to a string, which will be
     footnotes: "./footnotes.json"
 ```
 
-As yet another option, your `footnotes` field can point to a function that *returns* a footnotes object. This is a good way to make programatic changes to your footnotes object that require runtime resources, like the settings store.
-
 Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the parser constructs explicit maps of footnotes, computing inheritance at load time.
 
 ### `computed`
@@ -398,7 +428,50 @@ Use the `settings` field to define a data model. The archive will automatically 
     + `label`: A short label for this option
     + `desc`: A longer description for this option. Optional.
 
-Note that there is no setting for a default option. Values will always be undefined until the user interacts with the settings screen. You can override this behavior by including logic in your `computed` handler, for example
+A full example:
+
+```js
+  settings: {
+    boolean: [{
+      model: "booltest",
+      label: "Mod bool test",
+      desc: "Mod bool test desc"
+    }],
+    radio: [{
+      model: "radiotest",
+      label: "Mod radio test",
+      desc: "Mod radio test desc",
+      options: [
+        {
+          value: "value_a",
+          label: "Value A",
+          desc: "the a value"
+        },
+        {
+          value: "value_b",
+          label: "Value B",
+          desc: "the b value"
+        }
+      ]
+    },{
+      model: "radiotest2",
+      label: "Mod radio test (Compressed)",
+      desc: "Mod radio test desc 2",
+      options: [
+        {
+          value: "value_a",
+          label: "Value A"
+        },
+        {
+          value: "value_b",
+          label: "Value B"
+        }
+      ]
+    }]
+  }
+```
+
+Note that there is no setting for a default option. Values will always be undefined (falsey) until the user interacts with the settings screen. You can override this behavior by including logic in your `computed` handler, for example
 
 ```js
   computed(api) { 
@@ -409,14 +482,16 @@ Note that there is no setting for a default option. Values will always be undefi
 
 ### Vue Hooks
 
+**VueHooks are a bare-metal way to make changes, and should be considered highly unstable.** Using stable, supported API methods like `edit(archive)` is highly preferred whenever posssible, as VueHooks are liable to break with even minor patch versions.
+
 Vue hooks are the most complicated and the most powerful method of modifying the collection, and modify the Vue.js pages directly using mixins. 
 
 `vueHooks`: `List<VueHook>`
 
 Each `VueHook` has the following properties:
 
-- `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state.
-- `matchName` (string, optional): Shorthand for `match(c) {return c.$options.name == "pageText"}`. Helpful for matching specific `.vue` files by name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
+- `match(t)` (function): Gets the page's vue `this` object as an argument. Should return `true` if this hook is relevant for the page, and should not mutate state. Try to use `matchName` instead, though:
+- `matchName` (string, optional): Works like `match(c) {return c.$options.name == "pageText"}`, but is *much* more performant. Helpful for matching specific `.vue` files by their vue name. Do not define both a `matchName` and a `match(t)` function in the same VueHook.
 
 Ways to hook Vue data, in order from most to least recommended:
 
@@ -530,6 +605,57 @@ Note that the `component` object has two special page functions that take, as th
 
 - `title` (`function(ctx)`): A function that should return the tab title of the page.
 - `theme` (`function(ctx)`) (optional): A function that should return a theme id bassed on the url of the page. This may or may not style the app window depending on user settings. Return anything falsey to use the default theme.
+
+`browserActions`: `Map<Name: BrowserAction>`
+
+Like browserPages, but define a vue component to be used as a browserAction (address bar button).
+
+`BrowserAction.component`: the main vue component.
+
+An example BrowserAction, from oddities:
+
+```js
+const browserActions = {
+    HQAudioToggle: {
+      component: {
+        methods: {
+          toggle() {
+            this.$localData.settings.hqAudio = !this.$localData.settings.hqAudio
+          }
+        },
+        render: function(){with (this) {
+          return _c(
+            // Main component: a div with the systemButton class.
+            "div",
+            { staticClass: "systemButton",
+              // Specify what property makes the button "active":
+              class: { active: $localData.settings.hqAudio },
+              // Specify the action onClick
+              on: { click: toggle }
+            },
+            // Graphic used in the icon. Here is a fontAwesome icon
+            [ _c("fa-icon", {
+                attrs: { icon: "music" }
+              }),
+              // An optional badge, to display additional information
+              _c("span", { staticClass: "badge" }, 
+                [_v($localData.settings.hqAudio ? "HQ" : "LQ")]
+              )
+            ], 1
+          )
+        }}
+      }
+    }
+}
+```
+
+`browserToolbars`: `Map<Name: BrowserToolbar>`
+
+Like browserActions, but define a vue component to be used as a toolbar.
+
+`BrowserToolbar.component`: the main vue component.
+
+Toolbar components should have a main div element.
 
 ### Misc
 

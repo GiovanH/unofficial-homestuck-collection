@@ -23,8 +23,8 @@
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
-        <FindBox    :tab="tab" ref="findbox"/>
-        <JumpBox    :tab="tab" ref="jumpbox" />
+        <FindBox    :tab="tab" ref="findbox" :class="theme"/>
+        <JumpBox    :tab="tab" ref="jumpbox" :class="theme" />
     </div>
 </template>
 
@@ -211,12 +211,12 @@ export default {
                     // Construct canonical story name and page number
                     let story_id
                     let page_num
+                    const is_ryanquest = this.routeParams.base === 'ryanquest'
                     if (this.$isVizBase(this.routeParams.base)) {
                         const {s, p} = this.$vizToMspa(this.routeParams.base, this.routeParams.p)
                         story_id = s
                         page_num = p
                     } else {
-                        const is_ryanquest = this.routeParams.base === 'ryanquest'
                         page_num = this.routeParams.p
                         const tryLookup = this.$mspaToViz(page_num, is_ryanquest)
                         if (tryLookup) {
@@ -226,15 +226,22 @@ export default {
                         }
                     }
 
+                    // Lock ryanquest to mspa numbers for now
+                    // if (is_ryanquest) {
+                    //     page_num = this.$vizToMspa(this.routeParams.base, page_num).p
+                    // }
+
+                    const isTzPassword = (this.$archive.tweaks.tzPasswordPages.includes(page_num))
+                    
                     if (!(page_num && story_id)) component = 'Error404'
-                    else if (this.$pageIsSpoiler(page_num, true)) component = 'Spoiler'
+                    else if (this.$pageIsSpoiler(page_num, true) && !isTzPassword) component = 'Spoiler'
                     else if (
                         (story_id === 'ryanquest' && !(page_num in this.$archive.mspa.ryanquest)) || 
                         (story_id !== 'ryanquest' && !(page_num in this.$archive.mspa.story))
                     ) component = 'Error404'
                     else if (this.routeParams.base !== 'ryanquest') {
                         // If it's a new reader, take the opportunity to update the next allowed page for the reader to visit
-                        if (this.$isNewReader) this.$updateNewReader(page_num)
+                        this.$updateNewReader(page_num)
                         
                         const flag = this.$archive.mspa.story[page_num].flag
                         
@@ -303,7 +310,7 @@ export default {
                     break
                 }
                 case 'UNLOCK': {
-                    if (this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
+                    if (this.routeParams.p && this.routeParams.p.toLowerCase() === 'ps_titlescreen') component = 'PS_titlescreen'
                     else if (this.routeParams.p in this.$archive.mspa.psExtras) {
                         if ((this.routeParams.p == 'ps000039' && this.$pageIsSpoiler('003655')) || (this.routeParams.p == 'ps000040' && this.$pageIsSpoiler('003930'))) component = 'Spoiler'
                         else component = 'ExtrasPage'
@@ -421,7 +428,7 @@ export default {
             return (theme == 'default' ? 'mspa' : theme)
         },
         forceLoad(){
-            return this.tab.hasAudio
+            return this.tab.hasEmbed
         }
     },
     methods: {
@@ -433,10 +440,27 @@ export default {
             })
         },
         leftKeyPress(e) {
-            if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('left', e)
+            if (this.$localData.settings.arrowNav && 
+                this.$refs.page.keyNavEvent && 
+                !e.altKey && 
+                document.activeElement.tagName != 'INPUT') {
+                if (this.$el.scrollLeft == 0) {
+                    // Only send event if scrolling doesn't happen
+                    this.$refs.page.keyNavEvent('left', e)
+                }
+            }
         },
         rightKeyPress(e) {
-            if (this.$localData.settings.arrowNav && this.$refs.page.keyNavEvent && !e.altKey && document.activeElement.tagName != 'INPUT') this.$refs.page.keyNavEvent('right', e)
+            if (this.$localData.settings.arrowNav && 
+                this.$refs.page.keyNavEvent && 
+                !e.altKey && 
+                document.activeElement.tagName != 'INPUT') {
+                const frameEl = this.$el
+                if (frameEl.scrollLeft + frameEl.clientWidth == frameEl.scrollWidth) {
+                    // Only send event if scrolling doesn't happen
+                    this.$refs.page.keyNavEvent('right', e)
+                }
+            }
         },
         toggleBookmarks() {
             this.$refs.bookmarks.toggle()
@@ -476,7 +500,7 @@ export default {
     },
     updated(){
       this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASAUDIO(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
       })
     },
     watch: {
@@ -503,7 +527,7 @@ export default {
     },
     destroyed() {
         // Iframes sometimes decide to keep running in the background forever, so we manually clean them up
-        if (this.$el) {
+        if (this.$el.querySelectorAll) {
             const iframes = this.$el.querySelectorAll(`iframe`)
             for (var i = 0; i < iframes.length; i++) {
                 iframes[i].parentNode.removeChild(iframes[i])

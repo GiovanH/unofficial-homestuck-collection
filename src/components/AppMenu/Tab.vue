@@ -24,13 +24,15 @@ export default {
     return {
       pendingDeletion: false,
       resizeObserver: undefined,
-      titleFade: false,
-      stubAudioIcon: true
+      titleFade: false
     }
   },
   computed: {
+    stubAudioIcon(){
+      return !this.$localData.settings.devMode
+    },
     hasAudio() {
-      return this.tab.hasAudio
+      return this.tab.hasEmbed
     },
     isActiveTab() {
       return this.tab.key === this.$localData.tabData.activeTabKey

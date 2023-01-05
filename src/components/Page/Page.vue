@@ -56,7 +56,6 @@ export default {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
-      forceKeyboardEnable: false, // overridden by oddities
       showMetadata: false
     }
   },
@@ -132,7 +131,7 @@ export default {
         const flashPath = mediakey.substring(0, mediakey.length - 4)
         this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
         media[0] = `${flashPath}_hq.swf`
-      } else if (mediakey.includes(".swf")) {
+      } else if (mediakey && mediakey.includes(".swf")) {
         this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
 
@@ -208,11 +207,12 @@ export default {
     },
     keyNavEvent(dir) {
       // If navigation is hidden, abort now (unless force is on)
-      if (this.hideNav && !this.forceKeyboardEnable)
+      if (this.hideNav && !this.$archive.tweaks.forceKeyboardEnable)
         return
 
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
+      if (dir == 'left' && 'previous' in this.thisPage) 
+        this.$pushURL(this.$refs.pageNav.backUrl)
+      else if (dir == 'right') {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
         else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
       }

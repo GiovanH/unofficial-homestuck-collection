@@ -32,12 +32,13 @@
           :ref="'tab_' + key" 
           @mousedown.left.native="initDrag()" />
       </transition-group>
+      <!-- TODO: Replace this with an svg so it's consistent across systems -->
       <button class="systemButton newTabButton" @click="newTab()" title="New tab">
         <span>＋</span></button>
       <div class="sysActionButtons">
         <button class="systemButton sysActionButton jumpBoxButton" 
          v-if="!$localData.settings.showAddressBar" 
-         @click="toggleJumpBox" title="Jump box">
+         @click="toggleJumpBox" title="Jump bar">
           <fa-icon icon="terminal"></fa-icon></button>
         <button class="systemButton sysActionButton bookmarksButton" @click="toggleBookmarks" title="Bookmarks">
           <fa-icon icon="bookmark"></fa-icon></button>
@@ -304,8 +305,11 @@ export default {
     padding: 0px var(--padding);
   }
   .sysActionButtons {
-    --padding: 4px;
-    padding: 2px var(--padding);
+    // --padding: 4px;
+    // padding: 2px var(--padding);
+    .sysActionButton {
+      width: 38px;
+    }
   }
   .historyButton, .sysActionButton {
       color: var(--font-default);
@@ -419,6 +423,7 @@ export default {
 
     .newTabButton {
       font-family: Arial, Helvetica, sans-serif;
+      color: var(--font-header);
       height: var(--tab-height);
       width: calc(var(--tab-height) * (8/7));
       font-size: 24px;
