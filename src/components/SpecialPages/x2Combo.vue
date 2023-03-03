@@ -117,7 +117,12 @@ export default {
         })
       })
 
-      return [this.thisPages[0].media, this.thisPages[1].media]
+      var media1 = Array.from(this.thisPages[0].media)
+      var media2 = Array.from(this.thisPages[1].media)
+      this.deretcon(media1)
+      this.deretcon(media2)
+
+      return [media1, media2]
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPages[1].title}`)
@@ -132,6 +137,7 @@ export default {
     }
   },
   methods: {
+    deretcon: PAGE.methods.deretcon,
     keyNavEvent(dir) {
       if (dir == 'left') 
         this.$pushURL(this.$refs.pageNav1.backUrl)
