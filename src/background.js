@@ -672,6 +672,10 @@ ipcMain.handle('search', async (event, payload) => {
   }
 
   function separateNonConsecutive(array, delimiter) {
+    // Given an array and a delimiter, separate the non-consecutive members of the array.
+    // > separateNonConsecutive([1, 2, 3, 5], "f")
+    // [1, 2, 3, "f", 5]
+
     let next_v = array[0]
     let newarray = []
     for (const i in array) {
@@ -683,6 +687,7 @@ ipcMain.handle('search', async (event, payload) => {
     return newarray
   }
 
+  // Generate results from FlexSearch object
   const results = (payload.sort == 'asc' || payload.sort == 'desc') 
     ? filteredIndex.search(payload.input, {limit, sort})
     : filteredIndex.search(payload.input, {limit})
@@ -690,6 +695,8 @@ ipcMain.handle('search', async (event, payload) => {
   const foundText = []
   for (const page of results) {
     const intraPageSearch = new FlexSearch()
+
+    // Split page by breaks, and also split apart very long paragraphs by sentences.
     const page_lines = page.content.split('<br />').map(line => {
       if (line.length > 160) {
         return line.split(/(?<=\. )/) // non-consuming split
@@ -697,23 +704,28 @@ ipcMain.handle('search', async (event, payload) => {
         return [line]
       }
     }).flat()
+
     for (let i = 0; i < page_lines.length; i++) {
       intraPageSearch.add(i, page_lines[i])
     }
+    // Search matching lines *again* for input and return matching indexes
     const indexes = intraPageSearch.search(payload.input)
-    indexes.push(0) // always include first line
+    if (indexes.length > 0) indexes.push(0) // always include first line, primarily for pesterlog formatting reasons
+
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
         const spread = 2;
-        for (let j = i - spread; j < i + spread; j++) {
+        for (let j = Math.max(0, i - spread); j < i + spread; j++) {
           acc.add(j)
         }
         return acc
       }, new Set())
     ).sort()
 
-    const matching_lines = separateNonConsecutive(spread_indexes.filter(i => page_lines[i]), "...")
-      .map(i => i == '...' ? i : page_lines[i])
+    const matching_lines = separateNonConsecutive(
+      spread_indexes.filter(i => page_lines[i]),
+      "..."
+    ).map(i => i == '...' ? i : page_lines[i])
 
     if (matching_lines.length > 0){
       foundText.push({
