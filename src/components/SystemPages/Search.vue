@@ -10,12 +10,12 @@
             <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
           </div>
           <div class="results" ref="markup">
-            <div v-if="freshStart"><p>First search may take a few seconds!</p></div>
-            <div v-else-if="results.length < 1" class="result noResult">
+            <div v-if="freshStart"><p class="summary">First search may take a few seconds!</p></div>
+            <div v-else-if="results.length < 1" class="result summary noResult">
               <h2>No results found.</h2>
             </div>
-            <div class="result" v-else>
-              <p>Searching for "<span v-text="lastSearch.input" />" sorting by <span v-text="sortDictionary[lastSearch.sort] || lastSearch.sort" /></p>
+            <div class="result summary" v-else>
+              <p>Searching for "<span v-text="lastSearch.input" class="highlight" />" sorting by <span v-text="sortDictionary[lastSearch.sort] || lastSearch.sort" /></p>
               <!--  in {{lastSearch.filter}} -->
               <h2>{{results.length == 1000 ? '999+' : results.length}} results.</h2>
             </div>
@@ -75,8 +75,11 @@ export default {
         "ignoreJoiners": true,
         "acrossElements": true,
         "iframes": true,
-        "className": 'highlight'
-      }
+        "className": 'highlight',
+        "exclude": [
+          '.summary *'
+        ]
+      },
     }
   },
   computed: {
