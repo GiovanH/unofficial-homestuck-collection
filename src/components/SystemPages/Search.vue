@@ -116,30 +116,34 @@ export default {
         .replace(/\]/g, "&#93;")
 
       let sort = 'rel'
-      let filter = []
+      let chapter = ''
 
-      this.$logger.info("Input 1", input)
-      const tags = input.match(/(sort|order|in):\w*/gi) || []
-      for (let i = 0; i < tags.length; i++) {
-        const [setting, value] = tags[i].toUpperCase().split(':')
-        input = input.replace(tags[i], '')
+      const ops = input.match(/(sort|order|in):((&quot;(.+)&quot;)|(\w+))/gi) || []
+      for (let i = 0; i < ops.length; i++) {
+        const [setting, value] = ops[i].toUpperCase().split(':')
+        input = input.replace(ops[i], '')
 
         if (setting == 'SORT' || setting == 'ORDER') {
           if (value == 'ASC' || value == 'ASCENDING') sort = 'asc'
           if (value == 'DESC' || value == 'DESCENDING') sort = 'desc'
         }
-      // else if (setting == 'IN') {
-      //     // TODO: Now that chapters are strings, rewrite this
-      //     if (value in this.chapters) filter = filter.concat(this.chapters[value])
-      //   }
+        else if (setting == 'IN') {
+          // TODO: Now that chapters are strings, rewrite this
+          // if (value in this.chapters)
+          if (chapter) {
+            logger.warn("Can only have one selected IN: chapter. ")
+          }
+          chapter = value.replace(/&quot;/gi, '')
+        }
       }
-      filter = [...new Set(filter)] // remove duplicates
       input = input.trim()
 
-      this.lastSearch = {input, sort, filter}
+      const searchPayload = {input, sort, chapter}
 
-      this.$logger.info({input, sort, filter})
-      this.invokeSearch({input, sort, filter}).then(results => {
+      this.lastSearch = searchPayload
+
+      this.$logger.info(input, searchPayload)
+      this.invokeSearch(searchPayload).then(results => {
         this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
         this.onSearchDone()
       })
