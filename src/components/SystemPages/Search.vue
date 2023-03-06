@@ -75,11 +75,11 @@ export default {
         "ignoreJoiners": true,
         "acrossElements": true,
         "iframes": true,
-        "className": 'highlight',
+        "className": "highlight",
         "exclude": [
-          '.summary *'
+          ".summary *"
         ]
-      },
+      }
     }
   },
   computed: {
