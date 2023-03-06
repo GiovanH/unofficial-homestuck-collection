@@ -205,7 +205,7 @@ export default {
       align-items: center;
       flex-flow: column;
       &.leftPage {
-        margin-right: 30px;
+        margin-right: 33px;
       }
 
       .mediaContent {
@@ -221,14 +221,14 @@ export default {
           padding: 15px 0;
         }
 
-        .media{
+        .media {
           display: flex;
           align-items: center;
           flex-flow: column;
 
           .panel {
             &:not(:last-child) {
-              margin-bottom: 17px;
+              margin-bottom: 20px;
             }
           }            
         }
