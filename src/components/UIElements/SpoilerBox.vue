@@ -33,6 +33,9 @@ export default {
   methods: {
     loggle() {
       this.logHidden = !this.logHidden
+    },
+    open() {
+      this.logHidden = false
     }
   },
   computed: {

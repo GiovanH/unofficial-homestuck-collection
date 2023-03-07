@@ -15,7 +15,7 @@
           </div>
           <div class="textContent">
               <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textcontent"/>
               <PageNav :thisPage="thisPage" 
                 :nextPages="nextPagesArray" ref="pageNav"
                 :class="{'hidden': hideNav}" />
@@ -23,6 +23,7 @@
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
       <div class="hidden">
+        <!-- Preload images -->
         <Media v-for="url in nextPagesMedia" :key="url" :url="url" class="panel"/>
       </div>
     </div>
@@ -56,7 +57,6 @@ export default {
     return {
       preload: [],
       retcon6passwordPages: ["009058", "009109", "009135", "009150", "009188", "009204", "009222", "009263"],
-      forceKeyboardEnable: false, // overridden by oddities
       showMetadata: false
     }
   },
@@ -87,7 +87,7 @@ export default {
       } else {
         title = ctx.$archive.mspa.story[p].title + [
           " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-        ][ctx.$getStory(p) - 1]
+        ][ctx.$getStoryNum(p) - 1]
       }
     }
     return title
@@ -104,7 +104,7 @@ export default {
       }
     },
     storyId() {
-      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+      return this.isRyanquest ? 'ryanquest' : this.$getStoryNum(this.pageNum)
     },
     pageCollection() {
       const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
@@ -132,7 +132,7 @@ export default {
         const flashPath = mediakey.substring(0, mediakey.length - 4)
         this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
         media[0] = `${flashPath}_hq.swf`
-      } else if (mediakey.includes(".swf")) {
+      } else if (mediakey && mediakey.includes(".swf")) {
         this.$logger.info("Found no audio for", mediakey, this.audioData)
       }
 
@@ -208,13 +208,23 @@ export default {
     },
     keyNavEvent(dir) {
       // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.$archive.tweaks.forceKeyboardEnable)
+        return
+
+      if (dir == 'left' && 'previous' in this.thisPage) 
+        this.$pushURL(this.$refs.pageNav.backUrl)
+      else if (dir == 'right') {
+        if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
+        else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
+      }
+    },
+    spaceBarEvent(e) {
+      // If navigation is hidden, abort now (unless force is on)
       if (this.hideNav && !this.forceKeyboardEnable)
         return
 
-      if (dir == 'left' && 'previous' in this.thisPage && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.$refs.pageNav.backUrl)
-      else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth ) {
-        if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
-        else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
+      if (this.$refs.textcontent) {
+        this.$refs.textcontent.open()
       }
     }
   },
@@ -282,6 +292,23 @@ export default {
       }
     }
 
+    //Small screen check
+    @media only screen and (max-width: 850px) {
+      &{
+        overflow-x: hidden;
+        height: max-content;
+        .navBanner {
+          max-width: 100%;
+        }
+        .pageFrame {
+          max-width: 100%;
+        }
+        ::v-deep div.footer {
+          max-width: 100%;
+        }
+      }
+    }
+
     .pageFrame {
       background: var(--page-pageFrame);
 
@@ -322,14 +349,14 @@ export default {
             padding: 15px 0;
           }
 
-          .media{
+          .media {
             display: flex;
             align-items: center;
             flex-flow: column;
 
             .panel {
               &:not(:last-child) {
-                margin-bottom: 17px;
+                margin-bottom: 20px;
               }
             }            
           }

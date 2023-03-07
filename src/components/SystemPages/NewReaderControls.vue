@@ -97,6 +97,9 @@
         <p class="hint" v-if="$localData.settings.mspaMode">
           Enter an <strong>MS Paint Adventures</strong> page number between 000219 and 010029.<br>
           e.g. www.mspaintadventures.com/?s=6&p=<strong>004130</strong></p>
+        <p class="hint" v-else-if="vizStory == 'problem-sleuth'">
+          Enter a <strong>Homestuck.com</strong> page number between 1 and 1673.<br>
+          e.g. www.homestuck.com/problem-sleuth/<strong>570</strong></p>
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
@@ -123,7 +126,7 @@
         vizStory: {{vizStory}}
       </pre> -->
 
-      <div v-if="promptMspaMode" class="settings application" >
+      <div v-if="promptMspaMode" class="settings" >
         <dl>
           <template v-for="boolSetting in settingListBoolean">
             <dt :key="boolSetting.model"><label>
@@ -141,7 +144,7 @@
       </div>
     </template>
 
-    <div v-if="featureList.includes('fastforward')" class="settings application" >
+    <div v-if="featureList.includes('fastforward')" class="settings" >
       <h3>Reading Experience</h3>
       <dl class="fastForwardSelection">
         <dt>

@@ -49,15 +49,21 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pageBody .metadata { 
-  position: absolute; 
-  left: 7px;
-  font-size: 117%; 
-  max-width: 135px;
-  background-color: rgba(255, 255, 255, 0.5);
-  border: 1px solid black; 
-  border-top-color: white; 
-  border-left-color: white; 
+.pageBody {
+  .metadata {
+    position: absolute;
+    left: 7px;
+    font-size: 117%;
+    max-width: 135px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid black;
+    border-top-color: white;
+    border-left-color: white;
+  }
+  // WIP: Nudge box out of supercartridge panels
+  // &.supercartridge .metadata {
+  //   left: calc(-135px - 7px);
+  // }
 }
 .x2 .pageBody.two .metadata { 
   left: 630px; width: 135px; 

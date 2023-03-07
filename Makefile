@@ -1,10 +1,11 @@
 default: test
 
 install: package.json yarn.lock
-	yarn install
+	yarn install --ignore-optional
 	touch install
 
 clean:
+	rm install
 	rm -r src/imods.tar
 
 lint: install 

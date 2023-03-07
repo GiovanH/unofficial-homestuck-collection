@@ -34,6 +34,34 @@ const GlobalComponents = {
 
 var instances = 0
 
+const reset_sass = `
+h1, h2, h3, h4, h5, h6, p, ul, ol, li, div {
+  margin: unset;
+  padding: unset;
+}
+p {
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+ul {
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+}
+& {
+  font-family: unset;
+  font-size: unset;
+  font-weight: normal;
+  overflow-wrap: initial;
+}`
+
 export default {
   created(){
     // this.$logger.info("MBP created")
@@ -50,7 +78,7 @@ export default {
       style.id = `browserpage-style-${instances}`
       style.rel = "stylesheet"
       style.innerHTML = Sass.renderSync({
-        data: `.tabFrame [data-instance='${instances}'] {\n${this.$options.scss}\n}`,
+        data: `.tabFrame [data-instance='${instances}'] {\n${reset_sass}\n${this.$options.scss}\n}`,
         sourceComments: true
       }).css.toString()
       // this.$logger.info("MBP injected style")

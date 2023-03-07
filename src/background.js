@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
@@ -9,6 +9,7 @@ import FlexSearch from 'flexsearch'
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
+const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -36,6 +37,9 @@ if (!store.get('localData.settings.enableHardwareAcceleration')) {
 } else {
   console.log("Not disabling hardware acceleration")
 }
+
+// Log settings, for debugging
+logger.info(store.get('localData.settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -233,14 +237,9 @@ function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
-  // We pre-build this here so mods have access to it
-  data.search = Object.values(data.mspa.story).map(storypage => {
-    return {
-      key: storypage.pageId,
-      chapter: Resources.getChapter(storypage.pageId),
-      content: `${storypage.title}###${storypage.content}`
-    }
-  })
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
 
   win.webContents.send('SET_LOAD_STAGE', "MODS")
   logger.info("Loading mods")
@@ -400,7 +399,20 @@ ipcMain.on('STARTUP_GET_INFO', (event) => {
   event.returnValue = {port: port, appVersion: APP_VERSION}
 })
 
-if (assetDir) {
+ipcMain.handle('check-archive-version', async (event, payload) => {
+  try {
+    const versionJson = JSON.parse(fs.readFileSync(
+      path.join(payload.assetDir, 'archive/data/version.json'),
+      'utf8'
+    ))
+    return versionJson.version
+  } catch (e) {
+    logger.error(e)
+    return undefined
+  }
+})
+
+if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
 
@@ -465,6 +477,15 @@ ipcMain.on('win-close-sync', (e) => {
   e.returnValue = true;
 })
 
+ipcMain.handle('copy-image', async (event, payload) => {
+  // logger.info(payload.url)
+  Sharp(payload.url).png().toBuffer().then(buffer => {
+    // logger.info(buffer)
+    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+    // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+    clipboard.writeImage(sharpNativeImage)
+  })
+})
 
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {
@@ -490,7 +511,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     try {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
-      logger.info(assetDir)
+      logger.info("New asset directory", assetDir)
       loadArchiveData()
 
       let flashPath = getFlashPath()
@@ -585,7 +606,7 @@ function buildChapterIndex(){
       key: page_num,
       mspa_num: page_num,
       chapter: Resources.getChapter(page_num),
-      content: `${page.title}<br />${page.content}`
+      content: page.content
     }
   })
 
@@ -624,59 +645,96 @@ ipcMain.handle('search', async (event, payload) => {
   }
   
   let limit = 1000
-  const sort = (a, b) => {
+
+  function separateNonConsecutive(array, delimiter) {
+    // Given an array and a delimiter, separate the non-consecutive members of the array.
+    // > separateNonConsecutive([1, 2, 3, 5], "f")
+    // [1, 2, 3, "f", 5]
+
+    let next_v = array[0]
+    let newarray = []
+    for (const i in array) {
+      const v = array[i]
+      if (v != next_v) newarray.push(delimiter)
+      newarray.push(v)
+      next_v = v + 1
+    }
+    return newarray
+  }
+
+  // Generate results from FlexSearch object
+  const sortFn = (a, b) => {
     const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
     const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
-    return (payload.sort == 'desc') 
-      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0 
+    return (payload.sort == 'desc')
+      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0
       : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
   }
+  // "Where" function to make sure any IN: tag matches the *start* of the chapter
+  const where = payload.chapter ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0) : undefined
 
-  let filteredIndex
-  if (payload.filter[0]) {
-    const items = chapterIndex.where(function(item) {
-      return payload.filter.includes(item.chapter)
-    })
-    limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({
-      doc: {
-        id: 'key', 
-        field: ['mspa_num', 'content']
-      }
-    }).add(items)
-  } else {
-    filteredIndex = chapterIndex
-  }
-
-  const results = (payload.sort == 'asc' || payload.sort == 'desc') 
-    ? filteredIndex.search(payload.input, {limit, sort})
-    : filteredIndex.search(payload.input, {limit})
+  // Run search
+  const searchOpts = {field: ['content'], where, limit, sort: sortFn}
+  const results = chapterIndex.search(payload.input, searchOpts)
 
   const foundText = []
   for (const page of results) {
-    const flex = new FlexSearch()
-    const page_lines = page.content.split('<br />')
+    const intraPageSearch = new FlexSearch({
+      doc: {
+        id: 'index',
+        field: ['index', 'content']
+      }
+    })
+
+    // Split page by breaks, and also split apart very long paragraphs by sentences.
+    const page_lines = page.content.split('<br />').map(line => {
+      if (line.length > 160) {
+        return line.split(/(?<=\. )/) // non-consuming split
+      } else {
+        return [line]
+      }
+    }).flat()
+
     for (let i = 0; i < page_lines.length; i++) {
-      flex.add(i, page_lines[i])
+      intraPageSearch.add({index: i, content: page_lines[i]})
     }
-    const indexes = flex.search(payload.input)
+    // Search matching lines *again* for input and return matching indexes
+    const intraResults = intraPageSearch.search(payload.input, {limit, bool: "or"})
+    var indexes = intraResults.map(k => k.index)
+
+    //
+    if (indexes.length > 0)
+      indexes.push(0) // always include first line, primarily for pesterlog formatting reasons
+
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
         const spread = 2;
-        for (let j = i - spread; j < i + spread; j++) {
+        for (let j = Math.max(0, i - spread); j < Math.min(page_lines.length, i + spread); j++) {
           acc.add(j)
         }
         return acc
       }, new Set())
     ).sort()
-    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
 
-    if (matching_lines.length > 0){
+    const matching_lines = separateNonConsecutive(
+      spread_indexes.filter(i => page_lines[i]),
+      "..."
+    ).map(i => i == '...' ? i : page_lines[i])
+
+    if (matching_lines.length > 0) {
       foundText.push({
         key: page.key,
         mspa_num: page.mspa_num,
         lines: matching_lines
       })
+    } else {
+      // Couldn't find text within match, despite having already matched. Matching text is spread between lines.
+      // Behaviour: Filter out entirely.
+      // foundText.push({
+      //   key: page.key,
+      //   mspa_num: page.mspa_num,
+      //   lines: page_lines
+      // })
     }
   }
   return foundText
@@ -693,11 +751,29 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
+const Sharp = require('sharp')
 ipcMain.on('ondragstart', (event, filePath) => {
-  event.sender.startDrag({
-    file: filePath,
-    icon: `${__static}/img/dragSmall.png`
-  })
+  // logger.info("Dragging file", filePath)
+  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+  try {
+    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+    // if (!nativeIconFromPath.isEmpty()) {
+    //   logger.info("Native icon from path", nativeIconFromPath)
+    //   cb(nativeIconFromPath)
+    // } else {
+      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+      .png().toBuffer().then(buffer => {
+        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+        cb(sharpNativeImage)
+      })
+    // }
+  } catch (err) {
+    logger.error("Couldn't process image", err)
+    // eslint-disable-next-line no-undef
+    cb(`${__static}/img/dragSmall.png`)
+  }
 })
 
 let openedWithUrl
@@ -707,13 +783,14 @@ async function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1280,
-    height: 720,
-    'minWidth': 1000,
+    height: 780,
+    'minWidth': 650,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: false,
+    frame: store.get('localData.settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       enableRemoteModule: true,
@@ -768,19 +845,35 @@ async function createWindow () {
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
       "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://asset.uhc/*",
       "*://*.sweetcred.com/*"
     ]
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
       const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      callback({redirectURL})
+      if (details.url == redirectURL) {
+        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+        callback({redirectURL})
+      }
     } else {
       const destination_url = Resources.resolveURL(details.url)
-      if (details.resourceType == "subFrame")
-        win.webContents.send('TABS_PUSH_URL', destination_url)
-      else callback({
-        redirectURL: destination_url
-      })
+      if (details.url == destination_url) {
+        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+        logger.error(err)
+        throw Error(err)
+      } else {
+        // Okay
+        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+        if (details.resourceType == "subFrame")
+          win.webContents.send('TABS_PUSH_URL', destination_url)
+        else callback({
+          redirectURL: destination_url
+        })
+      }
     }
   })
 
@@ -817,8 +910,9 @@ async function createWindow () {
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
+    // eslint-disable-next-line no-undef
     new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
-    if (new_icon && new_icon != current_icon) {
+    if (new_icon && (new_icon != current_icon)) {
       try {
         if (process.platform == "win32") {
           new_icon += ".ico"
@@ -832,6 +926,10 @@ async function createWindow () {
         logger.error("Couldn't change icon; platform issue?", process.platform, new_icon, e)
       }
     }
+  })
+
+  ipcMain.on('set-title', (event, new_title) => {
+    win.setTitle(new_title)
   })
 
   // Give mods a reference to the window object so it can reload 

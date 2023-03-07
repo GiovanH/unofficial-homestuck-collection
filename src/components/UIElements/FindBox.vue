@@ -85,7 +85,7 @@ export default {
         "iframes": true,
 
         "exclude": [
-          ".findBox"
+          ".findBoxFrame *"
         ]
       }
       // Remove previous marked elements and mark
@@ -106,7 +106,6 @@ export default {
       }
 
       this.freshStart = false
-      
     },
     reset(){
       if (this.markedTab) this.markedTab.unmark()

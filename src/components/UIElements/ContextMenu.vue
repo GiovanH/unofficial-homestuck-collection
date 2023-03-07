@@ -32,7 +32,9 @@
     <ul v-if="tags.includes('Selection')">
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
+      <li @mouseup="collectionSearch()">Search Collection</li>
       <li @mouseup="googleSearch()">Search with Google</li>  
+      <li v-if="selectionToUrl" @mouseup="$openLink(selectionToUrl, true)">Goto {{selectionToUrl}}</li>
       <li v-for="(action, index) in actionsText" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
     </ul>
     <template v-if="tags.includes('Input')">
@@ -64,6 +66,7 @@
       <li @mouseup="resetZoom()">Reset Zoom</li>
     </ul>
     <ul v-if="$localData.settings.devMode">
+      <li v-if="tags.includes('Image')" @mouseup="copyAssetSrc()">Copy asset url</li>
       <li @mouseup="inspectElement()">Inspect</li>
     </ul>
   </div>
@@ -91,6 +94,14 @@ export default {
         {
           title: "Save Image",
           cb() { ipcRenderer.invoke('save-file', {url: this.$mspaFileStream(this.target.src)}) }
+        },
+        {
+          title: "Copy Image",
+          cb() { ipcRenderer.invoke('copy-image', {url: this.$mspaFileStream(this.target.src)}) }
+        },
+        {
+          title: "Copy Image Path",
+          cb() { clipboard.writeText(this.$mspaFileStream(this.target.src)) }
         }
       ],
       actionsLink: [],
@@ -103,6 +114,17 @@ export default {
     }
   },
   computed: {
+    selectionToUrl(){
+      this.target;
+      const query = window.getSelection().toString().trim().replace(/[^ -~]+/g, "")
+      let match
+      this.$logger.info(query)
+      if (match = /^(\d\/)?(\d{6})$/.exec(query)) return `app://./mspa/${match[2]}`
+      if (query.startsWith('http')) return query
+      if (query.startsWith('/')) return `app://.${query}`
+      if (/^([a-z]+)\/([a-z0-9]+)$/.test(query)) return `app://./${query}`
+      return false // `app://./${query}`
+    },
   },
   methods: {
     bind(cb, $event){
@@ -158,21 +180,28 @@ export default {
       this.$localData.root.TABS_DUPLICATE((this.target.closest('.tab') || this.target).id.slice(4))
     },
     openLinkInNewTab(){
-      let href = this.targetAnchor.href
+      const href = this.targetAnchor.href
       this.$openLink(href, true)
     },
     copyLink(){
-      let target = this.targetAnchor.href
+      const target = this.targetAnchor.href
       clipboard.writeText(target.replace(/.*?:\/\/(?:localhost:\d*|\.)(\/.*)$/, "$1"))
     },
     copyLinkText(){
       clipboard.writeText(this.target.innerText)
     },
+    copyAssetSrc(){
+      clipboard.writeText(this.target.src)
+    },
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
     },
+    collectionSearch() {
+      const query = window.getSelection().toString()
+      this.$openLink(`app://./search/${encodeURIComponent(query)}`, true)
+    },
     googleSearch() {
-      let query = window.getSelection().toString()
+      const query = window.getSelection().toString()
       this.$openLink(`https://google.com/search?q=${encodeURIComponent(query)}`)
     },
 
@@ -181,8 +210,8 @@ export default {
     },
 
     open(e, target){
-      if (target.id == 'titleBar' ||target.id == 'titleBarButtons' || target.parentNode.id == 'titleBarButtons') return
-      let box = this.$el
+      if (target.id == 'titleBar' || target.id == 'titleBarButtons' || target.parentNode.id == 'titleBarButtons') return
+      const box = this.$el
       if (document.activeElement !== box) {
         this.clickPos = {x: e.clientX, y: e.clientY}
         this.target = target
@@ -201,14 +230,14 @@ export default {
           this.tags.push('Link')
         }
 
-        this.$nextTick( () => {
+        this.$nextTick(() => {
           box.style.display = 'block'
 
-          let page = document.body
-          let boxX = e.clientX // mouse X
-          let boxY = e.clientY // mouse Y
-          let boxWidth = box.clientWidth
-          let boxHeight = box.clientHeight
+          const page = document.body
+          const boxX = e.clientX // mouse X
+          const boxY = e.clientY // mouse Y
+          const boxWidth = box.clientWidth
+          const boxHeight = box.clientHeight
 
           box.style.left = 
               (boxX + boxWidth > page.scrollLeft + page.clientWidth ? 
@@ -237,8 +266,7 @@ export default {
         if (this.wasClicked || !document.hasFocus()) {
           this.wasClicked = false
           this.partnerEl.focus()
-        }
-        else if (!this.partnerEl.contains(event.relatedTarget)) {
+        } else if (!this.partnerEl.contains(event.relatedTarget)) {
           this.partnerEl.focus()
           this.partnerEl.blur()
         }

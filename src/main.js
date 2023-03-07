@@ -8,7 +8,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -23,7 +23,7 @@ log.transports.console.format = '[{level}] {text}';
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 ])
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -54,10 +54,7 @@ Mods.getMixins().forEach((m) => Vue.mixin(m))
 Number.prototype.pad = function(size) {
   if (isNaN(this))
     return undefined
-  var s = String(this)
-  while (s.length < (size || 2)) 
-    s = "0" + s
-  return s
+  return this.toString().padStart(size || 2, '0')
 }
 
 Vue.mixin(Memoization.mixin)
@@ -147,157 +144,47 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
-      return Resources.resolvePath(url, this.$localData.assetDir)
+      return Resources.toFilePath(url, this.$localData.assetDir)
     },
-    $getStory(pageNumber){
-      pageNumber = parseInt(pageNumber) || pageNumber
-
-      // JAILBREAK
-      if (pageNumber <= 135 || pageNumber == "jb2_000000"){
-        return 1
-      }      
-      // BARD QUEST
-      else if (pageNumber >= 136 && pageNumber <= 216) {
-        return 2
+    $getStoryNum: Resources.getStoryNum,
+    $getAllPagesInStory: Resources.getAllPagesInStory,
+    $isVizBase: Resources.isVizBase,
+    $parseMspaOrViz(userInput, story = 'homestuck') {
+      // Takes a user-formatted string and returns a MSPA page number.
+      // The output page number may not be real!
+      if (Number.isInteger(userInput)) {
+        this.$logger.warning("parseMspaOrViz got int, not string: ", userInput)
+        userInput = String(userInput)
       }
-      // BLOOD SPADE
-      else if (pageNumber == "mc0001") {
-        return 3
-      }      
-      // PROBLEM SLEUTH
-      else if (pageNumber >= 219 && pageNumber <= 1892){
-        return 4
-      }      
-      // HOMESTUCK BETA
-      else if (pageNumber >= 1893 && pageNumber <= 1900){
-        return 5
-      }      
-      // HOMESTUCK
-      else if (pageNumber >= 1901 && pageNumber <= 10030 || (pageNumber == "pony" || pageNumber == "pony2" || pageNumber == "darkcage" || pageNumber == "darkcage2")){
-        return 6
+      if (this.$localData.settings.mspaMode) {
+        return userInput.replace(/^0+/, '').padStart(6, '0')
+      } else {
+        return this.$vizToMspa(story, userInput).p
       }
-
-      return undefined
-    },
-    $getAllPagesInStory(story_id, incl_secret=false) {
-      const page_nums = []
-      if (story_id == '1'){
-        for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
-        for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
-        page_nums.push("jb2_000000")
-      } else if (story_id == '2'){
-        page_nums.push(Number(136).pad(6))
-        for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '3'){
-        page_nums.push("mc0001")
-      } else if (story_id == '4'){
-        for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
-        for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '5'){
-        for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '6'){
-        for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
-        for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
-        for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
-        for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
-        for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
-        if (incl_secret) {
-          page_nums.push("darkcage")
-          page_nums.push("darkcage2")
-          page_nums.push("pony")
-          page_nums.push("pony2")
-        }
-      } else if (story_id == 'ryanquest'){
-        for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
-      }
-
-      if (story_id == 'snaps') {
-        for (let i = 1; i <= 64; i++) page_nums.push(String(i))
-      }
-      return page_nums
     },
     $vizToMspa(vizStory, vizPage) {
-      let mspaPage
-      const vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
-      const pageNotInStory = (mspaPage) => this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
-
-      switch (vizStory) {
-        case 'jailbreak':
-          mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 135 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'bard-quest':
-          mspaPage = (vizNum == 1) ? "000136" : (vizNum + 169).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 47 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'blood-spade':
-          if (vizNum == 1) mspaPage = "mc0001"
-          else return {s: undefined, p: undefined}
-          break
-        case 'problem-sleuth':
-          mspaPage = (vizNum + 218).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 1674 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'beta':
-          mspaPage = (vizNum + 1892).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 8 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'homestuck':
-          mspaPage = vizNum ? (vizNum + 1900).toString().padStart(6, '0') : vizPage
-          if (1 > vizNum || vizNum > 8130 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'ryanquest':
-          mspaPage = vizNum.toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 15 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
+      // Resources.vizToMspa, but also checks the archive.
+      const undef_page = {s: undefined, p: undefined}
+      const {s, p} = Resources.vizToMspa(vizStory, vizPage)
+      if (this.$archive) {
+        const pageInStory = (p in this.$archive.mspa.story || p in this.$archive.mspa.ryanquest)
+        if (!pageInStory) {
+          this.$logger.info("$vizToMspa:", p, "not in story!")
+          return undef_page
+        }
       }
-      return {s: vizStory == 'ryanquest' ? 'ryanquest' : this.$getStory(mspaPage), p: mspaPage}
+      return {s, p}
     },
     $mspaToViz(mspaInput, isRyanquest = false){
-      const mspaPage = (this.$archive && mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
-      const mspaStory = this.$getStory(mspaPage)
-      const pageNotInStory = this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
-
-      let vizStory, vizPage
-
-      if (isRyanquest) {
-        if (pageNotInStory) return undefined
-        return {s: 'ryanquest', p: parseInt(mspaPage).toString() }
-      } else if (pageNotInStory) {
-        return undefined
-      } else {
-        switch (mspaStory) {
-          case 1:
-            vizStory = "jailbreak"
-            vizPage = (mspaPage == 'jb2_000000') ? '135' : (parseInt(mspaPage) - 1).toString()
-            break
-          case 2:
-            vizStory = "bard-quest"
-            if (parseInt(mspaPage) == 136) vizPage = "1"
-            else vizPage = (parseInt(mspaPage) - 169).toString()
-            break
-          case 3:
-            vizStory = "blood-spade"
-            vizPage = "1"
-            break
-          case 4:
-            vizStory = "problem-sleuth"
-            vizPage = (parseInt(mspaPage) - 218).toString()
-            break
-          case 5:
-            vizStory = "beta"
-            vizPage = (parseInt(mspaPage) - 1892).toString()
-            break
-          case 6:
-            vizStory = "homestuck"
-            vizPage = isNaN(mspaPage) ? mspaPage : (parseInt(mspaPage) - 1900).toString()
-            break
+      // Resources.mspaToViz, but also checks the archive.
+      if (this.$archive) {
+        const mspaPage = mspaInput.padStart(6, '0')
+        const pageInStory = (mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest)
+        if (!pageInStory) {
+          return undefined
         }
-        return {s: vizStory, p: vizPage}
       }
-    },
-    $isVizBase(base){
-      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
+      return Resources.mspaToViz(mspaInput, isRyanquest)
     },
     $mspaOrVizNumber(mspaId){
       // Formates a mspaId as either an mspaId or viz number, depending on user settings.
@@ -308,20 +195,10 @@ Vue.mixin({
         ? mspaId 
         : this.$mspaToViz(mspaId).p
     },
-    $parseMspaOrViz(userInput, story = 'homestuck') {
-      // Takes a user-formatted string and returns a MSPA page number.
-      // The output page number may not be real!
-      if (Number.isInteger(userInput)) {
-        this.$logger.waring("parseMspaOrViz got int, not string: ", userInput)
-        userInput = String(userInput)
-      }
-      if (this.$localData.settings.mspaMode) {
-        return userInput.replace(/^0+/, '').padStart(6, '0')
-      } else {
-        return this.$vizToMspa(story, userInput).p
-      }
-    },
     $updateNewReader(thisPageId, forceOverride = false) {
+      if (!this.$isNewReader && !forceOverride)
+        return // don't reset non-new reader back to new-reader mode unless explicitly forced
+
       const isSetupMode = !this.$archive
       const isNumericalPage = /\D/.test(thisPageId)
       const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
@@ -338,6 +215,8 @@ Vue.mixin({
           if (offByOnePages.includes(thisPageId)) {
             nextLimit = (parseInt(thisPageId) + 1).pad(6)
           }
+
+          // else if ('000373' == thisPageId) nextLimit = '000375' // Problem sleuth multiple options
 
           // End of problem sleuth
           else if (thisPageId == '001892') nextLimit  = '001902'
@@ -359,6 +238,11 @@ Vue.mixin({
               nextPageId = nextPageOver
             }
             nextLimit = nextPageId
+          }
+
+          else if (this.$archive.tweaks.tzPasswordPages.includes(thisPageId)) {
+            this.$logger.info("Not advancing to terezi page")
+            return
           }
           // IF NEXT PAGE ID IS LARGER THAN WHAT WE STARTED WITH, JUST USE THAT
           // On normal pages, always pick the lowest next-pageId available. The higher one is a Terezi password 100% of the time

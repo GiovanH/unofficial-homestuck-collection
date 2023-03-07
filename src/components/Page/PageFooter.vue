@@ -61,6 +61,7 @@ export default {
     .footer {
         height: 110px;
 
+        max-width: 100vw;
         box-sizing: border-box;
         padding-left: 12px;
         padding-right: 12px;

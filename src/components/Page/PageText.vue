@@ -48,7 +48,7 @@ var Color = require('ts-color-class')
 
 export default {
     name: 'pageText',
-    props: ['pageId', 'content', 'forcetheme'],
+    props: ['pageId', 'content', 'forcetheme', 'startopen'],
     data() {
         return {
             usePurpleLinks: false,
@@ -101,8 +101,7 @@ export default {
             const lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
             return {
                 fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
-                lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight],
-                color: this.isDarkBackground ? "white" : "var(--font-log)"
+                lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight]
             }
         },
         textType() {
@@ -141,16 +140,17 @@ export default {
         loggle() {
             this.logHidden = !this.logHidden
         },
+        open() {
+          this.logHidden = false
+        },
         getTextType(content) {
             if (!content) return null
 
             if (/^\|AUTHORLOG\|/.test(content)){
                 return "authorlog"
-            }
-            else if (/^\|.*?\|/.test(content)){
+            } else if (/^\|.*?\|/.test(content)){
                 return "log"
-            }
-            else{
+            } else {
                 return "prattle"
             }
         },
@@ -218,7 +218,7 @@ export default {
         },
     },
     mounted() {
-        if (this.$localData.settings.openLogs) {
+        if (this.$localData.settings.openLogs || this.startopen) {
             // Manual exception for pre-ministrife fakeout
             this.logHidden = this.pageId == '007326' 
         }

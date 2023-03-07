@@ -5,7 +5,8 @@ const Mods = require('@/mods.js').default
 const log = require('electron-log');
 const logger = log.scope('Resources');
 
-// const Memoization = require('@/memoization.js').default
+// ====================================
+// Asset resolution
 
 var assets_root = undefined
 
@@ -39,13 +40,14 @@ function fileIsAsset(url) {
 
 // NOT PURE
 function resolveURL(url) {
-  // The main logic
+  // The main logic. Takes an input url (that may be from old data) and
+  // resolves it to... whatever url is appropriate. Resolves the assets protocol.
   let resource_url = getResourceURL(url)
   // logger.debug("Got resource URL", resource_url)
 
   if (resource_url.startsWith("assets://")) {
     // logger.debug("[resvUrl]", url, "to", resource_url, "to", resolveAssetsProtocol(resource_url))
-    resource_url = resolveAssetsProtocol(resource_url) 
+    resource_url = resolveAssetsProtocol(resource_url)
   } else {
     // logger.debug("[resvUrl]", "no change for", resource_url)
   }
@@ -54,18 +56,21 @@ function resolveURL(url) {
 }
 
 // Pure(?)
-function resolvePath(url, root_dir) {
+function toFilePath(url, root_dir) {
   // Like resolveURL, but returns an os-path and not a file URL
   let resource_path = getResourceURL(url)
 
   if (resource_path.startsWith("assets://")) {
     resource_path = path.join(root_dir, resource_path.replace(/^assets:\/\//, ''))
     // logger.debug("[resPath]", url, "to", resource_path)
+  } else if (resource_path.startsWith(assets_root)) {
+    resource_path = path.join(root_dir, resource_path.replace(assets_root, ''))
+    // logger.debug("[resPath]", url, "to", resource_path)
   } else {
     // logger.debug("[resPath]", "no change for", resource_path)
   }
 
-  return resource_path
+  return decodeURI(resource_path)
 }
 
 // Pure
@@ -94,15 +99,17 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com(\/credits\/(?:sound|art)credits)/, "$1") // Linked from a few flashes
     .replace(/.*mspaintadventures.com\/((scratch|trickster|ACT6ACT5ACT1x2COMBO|ACT6ACT6)\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$4") // Covers for 99% of flashes that link to other pages
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
+    .replace(/.*mspaintadventures.com\/extras\/(.+?)\.html/, "/unlock/$1") // Links to unlock pages
     .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") // Link from CD rack flash
     .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1") // TODO double-check this regex
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
-    .replace(/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
-    .replace('http://www.whatpumpkin.com/squiddles.htm', '/squiddles/credits')
+    .replace(/^http(s{0,1}):\/\/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
+    .replace(/^http(s{0,1}):\/\/www.whatpumpkin\.com\/squiddles\.htm(l)?/, '/squiddles/credits')
+    .replace(/^http(s{0,1}):\/\/asset\.uhc\//, 'assets://')
 
-  if (resource_url != request_url)
-    // logger.debug("[getResU prelim]", request_url, "to", resource_url)
+  // if (resource_url != request_url)
+  //   logger.debug("[getResU prelim]", request_url, "to", resource_url)
 
   request_url = resource_url
 
@@ -116,23 +123,25 @@ function getResourceURL(request_url){
       .replace(/\/Sfiles/, "")
       .replace(/^http(s{0,1}):\/\/127\.0\.0\.1:[0-9]+\//, "assets://")
       .replace(/^http(s{0,1}):\/\/localhost:[0-9]+\//, "assets://")  // TODO if this accidently catches localhost:8080 we're boned
-          
+
     // if (!/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(resource_url))
     //     // files like 'archive/xxx'
     //     resource_url = "assets://" + resource_url
     if (!resource_url.startsWith("assets://"))
       resource_url = resource_url.replace(/^(?=\w)/, "assets://")
 
-    if (resource_url != request_url)
-      // logger.debug("[getResU asset]", request_url, "to", resource_url)
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU asset]", request_url, "to", resource_url)
+
     request_url = resource_url
   } else {
     // waywardvagabond has assets in its folder but we redirect some paths to vue
     resource_url = resource_url
       .replace(/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com\/storyfiles\/hs2\/waywardvagabond/, "/waywardvagabond")
-  
-    if (resource_url != request_url) 
-      // logger.debug("[getResU nonas]", request_url, "to", resource_url)
+
+    // if (resource_url != request_url)
+    //   logger.debug("[getResU nonas]", request_url, "to", resource_url)
+
     request_url = resource_url
   }
   return resource_url
@@ -178,40 +187,40 @@ const UrlFilterMixin = {
     filterLinksAndImages(el){
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
-      if (!el) { 
+      if (!el) {
         if (this.$el.nodeType === 8) return
         else el = this.$el.querySelector('.pageContent')
       }
 
       // Check if this is a comment
       if (el.nodeType === 8) return
-      
+
       // else
       el.querySelectorAll("A").forEach((link) => {
         if (link.href) {
           const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
           link.href = getResourceURL(pseudLinkHref)
-          if (link.href != pseudLinkHref) {
-            logger.debug("[filterL]", pseudLinkHref, "->", link.href)
-          }
+          // if (link.href != pseudLinkHref) {
+          //   logger.debug("[filterL]", pseudLinkHref, "->", link.href)
+          // }
         }
       })
 
-      // Normally, this process would be handled by the MediaEmbed component. 
+      // Normally, this process would be handled by the MediaEmbed component.
       // Gotta get the behaviour into all them images somehow!
 
       // Internal links in the renderer already have the localhost:8080 prefix, which is different
-      // than how the other resources are handled. 
+      // than how the other resources are handled.
       const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
         media[i].src = resolveURL(pseudMediaSrc)
-        if (media[i].src != pseudMediaSrc) {
-          logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
-        }
+        // if (media[i].src != pseudMediaSrc) {
+        //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
+        // }
 
-        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {  
+        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
           media[i].ondragstart = (e) => {
             e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'
@@ -224,14 +233,14 @@ const UrlFilterMixin = {
     filterLinksAndImagesInternetArchive(el, best_date=1){
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
-      if (!el) { 
+      if (!el) {
         if (this.$el.nodeType === 8) return
         else el = this.$el.querySelector('.pageContent')
       }
 
       // Check if this is a comment
       if (el.nodeType === 8) return
-      
+
       // else
       el.querySelectorAll("a[href]").forEach((link) => {
         const input_href = link.href
@@ -244,8 +253,168 @@ const UrlFilterMixin = {
   }
 }
 
+// ====================================
+// Story logic
+
+function getStoryNum(pageNumber) {
+  // Given a MSPA page number, determine the numerical story ID it is associated with.
+  pageNumber = parseInt(pageNumber) || pageNumber
+
+  // JAILBREAK
+  if (pageNumber <= 135 || pageNumber == "jb2_000000")
+    return 1
+  // BARD QUEST
+  else if (pageNumber >= 136 && pageNumber <= 216)
+    return 2
+  // BLOOD SPADE
+  else if (pageNumber == "mc0001")
+    return 3
+  // PROBLEM SLEUTH
+  else if (pageNumber >= 219 && pageNumber <= 1892)
+    return 4
+  // HOMESTUCK BETA
+  else if (pageNumber >= 1893 && pageNumber <= 1900)
+    return 5
+  // HOMESTUCK
+  else if ((pageNumber >= 1901 && pageNumber <= 10030) || 
+    (pageNumber == "pony" || pageNumber == "pony2" || 
+    pageNumber == "darkcage" || pageNumber == "darkcage2"))
+    return 6
+
+  return undefined
+}
+
+function getAllPagesInStory(story_id, incl_secret=false) {
+  const page_nums = []
+  if (story_id == '1'){
+    for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
+    for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
+    page_nums.push("jb2_000000")
+  } else if (story_id == '2'){
+    page_nums.push(Number(136).pad(6))
+    for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '3'){
+    page_nums.push("mc0001")
+  } else if (story_id == '4'){
+    for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
+    for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '5'){
+    for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
+  } else if (story_id == '6'){
+    for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
+    for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
+    for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
+    for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
+    for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
+    if (incl_secret) {
+      page_nums.push("darkcage")
+      page_nums.push("darkcage2")
+      page_nums.push("pony")
+      page_nums.push("pony2")
+    }
+  } else if (story_id == 'ryanquest'){
+    for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
+  }
+
+  if (story_id == 'snaps') {
+    for (let i = 1; i <= 64; i++) page_nums.push(String(i))
+  }
+  return page_nums
+}
+
+function vizToMspa(vizStory, vizPage) {
+  let mspaPage
+  const vizNum = (!isNaN(vizPage) ? parseInt(vizPage) : undefined)
+  const undef_page = {s: undefined, p: undefined}
+
+  switch (vizStory) {
+    case 'jailbreak':
+      mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).pad(6)
+      if (1 > vizNum || vizNum > 135) return undef_page
+      break
+    case 'bard-quest':
+      mspaPage = (vizNum == 1) ? "000136" : (vizNum + 169).pad(6)
+      if (1 > vizNum || vizNum > 47) return undef_page
+      break
+    case 'blood-spade':
+      if (vizNum == 1) mspaPage = "mc0001"
+      else return undef_page
+      break
+    case 'problem-sleuth':
+      mspaPage = (vizNum + 218).pad(6)
+      if (1 > vizNum || vizNum > 1674) return undef_page
+      break
+    case 'beta':
+      mspaPage = (vizNum + 1892).pad(6)
+      if (1 > vizNum || vizNum > 8) return undef_page
+      break
+    case 'homestuck':
+      mspaPage = vizNum ? (vizNum + 1900).pad(6) : vizPage
+      if (1 > vizNum || vizNum > 8130) return undef_page
+      break
+    case 'ryanquest':
+      mspaPage = vizNum.pad(6)
+      if (1 > vizNum || vizNum > 15) return undef_page
+      break
+  }
+
+  const storyNum = (vizStory == 'ryanquest' ? 'ryanquest' : getStoryNum(mspaPage))
+  if (!storyNum) {
+    logger.error(`Page not in any story: ${mspaPage}`)
+    return undef_page
+  }
+
+  return {s: storyNum, p: mspaPage}
+  // return (storyNum && mspaPage) ? {s: storyNum, p: mspaPage} : undef_page
+}
+
+function mspaToViz(mspaInput, isRyanquest = false) {
+  const mspaPage = mspaInput.padStart(6, '0')
+  const mspaStory = getStoryNum(mspaPage)
+  let vizStory, vizPage
+
+  if (isRyanquest) {
+    return {s: 'ryanquest', p: parseInt(mspaPage).toString() }
+  } else {
+    switch (mspaStory) {
+      case 1:
+        vizStory = "jailbreak"
+        vizPage = (mspaPage == 'jb2_000000') ? '135' : (parseInt(mspaPage) - 1).toString()
+        break
+      case 2:
+        vizStory = "bard-quest"
+        if (parseInt(mspaPage) == 136) vizPage = "1"
+        else vizPage = (parseInt(mspaPage) - 169).toString()
+        break
+      case 3:
+        vizStory = "blood-spade"
+        vizPage = "1"
+        break
+      case 4:
+        vizStory = "problem-sleuth"
+        vizPage = (parseInt(mspaPage) - 218).toString()
+        break
+      case 5:
+        vizStory = "beta"
+        vizPage = (parseInt(mspaPage) - 1892).toString()
+        break
+      case 6:
+        vizStory = "homestuck"
+        vizPage = isNaN(mspaPage) ? mspaPage : (parseInt(mspaPage) - 1900).toString()
+        break
+    }
+    return (vizStory && vizPage) ? {s: vizStory, p: vizPage} : undefined
+  }
+}
+
+function isVizBase(base){
+  return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
+}
+
+// Pure
 function getChapter(key) {
-  // Just putting this here because both processes need this logic.
+  // Given an MSPA page number, return what section of the comic the page is in,
+  // including chapter/act information.
   let p = parseInt(key)
   if (!p) {
     switch (key) {
@@ -338,9 +507,12 @@ function getChapter(key) {
   }
 }
 
+// ====================================
+// Tests
+
 async function testArchiveMusic(archive){
   archive = archive || window.vm.archive
-  
+
   // logger.info("Flash art")
   // // from discography.vue
   // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
@@ -372,7 +544,7 @@ async function testArchiveMusic(archive){
 
 async function testArchiveComic(archive){
   archive = archive || window.vm.archive
-  
+
   // logger.info("Flash art")
   // // from discography.vue
   // const flash_urls = Object.keys(archive.music.flashes).map(flash => `assets://archive/music/flash/${flash}.png`)
@@ -396,6 +568,10 @@ async function testArchiveComic(archive){
 
 function testResolution(){
   const libGetResourceUrl = {
+    "http://www.turner.com/planet/mp3/cp_close.mp3": "assets://storyfiles/hs2/00338/cp_close.mp3",
+    "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3": "assets://storyfiles/hs2/00338/Ghostbusters.mp3",
+    "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3": "assets://storyfiles/hs2/00338/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3",
+    "http://www.mspaintadventures.com/extras/ps000015.html": "/unlock/ps000015",
     "/advimgs/jb/mspaintadventure08.gif": "assets://advimgs/jb/mspaintadventure08.gif",
     "/archive/collection/archive_beta.png": "assets://archive/collection/archive_beta.png",
     "/archive/collection/archive_vigilprince.png": "assets://archive/collection/archive_vigilprince.png",
@@ -584,7 +760,7 @@ function testResolution(){
     "http://www.spxpo.com/about": "http://www.spxpo.com/about",
     "http://www.timelesschaos.com/teambffcomics/": "http://www.timelesschaos.com/teambffcomics/",
     "http://www.whatpumpkin.com/": "http://www.whatpumpkin.com/",
-    "http://www.whatpumpkin.com/squiddles.html": "http://www.whatpumpkin.com/squiddles.html",
+    "http://www.whatpumpkin.com/squiddles.html": "/squiddles/credits",
     "http://www.whatpumpkin.com/store/main.html": "http://www.whatpumpkin.com/store/main.html",
     "http://www.whatpumpkin.com/store/trollshirts.html": "http://www.whatpumpkin.com/store/trollshirts.html",
     "http://www.whatpumpkin.com/videos/squiddletrailer.html": "http://www.whatpumpkin.com/videos/squiddletrailer.html",
@@ -758,6 +934,160 @@ function testResolution(){
   })
 }
 
+function testStoryLogic() {
+  const libGetStory = {
+    "sentinal": undefined,
+    134: 1,
+    135: 1,
+    '000135': 1,
+    136: 2,
+    215: 2,
+    216: 2,
+    '000216': 2,
+    217: undefined,
+    "mc0000": undefined,
+    "mc0001": 3,
+    "mc0002": undefined,
+    1891: 4,
+    1892: 4,
+    '001892': 4,
+    1893: 5,
+    1899: 5,
+    1900: 5,
+    '001900': 5,
+    1901: 6,
+    10029: 6,
+    10030: 6,
+    '010030': 6,
+    10031: undefined
+  }
+
+  const libAllPages = {
+    '1': 134,
+    '2': 47,
+    '3': 1,
+    '4': 1673,
+    '5': 8,
+    '6': 8124,
+    '7': 0,
+    'ryanquest': 15
+  }
+  const libAllPagesSec = { ...libAllPages, '6': 8128 }
+
+  /* eslint-disable key-spacing */
+  const libVizToMspa = {
+    "jailbreak 1":         JSON.stringify({s: 1, p: "000002"}),
+    "jailbreak 134":       JSON.stringify({s: 1, p: "000135"}),
+    "jailbreak 135":       JSON.stringify({s: 1, p: "jb2_000000"}),
+    "jailbreak 136":       JSON.stringify({}),
+    "bard-quest 1":        JSON.stringify({s: 2, p: "000136"}),
+    "bard-quest 136":      JSON.stringify({}),
+    "bard-quest 169":      JSON.stringify({}),
+    "blood-spade 1":       JSON.stringify({s: 3, p: "mc0001"}),
+    "problem-sleuth 1":    JSON.stringify({s: 4, p: "000219"}),
+    "problem-sleuth 218":  JSON.stringify({s: 4, p: "000436"}),
+    "problem-sleuth 1673": JSON.stringify({s: 4, p: "001891"}),
+    "problem-sleuth 1674": JSON.stringify({s: 4, p: "001892"}),
+    "problem-sleuth 1675": JSON.stringify({}),
+    "beta 1":              JSON.stringify({s: 5, p: "001893"}),
+    "homestuck 1":         JSON.stringify({s: 6, p: "001901"}),
+    "homestuck 1900":      JSON.stringify({s: 6, p: "003800"}),
+    "homestuck 1902":      JSON.stringify({s: 6, p: "003802"}),
+
+    "homestuck 7363":      JSON.stringify({s: 6, p: "009263"}),
+    "homestuck 7364":      JSON.stringify({s: 6, p: "009264"}),
+    "homestuck 7365":      JSON.stringify({s: 6, p: "009265"}),
+
+    "homestuck 3742":      JSON.stringify({s: 6, p: "005642"}),
+    "homestuck 3743":      JSON.stringify({s: 6, p: "005643"}),
+    "homestuck 3744":      JSON.stringify({s: 6, p: "005644"}),
+
+    "homestuck 8129":      JSON.stringify({s: 6, p: "010029"}),
+    "homestuck 8130":      JSON.stringify({s: 6, p: "010030"}),
+    "homestuck 8131":      JSON.stringify({}),
+    "homestuck darkcage":  JSON.stringify({s: 6, p: "darkcage"}),
+    // "homestuck pony3":     JSON.stringify({}),
+    "ryanquest 1":         JSON.stringify({s: 'ryanquest', p: "000001"}),
+    "ryanquest 15":        JSON.stringify({s: 'ryanquest', p: "000015"}),
+    "ryanquest 16":        JSON.stringify({})
+  }
+  const libMspaToViz = {
+    "000002":              JSON.stringify({s: 'jailbreak', p: "1"}),
+    "000135":              JSON.stringify({s: 'jailbreak', p: "134"}),
+    "jb2_000000":          JSON.stringify({s: 'jailbreak', p: "135"}),
+    "jailbreak 136":       undefined,
+    "000136":              JSON.stringify({s: 'bard-quest', p: "1"}),
+    "bard-quest 136":      undefined,
+    "mc0001":              JSON.stringify({s: 'blood-spade', p: "1"}),
+    "000219":              JSON.stringify({s: 'problem-sleuth', p: "1"}),
+    "000436":              JSON.stringify({s: 'problem-sleuth', p: "218"}),
+    "001891":              JSON.stringify({s: 'problem-sleuth', p: "1673"}),
+    "001892":              JSON.stringify({s: 'problem-sleuth', p: "1674"}),
+    "problem-sleuth 1675": undefined,
+    "001893":              JSON.stringify({s: 'beta', p: "1"}),
+    "001901":              JSON.stringify({s: 'homestuck', p: "1"}),
+    "003800":              JSON.stringify({s: 'homestuck', p: "1900"}),
+    "003802":              JSON.stringify({s: 'homestuck', p: "1902"}),
+    "009263":              JSON.stringify({s: 'homestuck', p: "7363"}),
+    "009264":              JSON.stringify({s: 'homestuck', p: "7364"}),
+    "009265":              JSON.stringify({s: 'homestuck', p: "7365"}),
+    "005642":              JSON.stringify({s: 'homestuck', p: "3742"}),
+    "005643":              JSON.stringify({s: 'homestuck', p: "3743"}),
+    "005644":              JSON.stringify({s: 'homestuck', p: "3744"}),
+    "010029":              JSON.stringify({s: 'homestuck', p: "8129"}),
+    "010030":              JSON.stringify({s: 'homestuck', p: "8130"}),
+    // "pony3":               undefined,
+    "darkcage":            JSON.stringify({s: 'homestuck', p: "darkcage"}),
+    "homestuck pony3":     undefined,
+    // "000001":              JSON.stringify({s: 'ryanquest', p: 1}),
+    // "000015":              JSON.stringify({s: 'ryanquest', p: 15}),
+  }
+
+  ;[
+    {
+      fun: window.vm.$getStoryNum,
+      library: libGetStory,
+      name: 'getStoryNum'
+    },
+    {
+      fun: (story) => window.vm.$getAllPagesInStory(story, false).length,
+      library: libAllPages,
+      name: 'getAllPagesInStory'
+    },
+    {
+      fun: (story) => window.vm.$getAllPagesInStory(story, true).length,
+      library: libAllPagesSec,
+      name: 'getAllPagesInStory inclSecret'
+    },
+    {
+      fun: (t) => {const [b, p] = t.split(" "); return JSON.stringify(window.vm.$vizToMspa(b, p))},
+      library: libVizToMspa,
+      name: 'vizToMspa'
+    },
+    {
+      fun: (p) => JSON.stringify(window.vm.$mspaToViz(p)),
+      library: libMspaToViz,
+      name: 'mspaToViz'
+    }
+  ].forEach(kind => {
+    let [ok, fail] = [0, 0]
+    for (const query in kind.library) {
+      const expected = kind.library[query]
+      const result = kind.fun(query)
+      if (result != expected) {
+        logger.error(`Testing ${kind.name}: Assertion failed!\nQuery:    ${query}\nExpected: ${JSON.stringify(expected)}\nActual:   ${JSON.stringify(result)}`)
+        fail += 1
+      } else {
+        ok += 1
+      }
+    }
+    logger.info(kind.name, "tests:", fail, "fail,", ok, "ok")
+  })
+}
+
+// ====================================
+// Export
+
 module.exports = {
   init(settings){
     assets_root = settings.assets_root || assets_root
@@ -768,12 +1098,20 @@ module.exports = {
   },
   UrlFilterMixin,
   resolveURL,
-  resolvePath,
+  toFilePath,
   getResourceURL,
-  getChapter,
+  linkIsOutlink,
   resolveAssetsProtocol,
+
+  getChapter,
+  getStoryNum,
+  getAllPagesInStory,
+  isVizBase,
+  vizToMspa,
+  mspaToViz,
+
   testResolution,
   testArchiveMusic,
   testArchiveComic,
-  linkIsOutlink
+  testStoryLogic
 }
