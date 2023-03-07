@@ -29,7 +29,7 @@
         <div>ARFTER #46: a bunch of other comomics to!</div>
         <template v-for="comic, i in listedPages">
           <br :key="`comic${i}br`"/>
-          <a :href="comic.url" v-text="comic.title" :key="`comic${i}`"/>
+          <a :href="comic.url" v-html="comic.title" :key="`comic${i}`"/>
         </template>
         <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
       </div>
