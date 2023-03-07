@@ -1,12 +1,13 @@
 <template>
   <div class="pageBody">
     <NavBanner />
-    <div class="pageFrame comic" v-if="routeParams.cid">
+    <PXSHome v-if="!routeParams.cid || ['archive', 'news', 'credits'].includes(routeParams.cid)" :homeTab="routeParams.cid" />
+    <div class="pageFrame comic" v-else>
       <div class="pageContent">
         <div class="logo">
           <a href="/pxs"><Media url="/archive/comics/pxs/logo.png" /></a>
         </div>
-        <div class="nav topNav">
+        <div class="nav topNav" v-if="!is404">
           <div class="back">
             <a :href="prevComic" :class="{disabled: !prevComic}">
               <Media url="/archive/comics/pxs/comnavFirst.png" />
@@ -27,10 +28,10 @@
         </div>
         <div class="mediaContent" >
           <a :href="nextPage || false">
-            <Media :url="comicPage" :title="comic.titleText[routeParams.pid]" :key="comicPage" />
+            <Media :url="comicPage" :title="titleText[page_num]" :key="comicPage" />
           </a>
         </div>
-        <div class="nav bottomNav">
+        <div class="nav bottomNav" v-if="!is404">
           <div class="back">
             <a :href="prevComic || false" :class="{disabled: !prevComic}">
               <Media url="/archive/comics/pxs/comnavFirst.png" />
@@ -39,7 +40,7 @@
               <Media url="/archive/comics/pxs/comnavPrev.png" />
             </a>
           </div>
-          <span class="archive" v-text="`${this.routeParams.pid}/${comic.pages.length}`" />
+          <span class="archive" v-text="`${this.page_num}/${comic.pages.length}`" />
           <div class="forward">
             <a :href="nextPage || false" :class="{disabled: !nextPage}">
               <Media url="/archive/comics/pxs/comnavNext.png" />
@@ -49,33 +50,9 @@
             </a>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="pageFrame archive" v-else>
-      <div class="pageContent">
-        <div class="logo">
-          <a href="/pxs"><Media url="/archive/comics/pxs/logo.png" /></a>
-        </div>
-        <div class="storyContainer">
-          <div class="title">STORIES</div><br>
-          <div v-for="story in $archive.comics.pxs.list">
-            <div class="storyButtonContainer">
-              <div class="storyButton" @click="openStory(story)">
-                <p class="storyName" v-text="$archive.comics.pxs.comics[story].name" />
-                <p class="storyCredit" v-text="$archive.comics.pxs.comics[story].credit" />
-                <p class="storyDesc" v-text="$archive.comics.pxs.comics[story].desc" />
-              </div>
-              <a @click="openStory(undefined)" :href="`/pxs/${story}`">==<fa-icon icon="chevron-right"></fa-icon></a>
-            </div>
-            <div class="thumbnailWrapper">
-              <transition name="thumbnails">
-                <div class="thumbs" :class="{summerteen: story == 'summerteen-romance'}" v-if="story == selectedStory" ref="thumbs">
-                  <a v-for="j in $archive.comics.pxs.comics[story].pages.length" @click="openStory(undefined)" :href="`/pxs/${story}/${j}`">
-                    <Media :url="$archive.comics.pxs.comics[story].pages[j-1]" />
-                  </a>
-                </div>
-              </transition>
-            </div>
+        <div id="content-tags" v-if="pageTags.length">
+          <div class="tags">
+            <a v-for="tag in pageTags" class="tag" v-text="'#' + tag" :key="tag"/>
           </div>
         </div>
       </div>
@@ -87,6 +64,11 @@
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import PXSHome from '@/components/Comics/pxshome.vue'
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
 
 export default {
   name: 'ParadoxSpace',
@@ -94,69 +76,106 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media
+    NavBanner, Media, PXSHome
   },
   title(ctx) {
-    if (!ctx.routeParams.cid)
+    if (!ctx.routeParams.cid || ['archive', 'news', 'credits'].includes(ctx.routeParams.cid))
       return 'Paradox Space' 
     else {
-      let comic = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
-      return `${comic} - Paradox Space`
+      try {
+        const name = ctx.$archive.comics.pxs.comics[ctx.routeParams.cid].name
+        return `${name} - Paradox Space`
+      } catch {
+        return 'Paradox Space?' 
+      }
     }
   },
   theme: () => 'pxs',
   data: function() {
     return {
-      selectedStory: undefined
+      pages404: [
+        "/archive/comics/pxs/404.png",
+        "/archive/comics/pxs/404-1.png",
+        "/archive/comics/pxs/404-2.png",
+        "/archive/comics/pxs/404-3.png",
+        "/archive/comics/pxs/404-4.png",
+        "/archive/comics/pxs/sitedown.png"
+      ]
     }
   },
   computed: {
+    is404() {
+      return this.comic != this.$archive.comics.pxs.comics[this.routeParams.cid]
+    },
     comic() {
       if (!this.routeParams.cid) return false
+      let comic = this.$archive.comics.pxs.comics[this.routeParams.cid]
 
-      return this.$archive.comics.pxs.comics[this.routeParams.cid]
+      if (comic && comic.pages[this.page_num - 1]) return comic
+
+      else {
+        comic = {
+          name: "404",
+          credit: "KC Green",
+          desc: "there ISN'T one",
+          pages: [
+            randomChoice(this.pages404)
+          ]
+        }
+        // Set the current (zero-index) page to be a 404 image.
+        comic.pages[this.page_num - 1] = randomChoice(this.pages404)
+        return comic
+      }
+    },
+    page_num(){
+      return this.routeParams.pid || 1
     },
     comicPage() {
-      return this.comic.pages[this.routeParams.pid-1]
+      return this.comic.pages[this.page_num - 1]
     },
     titleText() {
-      return this.comic.titleText[this.routeParams.pid]
+      return this.comic.titleText 
+        ? this.comic.titleText[this.page_num] || {} 
+        : {}
+    },
+    pageTags() {
+      if (this.comic.tags) return (this.comic.tags[this.page_num] || [])
+      return []
     },
     nextPage() {
       if (!this.routeParams.cid) return ''
 
-      let nextPage = parseInt(this.routeParams.pid) + 1
+      const nextPage = parseInt(this.page_num) + 1
       if (this.comic.pages[nextPage - 1]) return `/pxs/${this.routeParams.cid}/${nextPage}`
       else return this.nextComic
     },
     nextComic() {
       if (!this.routeParams.cid) return ''
 
-      let nextComic = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) + 1
+      const nextComic = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) + 1
       if (this.$archive.comics.pxs.list[nextComic]) return `/pxs/${this.$archive.comics.pxs.list[nextComic]}/1`
       else return ''
     },
     prevPage() {
       if (!this.routeParams.cid) return ''
 
-      let prevPage = parseInt(this.routeParams.pid) - 1
+      const prevPage = parseInt(this.page_num) - 1
       if (prevPage < 1)  {
         // We're going to serve up the last page of the previous comic
-        let prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.pxs.list[prevIndex]
+        const prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.pxs.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/pxs/${prevComic}/${this.$archive.comics.pxs.comics[prevComic].pages.length}`
-      }
-      else return `/pxs/${this.routeParams.cid}/${prevPage}`
+      } else return `/pxs/${this.routeParams.cid}/${prevPage}`
     },
     prevComic() {
       if (!this.routeParams.cid) return ''
 
-      if (this.routeParams.pid != '1') return `/pxs/${this.routeParams.cid}/1`
+      if (this.page_num != '1') return `/pxs/${this.routeParams.cid}/1`
       else {
-        let prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.pxs.list[prevIndex]
+        const prevIndex = this.$archive.comics.pxs.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.pxs.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/pxs/${prevComic}/1`
@@ -164,15 +183,11 @@ export default {
     }
   },
   methods: {
-    openStory(key) {
-      if (this.selectedStory == key) this.selectedStory = undefined
-      else this.selectedStory = key
-    },
     keyNavEvent(dir) {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0 && this.prevPage) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth && this.nextPage) this.$pushURL(this.nextPage)
     }
-  },
+  }
 }
 </script>
 
@@ -182,6 +197,10 @@ export default {
   background-image: url(assets://archive/comics/pxs/pixels_top.png), url(assets://archive/comics/pxs/pixels_bottom.png) !important;
   background-position: center top, center bottom !important;
   background-repeat: no-repeat !important;
+
+  ::v-deep a {
+    color: #2a6496;
+  }
 
   ::v-deep .navBanner {
     width: 100%;
@@ -219,14 +238,14 @@ export default {
         padding: 12px 0;
       }
 
-      .title, .archive {
-          font-family: "Century Gothic",arial, sans-serif;
-          font-size: 20px;
-          font-weight: bold;
-          color: white;
-          text-shadow: 0 0 5px #0ca6ff, 0 0 5px #0ca6ff;
-          text-decoration: none;
-        }
+      .title, .archive, {
+        font-family: "Century Gothic",arial, sans-serif;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 0 5px #0ca6ff, 0 0 5px #0ca6ff;
+        text-decoration: none;
+      }
 
       .nav {
         margin: 0 10px;
@@ -242,6 +261,56 @@ export default {
 
         .disabled {
           visibility: hidden;
+        }
+      }
+
+      #content-tags {
+        padding: 15px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: normal;
+        .tags {
+          padding: 10px;
+          border: 2px solid #232323;
+        }
+        .tag {
+          display: inline-block;
+          padding: 0px 3px;
+          margin: 3px;
+          color: #ffffff;
+          background: #626262;
+          border: 1px solid #7c7c7c;
+        }
+        a.tag {
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        .description-tag {
+          background-image: -webkit-linear-gradient(top, #00364e 0%, #001823 100%);
+          background-image: linear-gradient(to bottom, #00364e 0%, #001823 100%);
+          background-repeat: repeat-x;
+          border: 1px solid #424242;
+        }
+        .tag-writer {
+          background: #b0913f;
+          border: 1px solid #c5a85d;
+        }
+        .tag-art {
+          background: #4492a9;
+          border: 1px solid #61aabf;
+        }
+        .tag-layout {
+          border: 1px solid #93a1c6;
+          background: #7284b4;
+        }
+        .tag-lettering {
+          border: 1px solid #5ec2b1;
+          background: #41ac9a;
+        }
+        .tag-char {
+          border: 1px solid #cc8c79;
+          background: #be6c54;
         }
       }
 

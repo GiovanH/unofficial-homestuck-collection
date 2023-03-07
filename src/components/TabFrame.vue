@@ -278,8 +278,8 @@ export default {
                 }
                 case 'PXS': {
                     if (this.$pageIsSpoiler('008753')) component = 'Spoiler'
-                    else if (this.routeParams.cid) {
-                        let p = parseInt(this.routeParams.pid)
+                    else if (this.routeParams.cid && !['archive', 'news', 'credits'].includes(this.routeParams.cid)) {
+                        let p = parseInt(this.routeParams.pid) || 1
                         let data = this.$archive.comics.pxs.comics[this.routeParams.cid]
                         if (this.routeParams.cid && (!this.$archive.comics.pxs.list.includes(this.routeParams.cid) || !data || !Number.isInteger(p) || data.pages.length < p || p < 1)) component = 'Error404'
                     }
