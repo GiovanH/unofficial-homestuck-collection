@@ -241,16 +241,6 @@ function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  // We pre-build this here so mods have access to it
-  // TODO: This is unused now, remove it
-  data.search = Object.values(data.mspa.story).map(storypage => {
-    return {
-      key: storypage.pageId,
-      chapter: Resources.getChapter(storypage.pageId),
-      content: `${storypage.title}###${storypage.content}`
-    }
-  })
-
   win.webContents.send('SET_LOAD_STAGE', "MODS")
   logger.info("Loading mods")
 
@@ -616,7 +606,7 @@ function buildChapterIndex(){
       key: page_num,
       mspa_num: page_num,
       chapter: Resources.getChapter(page_num),
-      content: `${page.title}<br />${page.content}`
+      content: page.content
     }
   })
 
@@ -655,59 +645,96 @@ ipcMain.handle('search', async (event, payload) => {
   }
   
   let limit = 1000
-  const sort = (a, b) => {
+
+  function separateNonConsecutive(array, delimiter) {
+    // Given an array and a delimiter, separate the non-consecutive members of the array.
+    // > separateNonConsecutive([1, 2, 3, 5], "f")
+    // [1, 2, 3, "f", 5]
+
+    let next_v = array[0]
+    let newarray = []
+    for (const i in array) {
+      const v = array[i]
+      if (v != next_v) newarray.push(delimiter)
+      newarray.push(v)
+      next_v = v + 1
+    }
+    return newarray
+  }
+
+  // Generate results from FlexSearch object
+  const sortFn = (a, b) => {
     const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
     const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
-    return (payload.sort == 'desc') 
-      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0 
+    return (payload.sort == 'desc')
+      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0
       : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
   }
+  // "Where" function to make sure any IN: tag matches the *start* of the chapter
+  const where = payload.chapter ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0) : undefined
 
-  let filteredIndex
-  if (payload.filter[0]) {
-    const items = chapterIndex.where(function(item) {
-      return payload.filter.includes(item.chapter)
-    })
-    limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({
-      doc: {
-        id: 'key', 
-        field: ['mspa_num', 'content']
-      }
-    }).add(items)
-  } else {
-    filteredIndex = chapterIndex
-  }
-
-  const results = (payload.sort == 'asc' || payload.sort == 'desc') 
-    ? filteredIndex.search(payload.input, {limit, sort})
-    : filteredIndex.search(payload.input, {limit})
+  // Run search
+  const searchOpts = {field: ['content'], where, limit, sort: sortFn}
+  const results = chapterIndex.search(payload.input, searchOpts)
 
   const foundText = []
   for (const page of results) {
-    const flex = new FlexSearch()
-    const page_lines = page.content.split('<br />')
+    const intraPageSearch = new FlexSearch({
+      doc: {
+        id: 'index',
+        field: ['index', 'content']
+      }
+    })
+
+    // Split page by breaks, and also split apart very long paragraphs by sentences.
+    const page_lines = page.content.split('<br />').map(line => {
+      if (line.length > 160) {
+        return line.split(/(?<=\. )/) // non-consuming split
+      } else {
+        return [line]
+      }
+    }).flat()
+
     for (let i = 0; i < page_lines.length; i++) {
-      flex.add(i, page_lines[i])
+      intraPageSearch.add({index: i, content: page_lines[i]})
     }
-    const indexes = flex.search(payload.input)
+    // Search matching lines *again* for input and return matching indexes
+    const intraResults = intraPageSearch.search(payload.input, {limit, bool: "or"})
+    var indexes = intraResults.map(k => k.index)
+
+    //
+    if (indexes.length > 0)
+      indexes.push(0) // always include first line, primarily for pesterlog formatting reasons
+
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
         const spread = 2;
-        for (let j = i - spread; j < i + spread; j++) {
+        for (let j = Math.max(0, i - spread); j < Math.min(page_lines.length, i + spread); j++) {
           acc.add(j)
         }
         return acc
       }, new Set())
     ).sort()
-    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
 
-    if (matching_lines.length > 0){
+    const matching_lines = separateNonConsecutive(
+      spread_indexes.filter(i => page_lines[i]),
+      "..."
+    ).map(i => i == '...' ? i : page_lines[i])
+
+    if (matching_lines.length > 0) {
       foundText.push({
         key: page.key,
         mspa_num: page.mspa_num,
         lines: matching_lines
       })
+    } else {
+      // Couldn't find text within match, despite having already matched. Matching text is spread between lines.
+      // Behaviour: Filter out entirely.
+      // foundText.push({
+      //   key: page.key,
+      //   mspa_num: page.mspa_num,
+      //   lines: page_lines
+      // })
     }
   }
   return foundText
