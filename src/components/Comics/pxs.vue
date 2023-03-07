@@ -193,6 +193,9 @@ export default {
 
 <style scoped lang="scss">
 .pageBody {
+  display: flex;
+  flex-flow: column nowrap;
+
   background: #002d4d;
   background-image: url(assets://archive/comics/pxs/pixels_top.png), url(assets://archive/comics/pxs/pixels_bottom.png) !important;
   background-position: center top, center bottom !important;
@@ -224,6 +227,8 @@ export default {
   }
   
   .pageFrame {
+    flex-grow: 1;
+    
     margin: 0 auto;
     width: 774px;
     background: url(assets://archive/comics/pxs/bgContainer.png) !important;
@@ -238,7 +243,7 @@ export default {
         padding: 12px 0;
       }
 
-      .title, .archive, {
+      .title, .archive {
         font-family: "Century Gothic",arial, sans-serif;
         font-size: 20px;
         font-weight: bold;
