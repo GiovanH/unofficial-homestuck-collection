@@ -32,10 +32,10 @@ const gotTheLock = app.requestSingleInstanceLock()
 // We're not running crysis or anything its all gifs
 
 if (!store.get('localData.settings.enableHardwareAcceleration')) {
-  console.log("Disabling hardware acceleration")
+  logger.info("Disabling hardware acceleration")
   app.disableHardwareAcceleration()
 } else {
-  console.log("Not disabling hardware acceleration")
+  logger.info("Not disabling hardware acceleration")
 }
 
 // Log settings, for debugging
@@ -278,14 +278,12 @@ function loadArchiveData(){
   logger.info("Loading patches")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   if (data.version == "1") {
-    logger.info("Applying asset pack v1 patches")
+    logger.warn("Applying asset pack v1 patches")
     const gankraSearchPage = data.search.find(x => x.key == '002745')
     if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
 
     data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
-
     data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
-
     data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
   }
 
@@ -347,7 +345,7 @@ try {
   })
 } catch (error) {
   logger.error(error)
-  logger.info("Loading check failed, loading setup mode")
+  logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -414,19 +412,23 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
 
 if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
-  const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+  var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+  if (app.commandLine.hasSwitch('reset-last-version')) {
+    logger.warn(`Run with --reset-last-version flag, resetting version from ${last_app_version} to 0.0.0.`)
+    last_app_version = '0.0.0';
+  }
 
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
-    console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
+    logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
     Mods.extractimods()
   } else {
-    console.log(`last version ${last_app_version} gte current version ${APP_VERSION}`)
+    logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
 
   store.set("appVersion", APP_VERSION)
 } else {
-  console.log("Deferring app version checks until initial configuration is complete.")
+  logger.warn("Deferring app version checks until initial configuration is complete.")
 }
 
 // Speed hack, try to preload the first copy of the archive
