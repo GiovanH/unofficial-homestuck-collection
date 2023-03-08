@@ -11,9 +11,10 @@ clean:
 lint: install 
 	yarn run vue-cli-service lint
 	# yarn lint
-	
+
+# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar test' to make imods and pass --reset-last-version through
 test: install src/imods.tar
-	yarn run vue-cli-service electron:serve
+	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
 
 publish: install src/imods.tar

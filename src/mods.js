@@ -29,7 +29,7 @@ const store_devmode_key = 'localData.settings.devMode'
 let win = null
 function giveWindow(new_win) {
   win = new_win
-  logger.info("Got window")
+  logger.debug("Got window")
 }
 
 let validatedState = false
@@ -119,11 +119,11 @@ function removeModsFromEnabledList(responsible_mods) {
   // Clear enabled mods
   const old_enabled_mods = getEnabledMods()
   const new_enabled_mods = old_enabled_mods.filter(x => !responsible_mods.includes(x)).filter(x => !x.startsWith("_"))
-  logger.info("Changing modlist", old_enabled_mods, new_enabled_mods)
+  logger.debug("Changing modlist", old_enabled_mods, new_enabled_mods)
 
   // Fully reactive settings clobber
   if (ipcMain) {
-    logger.info("Trying to change modlist from main")
+    logger.debug("Trying to change modlist from main")
     store.set(store_modlist_key, new_enabled_mods)
     if (win) {
       win.webContents.send('RELOAD_LOCALDATA')
@@ -132,12 +132,12 @@ function removeModsFromEnabledList(responsible_mods) {
       logger.warn("Don't have win!")
     }
   } else if (window.vm) {
-    logger.info("Changing modlist from vm")
+    logger.debug("Changing modlist from vm")
     window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
-    logger.info(window.vm.$localData.settings["modListEnabled"])
+    logger.debug(window.vm.$localData.settings["modListEnabled"])
     window.vm.$localData.VM.saveLocalStorage()
   } else {
-    logger.info("Trying to change modlist before vm")
+    logger.warn("Trying to change modlist before vm")
     store.set(store_modlist_key, new_enabled_mods)
   }
 }
@@ -154,7 +154,7 @@ if (ipcMain) {
     if (win) {
       win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
     } else {
-      logger.info("MAIN: Mod load failure with issues in", responsible_mods)
+      logger.warn("MAIN: Mod load failure with issues in", responsible_mods)
       logger.error(e)
       logger.error("Don't have win!")
       // This only happens if we can't even display the pretty traceback. Absolute fallback.
@@ -174,7 +174,7 @@ if (ipcMain) {
 
     store.set("needsRecovery", true)
 
-    logger.info("RENDER: Mod load failure with modlist", responsible_mods)
+    logger.warn("RENDER: Mod load failure with modlist", responsible_mods)
     logger.error(e)
 
     window.doErrorRecover = () => {
@@ -225,7 +225,7 @@ if (ipcMain) {
 function bakeRoutes() {
   const enabled_mods = getEnabledMods()
   if (!expectWorkingState()) {
-    logger.info("No asset directory set, not baking any routes")
+    logger.warn("No asset directory set, not baking any routes")
     return
   }
   logger.info("Baking routes for", enabled_mods)
@@ -322,7 +322,7 @@ function getEnabledMods() {
 
 function getEnabledModsJs() {
   if (!modsDir) {
-    logger.info("No asset directory set, can't load any mods.")
+    logger.warn("No asset directory set, can't load any mods.")
     return []
   }
   try {
@@ -537,7 +537,7 @@ const footnote_categories = ['story']
 
 function editArchive(archive) {
   if (!expectWorkingState()) {
-    logger.info("No asset directory set, probably in new reader setup mode. Not editing the archive.")
+    logger.warn("No asset directory set, probably in new reader setup mode. Not editing the archive.")
     return
   }
   const enabledModsJs = getEnabledModsJs()
@@ -903,7 +903,7 @@ if (ipcMain) {
     var mod_folders
     try {
       if (fs.existsSync(assetDir) && !fs.existsSync(modsDir)){
-        logger.info("Asset pack exists but mods dir doesn't, making empty folder")
+        logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
         fs.mkdirSync(modsDir)
       }
       const tree = crawlFileTree(modsDir, false)
