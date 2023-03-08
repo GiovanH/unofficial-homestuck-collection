@@ -35,7 +35,7 @@
         <div class="panel-heading" />
         <div v-for="c, name in $archive.comics.pxs.contributors" :key="name" class="contributor">
           <span class="name" v-text="name" />
-          <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${c.avatar || 'undefined.png'}`" />
+          <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${c.avatar.replace(/ /g, '%20') || 'undefined.png'}`" />
           <div>
             <p class="bio" v-html="c.bio" />
             <ul v-if="c.social" class="social">
