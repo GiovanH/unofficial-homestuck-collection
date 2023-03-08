@@ -94,7 +94,6 @@ export default {
   data: function() {
     return {
       pages404: [
-        "/archive/comics/pxs/404.png",
         "/archive/comics/pxs/404-1.png",
         "/archive/comics/pxs/404-2.png",
         "/archive/comics/pxs/404-3.png",
