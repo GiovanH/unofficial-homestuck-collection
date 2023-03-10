@@ -39,6 +39,7 @@
           }
         </component>
 	</div>
+    <span v-else data-placeholder />
 
 </template>
 
