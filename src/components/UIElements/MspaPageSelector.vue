@@ -73,14 +73,17 @@ export default {
       type: Boolean,
       default: false
     },
+    // value: {
+    //   type: String,
+    //   default: undefined
+    // },
   },
   data: function() {
     return {
       // The number in the input field. May be an mspa number or viz number depending on settings. Mutable.
       // TODO: This assignment sometimes doesn't work, and assigns 001901 anyway?
-      currentInputValue: undefined,
-      // The last "assign"ed value
-      currentIdSubmitted: undefined,
+      currentInputValue: "001901",
+      value: "001901",
       vizStory: undefined,
       settingListBoolean: [
         {
@@ -126,7 +129,7 @@ export default {
       return pageInStory
     },
     currentInputChanged(){
-      return this.selectionPageId != this.currentIdSubmitted
+      return this.selectionPageId != this.value
     },
   },
   methods: {
@@ -145,7 +148,8 @@ export default {
     },
     onValueSubmit(){
       if (this.isValidPageSet) {
-        this.currentIdSubmitted = this.selectionPageId
+        this.value = this.selectionPageId
+        // this.$emit('update:value', this.selectionPageId)
         this.$emit('change', this.selectionPageId)
         if (this.handleChange) {
           this.handleChange(this.selectionPageId)

@@ -17,10 +17,10 @@
             <p class="hint">MSPA text content. See <a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/MSPA-Story-Format">Reference</a></p>
           </div>
         </div>
+        <span class="opt">Next Page(s): <input v-model="editNext" /></span>
         <div class="meta">
-          <span>Next Page(s): <input v-model="editNext" /></span>
-          <span>Flags: <input v-model="editFlag" /></span>
-          <span>Theme:
+          <span class="opt">Flags: <input v-model="editFlag" /></span>
+          <span class="opt">Theme:
             <select class="themeSelector" v-model="livePage.theme" >
               <option v-for="theme in themes" :value="theme.value" :key="theme.value">
                 {{ theme.text }}
@@ -28,10 +28,26 @@
             </select>
           </span>
         </div>
+      </div>
+      <div class="page">
+        <LivePage ref="LivePage"
+          :thisPage="livePage" @update="reloadBboxes()" />
+      </div>
+    </div>
+    <div class="under">
+      <div class="section">
         <p>JSON output:</p>
         <pre class="code" v-text="jsonDump" @click="selectText" />
         <p><a :href="singlepageLink">Singlepage Link</a></p>
         <!-- <pre class="code" v-text="singlepageLink" @click="selectText" /> -->
+        <span>
+          <label>
+            <input type="checkbox" v-model="jsonPatchMode" />
+            Patch mode
+          </label>
+        </span>
+      </div>
+      <div class="section">
         <span>
           Load page:
           <input style="width: 6em;" v-model="pginput"
@@ -40,19 +56,10 @@
             <StoryPageLink titleOnly :mspaId='pginput' style="pointer-events: none; color: black;"/>
           </Button>
         </span>
-        <span>
-          <MspaPageSelector promptMspaMode/>
-        </span>
-        <span>
-          <label>
-            <input type="checkbox" v-model="jsonPatchMode" />
-            Patch mode
-          </label>
-        </span>
-      </div>
-      <div class="page">
-        <LivePage ref="LivePage"
-          :thisPage="livePage" @update="reloadBboxes()" />
+<!--         <span>
+          <MspaPageSelector promptMspaMode
+           :handleChange="(pg) => {pginput = pg; livePage = {...$archive.mspa.story[pg]}}" />
+        </span> -->
       </div>
     </div>
     <PageFooter pageWidth="1400px" />
@@ -76,7 +83,7 @@ const LivePage = {
     return {
       ...VanillaPage.data(),
       tab: {},
-      routeParams: {}
+      routeParams: {},
     }
   },
   props: ['thisPage'],
@@ -145,11 +152,13 @@ export default {
         // })
       } else {
         const liverefs = this.$refs.LivePage.$refs
+        // Need a fallback element in case a page renders without one of these (i.e. supercartridge)
+        const fallbackElem = this.$refs.LivePage.$el
         this.bboxes = {
-          pageTitle: liverefs.pageTitle.getBoundingClientRect(),
-          media: liverefs.media.getBoundingClientRect(),
-          textContent: liverefs.textContent.$el.getBoundingClientRect(),
-          pageNav: liverefs.pageNav.$el.getBoundingClientRect()
+          pageTitle: (liverefs.pageTitle || fallbackElem).getBoundingClientRect(),
+          media: (liverefs.media || fallbackElem).getBoundingClientRect(),
+          textContent: (liverefs.textContent.$el || fallbackElem).getBoundingClientRect(),
+          pageNav: (liverefs.pageNav.$el || fallbackElem).getBoundingClientRect()
         }
       }
     },
@@ -234,14 +243,8 @@ export default {
   .editor {
     // Various position hacks
     width: 650px;
-    padding: 0 25px;
     position: relative;
-    border-top: solid black 17px;
-    padding-bottom: 2em;
     // margin-bottom: 110px;
-
-    text-align: center;
-    background: var(--page-pageContent);
 
     .linked {
       margin-top: calc(var(--headerHeight) * -1 - 17px);
@@ -253,7 +256,19 @@ export default {
       }
     }
   }
-  .editor {
+  .editor, .under {
+    border-top: solid black 17px;
+    text-align: center;
+    background: var(--page-pageContent);
+    padding: 0 25px;
+    // padding-bottom: 2em;
+  }
+  .under {
+    max-width: 1300px;
+    margin: 1em auto;
+    padding-bottom: 2em;
+  }
+  .editor, .section {
     // Actual control styles
     color: var(--font-log);
     div {
@@ -265,6 +280,9 @@ export default {
     }
     span {
       display: block;
+      &.opt {
+        margin: 1em auto;
+      }
     }
     textarea {
       width: 100%;
@@ -309,6 +327,11 @@ export default {
       resize: auto;
       white-space: pre-wrap;
       height: auto;
+    }
+    .meta {
+      margin-top: 2em;
+      display: flex;
+      justify-content: space-between;
     }
   }
   .page {
