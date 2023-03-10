@@ -41,6 +41,9 @@
           </Button>
         </span>
         <span>
+          <MspaPageSelector promptMspaMode/>
+        </span>
+        <span>
           <label>
             <input type="checkbox" v-model="jsonPatchMode" />
             Patch mode
@@ -61,6 +64,7 @@
 import VanillaPage from '@/components/Page/Page.vue'
 import SinglePage from '@/components/Page/SinglePage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import MspaPageSelector from '@/components/UIElements/MspaPageSelector.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Settings from '@/components/SystemPages/Settings.vue'
 
@@ -112,7 +116,7 @@ export default {
   props: [
     'tab', 'routeParams'
   ],
-  components: {LivePage, StoryPageLink, PageFooter},
+  components: {LivePage, StoryPageLink, PageFooter, MspaPageSelector},
   theme: function(ctx) {
     const theme = ctx.$refs.page && ctx.$refs.page.livePage ? ctx.$refs.page.livePage.theme : 'default'
     ctx.$logger.info("Editor current theme is ", theme)
