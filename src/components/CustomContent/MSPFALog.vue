@@ -7,7 +7,7 @@
         <a v-if="log.length > 0" @click="sortOrder = sortOrderNext" href="javascript:" class="switchOrder">{{ reverseText }}</a>
         <div class="logItems" v-if="log.length > 0">
           <template v-for="page in log">
-            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
+            {{page.date}} - <a :href="page.href">{{page.title || 'Next.'}}</a><br/>
           </template>
         </div>
         <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />

@@ -113,7 +113,7 @@ def bbToHTML(bbcode):
 #             time.sleep(2**backoff)
 
 def saveImageAs(story, src_url, target_name):
-    directory = os.path.join(story, story, "img")
+    directory = os.path.join(story, "img")
     os.makedirs(directory, exist_ok=True)
 
     ext = os.path.splitext(urlparse(src_url).path)[1]
@@ -187,7 +187,7 @@ def _saveChunked(path, response):
         os.unlink(path)
         raise
 
-def swfhack(pageno, bbcode, b4):
+def swfhack(pageno, bbcode, soup):
     # Hack: Replace flash links with real flash embeds
 
     # Find dimensions of the video embed
@@ -196,12 +196,12 @@ def swfhack(pageno, bbcode, b4):
 
     swf_width = 650
     swf_height = 450
-    panel_video = b4.find("video", width=True, height=True)
+    panel_video = soup.find("video", width=True, height=True)
     if panel_video:
         swf_width = panel_video['width']
         swf_height = panel_video['height']
 
-    for swflink in b4.find_all("a", href=re.compile(r"\.swf$")):
+    for swflink in soup.find_all("a", href=re.compile(r"\.swf$")):
         logger.debug(f"swf link {swflink!r} on page {pageno}")
         swf_bbcode = f"[flash={swf_width}x{swf_height}]{swflink['href']}[/flash]"
 
@@ -232,45 +232,55 @@ def swfhack(pageno, bbcode, b4):
         )) + "\n")
     return bbcode
 
-def downloadStory(STORY, STORY_NO):
+def downloadStory(STORY_NUM, offline=True):
     global logger
-    logger = TriadLogger(f"{STORY_NO}-{STORY}")
     # parser.add_simple_formatter('img', '<img src=%(value)s" />')
 
     # curl 'https://mspfa.com/' --data-raw 'do=action&k=v'
 
     r = requests.request("POST", 'https://mspfa.com/', data={
         "do": "story",
-        "s": str(STORY_NO)
+        "s": str(STORY_NUM)
     })
-    story_resp = r.json()
 
-    os.makedirs(f"{STORY}", exist_ok=True)
-    os.makedirs(f"{STORY}/{STORY}", exist_ok=True)
-    json.dump(story_resp, open(f"{STORY}/{STORY}/story_raw.json", "w"), indent=2)
+    try:
+        r.raise_for_status()
+        story_resp = r.json()
+    except requests.exceptions.HTTPError:
+        r = requests.get(f"https://mspfa.com/?s={STORY_NUM}")
+        soup = bs4.BeautifulSoup(r.text)
+        story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])
 
-    # os.makedirs(f"{STORY}/{STORY}/json", exist_ok=True)
-    # os.makedirs(f"{STORY}/{STORY}/yaml", exist_ok=True)
-    # os.makedirs(f"{STORY}/{STORY}/html", exist_ok=True)
-    os.makedirs(f"{STORY}/{STORY}/img", exist_ok=True)
-    # os.makedirs(f"{STORY}/{STORY}/assets", exist_ok=True)
+    story_name = story_resp.get('n')
+
+    logger = TriadLogger(f"{STORY_NUM}-{story_name}")
+
+    os.makedirs(f"{story_name}", exist_ok=True)
+    os.makedirs(f"{story_name}", exist_ok=True)
+    json.dump(story_resp, open(f"{story_name}/story_raw.json", "w"), indent=2)
+
+    # os.makedirs(f"{story_name}/json", exist_ok=True)
+    # os.makedirs(f"{story_name}/yaml", exist_ok=True)
+    # os.makedirs(f"{story_name}/html", exist_ok=True)
+    os.makedirs(f"{story_name}/img", exist_ok=True)
+    # os.makedirs(f"{story_name}/assets", exist_ok=True)
 
     # Write blank file
-    open(f"{STORY}/{STORY}/links.txt", "w").close()
-    if os.path.isfile(f"{STORY}/{STORY}/missing_urls.txt"):
-        os.unlink(f"{STORY}/{STORY}/missing_urls.txt")
+    open(f"{story_name}/links.txt", "w").close()
+    if os.path.isfile(f"{story_name}/missing_urls.txt"):
+        os.unlink(f"{story_name}/missing_urls.txt")
 
     # imagespool = loom.Spool(2, "Images")
     # linkspool = loom.Spool(2, "Links")
 
     # Thumbnail
     if story_resp['o']:
-        story_resp['o'] = "assets://mspfa/" + saveImageAs(STORY, story_resp['o'], 'thumbnail')
+        story_resp['o'] = "assets://mspfa/" + saveImageAs(story_name, story_resp['o'], 'thumbnail')
 
     adv_images = {}
     page_list = list(enumerate(story_resp['p']))
 
-    for (pageno, page) in tqdm(page_list, desc=STORY):
+    for (pageno, page) in tqdm(page_list, desc=story_name):
         pageno += 1
         page["i"] = pageno
 
@@ -278,106 +288,118 @@ def downloadStory(STORY, STORY_NO):
         page_bbcode = page['b']
 
         html = bbToHTML(page_bbcode)
-        b4 = bs4.BeautifulSoup(f"<h2>{command}</h2>\n{html}", features="html.parser")
+        soup = bs4.BeautifulSoup(f"<h2>{command}</h2>\n{html}", features="html.parser")
 
-        with open(f"{STORY}/{STORY}/links.txt", "a", encoding="utf-8") as linklist:
-            for a in b4.find_all("a"):
+        with open(f"{story_name}/links.txt", "a", encoding="utf-8") as linklist:
+            for a in soup.find_all("a", href=True):
                 linklist.write(a['href'])
                 linklist.write("\n")
 
         images = list(itertools.chain(
-            [i['src'] for i in b4.find_all("img")],
-            [o['data'] for o in b4.find_all("object", data=True)],
-            [o['value'] for o in b4.find_all("param", attrs={'name': "movie"}, value=True)],
-            [o['src'] for o in b4.find_all("source")],
+            [i['src'] for i in soup.find_all("img")],
+            [o['data'] for o in soup.find_all("object", data=True)],
+            [o['value'] for o in soup.find_all("param", attrs={'name': "movie"}, value=True)],
+            [o['src'] for o in soup.find_all("source")],
         ))
         images += [
-            a['href'] for a in b4.find_all("a")
+            a['href'] for a in soup.find_all("a")
             if any(a['href'].endswith(e) for e in ["swf", "mp4", "mp3", "png", "jpg", "gif", "jpeg", "webm"])
         ]
 
         weird_things = None 
-        # b4.find_all("object", data=False)
+        # soup.find_all("object", data=False)
         if weird_things:
             logger.warning(weird_things)
 
         if Hacks.swflinks:
-            page['b'] = swfhack(pageno, page['b'], b4)
+            page['b'] = swfhack(pageno, page['b'], soup)
 
-        for i, src in enumerate(images):
-            if adv_images.get(src, False):
-                img_id = adv_images[src]
-            else:
-                if len(images) <= 1:
-                    img_id = f"{pageno}"
+        if offline:
+            for i, src in enumerate(images):
+                if adv_images.get(src, False):
+                    img_id = adv_images[src]
                 else:
-                    img_id = f"{pageno}_{i}"
+                    if len(images) <= 1:
+                        img_id = f"{pageno}"
+                    else:
+                        img_id = f"{pageno}_{i}"
 
-            adv_images[src] = img_id
+                adv_images[src] = img_id
 
-            try:
-                outpath = "assets://mspfa/" + saveImageAs(STORY, src, img_id)
-                # Replace text in source
-                page['b'] = page['b'].replace(src, outpath)
-            except requests.exceptions.HTTPError:
-                logger.warning(f"Could not replace path {img_id} in page {pageno}")
-                with open(f"{STORY}/{STORY}/missing_urls.txt", "a", encoding="utf-8") as linklist:
-                    linklist.write(src + "\n")
+                try:
+                    outpath = "assets://mspfa/" + saveImageAs(story_name, src, img_id)
+                    # Replace text in source
+                    page['b'] = page['b'].replace(src, outpath)
+                except requests.exceptions.HTTPError:
+                    logger.warning(f"Could not replace path {img_id} in page {pageno}")
+                    with open(f"{story_name}/missing_urls.txt", "a", encoding="utf-8") as linklist:
+                        linklist.write(src + "\n")
 
-    # json.dump(adv_images, open(f"{STORY}/{STORY}/adv_images.json", "w"))
-    yaml.dump(adv_images, open(f"{STORY}/{STORY}/adv_images.yaml", "w"))
+    # json.dump(adv_images, open(f"{story_name}/adv_images.json", "w"))
+    yaml.dump(adv_images, open(f"{story_name}/adv_images.yaml", "w"))
 
-    # yaml.dump(story_resp, open(f"{STORY}/{STORY}/story_raw.yaml", "w"))
+    # yaml.dump(story_resp, open(f"{story_name}/story_raw.yaml", "w"))
 
-    story_resp["editors"] = [
-        requests.request("POST", 'https://mspfa.com/', data={
-            "do": "user",
-            "u": str(editor)
-        }).json()
-        for editor in story_resp['e']
-    ]
-    for junk in ["f", "g", "e"]:
-        story_resp.pop(junk)
+    try:
+        story_resp["editors"] = [
+            requests.request("POST", 'https://mspfa.com/', data={
+                "do": "user",
+                "u": str(editor)
+            }).json()
+            for editor in story_resp['e']
+        ]
+        for junk in ["f", "g", "e"]:
+            story_resp.pop(junk)
+    except Exception as e:
+        logger.warn(e)
 
-    # json.dump(story_resp, open(f"{STORY}/{STORY}/story.json", "w"))
-    yaml.dump(story_resp, open(f"{STORY}/{STORY}/story.yaml", "w"))
+    # json.dump(story_resp, open(f"{story_name}/story.json", "w"))
+    yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w"))
 
     story_resp.pop("p")
 
     for key, filename in RAW_FILES.items():
         val = story_resp.pop(key)
         if val:
-            with open(f"{STORY}/{STORY}/{filename}", "w") as fp:
+            with open(f"{story_name}/{filename}", "w") as fp:
                 fp.write(val)
 
-    # json.dump(story_resp, open(f"{STORY}/{STORY}/story_meta.json", "w"))
-    yaml.dump(story_resp, open(f"{STORY}/{STORY}/story_meta.yaml", "w"))
+    # json.dump(story_resp, open(f"{story_name}/story_meta.json", "w"))
+    yaml.dump(story_resp, open(f"{story_name}/story_meta.yaml", "w"))
 
     logger.info(f"{story_resp['n']}: {len(page_list)} pages")
 
-    with open(f"{STORY}/mod.js", "w") as fp:
+    with open(f"{story_name}/mod.js", "w") as fp:
         fp.write(f"""module.exports = {{
-  title: "{STORY}", 
+  title: "{story_name}{' (online)' if not offline else ''}",
   summary: "MSPFA",
   
   edit: true,
 
   trees: {{
-      './{STORY}/': 'assets://mspfa/{STORY}/',
+      './': 'assets://mspfa/{story_name}/',
   }},
   computed(api) {{
     return {{
       edit(archive){{
-        archive.mspfa['{STORY}'] = api.readYaml("./{STORY}/story.yaml")
+        archive.mspfa['{story_name}'] = api.readYaml("./story.yaml")
       }}
     }}
   }}
 }}""")
 
+
 if __name__ == "__main__":
-    import sys
-    print(sys.argv[1:])
-    downloadStory(*sys.argv[1:])
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="Render j2 templates",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('story_ids', help="Story IDs", nargs='+')
+    parser.add_argument('--online', action='store_true', help="Don't download resources", default=False)
+    args = parser.parse_args()
+    for id_ in args.story_ids:
+        downloadStory(id_, offline=(not args.online))
 
 """
 requests.request

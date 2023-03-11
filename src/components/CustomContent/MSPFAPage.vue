@@ -83,7 +83,7 @@
                                 <template v-for="page in story.p.slice(-30).reverse()">
                                   <br>
                                   <span :data-timestamp="page.d">{{formatTimestamp(page.d)}} - 
-                                    <a :href="`/mspfa/${storyId}/${page.i}`" v-text="page.c" />
+                                    <a :href="`/mspfa/${storyId}/${page.i}`" v-text="page.c || 'Next.'" />
                                   </span>
                                 </template>
                               </div>
