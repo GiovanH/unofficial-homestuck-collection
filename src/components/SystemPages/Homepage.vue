@@ -139,6 +139,24 @@
       </div>
     </div>
     
+    <div class="card" v-if="$archive.mspfa">
+      <div class="cardContent cardEntry">
+        <div class="icon">
+          <a href="/mspfa/" ><Media url="/images/archive_mspfa.gif" /></a>
+          <p class="date">Sep 2006 - ???</p>
+        </div>
+        <div class="description">
+          <h2><a href="/mspfa/" >MS Paint Fan Adventures</a></h2>
+          <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
+          <br />
+          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired ????, and the site is currently run by Grant.</p>
+          <div class="links">
+            > <a href="/mspfa/" >Index</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
       <div class="cardContent mainSection">

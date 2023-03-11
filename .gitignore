@@ -34,3 +34,6 @@ install
 
 # generated file
 src/imods.tar
+
+/tools/mspfa/*/
+/tools/mspfa/*.log

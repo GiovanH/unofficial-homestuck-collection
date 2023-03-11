@@ -1,0 +1,163 @@
+<template>
+  <div class="pageBody customStyles">
+    <NavBanner useCustomStyles="true" />
+    <div class="pageFrame" v-if="log">
+      <div class="pageContent">
+        <h2 class="pageTitle">Adventure Log</h2>
+        <a v-if="log.length > 0" @click="sortOrder = sortOrderNext" href="javascript:" class="switchOrder">{{ reverseText }}</a>
+        <div class="logItems" v-if="log.length > 0">
+          <template v-for="page in log">
+            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
+          </template>
+        </div>
+        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
+      </div>
+    </div>
+    <PageFooter />
+  </div>
+</template>
+
+<script>
+
+import NavBanner from '@/components/UIElements/NavBanner.vue'
+import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
+
+const { DateTime } = require('luxon');
+
+const sort_methods = {
+    asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
+    desc: (a, b) => (a.page_num < b.page_num) ? 1 : -1,
+    alpha: (a, b) => (a.title > b.title) ? 1 : -1,
+    random: (a, b) => 0.5 - Math.random()
+}
+
+export default {
+  name: 'MSPFALog',
+  props: [
+    'tab', 'storyId'
+  ],
+  components: {
+    NavBanner, PageFooter, MediaEmbed
+  },
+  data: function() {
+    return {
+      sort: 'log',
+      sortOrder: 'asc',
+      sortNames: {
+        asc: 'oldest to newest',
+        desc: 'newest to oldest'
+      }
+    }
+  },
+  computed: {
+    story(){
+      if (this.storyId)
+        return this.$archive.mspfa[this.storyId]
+      return undefined
+    },
+    log() {
+      // depends on
+      // this.$localData.settings.newReader;
+
+      // A sorted list of log objects
+      if (!this.storyId) 
+        return undefined
+
+      return this.story.p.map(page_i => 
+        this.getLogEntry(this.storyId, page_i)
+      ).sort(this.sorter)
+    },
+    reverseText(){
+      // Todo
+      return "View " + (this.sortNames[this.sortOrderNext] || "log")
+    },
+    sortOrderNext(){
+      let next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
+      return next
+    },
+    sorter(){
+      // The sorter function that .sort() keys
+      let default_="asc"
+      return sort_methods[this.sortOrder] || sort_methods[default_]
+    }
+  },
+  methods: {
+    getLogEntry(story_id, page) {
+      // Returns the actual entry object for a given page
+      // needs the story_id because ryanquest
+
+      let time_zone = "America/New_York"
+      return {
+        title: page.c,
+        page_num: page.i,
+        href: `/mspfa/${this.storyId}/${page.i}`,
+        date: (page.d ? DateTime.fromMillis(Number(page.d)).setZone(time_zone).toFormat("MM/dd/yy") : "??/??/??")
+      }
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+  ::v-deep a{
+    color: var(--page-links);
+  }
+  .pageBody {
+    color: var(--font-default);
+    background: var(--page-pageBody);
+
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-flow: column;
+    flex: 1 0 auto;
+    align-items: center;
+
+    .pageFrame {
+      background: var(--page-pageFrame);
+
+      width: 950px;
+      padding-top: 7px;
+      padding-bottom: 23px;
+      margin: 0 auto;
+
+      flex: 0 1 auto;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
+      align-items: center;
+      align-content: center;
+      .pageContent{
+        background: var(--page-pageContent);
+
+        .pageContent img {
+            max-width: 100%;
+        }
+        
+        width: 650px;     
+        h2.pageTitle {
+          max-width: 590px;
+          text-align: center;
+          line-height: 1.1;
+          font-size: 32px;
+          padding: 15px 0;
+          margin: 0 auto;
+        }
+        .switchOrder {
+          padding-left: 30px;
+        }
+        .logItems {
+          padding: 30px;
+
+          font-family: Verdana, Geneva, Tahoma, sans-serif;
+          font-size: 12px;
+        }
+      }
+    }
+
+  }
+  
+
+</style>
+

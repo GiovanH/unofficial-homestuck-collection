@@ -110,6 +110,7 @@ const preload_components = [
 const COMPONENT_LOADING = undefined // "GenericPage"
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
+import MSPFADISAMBIG from '@/components/CustomContent/MSPFADisambig.vue'
 
 export default {
     name: 'TabFrame',
@@ -173,7 +174,8 @@ export default {
         SNAPS,
 
         TESTS,
-        EDITOR
+        EDITOR,
+        MSPFADISAMBIG
     },
     data() {
         return {
@@ -253,7 +255,9 @@ export default {
                 'sweetbroandhellajeff': 'SBAHJ',
                 'faqs': 'ExtrasPage',
                 'oilretcon': 'ExtrasPage',
-                'page': 'SinglePage'
+                'page': 'SinglePage',
+                'mspfa': 'MSPFADisambig',
+
             }
     
             const base = this.routeParams.base.toLowerCase()
@@ -505,7 +509,8 @@ export default {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.keyNavEvent && 
                 !e.altKey && 
-                document.activeElement.tagName != 'INPUT') {
+                document.activeElement.tagName != 'INPUT' &&
+                document.activeElement.tagName != 'OBJECT') {
                 if (this.$el.scrollLeft == 0) {
                     // Only send event if scrolling doesn't happen
                     this.$refs.page.keyNavEvent('left', e)
@@ -516,7 +521,8 @@ export default {
             if (this.$localData.settings.arrowNav && 
                 this.$refs.page.keyNavEvent && 
                 !e.altKey && 
-                document.activeElement.tagName != 'INPUT') {
+                document.activeElement.tagName != 'INPUT' &&
+                document.activeElement.tagName != 'OBJECT') {
                 const frameEl = this.$el
                 // Really weird workaround here for what I think is a subpixel math bug:
                 // Depending on zoom/dpi, frameEl.scrollWidth can be (frameEl.clientWidth - 1)
