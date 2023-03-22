@@ -328,7 +328,8 @@ export default {
 }
 
 nav.navBanner::v-deep{
-  width: 100%;
+  width: calc(100% - 10px);
+  margin: 0 5px;
 }
 
 // Hacks end here
@@ -343,10 +344,10 @@ div[role="styleWrap"]::v-deep {
   }
 
   #main {
-    width: 940px;
+    width: 950px;
     // width: 950px;
     margin: 0 auto;
-    padding: 0 5px 5px 5px;
+    // padding: 0 5px 5px 5px;
     // padding: 0;
     background-color: var(--page-pageFrame);
   }

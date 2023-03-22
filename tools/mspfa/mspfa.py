@@ -251,7 +251,7 @@ def downloadStory(STORY_NUM, offline=True):
         soup = bs4.BeautifulSoup(r.text)
         story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])
 
-    story_name = story_resp.get('n')
+    story_name = story_resp.get('n').replace(':', '-')
 
     logger = TriadLogger(f"{STORY_NUM}-{story_name}")
 

@@ -139,7 +139,7 @@
       </div>
     </div>
     
-    <div class="card" v-if="$archive.mspfa">
+    <div class="card tight" v-if="Object.keys($archive.mspfa).length > 0">
       <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspfa/" ><Media url="/images/archive_mspfa.gif" /></a>
@@ -149,7 +149,7 @@
           <h2><a href="/mspfa/" >MS Paint Fan Adventures</a></h2>
           <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
           <br />
-          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired ????, and the site is currently run by Grant.</p>
+          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired, and the site is currently run by Grant.</p>
           <div class="links">
             > <a href="/mspfa/" >Index</a>
           </div>
