@@ -15,7 +15,7 @@
           <td width="5px" class="grey"></td>
           <td bgcolor="#1c3019">
             <!-- Main body cell -->
-            <table summary="" width="" height="400px" cellpadding="40px" border="0" bgcolor="">
+            <table summary="" width="" height="400px" border="0" bgcolor="" style="padding: 40px;">
               <tr>
                 <td>
                   <div v-if="routeParams.cursed_history == 'cursed_history'" class="cursedWrapper">
