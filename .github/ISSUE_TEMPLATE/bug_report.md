@@ -7,6 +7,20 @@ assignees: ''
 
 ---
 
+This is for reporting bugs with the program **only**. 
+This is *not* a place for general technical support. Do not use this section for "How do I..." questions.
+
+Before reporting a bug:
+- Read the FAQ: https://bambosh.dev/unofficial-homestuck-collection/faq.html
+- Make absolutely sure your exact issue hasn't already been identified in the pinned issue list
+- Search the issues to see your problem is already being tracked.
+- See if the issue has already been fixed in the latest prerelease build
+- See if the issue has already been fixed in the `develop` branch (if possible)
+
+Don't leave this section in your post.
+
+---
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
