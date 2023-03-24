@@ -65,7 +65,7 @@ export default {
       if (noHTML) {
         code = [code.replace(/</g, "&lt;").replace(/>/g, "&gt;")]
       } else {
-        code = code.split(/\<(textarea|style)(?:(?: |\n)(?:.|\n)*?)?\>(?:.|\n)*?\<\/\2\>/gi)
+        code = code.split(/\<(textarea|style)(?:(?: |\n)(?:.|\n)*?)?\>(?:.|\n)*?\<\/\1\>/gi)
         for (var i = 2; i < code.length; i += 2) {
           code.splice(i, 1)
         }
