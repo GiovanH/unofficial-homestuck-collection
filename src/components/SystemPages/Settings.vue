@@ -74,7 +74,7 @@
                 {{ theme.text }}
               </option>
             </select>
-            <template v-if="$localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default'">
+            <template v-if="!$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
               <dt><label><input type="checkbox" 
                 name="forceThemeOverride" 
                 v-model="$localData.settings['forceThemeOverride']" 
@@ -116,6 +116,13 @@
               :checked.prop="darkModeChecked === true"
               :indeterminate.prop="darkModeChecked === undefined"
               @click="toggleDarkMode()"> Dark Mode
+            </label>
+            <label v-if="$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
+              <input type="checkbox"
+                name="forceThemeOverride"
+                v-model="$localData.settings['forceThemeOverride']"
+                @click="toggleSetting('forceThemeOverride')">
+              Override page-specific themes
             </label>
           </dt>
 

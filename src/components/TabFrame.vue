@@ -423,8 +423,9 @@ export default {
             let theme = page_theme
 
             if (set_theme) {
-              if (page_theme != 'default') {
-                // Page has a theme
+              // Treat 'retro' for bq/ps/jb as "no special theme", for override/dark mode purposes.
+              if (page_theme != 'default' && page_theme != 'retro') {
+                // Page has a special theme
                 if (this.$localData.settings.forceThemeOverride) {
                   // If force is on, use the override theme
                   theme = set_theme
