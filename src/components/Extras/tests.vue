@@ -224,7 +224,7 @@ export default {
       }
     },
     allConversations(){
-      let re = /<span style="color: #([^>]+?)">(\S+?):/g
+      let re = /<span style="color: #([A-Fa-f0-9]+)">([A-Z]+):/g
       return this.storyPages.filter(
           page => re.exec(page.content)
         ).reduce((acc, page) => {
@@ -238,7 +238,8 @@ export default {
       // Compute color: list<page> and color: set<nickname> mappings
       const {pagesByColor, speakersByColor} = Object.keys(this.allConversations).reduce((acc, pageId) => {
           this.allConversations[pageId].forEach(pair => {
-              const [color, nickname] = pair.split(":")
+              let [color, nickname] = pair.split(":")
+              color = color.toUpperCase()
               acc.pagesByColor[color] = acc.pagesByColor[color] || []
               acc.pagesByColor[color].push(pageId)
               acc.speakersByColor[color] = acc.speakersByColor[color] || []
