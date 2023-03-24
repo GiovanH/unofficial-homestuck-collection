@@ -149,9 +149,9 @@ export default {
       return nextPages
     },
     nextPagesMedia(){
-      return this.nextPagesArray.reduce((acc, page) => {
+      return new Set(this.nextPagesArray.reduce((acc, page) => {
         return [...acc, ...page.media.filter(x => /(gif|png)$/i.test(x))]
-      }, []).map(this.$getResourceURL)
+      }, []).map(this.$getResourceURL))
     },
     pixelated() {
       return this.$localData.settings.pixelScaling
