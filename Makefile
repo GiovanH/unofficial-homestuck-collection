@@ -24,7 +24,7 @@ publish: install src/imods.tar
 vuebuild: install 
 	yarn run vue-cli-service build
 
-src/imods.tar: $(wildcard src/imods/*)
+src/imods.tar: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 	cd src && tar -czf imods.tar imods/
 
 	

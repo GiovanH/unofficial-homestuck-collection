@@ -769,7 +769,7 @@ ipcMain.on('ondragstart', (event, filePath) => {
         const sharpNativeImage = nativeImage.createFromBuffer(buffer)
         // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
         cb(sharpNativeImage)
-      })
+      }).catch(err => {throw err;})
     // }
   } catch (err) {
     logger.error("Couldn't process image", err)
