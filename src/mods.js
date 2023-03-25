@@ -272,7 +272,7 @@ function bakeRoutes() {
     }
   })
 
-  logger.debug(all_mod_routes)
+  // logger.debug(all_mod_routes)
   
   // Modify script-global `routes`
   routes = all_mod_routes
@@ -362,6 +362,7 @@ function crawlFileTree(root, recursive=false) {
 }
 
 function buildApi(mod) {
+  const Resources = require("@/resources.js")
   function readFileSyncLocal(local_path, method_name) {
     console.assert(!mod._singlefile, `Singlefile mods cannot use api.${method_name}`)
     console.assert(local_path.startsWith("./"), local_path, `${method_name} paths must be mod relative (./)`)
@@ -389,7 +390,8 @@ function buildApi(mod) {
     },
     readYaml(asset_path) {
       return yaml.safeLoad(readFileSyncLocal(asset_path, "readYaml"))
-    } 
+    },
+    Resources
   }
   var logger
   Object.defineProperty(api, 'logger', {
