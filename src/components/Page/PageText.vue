@@ -2,7 +2,7 @@
     <p class="prattle text" :class="fontFamily" :style="fontStyle" 
         v-html="filteredPrattle" v-if="textType == 'prattle' && !!content" />
 
-    <div class="log" :class="{logHidden: logHidden}" v-else-if="textType == 'log'">
+    <div class="log" :class="{logHidden: logHidden, darkBackground: isDarkBackground}" v-else-if="textType == 'log'">
         <div class="bgshade" v-if="$localData.settings.textOverride.highContrast" :style="{background: isDarkBackground ? '#000A' : '#FFFA'}"/>
 		<button class="logButton" @click="loggle()">
             {{ logButtonText }}
@@ -257,6 +257,13 @@ export default {
                 color: var(--page-links-visited);
             }
         }
+        &.darkBackground .logContent img {
+            &[src="assets://storyfiles/hs2/scraps/shades.png"],
+            &[src="assets://storyfiles/hs2/scraps/trollc00l.gif"],
+            {
+                filter: invert(1);
+            }
+        }
     }
 
     .text {
@@ -321,9 +328,9 @@ export default {
         align-self: center;
         position: relative;
         
-        &.highContrast {
-            background: #ffffff;
-        }
+        // &.highContrast {
+        //     background: #ffffff;
+        // }
         button {
             text-transform: capitalize;
             position: inherit;
