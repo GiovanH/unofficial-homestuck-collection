@@ -17,17 +17,21 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
   <description>
-    <p>The Unofficial Homestuck Collection is a heavily customised browser built from the ground up to support offline reading of Homestuck and its related works.</p>
-    <p>This application requires the <strong>Asset Pack V2</strong> in order to function. This is a separate download, <a href="https://bambosh.dev/unofficial-homestuck-collection#download">which you can find here.</a></p>
+    <p>The Unofficial Homestuck Collection is a heavily customised browser built from the ground up
+      to support offline reading of Homestuck and its related works.</p>
+    <p>This application requires the Asset Pack V2 in order to function. This is a separate
+      download: https://bambosh.dev/unofficial-homestuck-collection#download</p>
   </description>
   <screenshots>
     <screenshot type="default">
       <caption>Collection interface</caption>
-      <image type="source" width="998" height="900">https://bambosh.dev/unofficial-homestuck-collection/images/collection.gif</image>
+      <image type="source" width="998" height="900">
+        https://bambosh.dev/unofficial-homestuck-collection/images/collection.gif</image>
     </screenshot>
     <screenshot>
       <caption>Bandcamp interface</caption>
-      <image type="source" width="1015" height="708">https://bambosh.dev/unofficial-homestuck-collection/images/bandcamp.gif</image>
+      <image type="source" width="1015" height="708">
+        https://bambosh.dev/unofficial-homestuck-collection/images/bandcamp.gif</image>
     </screenshot>
   </screenshots>
   <releases>
