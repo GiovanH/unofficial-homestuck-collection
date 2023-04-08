@@ -6,6 +6,8 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import fs from 'fs'
 import FlexSearch from 'flexsearch'
 
+import yaml from 'js-yaml'
+
 import Resources from "./resources.js"
 import Mods from "./mods.js"
 
@@ -226,6 +228,7 @@ function loadArchiveData(){
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
+      epilogues: yaml.safeLoad(fs.readFileSync(path.join(assetDir, 'archive/beyond/epilogues.yaml'))),
       audioData: {},
       flags: {}
     }
@@ -329,6 +332,9 @@ try {
   
   // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Max-Age', 2592000); // 30 days
     return handler(request, response, {
       public: assetDir
     })

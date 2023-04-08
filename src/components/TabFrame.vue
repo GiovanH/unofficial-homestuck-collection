@@ -68,6 +68,8 @@ import SKAIANET from '@/components/Extras/Skaianet.vue'
 import SQUIDDLES from '@/components/Extras/Squiddles.vue'
 import EVENMORE from '@/components/Extras/EvenMore.vue'
 
+import EPILOGUES from '@/components/Beyond/Epilogues.vue'
+
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
 import SOCIALS from '@/components/Socials/Socials.vue'
@@ -129,6 +131,8 @@ export default {
         SKAIANET,
         SQUIDDLES,
         EVENMORE,
+
+        EPILOGUES,
 
         MUSIC,
         SOCIALS,
