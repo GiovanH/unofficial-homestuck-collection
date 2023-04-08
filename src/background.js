@@ -228,7 +228,6 @@ function loadArchiveData(){
       comics: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/comics.json'), 'utf8')),
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
-      epilogues: yaml.safeLoad(fs.readFileSync(path.join(assetDir, 'archive/beyond/epilogues.yaml'))),
       audioData: {},
       flags: {}
     }

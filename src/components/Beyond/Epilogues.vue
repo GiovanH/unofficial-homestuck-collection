@@ -27,10 +27,21 @@ export default {
     return 'Epilogues'
   },
   methods: {
+    keyNavEvent(dir) {
+      const el_prev = this.$el.querySelector(".o_game-nav-item a:not([id])")
+      const el_next = this.$el.querySelector(".o_story-nav a")
+      if (dir == 'left' && el_prev != undefined) el_prev.click()
+
+      else if (dir == 'right' && el_next != undefined) el_next.click()
+    },
   },
   computed: {
     epiloguesPage() {
-      return this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
+      if (this.$archive != undefined) {
+        return this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
+      } else {
+        return "NotImplemented"
+      }
     }
   }
 }
