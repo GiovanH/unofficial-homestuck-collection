@@ -227,7 +227,7 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
   .ao3-header {
       position: relative;
       height: 30px;
-      background: #900 url("/assets/epilogues/red-ao3-639c23787c95993ec52e91921778ba44c9086804be33229a40b5155e1dc91747.png");
+      background: #900 url("assets://archive/beyond/ao3_redtile.png");
       padding: 0 0;
       width: 100%;
       box-shadow: inset 0 -6px 10px rgba(0,0,0,0.35),1px 1px 3px -1px rgba(0,0,0,0.25),inset 0 -1px 0 rgba(0,0,0,0.85)
