@@ -374,6 +374,7 @@ Vue.mixin({
   } 
 })
 
+window.Vue = Vue;
 window.vm = new Vue({
   data(){
     return {

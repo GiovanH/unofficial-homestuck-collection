@@ -9,7 +9,7 @@
         <fa-icon icon="chevron-right"></fa-icon></button>
 
       <button class="systemButton historyButton refresh" 
-        @click="reloadTab" @click.middle="forceReload">
+        @click="reloadTab" @click.middle="forceReload" @click.shift="ipcRenderer.sendSync('MODS_FORCE_RELOAD'); archiveReload();">
         <fa-icon icon="redo"></fa-icon></button>
     </div>
     <template v-if="$localData.settings.showAddressBar">
@@ -57,6 +57,7 @@
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
 import AddressBar from '@/components/AppMenu/AddressBar.vue'
+import Settings from '@/components/SystemPages/Settings.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
@@ -76,7 +77,8 @@ export default {
       dragTarget: undefined,
       showDragTab: false,
       dragTitleFade: false,
-      browserToolbars: {}
+      browserToolbars: {},
+      ipcRenderer
     }
   },  
   created(){
@@ -163,10 +165,6 @@ export default {
       } catch (e) {
         this.$logger.warn("Couldn't reload tab (no page?)", e)
       }
-    },
-    forceReload(e) {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      ipcRenderer.invoke('reload')
     },
     newTab() {
       this.$localData.root.TABS_NEW()
@@ -282,7 +280,9 @@ export default {
       if (!document.getElementById('appHeader').classList.contains('headerHoverEnabled')) document.getElementById('appHeader').classList.add('headerHoverEnabled')
 
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
-    }
+    },
+    forceReload: Settings.methods.forceReload,
+    archiveReload: Settings.methods.archiveReload,
   }
 }
 </script>

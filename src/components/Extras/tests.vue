@@ -224,7 +224,7 @@ export default {
       }
     },
     allConversations(){
-      let re = /<span style="color: #([A-Fa-f0-9]+)">([A-Z]+):/g
+      let re = /<span style="color: #([A-Fa-f0-9]+)">([A-Z0-9^]+):/g
       return this.storyPages.filter(
           page => re.exec(page.content)
         ).reduce((acc, page) => {
@@ -256,12 +256,12 @@ export default {
       }
     },
     convoResults(){
+      const selectedConvoColors = Object.keys(this.selectedConvoColors).filter(k => this.selectedConvoColors[k])
       return Object.entries(this.allConversations).filter(a => {
         // Conversations in which all selected colors are participants
         const [pageId, pairs] = a
-        const selectedConvoColors = Object.keys(this.selectedConvoColors).filter(k => this.selectedConvoColors[k])
         return selectedConvoColors.every(
-          c => [...pairs].some(p => p.includes(c))
+          c => [...pairs].some(p => p.toUpperCase().includes(c))
       )}).map(
         // Just get the nicknames
         a => {a[1] = a[1].map(pair => pair.split(':')[1]); return a}

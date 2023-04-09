@@ -315,6 +315,7 @@
           <!-- v-if="$localData.settings.devMode || needReload"  -->
           <button @click="forceReload" class="reload">Reload Application</button>
         </div>
+        <button v-if="$localData.settings.devMode" @click="reloadModList(); archiveReload();" class="reload">Soft reload archive (refresh mods and re-run edits)</button>
       </div>
     </div>
     <div class="card">
@@ -789,7 +790,7 @@ export default {
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
       this.$forceUpdate()
-      this.queueArchiveReload()
+      // this.queueArchiveReload()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)

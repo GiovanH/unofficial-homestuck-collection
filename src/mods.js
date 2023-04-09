@@ -518,7 +518,7 @@ function getModJs(mod_dir, options={}) {
     const e1_is_notfound = (e1.code && e1.code == "MODULE_NOT_FOUND")
     if (e1_is_notfound) {
       // Tried singlefile, missing
-      logger.error("Missing file", mod_dir)
+      logger.error("Missing file", mod_dir, e1)
       removeModsFromEnabledList([mod_dir])
       return null
     } else {
@@ -716,7 +716,7 @@ function getMixins(){
   if (newPages) {
     var pageComponents = {}
     for (let k in newPages)
-      pageComponents[k] = newPages[k].component
+      pageComponents[k.toUpperCase()] = newPages[k].component
 
     mixable_mods.push({
       title: "!pages",
