@@ -10,6 +10,10 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 export default {
   name: 'epilogues',
   components: { NavBanner, PageFooter },
@@ -24,6 +28,8 @@ export default {
     return 'default'
   },
   title: function(ctx) {
+    if (ctx.routeParams.volume && ctx.routeParams.page)
+      return `${capitalize(ctx.routeParams.volume)} ${ctx.routeParams.page}`
     return 'Epilogues'
   },
   methods: {
