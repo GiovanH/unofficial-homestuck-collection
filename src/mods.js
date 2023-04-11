@@ -540,26 +540,6 @@ function editArchive(archive) {
     logger.warn("No asset directory set, probably in new reader setup mode. Not editing the archive.")
     return
   }
-  const enabledModsJs = getEnabledModsJs()
-  enabledModsJs.reverse().forEach((js) => {
-    try {
-      const editfn = js.edit
-      if (editfn) {        
-        logger.info(js._id, "editing archive")
-        editfn(archive)
-        console.assert(archive, js.title, "You blew it up! You nuked the archive!")
-      
-        // Sanity checks
-        // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
-        // required_keys.forEach(key => {
-        //   if (!archive[key]) throw new Error("Archive object missing required key", key)
-        // })
-      }
-    } catch (e) {
-      onModLoadFail([js._id], e)
-      throw e
-    }
-  })
 
   // Footnotes
   archive.footnotes = {}
@@ -568,14 +548,16 @@ function editArchive(archive) {
     archive.footnotes[category] = []
   })
 
+  const enabledModsJs = getEnabledModsJs()
   enabledModsJs.reverse().forEach((js) => {
+    // Load footnotes into archive
     try {
       if (js.footnotes) {
         if (typeof js.footnotes == "string") {
           console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
-          
+
           const json_path = path.join(
-            js._mod_root_dir, 
+            js._mod_root_dir,
             js.footnotes
           )
 
@@ -593,6 +575,24 @@ function editArchive(archive) {
       }
     } catch (e) {
       onModLoadFail([js._id], e)
+    }
+    // Run archive edit function
+    try {
+      const editfn = js.edit
+      if (editfn) {        
+        logger.info(js._id, "editing archive")
+        editfn(archive)
+        console.assert(archive, js.title, "You blew it up! You nuked the archive!")
+      
+        // Sanity checks
+        // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+        // required_keys.forEach(key => {
+        //   if (!archive[key]) throw new Error("Archive object missing required key", key)
+        // })
+      }
+    } catch (e) {
+      onModLoadFail([js._id], e)
+      throw e
     }
   })
 }
