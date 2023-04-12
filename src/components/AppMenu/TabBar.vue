@@ -194,6 +194,7 @@ export default {
     },
 
     initDrag(e) {
+      // TODO: Improve performance
       e = e || window.event
       e.preventDefault()
 

@@ -6,9 +6,10 @@
         <h2 class="pageTitle">Adventure Logs</h2>
         <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
         <div class="logItems" v-if="log.length > 0">
-          <template v-for="page in log">
-            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
-          </template>
+          <span class="line" v-for="page in log">
+            {{page.date}} - <a :href="page.href">{{page.title}}</a>
+            <!-- <br/> -->
+          </span>
         </div>
         <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
       </div>
@@ -72,7 +73,14 @@ export default {
           // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
           {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
           // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
-      ]
+      ],
+      storyLogRaw: this.memoized(story_id => {
+        // console.log("Recalculating raw story log (BAD)")
+
+        return this.$getAllPagesInStory(story_id).map(page_num =>
+          this.getLogEntry(story_id, page_num)
+        )
+      }, "storyLogRaw", 10),
     }
   },
   computed: {
@@ -126,20 +134,6 @@ export default {
       let default_="asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
     },
-    storyLogRaw() {
-      // The unsorted story log
-      this.$archive;
-
-      // Vue should really be able to keep track of this, but it just can't. 
-      
-      return this.memoized(story_id => {
-        // console.log("Recalculating raw story log (BAD)")
-
-        return this.$getAllPagesInStory(story_id).map(page_num => 
-          this.getLogEntry(story_id, page_num)
-        )
-      }, "storyLogRaw", 10)
-    }
   },
   methods: {
     getLogEntry(story_id, page_num) {
@@ -229,6 +223,9 @@ export default {
 
           font-family: Verdana, Geneva, Tahoma, sans-serif;
           font-size: 12px;
+          span.line {
+            display: block;
+          }
         }
       }
     }
