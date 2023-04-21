@@ -376,13 +376,8 @@
       @extend .fas;
       content: fa-content($fa-var-chevron-right);
     }
-    &[href^="http://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href$=".pdf"],
-    // &[href$=".html"]:not([href*="assets://"]) {
-    &[href$=".html"] {
-      &::after{
+    &[href^="http://"], &[href^="https://"], &[href^="mailto"], &[href$=".pdf"], &[href$=".html"] {
+      &:not([href*="127.0.0.1"]):not([href*="localhost"]):not([href*="assets://"])::after{
         @extend %fa-icon;
         @extend .fas;
         content: fa-content($fa-var-external-link-alt);
@@ -390,7 +385,7 @@
         line-height: inherit;
       }
     }
-    &[href$=".jpg"],&[href$=".png"],&[href$=".gif"],&[href$=".swf"],&[href$=".txt"],&[href$=".mp3"],&[href$=".wav"],&[href$=".mp4"],&[href$=".webm"]{
+    &[href$=".jpg"], &[href$=".png"], &[href$=".gif"], &[href$=".swf"], &[href$=".txt"], &[href$=".mp3"], &[href$=".wav"], &[href$=".mp4"], &[href$=".webm"]{
       &::after{
         @extend %fa-icon;
         @extend .fas;
