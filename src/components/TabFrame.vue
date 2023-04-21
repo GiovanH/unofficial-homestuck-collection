@@ -73,6 +73,7 @@ const VIGILPRINCE = () => import('@/components/Extras/VigilPrince.vue')
 const SKAIANET = () => import('@/components/Extras/Skaianet.vue')
 const SQUIDDLES = () => import('@/components/Extras/Squiddles.vue')
 const EVENMORE = () => import('@/components/Extras/EvenMore.vue')
+const WIZARDYHERBERT = () => import('@/components/Extras/WizardyHerbert.vue')
 
 const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
 
@@ -154,6 +155,7 @@ export default {
         SKAIANET,
         SQUIDDLES,
         EVENMORE,
+        WIZARDYHERBERT,
 
         EPILOGUES,
 
