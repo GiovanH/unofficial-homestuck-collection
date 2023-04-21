@@ -1,10 +1,10 @@
 <template>
-  <div class="pageBody customStyles" :class="{pixelated: $localData.settings.pixelScaling}">
+  <div class="pageBody customStyles">
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
       <div class="pageContent">
-        <a :href="url_epub" v-text="url_epub" class="book-srclink-header" />
-        <div id="viewer"></div>
+        <a :href="url_browse + 'index.html'" v-text="url_browse" class="book-srclink-header" />
+        <div id="viewer" ref="viewer"></div>
 
         <div class="comicNav">
           <a v-if="prev_page_url" ref="prev" :href="prev_page_url" class="goBack"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
@@ -38,7 +38,7 @@ export default {
     NavBanner, MediaEmbed, PageFooter, VuePdfEmbed
   },
   theme(ctx) {
-    return 'default'
+    return 'msword'
   },
   title(ctx) {
     if (ctx.routeParams.p)
@@ -48,6 +48,7 @@ export default {
   data () {
     return {
       url_epub: 'assets://archive/wizardyherbert/WH.epub',
+      url_browse: 'assets://archive/wizardyherbert/',
       max_pages: 209,
       min_page: 0,
       renderer: undefined,
@@ -81,18 +82,21 @@ export default {
   created(){
     this.book = ePub(this.url_epub)
 
-    this.rendition = this.book.renderTo("viewer", {
-      method: "default",
-      flow: "scrolled-doc",
-      width: 900,
+    // Wait for refs
+    this.$nextTick(() => {
+      this.rendition = this.book.renderTo(this.$refs.viewer, {
+        method: "default",
+        flow: "scrolled-doc",
+        width: 900,
+      })
+
+      this.book.ready.then((renderer) => {
+        this.renderer = renderer
+        this.max_pages = this.book.spine.spineItems.length
+
+        this.rendition.display(this.page_num)
+      });
     })
-
-    this.book.ready.then((renderer) => {
-      this.renderer = renderer
-      this.max_pages = this.book.spine.spineItems.length
-
-      this.rendition.display(this.page_num)
-    });
 
   },
   watch: {

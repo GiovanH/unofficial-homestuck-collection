@@ -579,7 +579,8 @@ export default {
         {text: "Homosuck", value: "A6A6"},
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
-        {text: "Paradox Space", value: "pxs"}
+        {text: "Paradox Space", value: "pxs"},
+        {text: "MS Office 2003", value: "msword"},
       ],
       fonts: [
         {text: "Default", value: ""},
