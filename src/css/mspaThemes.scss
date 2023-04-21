@@ -528,4 +528,20 @@
 			}
 		}
 	}
+
+	&.msword {
+		--page-pageContent: #ffffff;
+		--page-pageFrame: #9099ae;
+		--page-pageBody: #9099ae;
+		--nav-bg: #ece9d8;
+		--nav-link: black;
+
+		&.customStyles .navBanner {
+			border: 1px solid black;
+			border-top: none;
+		}
+		.pageContent {
+			border: 1px solid black;
+		}
+	}
 }
