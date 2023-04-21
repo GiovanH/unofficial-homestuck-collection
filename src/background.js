@@ -329,6 +329,9 @@ try {
   
   // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Max-Age', 2592000); // 30 days
     return handler(request, response, {
       public: assetDir
     })

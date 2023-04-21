@@ -67,6 +67,7 @@ import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
 import SKAIANET from '@/components/Extras/Skaianet.vue'
 import SQUIDDLES from '@/components/Extras/Squiddles.vue'
 import EVENMORE from '@/components/Extras/EvenMore.vue'
+import WIZARDYHERBERT from '@/components/Extras/WizardyHerbert.vue'
 
 import MUSIC from '@/components/Music/MusicFrame.vue'
 
@@ -129,6 +130,7 @@ export default {
         SKAIANET,
         SQUIDDLES,
         EVENMORE,
+        WIZARDYHERBERT,
 
         MUSIC,
         SOCIALS,
