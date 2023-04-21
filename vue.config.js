@@ -1,3 +1,5 @@
+// const { VueLoaderPlugin } = require('vue-loader')
+
 module.exports = {
     configureWebpack: {
         devtool: "source-map",
@@ -6,6 +8,37 @@ module.exports = {
                 // Include the vue compiler so mods can use templates
                 "vue$": "vue/dist/vue.esm.js"
             }
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.(?:js|mjs|cjs)$/,
+                    exclude: {
+                        and: [/node_modules/], // Exclude libraries in node_modules ...
+                        not: [
+                            // Except for a few of them that needs to be transpiled because they use modern syntax
+                            /vue-reader/,
+                            /typescript-etw/
+                        ]
+                    },
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                ['@babel/preset-env', { targets: "defaults" }]
+                            ],
+                            plugins: [
+                                '@babel/plugin-proposal-nullish-coalescing-operator',
+                                '@babel/plugin-proposal-optional-chaining',
+                            ]
+                        }
+                    }
+                },
+                {
+                    test: /\.node$/,
+                    loader: "node-loader",
+                }
+            ]
         }
     },
     pluginOptions: {
