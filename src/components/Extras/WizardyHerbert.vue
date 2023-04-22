@@ -4,11 +4,30 @@
     <div class="pageFrame">
       <div class="pageContent">
         <a :href="url_browse + 'index.html'" v-text="url_browse" class="book-srclink-header" />
-        <div id="viewer" ref="viewer"></div>
+
+        <div class="note" v-if="page_num == undefined">
+          <p>bambosh i know you'll want to write some hand-wringing preface thing here</p>
+          <MediaEmbed url="assets://archive/wizardyherbert/herbertsketch2_sm.jpg" />
+        </div>
+
+        <div
+          id="viewer"
+          ref="viewer"
+          :style="{
+            // Because this is managed in `created`, the element must exist
+            // as long as the component exists, so no v-if here.
+            height: (page_num == undefined ? '1px' : 'inherit'),
+            padding: (page_num == undefined ? '0' : undefined)
+          }"
+        />
 
         <div class="comicNav">
-          <a v-if="prev_page_url" ref="prev" :href="prev_page_url" class="goBack"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
-          <a v-if="next_page_url" ref="next" :href="next_page_url" class="nextArrowLink"><MediaEmbed url="/sweetbroandhellajeff/next.jpg" /></a>
+          <a :style="{visibility: (prev_page_url ? 'visible' : 'hidden')}" :href="prev_page_url" class="goBack" >
+            <MediaEmbed url="assets://images/msoffice_prev.png" />
+          </a>
+          <a :style="{visibility: (next_page_url ? 'visible' : 'hidden')}" :href="next_page_url" class="nextArrowLink">
+            <MediaEmbed url="assets://images/msoffice_next.png" />
+          </a>
         </div>
       </div>
     </div>
@@ -53,7 +72,22 @@ export default {
       min_page: 0,
       renderer: undefined,
       rendition: undefined,
-      book: undefined
+      book: undefined,
+      style_override: {
+        // Fix centered 0/business card
+        'ul.calibre6': {
+          width: 'max-content',
+          margin: 'auto'
+        },
+        // Tight spacing around comic sans on cards
+        'p.western3, ul.calibre6 li p.western, ol.calibre12 li p.western': {
+          'margin-top': '0'
+        },
+        // Fix 1/seinfeld script
+        '.calibre8': {
+          'font-size': 'unset'
+        }
+      }
     }
   },
   methods: {
@@ -63,18 +97,24 @@ export default {
       else if (dir == 'right' && this.next_page_url)
         this.$pushURL(this.next_page_url)
     },
+    display(spine_num){
+      this.rendition.display(spine_num)
+    }
   },
   computed: {
     page_num() {
-      return Number.parseInt(this.routeParams.p)
+      return (this.routeParams.p != undefined) ? Number.parseInt(this.routeParams.p) : undefined
     },
     prev_page_url() {
       if (this.page_num > this.min_page)
         return `/${this.routeParams.base}/${Math.max(this.min_page, this.page_num - 1)}`
-      return undefined
+      else if (this.page_num != undefined)
+        return `/${this.routeParams.base}/`
     },
     next_page_url() {
-      if (this.page_num < this.max_pages)
+      if (this.page_num == undefined)
+        return `/${this.routeParams.base}/${this.min_page}`
+      else if (this.page_num < this.max_pages)
         return `/${this.routeParams.base}/${Math.min(this.page_num + 1, this.max_pages)}`
       return undefined
     }
@@ -91,17 +131,23 @@ export default {
       })
 
       this.book.ready.then((renderer) => {
+        // Nab vars
         this.renderer = renderer
         this.max_pages = this.book.spine.spineItems.length
 
-        this.rendition.display(this.page_num)
+        // Display book
+        this.book.opened.then(() => {
+          this.rendition.themes.default(this.style_override)
+
+          // this.$logger.info(this.renderer, this.rendition.themes)
+          this.display(this.page_num)
+        });
       });
     })
-
   },
   watch: {
     'page_num': function (to, from) {
-      this.rendition.display(to)
+      this.display(to)
     }
   }
 }
@@ -115,12 +161,20 @@ export default {
   #viewer {
     padding: 3em 0;
     width: 900px;
+    overflow: hidden;
   }
 
   .comicNav {
     a {
       cursor: pointer;
     }
+
+    width: -webkit-fill-available;
+    display: block;
+    margin: 0 80px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
 
   .pageBody {
@@ -156,6 +210,10 @@ export default {
         flex: 0 1 auto;
         align-items: center;
         flex-flow: column;
+
+        .note {
+          margin: 2em;
+        }
       }
     }
   }
