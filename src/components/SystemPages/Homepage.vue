@@ -257,6 +257,14 @@
           <p>Gaze deep into the uncanny valley.</p>
         </HomeRowItem>
 
+        <!-- <HomeRowItem
+          class="rowItem"
+          href="assets://archive/wizardyherbert/"
+          thumbsrc="/archive/collection/archive_wh.png"
+          date="Jul 2008">
+          <template v-slot:title>Wizardy Herbert</template>
+          <p>An unfinished book draft. Last revised July 2008, leaked Dec 2012 when Andrew stored it unsecured on an open directory.</p>
+        </HomeRowItem> -->
         <HomeRowItem
           class="rowItem"
           href="/wizardyherbert/"
