@@ -1,10 +1,16 @@
 {
   "name": "unofficial-homestuck-collection",
   "description": "An offline collection of Homestuck and its related works.",
-  "author": {
-    "name": "Bambosh",
-    "email": "andrewjnkn7@gmail.com"
-  },
+  "contributors": [
+    {
+      "name": "Bambosh",
+      "email": "andrewjnkn7@gmail.com"
+    },
+    {
+      "name": "GiovanH",
+      "url": "https://giovanh.com"
+    }
+  ],
   "version": "2.0.5",
   "license": "GPL-3.0",
   "repository": "github:Bambosh/unofficial-homestuck-collection",
