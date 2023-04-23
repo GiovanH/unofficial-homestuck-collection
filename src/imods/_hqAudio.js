@@ -38,35 +38,44 @@ module.exports = {
             const base_url = page.media[0].split("/").slice(0, -1).join("/")
             const ext = filename.split('.').pop()
 
-            // audiodata is keyed to the normal swf path, not _hq.swf.
-            if (two_track_flashes.includes(plainname)){ 
-                archive.audioData[page.media[0]] = [
-                    {
-                        href: `${base_url}/${plainname}_1.mp3`, 
-                        loop: (looping_flashes.includes(`${plainname}_1`))
-                    },
-                    {
-                        href: `${base_url}/${plainname}_2.mp3`, 
-                        loop: (looping_flashes.includes(`${plainname}_2`))
+            const our_medias = [
+                ...page.media,
+                // Replace this media and any retconned versions of it (logic from page.vue)
+                ...page.media.map(m => m.replace(/1([0-9]{4})\/1[0-9]{4}\.swf/g, "0$1/0$1.swf"))
+            ]
+
+            our_medias.forEach(media_id => {
+                // audiodata is keyed to the normal swf path, not _hq.swf.
+                if (two_track_flashes.includes(plainname)){
+                    archive.audioData[media_id] = [
+                        {
+                            href: `${base_url}/${plainname}_1.mp3`,
+                            loop: (looping_flashes.includes(`${plainname}_1`))
+                        },
+                        {
+                            href: `${base_url}/${plainname}_2.mp3`,
+                            loop: (looping_flashes.includes(`${plainname}_2`))
+                        }
+                    ]
+                } else if (plainname == '04106'){
+                    archive.audioData[media_id] = []
+                    for (var i = 1; i <= 5; i++) {
+                        archive.audioData[media_id].push({
+                            href: `${base_url}/cascade_segment${i}.mp3`,
+                            loop: (looping_flashes.includes(`cascade_segment${i}`))
+                        })
                     }
-                ]
-            } else if (plainname == '04106'){
-                archive.audioData[page.media[0]] = [] 
-                for (var i = 1; i <= 5; i++) 
-                    archive.audioData[page.media[0]].push({
-                        href: `${base_url}/cascade_segment${i}.mp3`, 
-                        loop: (looping_flashes.includes(`cascade_segment${i}`))
-                    })
-            } else if (hq_baked_in.includes(plainname)) {
-                archive.mspa.story[page_num].media[0] = `${base_url}/${plainname}_hqbaked.${ext}`
-            } else {
-                archive.audioData[page.media[0]] = [
-                    {
-                        href: `${base_url}/${plainname}.mp3`,
-                        loop: (looping_flashes.includes(plainname))
-                    },
-                ]
-            }
+                } else if (hq_baked_in.includes(plainname)) {
+                    archive.mspa.story[page_num].media[0] = `${base_url}/${plainname}_hqbaked.${ext}`
+                } else {
+                    archive.audioData[media_id] = [
+                        {
+                            href: `${base_url}/${plainname}.mp3`,
+                            loop: (looping_flashes.includes(plainname))
+                        },
+                    ]
+                }
+            })
         })
     }
 }
