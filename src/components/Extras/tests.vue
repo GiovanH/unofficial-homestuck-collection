@@ -176,7 +176,7 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 // import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
 
 import Vue from 'vue'
-const prettier = require("prettier");
+// const prettier = require("prettier");
 
 // function intersect(...sets) {
 //     if (!sets.length) return new Set();
@@ -218,7 +218,7 @@ export default {
       try {
         const compiled = Vue.compile(this.compileTemplate)
         const code = compiled.render.toString()
-        return prettier.format(code, { semi: false })
+        return code // prettier.format(code, { semi: false })
       } catch (e) {
         return e.stack
       }
