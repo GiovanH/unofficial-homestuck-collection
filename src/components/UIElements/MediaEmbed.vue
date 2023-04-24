@@ -1,8 +1,21 @@
 <template>
-  <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
-  <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
-  <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt :autoplay="autoplay" @loadeddata="onVideoLoaded" />
-  <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
+  <img v-if="getMediaType(url) === 'img'"
+    :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
+  <video v-else-if="getMediaType(url) ==='vid' && gifmode != undefined"
+    :src='$getResourceURL(url)'
+    :width="videoWidth"
+    disablePictureInPicture
+    autoplay="true" muted="true"
+    loop  />
+  <video v-else-if="getMediaType(url) ==='vid' && gifmode == undefined"
+    :src='$getResourceURL(url)'
+    :width="videoWidth"
+    disablePictureInPicture alt
+    :autoplay="autoplay" @loadeddata="onVideoLoaded" />
+  <iframe v-else-if="getMediaType(url) === 'swf'"
+    :key="url" :srcdoc='flashSrc'
+    :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
+    @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
   <component v-else-if="getMediaType(url) === 'html'"
@@ -10,11 +23,16 @@
   :src='resolveFrameUrl(url)' 
   ref='frame'
   :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
-  @did-finish-load="initHtmlFrame" seamless />
+    @did-finish-load="initHtmlFrame" seamless />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
-  <div v-else-if="getMediaType(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
-  <audio v-else-if="getMediaType(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
+  <div v-else-if="getMediaType(url) === 'txt'"
+    v-html="getFile(url)" class="textEmbed" />
+  <audio v-else-if="getMediaType(url) === 'audio'"
+    class="audioEmbed"
+    controls controlsList="nodownload"
+    :src="this.$getResourceURL(url)"
+    type="audio/mpeg" />
 </template>
 
 <script>
@@ -315,6 +333,10 @@ export default {
   },
   methods: {
     onVideoLoaded(event) {
+      // Don't show controls until video is loaded and element is sized
+      event.srcElement.controls = true
+      event.srcElement.controlsList = "nodownload"
+
       const pauseAt = this.pauseAt[this.flashProps.id]
       if (pauseAt) {
         const pause = function(){

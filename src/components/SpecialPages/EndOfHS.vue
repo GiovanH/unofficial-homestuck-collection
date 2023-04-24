@@ -72,61 +72,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    // Classes copied from original pages to preserve original theme through style changes
 
-  .pageBody {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
+// Classes copied from original pages to preserve original theme through style changes
+.pageBody {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: column;
+  flex: 1 0 auto;
+  align-items: center;
 
-    .footnote {
-      width: 600px;
-      // border-top: solid 23px var(--page-pageBorder, var(--page-pageFrame));
-      padding: 30px 25px;
-      p {
-        text-align: center;
-        margin: 0 auto;
-        width: 600px;
-      }
-    }
-    .preface {
-      width: 600px;
-      margin: 1em 0;
-
-      border-style: dashed;
-      border-width: 1px;
-
-      border-color: var(--page-log-border);
-      background-color: var(--page-pageFrame);
-      color: var(--page-nav-divider);
-      p {
-        text-align: center;
-        margin: 0 auto;
-        width: 600px;
-      }
-    }
-
-    .footnote, .preface {
-      .author {
-        font-weight: 300;
-        font-size: 10px;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
-
-        display: flex;
-        justify-content: flex-end;
-
-        position: relative;
-        top: 12px;
-        margin-top: -12px;
-
-        color: var(--page-nav-meta);
-      }
-    }
-
-    &.collide {
+  &.collide {
       background: #000;
       .tall {          
         background-color: #323232;          
@@ -140,21 +96,24 @@ export default {
         }
         .header {
             background-color: #1a1a1a;
-        }
-        .vid {
-            height: 650px;
-        }
-        .links {
-                background-color: #262626;
+      }
+      .vid {
+        height: 650px;
+        background: #262626;
+      }
+      .links {
+        background-color: #262626;
 
-                ::v-deep nav {
-                    .nextArrow {
-                        font-size: 32px;
-                    }
-                    .nextArrow a, .navOptions, .navOptions a{
-                        color: red;
-                    }
-                }
+        ::v-deep nav {
+          .nextArrow {
+            font-size: 32px;
+          }
+          .nextArrow a,
+          .navOptions,
+          .navOptions a {
+            color: red;
+          }
+        }
           }
       }
     }
@@ -176,13 +135,15 @@ export default {
             background-color: #cecece;
 
             ::v-deep nav {
-                .nextArrow {
-                    font-size: 48px;
-                }
-                .nextArrow a, .navOptions, .navOptions a{
-                    color: white;
-                }
-            }
+          .nextArrow {
+            font-size: 48px;
+          }
+          .nextArrow a,
+          .navOptions,
+          .navOptions a {
+            color: white;
+          }
+        }
         }
       }
     }
@@ -200,12 +161,11 @@ export default {
                     line-height: initial;
                 }
             }
-            .meta {
-                display: none;
-            }
-
-        } 
+      .meta {
+        display: none;
+      }
     }
+  }
 
     .tall {
     flex: 0 1 auto;
@@ -227,23 +187,19 @@ export default {
         }
         .vid {
           display: flex;
-          align-items: center;
-          flex-flow: column;
-          width: 100%;
-          .collide & {
-            background: #262626;
-          }
-        }
+        align-items: center;
+        flex-flow: column;
+        width: 100%;
+      }
 
-        .links{
-            width: 100%;
-            padding: 40px 0;
-            margin: 10px 0;
+      .links {
+        width: 100%;
+        padding: 40px 0;
+        margin: 10px 0;
 
-            
-            display: flex;
-            align-items: center;
-            flex-direction: column;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
             flex-grow: 0;
             ::v-deep nav {
                 width: 600px;
@@ -251,12 +207,10 @@ export default {
                     font-size: 14px;
                 }
             }
-        }
-      }	
+      }
     }
-
   }
-  
+}
 
 </style>
 
