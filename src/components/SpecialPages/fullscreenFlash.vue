@@ -24,10 +24,8 @@ import Footnotes from '@/components/Page/PageFootnotes.vue'
 import PAGE from '@/components/Page/Page.vue'
 
 export default {
+  extends: PAGE,
   name: 'fullscreenFlash',
-  props: [
-    'tab', 'routeParams'
-  ],
   components: {
     Media, PageNav, Footnotes
   },
@@ -35,20 +33,12 @@ export default {
     ctx.$logger.info("Checked theme", ctx.gameOverThemeOverride)
     if (ctx.gameOverThemeOverride) return ctx.gameOverThemeOverride
   },
-  title: PAGE.title,
   data: function() {
     return {
-      ...PAGE.data(),
       appThemeOverride: 'default'
     }
   },
   computed: {
-    pageNum: PAGE.computed.pageNum,
-    storyId: PAGE.computed.storyId,
-    thisPage: PAGE.computed.thisPage,
-    pageCollection: PAGE.computed.pageCollection,
-    nextPagesArray: PAGE.computed.nextPagesArray,
-    isRyanquest: PAGE.computed.isRyanquest,
     flashUrl() {
       // Mirrored from Page.vue:pageMedia()
       let media = Array.from(this.thisPage.media)

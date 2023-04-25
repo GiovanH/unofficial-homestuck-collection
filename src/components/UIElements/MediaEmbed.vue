@@ -19,10 +19,10 @@
   <!-- HTML iframes must not point to assets :c -->
 
   <component v-else-if="getMediaType(url) === 'html'"
-  :is="frameType"
-  :src='resolveFrameUrl(url)' 
-  ref='frame'
-  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
+    :is="frameType"
+    :src='resolveFrameUrl(url)'
+    ref='frame'
+    :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
     @did-finish-load="initHtmlFrame" seamless />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
@@ -272,7 +272,7 @@ export default {
       this.$logger.info("Getting flash props for", filename, this.url)
 
       const defaultProps = {
-        id: filename, 
+        id: filename,
         width: this.width || 650,
         height: this.height || 450,
         bgcolor: '#fff',
@@ -349,25 +349,6 @@ export default {
         }
         event.srcElement.controls = false
         event.srcElement.addEventListener("timeupdate", pause)
-      }
-      if (this.flashProps.id == "08080") {
-        // Collide hijinks
-        const collide = function(){
-          if (this.currentTime > 22) {
-            this.style.transition = "width 1.5s cubic-bezier(0, 0, 0, 1)"
-            // this.style.height = "650px"
-            this.style.width = "950px"
-            this.removeAttribute("controls")
-            setTimeout(() => this.setAttribute("controls", "true"), 6000)
-            this.removeEventListener("timeupdate", collide)
-          }
-        }
-        event.srcElement.style.objectFit = "cover"
-        event.srcElement.style.objectPosition = "top"
-        event.srcElement.style.height = "650px"
-        event.srcElement.style.width = "650px"
-        event.srcElement.addEventListener("timeupdate", collide)
-        // event.srcElement.currentTime = 17 // debug helper
       }
     },
     initHtmlFrame(event) {
