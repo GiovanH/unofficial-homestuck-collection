@@ -6,6 +6,14 @@ module.exports = {
                 // Include the vue compiler so mods can use templates
                 "vue$": "vue/dist/vue.esm.js"
             }
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.node$/,
+                    loader: "node-loader",
+                }
+            ]
         }
     },
     pluginOptions: {
@@ -19,16 +27,32 @@ module.exports = {
                     buildResources: "build"
                 },
                 win: {
-                    target: "zip"
+                    target: {
+                        target: "zip",
+                        arch: [
+                            "x64",
+                            "ia32"
+                        ]
+                    },
+                    artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 mac: {
                     target: ["dmg"],
                     category: "entertainment",
-                    identity: null
+                    identity: null,
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],
-                    category: "game"
+                    category: "game",
+                    asarUnpack: [
+                        "**/node_modules/sharp/**"
+                    ]
                 }
             }
         }

@@ -5,7 +5,8 @@ install: package.json yarn.lock
 	touch install
 
 clean:
-	rm -r src/imods.tar
+	-rm ./install src/imods.tar
+	-rm -r dist/ dist_electron/*/
 
 lint: install 
 	yarn run vue-cli-service lint

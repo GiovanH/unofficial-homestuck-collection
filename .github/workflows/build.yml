@@ -1,0 +1,158 @@
+name: Build electron releases
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  # pull_request:
+  #   branches: [ "main", "develop" ]
+
+jobs:
+  prep-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - id: package_json
+      run: |
+        content=`cat ./package.json`
+        # the following lines are only required for multi line json
+        content="${content//'%'/'%25'}"
+        content="${content//$'\n'/'%0A'}"
+        content="${content//$'\r'/'%0D'}"
+        # end of optional handling for multi line json
+        echo "::set-output name=json::$content"
+    - name: Create tag
+      id: create_tag
+      run: |
+        tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
+        # if [[ "${{ github.event_name }}" == "schedule" ]]; then
+        #   tag=$(basename "${{ github.ref }}")v$(date +%Y%m%d.%H%M%S)
+        # else
+        #   tag=$(basename "${{ github.ref }}")
+        # fi
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create_tag.outputs.tag }}
+        release_name: ${{ steps.create_tag.outputs.tag }}
+        draft: true
+        prerelease: true
+
+  build:
+    needs: [prep-release]
+    strategy:
+      matrix:
+        node-version: [14.18]
+        os: [ ubuntu-latest, windows-latest ] # macos-latest,
+        
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Yarn
+      uses: mskelton/setup-yarn@v1.4.0
+      with:
+        node-version: ${{ matrix.node-version }}
+        
+    - run: make install
+    - run: make publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    # Linux: .tar.gz
+    - uses: tj-actions/glob@v17
+      name: "Linux: Glob .tar.gz"
+      id: glob_targz
+      with:
+        working-directory: ./dist_electron/
+        files: unofficial-homestuck-collection-*.tar.gz
+    - uses: actions/upload-release-asset@v1
+      name: "Linux: Upload .tar.gz"
+      if: steps.glob_targz.outputs.paths != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: ./dist_electron/${{ steps.glob_targz.outputs.paths }}
+        asset_name: ${{ steps.glob_targz.outputs.paths }}
+        asset_content_type: application/gzip
+        
+    # Linux: .AppImage
+    - uses: tj-actions/glob@v17
+      name: "Linux: Glob AppImage"
+      id: glob_appimage
+      with:
+        working-directory: ./dist_electron/
+        files: "*.AppImage"
+    - uses: actions/upload-release-asset@v1
+      name: "Linux: Upload AppImage"
+      if: steps.glob_appimage.outputs.paths != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: ./dist_electron/${{ steps.glob_appimage.outputs.paths }}
+        asset_name: ${{ steps.glob_appimage.outputs.paths }}
+        asset_content_type:	application/octet-stream
+
+    # Windows: win-x64.zip
+    - uses: tj-actions/glob@v17
+      name: "Win: Glob x64.zip"
+      id: glob_winzip64
+      with:
+        working-directory: ./dist_electron/
+        files: "*-win-x64.zip"
+    - uses: actions/upload-release-asset@v1
+      if: steps.glob_winzip64.outputs.paths != ''
+      name: "Win: Upload x64.zip"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: ./dist_electron/${{ steps.glob_winzip64.outputs.paths }}
+        asset_name: ${{ steps.glob_winzip64.outputs.paths }}
+        asset_content_type:	application/zip
+        
+    # Windows: win-x64.zip
+    - uses: tj-actions/glob@v17
+      name: "Win: Glob ia32.zip"
+      id: glob_winzip32
+      with:
+        working-directory: ./dist_electron/
+        files: "*-win-ia32.zip"
+    - uses: actions/upload-release-asset@v1
+      if: steps.glob_winzip32.outputs.paths != ''
+      name: "Win: Upload ia32.zip"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: ./dist_electron/${{ steps.glob_winzip32.outputs.paths }}
+        asset_name: ${{ steps.glob_winzip32.outputs.paths }}
+        asset_content_type:	application/zip
+        
+  metadata:
+    name: Publish Release
+    needs: [prep-release, build]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ needs.prep-release.outputs.release_id }}
+  #   - uses: eregon/keep-last-n-releases@v1
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       n: 3
+  #       remove_tags_without_release: true
