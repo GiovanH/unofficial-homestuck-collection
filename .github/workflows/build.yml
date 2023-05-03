@@ -1,5 +1,8 @@
 name: Build electron releases
 
+env:
+  NODE_VERSION: "14.18"
+
 on:
   push:
     branches: [ "main", "develop" ]
@@ -47,22 +50,16 @@ jobs:
         draft: true
         prerelease: true
 
-  build:
+  build-linux:
     needs: [prep-release]
-    strategy:
-      matrix:
-        node-version: [14.18]
-        os: [ ubuntu-latest, windows-latest ] # macos-latest,
-        
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
+    # Platform-agnostic build
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Yarn
-      uses: mskelton/setup-yarn@v1.4.0
+    - uses: mskelton/setup-yarn@v1.4.0
       with:
-        node-version: ${{ matrix.node-version }}
-        
+        node-version: "${{ env.NODE_VERSION }}"
     - run: make install
     - run: make publish
       env:
@@ -81,7 +78,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.release.outputs.upload_url }}
+        upload_url: ${{ needs.prep-release.outputs.upload_url }}
         asset_path: ./dist_electron/${{ steps.glob_targz.outputs.paths }}
         asset_name: ${{ steps.glob_targz.outputs.paths }}
         asset_content_type: application/gzip
@@ -99,50 +96,92 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.release.outputs.upload_url }}
+        upload_url: ${{ needs.prep-release.outputs.upload_url }}
         asset_path: ./dist_electron/${{ steps.glob_appimage.outputs.paths }}
         asset_name: ${{ steps.glob_appimage.outputs.paths }}
         asset_content_type:	application/octet-stream
 
+  build-windows:
+    needs: [prep-release]
+    runs-on: windows-latest-latest
+
+    # Platform-agnostic build
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mskelton/setup-yarn@v1.4.0
+      with:
+        node-version: "${{ env.NODE_VERSION }}"
+    - run: make install
+    - run: make publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     # Windows: win-x64.zip
     - uses: tj-actions/glob@v17
-      name: "Win: Glob x64.zip"
       id: glob_winzip64
       with:
         working-directory: ./dist_electron/
         files: "*-win-x64.zip"
     - uses: actions/upload-release-asset@v1
       if: steps.glob_winzip64.outputs.paths != ''
-      name: "Win: Upload x64.zip"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.release.outputs.upload_url }}
+        upload_url: ${{ needs.prep-release.outputs.upload_url }}
         asset_path: ./dist_electron/${{ steps.glob_winzip64.outputs.paths }}
         asset_name: ${{ steps.glob_winzip64.outputs.paths }}
         asset_content_type:	application/zip
         
     # Windows: win-x64.zip
     - uses: tj-actions/glob@v17
-      name: "Win: Glob ia32.zip"
       id: glob_winzip32
       with:
         working-directory: ./dist_electron/
         files: "*-win-ia32.zip"
     - uses: actions/upload-release-asset@v1
       if: steps.glob_winzip32.outputs.paths != ''
-      name: "Win: Upload ia32.zip"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.release.outputs.upload_url }}
+        upload_url: ${{ needs.prep-release.outputs.upload_url }}
         asset_path: ./dist_electron/${{ steps.glob_winzip32.outputs.paths }}
         asset_name: ${{ steps.glob_winzip32.outputs.paths }}
         asset_content_type:	application/zip
         
+  build-osx:
+    needs: [prep-release]
+    runs-on: macos-latest
+
+    # Platform-agnostic build
+    steps:
+    - uses: actions/checkout@v3
+    - uses: mskelton/setup-yarn@v1.4.0
+      with:
+        node-version: "${{ env.NODE_VERSION }}"
+    - run: make install
+    - run: make publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Windows: win-x64.zip
+    - uses: tj-actions/glob@v17
+      id: glob_dmg
+      with:
+        working-directory: ./dist_electron/
+        files: "*.dmg"
+    - uses: actions/upload-release-asset@v1
+      if: steps.glob_dmg.outputs.paths != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.prep-release.outputs.upload_url }}
+        asset_path: ./dist_electron/${{ steps.glob_dmg.outputs.paths }}
+        asset_name: ${{ steps.glob_dmg.outputs.paths }}
+        asset_content_type: TODO
+
   metadata:
     name: Publish Release
-    needs: [prep-release, build]
+    needs: [prep-release, build-windows, build-linux, build-osx]
     runs-on: ubuntu-latest
     steps:
     - uses: eregon/publish-release@v1
