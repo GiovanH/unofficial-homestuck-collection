@@ -95,7 +95,14 @@ function extractimods(){
   // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   // eslint-disable-next-line import/no-webpack-loader-syntax
-  const [match, contentType, base64] = require("url-loader!./imods.tar").match(/^data:(.+);base64,(.*)$/)
+  let tardata
+  try {
+    tardata = require("url-loader!./imods.tar").default // Require *must* have a literal string here
+  } catch (e) {
+    logger.error(`Couldn't read bundled tar data from url-loader!./imods.tar: webpack issue?`)
+    throw e
+  }
+  const [match, contentType, base64] = tardata.match(/^data:(.+);base64,(.*)$/)
   const tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")

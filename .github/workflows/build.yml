@@ -33,7 +33,7 @@ jobs:
       id: create_tag
       run: |
         if [[ "$(basename "${{ github.ref }}")" == "main" ]]; then
-          tag=${{ fromJson(steps.package_json.outputs.json).version }}
+          tag=v${{ fromJson(steps.package_json.outputs.json).version }}
         else
           tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
         fi
@@ -49,9 +49,15 @@ jobs:
         draft: true
         prerelease: "${{ steps.create_tag.outputs.tag != fromJson(steps.package_json.outputs.json).version }}"
 
-  build-linux:
-    needs: [prep-release]
-    runs-on: ubuntu-latest
+  build-matrix:
+    needs: [ prep-release ]
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [14.18]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    runs-on: ${{ matrix.os }}
 
     # Platform-agnostic build
     steps:
@@ -60,132 +66,6 @@ jobs:
       with:
         node-version: "${{ env.NODE_VERSION }}"
     - run: make install
-    - run: make publish
+    - run: make publish_release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    # Linux: .tar.gz
-    - uses: tj-actions/glob@v17
-      id: glob_targz
-      with:
-        working-directory: ./dist_electron/
-        files: unofficial-homestuck-collection-*.tar.gz
-    - uses: actions/upload-release-asset@v1
-      if: steps.glob_targz.outputs.paths != ''
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.prep-release.outputs.upload_url }}
-        asset_path: ./dist_electron/${{ steps.glob_targz.outputs.paths }}
-        asset_name: ${{ steps.glob_targz.outputs.paths }}
-        asset_content_type: application/gzip
-        
-    # Linux: .AppImage
-    - uses: tj-actions/glob@v17
-      id: glob_appimage
-      with:
-        working-directory: ./dist_electron/
-        files: "*.AppImage"
-    - uses: actions/upload-release-asset@v1
-      if: steps.glob_appimage.outputs.paths != ''
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.prep-release.outputs.upload_url }}
-        asset_path: ./dist_electron/${{ steps.glob_appimage.outputs.paths }}
-        asset_name: ${{ steps.glob_appimage.outputs.paths }}
-        asset_content_type:	application/octet-stream
-
-  build-windows:
-    needs: [prep-release]
-    runs-on: windows-latest
-
-    # Platform-agnostic build
-    steps:
-    - uses: actions/checkout@v3
-    - uses: mskelton/setup-yarn@v1.4.0
-      with:
-        node-version: "${{ env.NODE_VERSION }}"
-    - run: make install
-    - run: make publish
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # Windows: win-x64.zip
-    - uses: tj-actions/glob@v17
-      id: glob_winzip64
-      with:
-        working-directory: ./dist_electron/
-        files: "*-win-x64.zip"
-    - uses: actions/upload-release-asset@v1
-      if: steps.glob_winzip64.outputs.paths != ''
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.prep-release.outputs.upload_url }}
-        asset_path: ./dist_electron/${{ steps.glob_winzip64.outputs.paths }}
-        asset_name: ${{ steps.glob_winzip64.outputs.paths }}
-        asset_content_type:	application/zip
-        
-    # Windows: win-x64.zip
-    - uses: tj-actions/glob@v17
-      id: glob_winzip32
-      with:
-        working-directory: ./dist_electron/
-        files: "*-win-ia32.zip"
-    - uses: actions/upload-release-asset@v1
-      if: steps.glob_winzip32.outputs.paths != ''
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.prep-release.outputs.upload_url }}
-        asset_path: ./dist_electron/${{ steps.glob_winzip32.outputs.paths }}
-        asset_name: ${{ steps.glob_winzip32.outputs.paths }}
-        asset_content_type:	application/zip
-        
-  build-osx:
-    needs: [prep-release]
-    runs-on: macos-latest
-
-    # Platform-agnostic build
-    steps:
-    - uses: actions/checkout@v3
-    - uses: mskelton/setup-yarn@v1.4.0
-      with:
-        node-version: "${{ env.NODE_VERSION }}"
-    - run: make install
-    # - run: make publish
-    #   env:
-    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # - uses: tj-actions/glob@v17
-    #   id: glob_dmg
-    #   with:
-    #     working-directory: ./dist_electron/
-    #     files: "*.dmg"
-    # - uses: actions/upload-release-asset@v1
-    #   if: steps.glob_dmg.outputs.paths != ''
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ needs.prep-release.outputs.upload_url }}
-    #     asset_path: ./dist_electron/${{ steps.glob_dmg.outputs.paths }}
-    #     asset_name: ${{ steps.glob_dmg.outputs.paths }}
-    #     asset_content_type: application/octet-stream
-
-  metadata:
-    name: Publish Release
-    needs: [prep-release, build-windows, build-linux, build-osx]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: eregon/publish-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ needs.prep-release.outputs.release_id }}
-  #   - uses: eregon/keep-last-n-releases@v1
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       n: 3
-  #       remove_tags_without_release: true

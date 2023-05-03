@@ -16,11 +16,14 @@ test: install src/imods.tar
 	yarn run vue-cli-service electron:serve
 	# yarn dev
 
-publish: install src/imods.tar
+build: install src/imods.tar
 	yarn run vue-cli-service electron:build
 	# yarn electron:build
+
+publish_release: install src/imods.tar
+	yarn run vue-cli-service electron:build -p always
 	
-vuebuild: install 
+vuebuild: install src/imods.tar
 	yarn run vue-cli-service build
 
 src/imods.tar: $(wildcard src/imods/*)
