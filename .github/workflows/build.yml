@@ -32,12 +32,11 @@ jobs:
     - name: Create tag
       id: create_tag
       run: |
-        tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
-        # if [[ "${{ github.event_name }}" == "schedule" ]]; then
-        #   tag=$(basename "${{ github.ref }}")v$(date +%Y%m%d.%H%M%S)
-        # else
-        #   tag=$(basename "${{ github.ref }}")
-        # fi
+        if [[ "$(basename "${{ github.ref }}")" == "main" ]]; then
+          tag=${{ fromJson(steps.package_json.outputs.json).version }}
+        else
+          tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
+        fi
         echo "tag=$tag" >> $GITHUB_OUTPUT
     - name: Create Release
       id: create_release
@@ -48,7 +47,7 @@ jobs:
         tag_name: ${{ steps.create_tag.outputs.tag }}
         release_name: ${{ steps.create_tag.outputs.tag }}
         draft: true
-        prerelease: true
+        prerelease: "${{ steps.create_tag.outputs.tag != fromJson(steps.package_json.outputs.json).version }}"
 
   build-linux:
     needs: [prep-release]
@@ -67,13 +66,11 @@ jobs:
     
     # Linux: .tar.gz
     - uses: tj-actions/glob@v17
-      name: "Linux: Glob .tar.gz"
       id: glob_targz
       with:
         working-directory: ./dist_electron/
         files: unofficial-homestuck-collection-*.tar.gz
     - uses: actions/upload-release-asset@v1
-      name: "Linux: Upload .tar.gz"
       if: steps.glob_targz.outputs.paths != ''
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,13 +82,11 @@ jobs:
         
     # Linux: .AppImage
     - uses: tj-actions/glob@v17
-      name: "Linux: Glob AppImage"
       id: glob_appimage
       with:
         working-directory: ./dist_electron/
         files: "*.AppImage"
     - uses: actions/upload-release-asset@v1
-      name: "Linux: Upload AppImage"
       if: steps.glob_appimage.outputs.paths != ''
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,7 +98,7 @@ jobs:
 
   build-windows:
     needs: [prep-release]
-    runs-on: windows-latest-latest
+    runs-on: windows-latest
 
     # Platform-agnostic build
     steps:
@@ -159,25 +154,24 @@ jobs:
       with:
         node-version: "${{ env.NODE_VERSION }}"
     - run: make install
-    - run: make publish
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - run: make publish
+    #   env:
+    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # Windows: win-x64.zip
-    - uses: tj-actions/glob@v17
-      id: glob_dmg
-      with:
-        working-directory: ./dist_electron/
-        files: "*.dmg"
-    - uses: actions/upload-release-asset@v1
-      if: steps.glob_dmg.outputs.paths != ''
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.prep-release.outputs.upload_url }}
-        asset_path: ./dist_electron/${{ steps.glob_dmg.outputs.paths }}
-        asset_name: ${{ steps.glob_dmg.outputs.paths }}
-        asset_content_type: TODO
+    # - uses: tj-actions/glob@v17
+    #   id: glob_dmg
+    #   with:
+    #     working-directory: ./dist_electron/
+    #     files: "*.dmg"
+    # - uses: actions/upload-release-asset@v1
+    #   if: steps.glob_dmg.outputs.paths != ''
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ needs.prep-release.outputs.upload_url }}
+    #     asset_path: ./dist_electron/${{ steps.glob_dmg.outputs.paths }}
+    #     asset_name: ${{ steps.glob_dmg.outputs.paths }}
+    #     asset_content_type: application/octet-stream
 
   metadata:
     name: Publish Release
