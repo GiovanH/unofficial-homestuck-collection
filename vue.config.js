@@ -6,11 +6,28 @@ module.exports = {
                 // Include the vue compiler so mods can use templates
                 "vue$": "vue/dist/vue.esm.js"
             }
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.node$/,
+                    loader: "node-loader",
+                }
+            ]
         }
     },
     pluginOptions: {
         electronBuilder: {
             nodeIntegration: true,
+            // TEMPORARY: builds failing due to faulty minimization!
+            chainWebpackMainProcess: config => {
+                config.plugins.delete("uglify");
+                config.optimization.minimize(false);
+            },
+            // chainWebpackRendererProcess: config => {
+            //     config.plugins.delete("uglify");
+            //     config.optimization.minimize(false);
+            // },
             builderOptions: {
                 appId: "com.bambosh.unofficialhomestuckcollection",
                 productName: "The Unofficial Homestuck Collection",
@@ -26,6 +43,7 @@ module.exports = {
                             "ia32"
                         ]
                     },
+                    artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
                     asarUnpack: [
                         "**/node_modules/sharp/**"
                     ]
