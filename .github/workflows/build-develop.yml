@@ -1,11 +1,11 @@
-name: Build electron releases
+name: Build electron releases - development
 
 env:
   NODE_VERSION: "14.18"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   prep-release:
