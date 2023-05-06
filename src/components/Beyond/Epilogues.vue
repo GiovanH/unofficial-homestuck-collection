@@ -1,7 +1,8 @@
 <template>
   <div class="pageBody epilogue">
     <NavBanner />
-    <div class="pageFrame" v-html="epiloguesPage" />
+    <div class="pageFrame" :class="{fakechat}" v-html="epiloguesPage" />
+    <!-- <label><input type="checkbox" v-model="fakechat">fakechat</label> -->
     <PageFooter />
   </div>
 </template>
@@ -19,6 +20,7 @@ export default {
   components: { NavBanner, PageFooter },
   data: function() {
     return {
+      fakechat: false
     }
   },
   props: [
@@ -29,7 +31,7 @@ export default {
   },
   title: function(ctx) {
     if (ctx.routeParams.volume && ctx.routeParams.page)
-      return `${capitalize(ctx.routeParams.volume)} ${ctx.routeParams.page}`
+      return `${capitalize(ctx.routeParams.volume)} | ${ctx.routeParams.page}`
     return 'Epilogues'
   },
   methods: {
@@ -101,8 +103,7 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
 
   .pageFrame {
     background: var(--page-pageFrame);
-    // background: #C6C6C6; // var(--page-pageFrame);
-    color: #000000; // var(--font-default);
+    color: var(--font-default);
 
     width: 950px;
     padding-top: 7px;
@@ -113,7 +114,27 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
   }
 }
 
+.mspa.epilogue ::v-deep {
+  .bg-white { background-color: #FFFFFF; }
+}
+
+.epilogue .fakechat ::v-deep .chat {
+  background: var(--page-log-bg);
+  border: 1px dashed var(--page-log-border);
+  padding: 1.5em;
+  margin: 1em 0 !important;
+}
+
 .epilogue ::v-deep {
+  // Epilogues uses "rows"
+  .row {
+  }
+}
+
+.epilogue ::v-deep {
+  .pageFrame a[href] {
+    color: var(--page-links);
+  }
   // Epilogues uses "rows"
   .row {
     max-width: 650px;
@@ -334,15 +355,13 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
   //     font-size: 65px;
   // }
 
-  .bg-white { background-color: #FFFFFF; }
 
   .clearfix:after {
     content: "";
     display: table;
     clear: both;
   }
-
-
-
 }
+
+
 </style>
