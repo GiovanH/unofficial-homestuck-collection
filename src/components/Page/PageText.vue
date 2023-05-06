@@ -9,35 +9,11 @@
 		</button>
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
          v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
-        <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .log .logContent span:not(:first-child) {
-            padding-top: 1em;
-            display: inline-block;
-            white-space: pre-wrap;
-          }          
-          .log .logContent span + span, 
-          .log .logContent br + br + span {
-            padding: initial;
-            display: inline !important;
-          }
-        </component>
 	</div>
 
     <div class="authorlog" v-else-if="textType == 'authorlog'">
 		<p class="logContent text" :class="fontFamily" :style="fontStyle" 
             v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
-        <component is="style" v-if="$localData.settings.textOverride.paragraphSpacing">
-          .authorlog .logContent span:not(:first-child) {
-            padding-top: 1em;
-            display: inline-block;
-            white-space: pre-wrap;
-          }
-          .authorlog .logContent span + span, 
-          .authorlog .logContent br + br + span {
-            padding: initial;
-            display: inline !important;
-          }
-        </component>
 	</div>
     <span v-else data-placeholder />
 
@@ -80,6 +56,7 @@ export default {
             let result = []
             if (this.$localData.settings.textOverride.bold || !this.$localData.settings.textOverride.fontFamily) result.push('bold')
             if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
+            if (this.$localData.settings.textOverride.paragraphSpacing) result.push("paragraphSpacing")
             return result
         },
         theme(){
@@ -300,6 +277,19 @@ export default {
         ::v-deep img.fullWidth {
             position: relative;
             left: -25px;
+        }
+    }
+
+    ::v-deep .logContent.paragraphSpacing {
+        span:not(:first-child) {
+            padding-top: 1em;
+            display: inline-block;
+            white-space: pre-wrap;
+        }
+        span + span,
+        br + br + span {
+            padding: initial;
+            display: inline !important;
         }
     }
 
