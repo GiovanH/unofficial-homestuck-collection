@@ -101,6 +101,8 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
 
   .pageFrame {
     background: var(--page-pageFrame);
+    // background: #C6C6C6; // var(--page-pageFrame);
+    color: #000000; // var(--font-default);
 
     width: 950px;
     padding-top: 7px;
