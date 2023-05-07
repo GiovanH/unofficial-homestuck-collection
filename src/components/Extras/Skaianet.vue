@@ -533,7 +533,7 @@
                                       <tbody>
                                         <tr>
                                           <td>
-                                            <font size="6"><a href="https://www.homestuck.com/epilogues" target="_blank">EPILOGUES.TXT</a></font>
+                                            <font size="6"><a href="/epilogues" target="_blank">EPILOGUES.TXT</a></font>
                                           </td>
                                           <td>
                                             <MediaEmbed url="archive/skaianet/txt.gif" align="middle" />

@@ -46,7 +46,10 @@ export default {
   computed: {
     epiloguesPage() {
       if (this.$archive != undefined) {
-        return this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
+        const html = this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
+        return html.replace(
+          '<a class="nav-btn nav-btn--center type-hs-small mar-b-md" data-gamenav-open="" href="javascript:void(0)" style="text-decoration:none; text-transform: none; font-size:14px; line-height:14px;"><span>Options</span> <i class="icon-menu" style="margin:0;"></i></a>',
+          `<div class="pad-r-lg--md mar-b-md type-hs-small type-hs-bottom--md type-center type-left--md"><ul class="o_game-nav"><li class="o_game-nav-item"><a href="https://www.homestuck.com${this.tab.url}">${this.tab.url}</a></li></ul></div>`)
       } else {
         return "NotImplemented"
       }
