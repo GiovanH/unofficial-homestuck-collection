@@ -6,7 +6,10 @@ import os
 import itertools
 import re
 import json
-import yaml
+import ruamel.yaml
+
+
+yaml = ruamel.yaml.YAML()
 
 epilogues = {}
 
@@ -19,8 +22,13 @@ def _str_presenter(dumper, data):
     TAG_STR = 'tag:yaml.org,2002:str'
     return dumper.represent_scalar(TAG_STR, data, style='|')
 
-yaml.add_representer(str, _str_presenter)
+yaml.representer.add_representer(str, _str_presenter)
 
+
+class blockstr(str):
+    pass
+
+yaml.representer.add_representer(blockstr, _str_presenter)
 
 def extract(html_path, cat_name, page_name):
     out_name = f"epilogues/{cat_name}_{page_name}.html"
@@ -42,7 +50,7 @@ def extract(html_path, cat_name, page_name):
         ):
             no.extract()
 
-    epilogues[cat_name][page_name] = '\n'.join(map(str, rows))
+    epilogues[cat_name][page_name] = blockstr('\n'.join(map(str, rows)))
 
 
 for cat in glob.glob(os.path.join(html_root, "*/")):
@@ -57,4 +65,4 @@ extract(os.path.join(html_root, 'prologue.html'), 'prologue', '0')
 
 
 with open('epilogues.yaml', 'w', encoding='utf-8') as fp:
-    yaml.dump(epilogues, fp, allow_unicode=True)
+    yaml.dump(epilogues, fp)

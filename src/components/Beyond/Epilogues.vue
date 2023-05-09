@@ -20,7 +20,31 @@ export default {
   components: { NavBanner, PageFooter },
   data: function() {
     return {
-      fakechat: false
+      fakechat: false,
+      filter_content_warnings: true,
+      cw_super_serious: [
+      ],
+      cws: [
+        "Graphic Depictions of Violence", "Major Character Death", "Rape", "The Economy", "Xenophobia",
+        "Pregnancy", "Alternate Universe", "Mind Control", "Non-Con", "Breastfeeding", "Misogyny",
+        "Sexism", "Transphobia", "Misgendering", "Canon Compliant", "Canon Divergent", "Redemption",
+        "Dubious Consent", "Mind Break", "World War", "Political Intrigue", "Robots", "Child Abuse", "Rough Sex",
+        "Child Neglect", "Alcohol Use", "Breastmilk", "Death", "Incestuous Undertones", "Mental Illness",
+        "Suicide", "Polyamory", "Clown Dynamics", "Meta", "Abuse", "Fridging", "Genocide", "Diapers", "Murder", "Honk",
+        "Children", "Gender Transition", "Depression", "Toxic Masculinity", "Sexual Abuse", "Friends to Lovers",
+        "Speciesism", "Babies", "Manipulation", "Gore", "Infidelity", "Marriage", "Nonbinary Character(s)", "Milking",
+        "Identity Questioning", "Feet", "Political Rebellion", "Fascism", "Rapping", "Drug Use", "Funerals", "Religion",
+        "Eating", "Food", "Aliens", "Possession", "Light BDSM", "Theft", "Furry", "Anthropomorphic Characters",
+        "Power Imbalances", "Blood", "Trickster Mode", "Body Horror", "Gerrymandering", "Starvation", "Cuckolding",
+        "Interspecies Relationships", "Guns", "Vore", "Assassination", "Alien Biology", "Detransitioning",
+        "Chronic Illness", "Vomit", "Drugging", "Cannibalism", "Unhealthy Relationships", "Capitalism", "Eggs",
+        "Slut Shaming", "Black Romance", "Kidnapping", "Faygo", "Bimboification", "Poisoning", "Teenagers",
+        "Domestic Abuse", "Reality Television", "Ovipositioning", "Ghosts", "Revolutionary Rhetoric", "Self-Sacrifice",
+        "Propaganda", "Super PACs", "Pica", "Early 20th Century Dance Movements", "Prison Camps", "Existential Crisis",
+        "Xenophilia", "Daddy Issues", "Bad Parenting", "Addiction", "Clown"
+      ],
+      cw_additional: [
+      ],
     }
   },
   props: [
@@ -42,14 +66,34 @@ export default {
 
       else if (dir == 'right' && el_next != undefined) el_next.click()
     },
+    generateContentWarnings(label, cws) {
+      return `<div class="g-6 g-3--md type-bs pos-r clearfix mar-b-md--md ao3-label">${label}</div>
+        <div class="g-6 g-9--md g-omega--md type-bs pos-r clearfix mar-b-md mar-l-md mar-l-0--md ao3-field">
+        ${cws.join(', ')}
+        </div>`
+    },
+    filterPageHtml(html) {
+      const ext_link = `<div class="pad-r-lg--md mar-b-md type-hs-small type-hs-bottom--md type-center type-left--md"><ul class="o_game-nav"><li class="o_game-nav-item"><a href="https://www.homestuck.com${this.tab.url}">${this.tab.url}</a></li></ul></div>`
+      html = html.replace(
+        '<a class="nav-btn nav-btn--center type-hs-small mar-b-md" data-gamenav-open="" href="javascript:void(0)" style="text-decoration:none; text-transform: none; font-size:14px; line-height:14px;"><span>Options</span> <i class="icon-menu" style="margin:0;"></i></a>',
+        ext_link)
+
+      if (this.filter_content_warnings && this.tab.url == '/epilogues/') {
+        // Index page
+        const content_warnings =
+          this.generateContentWarnings("Content Warning:", [...this.cw_super_serious.map(s => `<b>${s}</b>`), ...this.cws])
+          // + this.generateContentWarnings("Additional Tags:", this.cw_additional)
+
+        html = html.replace(/<div class="[^"]+?">Content Warning:<\/div>.+?Clown<\/div>/gs, content_warnings)
+      }
+      return html
+    }
   },
   computed: {
     epiloguesPage() {
       if (this.$archive != undefined) {
         const html = this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
-        return html.replace(
-          '<a class="nav-btn nav-btn--center type-hs-small mar-b-md" data-gamenav-open="" href="javascript:void(0)" style="text-decoration:none; text-transform: none; font-size:14px; line-height:14px;"><span>Options</span> <i class="icon-menu" style="margin:0;"></i></a>',
-          `<div class="pad-r-lg--md mar-b-md type-hs-small type-hs-bottom--md type-center type-left--md"><ul class="o_game-nav"><li class="o_game-nav-item"><a href="https://www.homestuck.com${this.tab.url}">${this.tab.url}</a></li></ul></div>`)
+        return this.filterPageHtml(html)
       } else {
         return "NotImplemented"
       }
@@ -339,19 +383,10 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
   .flex-wrap { flex-wrap: wrap; }
   .flex { display: flex; }
   .flex-justify {
-    -webkit-box-pack: justify;
-    -moz-box-pack: justify;
-    box-pack: justify;
-    -ms-flex-pack: justify;
-    -webkit-box-pack: justify;
-    -moz-box-pack: justify;
-    box-pack: justify;
-    -webkit-justify-content: space-between;
-    -moz-justify-content: space-between;
-    -ms-justify-content: space-between;
-    -o-justify-content: space-between;
     justify-content: space-between;
-    -ms-flex-pack: justify;
+  }
+  .flex-justify-center {
+    justify-content: center;
   }
 
   // .type-hs-opener-rg {
