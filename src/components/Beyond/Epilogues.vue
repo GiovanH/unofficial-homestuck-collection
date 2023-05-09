@@ -23,27 +23,60 @@ export default {
       fakechat: false,
       filter_content_warnings: true,
       cw_super_serious: [
+        "Rape", "Non-Con", "Dubious Consent",
+        "Chronic Illness",
+        "Graphic Depictions of Violence", "Major Character Death", "Suicide",
+        "Child Abuse", "Sexual Abuse", "Domestic Abuse",
+        "Age Difference", "Pedophilia",
+        "White Supremacy", "Prison Camps", "Genocide",
+        "Transphobia", "Misgendering",
+        "Mind Control", "Mind Break",
+        "Bad Ending"
       ],
       cws: [
-        "Graphic Depictions of Violence", "Major Character Death", "Rape", "The Economy", "Xenophobia",
-        "Pregnancy", "Alternate Universe", "Mind Control", "Non-Con", "Breastfeeding", "Misogyny",
-        "Sexism", "Transphobia", "Misgendering", "Canon Compliant", "Canon Divergent", "Redemption",
-        "Dubious Consent", "Mind Break", "World War", "Political Intrigue", "Robots", "Child Abuse", "Rough Sex",
-        "Child Neglect", "Alcohol Use", "Breastmilk", "Death", "Incestuous Undertones", "Mental Illness",
-        "Suicide", "Polyamory", "Clown Dynamics", "Meta", "Abuse", "Fridging", "Genocide", "Diapers", "Murder", "Honk",
-        "Children", "Gender Transition", "Depression", "Toxic Masculinity", "Sexual Abuse", "Friends to Lovers",
-        "Speciesism", "Babies", "Manipulation", "Gore", "Infidelity", "Marriage", "Nonbinary Character(s)", "Milking",
-        "Identity Questioning", "Feet", "Political Rebellion", "Fascism", "Rapping", "Drug Use", "Funerals", "Religion",
-        "Eating", "Food", "Aliens", "Possession", "Light BDSM", "Theft", "Furry", "Anthropomorphic Characters",
-        "Power Imbalances", "Blood", "Trickster Mode", "Body Horror", "Gerrymandering", "Starvation", "Cuckolding",
-        "Interspecies Relationships", "Guns", "Vore", "Assassination", "Alien Biology", "Detransitioning",
-        "Chronic Illness", "Vomit", "Drugging", "Cannibalism", "Unhealthy Relationships", "Capitalism", "Eggs",
-        "Slut Shaming", "Black Romance", "Kidnapping", "Faygo", "Bimboification", "Poisoning", "Teenagers",
-        "Domestic Abuse", "Reality Television", "Ovipositioning", "Ghosts", "Revolutionary Rhetoric", "Self-Sacrifice",
-        "Propaganda", "Super PACs", "Pica", "Early 20th Century Dance Movements", "Prison Camps", "Existential Crisis",
-        "Xenophilia", "Daddy Issues", "Bad Parenting", "Addiction", "Clown"
+        "Unhealthy Relationships", "Sexual Harassment",
+        "Breastfeeding", "Breastmilk", "Milking",
+        "Misogyny", "Sexism", "Toxic Masculinity",
+        "Alternate Universe", "Canon Compliant", "Canon Divergent",
+        "Redemption",
+        "World War", "Political Intrigue",
+        "Rough Sex", "Light BDSM", "Black Romance",
+        "Child Neglect",  "Daddy Issues", "Bad Parenting",
+        "Addiction", "Alcohol Use", "Drug Use",
+        "Death", "Murder",
+        "Incestuous Undertones",
+        "Polyamory", "Cuckolding", "Infidelity",
+        "Gender Transition", "Nonbinary Character(s)", "Identity Questioning",
+        "Detransitioning",
+        "Mental Illness", "Depression", "Existential Crisis",
+        "Speciesism", "Xenophobia",
+        "Pregnancy", "Babies",
+        "Bimboification", "Slut Shaming",
+        "Gore", "Blood", "Body Horror",
+        "Fascism", "Political Rebellion", "Assassination",
+        "Furry",  "Anthropomorphic Characters",
+        "Alien Biology", "Ovipositioning",
+        "Capitalism", "Propaganda",  "Super PACs",
+        "Revolutionary Rhetoric",  "Self-Sacrifice",
+        "Friends to Lovers",
+        "Power Imbalances", "Manipulation",
+        "Abuse",
+        "Diapers",
+        "Possession",
+        "Starvation",
+        "Interspecies Relationships", "Xenophilia",
+        "Vore",
+        "Vomit",
+        "Drugging",
+        "Cannibalism",
+        "Pica",
       ],
       cw_additional: [
+        "The Economy", "Robots", "Meta", "Fridging", "Honk", "Marriage", "Feet", "Clown Dynamics",
+        "Children", "Funerals", "Religion", "Eating", "Food", "Aliens",
+        "Theft", "Trickster Mode", "Reality Television", "Gerrymandering", "Rapping", "Guns",
+        "Eggs", "Kidnapping", "Faygo", "Poisoning", "Teenagers", "Ghosts",
+        "Early 20th Century Dance Movements", "Clown"
       ],
     }
   },
@@ -82,7 +115,7 @@ export default {
         // Index page
         const content_warnings =
           this.generateContentWarnings("Content Warning:", [...this.cw_super_serious.map(s => `<b>${s}</b>`), ...this.cws])
-          // + this.generateContentWarnings("Additional Tags:", this.cw_additional)
+          + this.generateContentWarnings("Additional Tags:", this.cw_additional)
 
         html = html.replace(/<div class="[^"]+?">Content Warning:<\/div>.+?Clown<\/div>/gs, content_warnings)
       }
