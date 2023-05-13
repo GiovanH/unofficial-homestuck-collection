@@ -124,8 +124,8 @@ export default {
   },
   computed: {
     epiloguesPage() {
-      if (this.$archive != undefined) {
-        const html = this.$archive.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
+      if (this.$archive.extras.epilogues != undefined) {
+        const html = this.$archive.extras.epilogues[this.routeParams.volume || 'prologue'][this.routeParams.page || '0']
         return this.filterPageHtml(html)
       } else {
         return "NotImplemented"

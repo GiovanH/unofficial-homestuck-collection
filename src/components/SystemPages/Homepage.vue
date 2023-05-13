@@ -127,6 +127,7 @@
           <p>Tomorrow's canon, today! Homestuck still has plenty in store for you.</p>
         </HomeRowItem>
         <HomeRowItem
+          v-if="$archive.extras.epilogues"
           class="rowItem"
           href="/epilogues"
           thumbsrc="assets://archive/epilogues/resources/archive_ep.gif"
