@@ -70,3 +70,4 @@ jobs:
     - run: make publish_release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PUBLISH_FOR_PULL_REQUEST: true
