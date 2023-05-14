@@ -5,17 +5,29 @@
 import re
 import json
 import os
-import shutil
 import requests
 import bs4
-import yaml
-import time
 import urllib.parse
 import logging
 import difflib
 import itertools
 from urllib.parse import urlparse
 from lib import TriadLogger
+
+import ruamel.yaml
+
+yaml = ruamel.yaml.YAML()
+
+# Sensible multiline representer
+def _str_presenter(dumper, data):
+    TAG_STR = 'tag:yaml.org,2002:str'
+    if '\n' in data:
+        return dumper.represent_scalar(TAG_STR, data, style='|')
+    return dumper.represent_scalar(TAG_STR, data, style='"')
+
+
+yaml.representer.add_representer(str, _str_presenter)
+
 
 try:
     from tqdm import tqdm
@@ -252,6 +264,8 @@ def downloadStory(STORY_NUM, offline=True):
         story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])
 
     story_name = story_resp.get('n').replace(':', '-')
+    if (not offline):
+        story_name += "_online"
 
     logger = TriadLogger(f"{STORY_NUM}-{story_name}")
 
@@ -278,9 +292,9 @@ def downloadStory(STORY_NUM, offline=True):
         story_resp['o'] = "assets://mspfa/" + saveImageAs(story_name, story_resp['o'], 'thumbnail')
 
     adv_images = {}
-    page_list = list(enumerate(story_resp['p']))
+    page_list = story_resp['p']
 
-    for (pageno, page) in tqdm(page_list, desc=story_name):
+    for (pageno, page) in tqdm(enumerate(page_list), desc=story_name):
         pageno += 1
         page["i"] = pageno
 
@@ -292,8 +306,7 @@ def downloadStory(STORY_NUM, offline=True):
 
         with open(f"{story_name}/links.txt", "a", encoding="utf-8") as linklist:
             for a in soup.find_all("a", href=True):
-                linklist.write(a['href'])
-                linklist.write("\n")
+                linklist.write(a['href'] + '\n')
 
         images = list(itertools.chain(
             [i['src'] for i in soup.find_all("img")],
@@ -316,6 +329,7 @@ def downloadStory(STORY_NUM, offline=True):
 
         if offline:
             for i, src in enumerate(images):
+                # adv_images[src] would be the image id it first appeared as
                 if adv_images.get(src, False):
                     img_id = adv_images[src]
                 else:
@@ -335,10 +349,7 @@ def downloadStory(STORY_NUM, offline=True):
                     with open(f"{story_name}/missing_urls.txt", "a", encoding="utf-8") as linklist:
                         linklist.write(src + "\n")
 
-    # json.dump(adv_images, open(f"{story_name}/adv_images.json", "w"))
-    yaml.dump(adv_images, open(f"{story_name}/adv_images.yaml", "w"))
-
-    # yaml.dump(story_resp, open(f"{story_name}/story_raw.yaml", "w"))
+    yaml.dump(adv_images, open(f"{story_name}/adv_images.yaml", "w", encoding="utf-8"))
 
     try:
         story_resp["editors"] = [
@@ -353,8 +364,7 @@ def downloadStory(STORY_NUM, offline=True):
     except Exception as e:
         logger.warn(e)
 
-    # json.dump(story_resp, open(f"{story_name}/story.json", "w"))
-    yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w"))
+    yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w", encoding="utf-8"))
 
     story_resp.pop("p")
 
@@ -364,12 +374,11 @@ def downloadStory(STORY_NUM, offline=True):
             with open(f"{story_name}/{filename}", "w") as fp:
                 fp.write(val)
 
-    # json.dump(story_resp, open(f"{story_name}/story_meta.json", "w"))
-    yaml.dump(story_resp, open(f"{story_name}/story_meta.yaml", "w"))
+    yaml.dump(story_resp, open(f"{story_name}/story_meta.yaml", "w", encoding="utf-8"))
 
     logger.info(f"{story_resp['n']}: {len(page_list)} pages")
 
-    with open(f"{story_name}/mod.js", "w") as fp:
+    with open(f"{story_name}/mod.js", "w", encoding="utf-8") as fp:
         fp.write(f"""module.exports = {{
   title: "{story_name}{' (online)' if not offline else ''}",
   summary: "MSPFA",
@@ -396,17 +405,11 @@ if __name__ == "__main__":
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('story_ids', help="Story IDs", nargs='+')
-    parser.add_argument('--online', action='store_true', help="Don't download resources", default=False)
+    parser.add_argument('--no-swfhack', action='store_true')
+    parser.add_argument('--online', action='store_true', help="Don't download resources or replace links within story", default=False)
     args = parser.parse_args()
+
+    Hacks.swflinks = (not args.no_swfhack)
+
     for id_ in args.story_ids:
         downloadStory(id_, offline=(not args.online))
-
-"""
-requests.request
-
-echo $DATA
-
-curl 'https://mspfa.com/' -H 'content-type: application/x-www-form-urlencoded' -H 'accept: application/json' --data ${DATA} > ${STORY}.json
-
-python3 -c "import json; for json.load(open('waterworks.json'))"
-"""
