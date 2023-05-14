@@ -150,7 +150,7 @@
           <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
           <br />
           <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired, and the site is currently run by Grant.</p>
-          <div class="links flexgrid">
+          <div class="links autocol">
             <span v-for="advlink in mspfaLinks" :key="advlink.href">
               &gt; <a :href="advlink.href"><span v-text="advlink.label" /></a>
             </span>
@@ -623,14 +623,12 @@ export default {
       border-top: none;
     }
   }
-  .flexgrid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start !important;
+  .autocol {
+    display: block !important;
+    column-count: 2;
     & > * {
-      flex: 0 0 33%;
+      display: block;
     }
   }
 
 </style>
-
