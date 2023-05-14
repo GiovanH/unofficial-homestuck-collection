@@ -143,15 +143,17 @@
       <div class="cardContent cardEntry">
         <div class="icon">
           <a href="/mspfa/" ><Media url="/images/archive_mspfa.gif" /></a>
-          <p class="date">Sep 2006 - ???</p>
+          <p class="date">Jan 2010 -</p>
         </div>
         <div class="description">
           <h2><a href="/mspfa/" >MS Paint Fan Adventures</a></h2>
           <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
           <br />
           <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired, and the site is currently run by Grant.</p>
-          <div class="links">
-            > <a href="/mspfa/" >Index</a>
+          <div class="links flexgrid">
+            <span v-for="advlink in mspfaLinks" :key="advlink.href">
+              &gt; <a :href="advlink.href"><span v-text="advlink.label" /></a>
+            </span>
           </div>
         </div>
       </div>
@@ -402,6 +404,8 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import Logo from '@/components/UIElements/Logo.vue'
 import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
 
+import MSPFAIndex from '@/components/CustomContent/MSPFAIndex.vue'
+
 export default {
   name: 'homepage',
   props: [
@@ -417,7 +421,8 @@ export default {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
-    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []}
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []},
+    mspfaLinks: MSPFAIndex.computed.mspfaLinks
   },
   methods: {
   }
@@ -449,6 +454,7 @@ export default {
   .navBanner {
     margin-bottom: 25px;
   }
+
   .card {
     position: relative;
     margin-top: 75px;
@@ -615,6 +621,14 @@ export default {
   .card.noHeaderCard .cardContent.cardRows .rowItem  {
     &:nth-child(1), &:nth-child(2) {
       border-top: none;
+    }
+  }
+  .flexgrid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+    & > * {
+      flex: 0 0 33%;
     }
   }
 

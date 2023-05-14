@@ -5,7 +5,7 @@
       <div class="pageContent">
         <h2 class="pageTitle">MS Paint Fan Adventures</h2>
         <div class="adventureLinks">
-          <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
+          <div class="adventure" v-for="advlink in mspfaLinks" :key="advlink.href">
             <a :href="advlink.href"><MediaEmbed :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
           </div>
         </div>
@@ -33,8 +33,8 @@ export default {
     }
   },
   computed: {
-    adventureLinks(){
-      return Object.keys(this.$archive.mspfa).map(k => {
+    mspfaLinks(){
+      return (Object.keys(this.$archive.mspfa) || []).map(k => {
         return {
           href: `/mspfa/${k}/`,
           img: this.$archive.mspfa[k].o || "assets://images/mspalogo_mspa.png",
