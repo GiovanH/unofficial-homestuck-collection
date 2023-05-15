@@ -369,8 +369,8 @@ function vizToMspa(vizStory, vizPage) {
 }
 
 function mspaToViz(mspaInput, isRyanquest = false) {
-  const mspaPage = mspaInput.padStart(6, '0')
-  const mspaStory = getStoryNum(mspaPage)
+  const mspaPage = isNaN(mspaInput) ? mspaInput : mspaInput.padStart(6, '0')
+  const mspaStory = (isRyanquest ? 'ryanquest' : getStoryNum(mspaPage))
   let vizStory, vizPage
 
   if (isRyanquest) {
@@ -1006,6 +1006,7 @@ function testStoryLogic() {
     "homestuck 8130":      JSON.stringify({s: 6, p: "010030"}),
     "homestuck 8131":      JSON.stringify({}),
     "homestuck darkcage":  JSON.stringify({s: 6, p: "darkcage"}),
+    "homestuck pony":      JSON.stringify({s: 6, p: "pony"}),
     // "homestuck pony3":     JSON.stringify({}),
     "ryanquest 1":         JSON.stringify({s: 'ryanquest', p: "000001"}),
     "ryanquest 15":        JSON.stringify({s: 'ryanquest', p: "000015"}),
@@ -1038,6 +1039,7 @@ function testStoryLogic() {
     "010030":              JSON.stringify({s: 'homestuck', p: "8130"}),
     // "pony3":               undefined,
     "darkcage":            JSON.stringify({s: 'homestuck', p: "darkcage"}),
+    "pony":                JSON.stringify({s: 'homestuck', p: "pony"}),
     "homestuck pony3":     undefined,
     // "000001":              JSON.stringify({s: 'ryanquest', p: 1}),
     // "000015":              JSON.stringify({s: 'ryanquest', p: 15}),

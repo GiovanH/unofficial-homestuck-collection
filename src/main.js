@@ -169,7 +169,7 @@ Vue.mixin({
       if (this.$archive) {
         const pageInStory = (p in this.$archive.mspa.story || p in this.$archive.mspa.ryanquest)
         if (!pageInStory) {
-          this.$logger.info("$vizToMspa:", p, "not in story!")
+          this.$logger.info("$vizToMspa: p", p, "not in story!", vizStory, vizPage)
           return undef_page
         }
       }
@@ -178,8 +178,8 @@ Vue.mixin({
     $mspaToViz(mspaInput, isRyanquest = false){
       // Resources.mspaToViz, but also checks the archive.
       if (this.$archive) {
-        const mspaPage = mspaInput.padStart(6, '0')
-        const pageInStory = (mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest)
+        const mspaPage = isNaN(mspaInput) ? mspaInput : mspaInput.padStart(6, '0')
+        const pageInStory = (mspaPage in (isRyanquest ? this.$archive.mspa.ryanquest : this.$archive.mspa.story))
         if (!pageInStory) {
           return undefined
         }
