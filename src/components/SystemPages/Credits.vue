@@ -1,61 +1,59 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame">
-      <div class="pageContent">
-        <Media url="images/logo.gif" class="logo"/>
-        <div v-if="routeParams.mode == 'artcredits'" class="credits artCredits" >
-          <div class="center">
-            <h2>ART CREDITS</h2>
+  <GenericPage>
+    <div class="pageContent">
+      <Media url="images/logo.gif" class="logo"/>
+      <div v-if="routeParams.mode == 'artcredits'" class="credits artCredits" >
+        <div class="center">
+          <h2>ART CREDITS</h2>
 
-            After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here. 
+          After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here.
 
-            <br><br>
-            -------------------------------------------------------
-            <br><br>
-            
-            <template v-for="(credit, ci) in artCredits">
-              <div class="artCredit" :key="ci" v-if="!credit.pages.some(p => $pageIsSpoiler(p))">
-                <template v-for="(page, pi) in credit.pages" >
-                  <span v-if="page === '-'" :key="`${pi}a`"> through </span>
-                  <template v-else>
-                    <StoryPageLink 
-                      :mspaId='page' credit
-                      class="artCreditLink"
-                      :key="`${pi}b`">
-                    </StoryPageLink>
-                  </template>
+          <br><br>
+          -------------------------------------------------------
+          <br><br>
 
+          <template v-for="(credit, ci) in artCredits">
+            <div class="artCredit" :key="ci" v-if="!credit.pages.some(p => $pageIsSpoiler(p))">
+              <template v-for="(page, pi) in credit.pages" >
+                <span v-if="page === '-'" :key="`${pi}a`"> through </span>
+                <template v-else>
+                  <StoryPageLink
+                    :mspaId='page' credit
+                    class="artCreditLink"
+                    :key="`${pi}b`">
+                  </StoryPageLink>
                 </template>
-                <span v-html="credit.desc"></span>
-              </div>
-            </template>
 
-            <div class="artCredit" v-if="$pageIsSpoiler('010027')">
-              Keep reading to unlock!
+              </template>
+              <span v-html="credit.desc"></span>
             </div>
+          </template>
+
+          <div class="artCredit" v-if="$pageIsSpoiler('010027')">
+            Keep reading to unlock!
           </div>
         </div>
-        <div v-else class="credits noCredits">
-          <div class="creditLinks">
-            <div class="credit"><a href="/music/features"><Media url="/archive/collection/credits_sound.png" /><br>SOUND CREDITS</a></div>
-            <div class="credit"><a href="/credits/artcredits"><Media url="/archive/collection/credits_art.png" /><br>ART CREDITS</a></div>
-          </div>
+      </div>
+      <div v-else class="credits noCredits">
+        <div class="creditLinks">
+          <div class="credit"><a href="/music/features"><Media url="/archive/collection/credits_sound.png" /><br>SOUND CREDITS</a></div>
+          <div class="credit"><a href="/credits/artcredits"><Media url="/archive/collection/credits_art.png" /><br>ART CREDITS</a></div>
+        </div>
 
-          <div class="archiveCredits">
-            <h2>Archive credits:</h2>
-            <dl>
-              <template v-for="(credit, ci) in archiveCredits">
-                <dt :key="`${ci}a`">
-                  <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
-                  <span v-else>{{credit.name}}</span>
-                :</dt>
-                <dd v-html="credit.desc" :key="`${ci}b`"></dd>
-              </template>
-            </dl>
-            <hr />
-            <div class="legal">
-              Legal:
+        <div class="archiveCredits">
+          <h2>Archive credits:</h2>
+          <dl>
+            <template v-for="(credit, ci) in archiveCredits">
+              <dt :key="`${ci}a`">
+                <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
+                <span v-else>{{credit.name}}</span>
+              :</dt>
+              <dd v-html="credit.desc" :key="`${ci}b`"></dd>
+            </template>
+          </dl>
+          <hr />
+          <div class="legal">
+            Legal:
 <pre>The Unofficial Homestuck Collection
 Copyright (C) 2020-2022 Bambosh et al.
 
@@ -64,31 +62,28 @@ it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Pub
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 </pre>
-              <p>
-                In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
-              </p>
-              <br /> 
-              <p>
-                As per section 7, the author attributions above must 
-                be preserved in all covered works. Modified versions may optionally
-                extend this list as applicable, but modifications that remove 
-                attributions or otherwise misrepresent the origin of the material 
-                are not permitted.
-              </p>
-            </div>
+            <p>
+              In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+            </p>
+            <br />
+            <p>
+              As per section 7, the author attributions above must
+              be preserved in all covered works. Modified versions may optionally
+              extend this list as applicable, but modifications that remove
+              attributions or otherwise misrepresent the origin of the material
+              are not permitted.
+            </p>
           </div>
         </div>
       </div>
     </div>
-    <PageFooter />
-  </div>
+  </GenericPage>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 export default {
@@ -97,7 +92,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, PageFooter, StoryPageLink
+    Media, GenericPage, StoryPageLink
   },
   title(ctx) {
     return ctx.routeParams.mode == 'artcredits' ? "Art Credits" : "Credits"
@@ -302,123 +297,70 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .pageBody {
-    color: var(--font-default);
-    background: var(--page-pageBody);
 
-    margin: 0;
-    padding: 0;
+.legal {
+  margin: 1em 0;
+  pre {
+    white-space: pre-wrap;
+    opacity: 0.6; // Not obfuscation, just coloring >.>
+  }
+}
+.artCredits {
+  width: 650px;
+
+  h2 {
+    font-weight: bold;
+    font-family: courier, monospace;
+    font-size: 32px;
+  }
+  .center {
+    width: 480px;
+    text-align: center;
+    margin: 0 auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-weight: normal;
+    font-size: 12px;
+  }
+  .artCreditLink {
+    display: block;
+  }
+  .artCredit {
+    margin-bottom: 2em;
+  }
+}
+.noCredits {
+  width: 650px;
+  .creditLinks {
     display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    width: 600px;
 
-    > img {
-      align-self: center;
-    }
-    ::v-deep a {
-      color: var(--page-links);
-    }
+    .credit {
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.1;
+      font-size: 18px;
 
-    .pageFrame {
-      background: var(--page-pageFrame);
-
-      width: 950px;
-      padding-top: 7px;
-      padding-bottom: 23px;
-      margin: 0 auto;
-
-      flex: 0 1 auto;
-      display: flex;
-      justify-content: center;
-
-      .pageContent {
-        background: var(--page-pageContent);
-        
-        max-width: 650px;
-        display: flex;
-        flex: 0 1 auto;
-        align-items: center;
-        flex-flow: column;
-        .logo {
-          margin-bottom: 25px;
-        }
-        .legal {
-          margin: 1em 0;
-          pre {
-            white-space: pre-wrap;
-            opacity: 0.6; // Not obfuscation, just coloring >.>
-          }
-        }
-        .artCredits {
-          width: 650px;
-
-          h2 {
-            font-weight: bold; 
-            font-family: courier, monospace;
-            font-size: 32px;
-          }
-          .center {
-            width: 480px;
-            text-align: center;
-            margin: 0 auto;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-weight: normal;
-            font-size: 12px;
-          }
-          .artCreditLink {
-            display: block;
-          }
-          .artCredit {
-            margin-bottom: 2em;
-          }
-        }
-        .noCredits {
-          width: 650px;
-          .creditLinks {
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: space-around;
-            margin: 0 auto;
-            width: 600px;
-
-            .credit {
-              margin-bottom: 20px;
-              text-align: center;
-              line-height: 1.1;
-              font-size: 18px;
-
-              img{
-                display: block;
-              }         
-            }
-          }
-          .archiveCredits {
-            width: 600px;
-            margin: 0 auto;
-            padding-bottom: 2em;
-            h2 {
-             text-align: center;
-            }
-            dl {
-              dt {
-                margin-top: 15px;
-              }
-            }
-          }
-        }
-
-      }	
+      img{
+        display: block;
+      }
     }
   }
-  .retro {
-    .pageContent {
-      background: #EEEEEE !important;
+  .archiveCredits {
+    width: 600px;
+    margin: 0 auto;
+    padding-bottom: 2em;
+    h2 {
+     text-align: center;
     }
-    .credits {
-      background: white;
+    dl {
+      dt {
+        margin-top: 15px;
+      }
     }
-  } 
-
+  }
+}
 </style>
 

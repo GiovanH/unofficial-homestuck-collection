@@ -1,46 +1,39 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame">
-      <div class="pageContent">
-        <div class="search">
-          <h1>Search:</h1>
-          <div class="searchBox">
-            <input ref="input" class="searchInput" type="text" spellcheck="false" @keydown.enter="query = inputText" v-model="inputText" />
-            <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
-          </div>
-          <div class="results" ref="markup">
-            <div v-if="freshStart"><p class="summary">First search may take a few seconds!</p></div>
-            <div v-else-if="results.length < 1" class="result summary noResult">
-              <h2>No results found.</h2>
-            </div>
-            <div class="result summary" v-else>
-              <p>Searching for "<span v-text="lastSearch.input" class="highlight" />" sorting by <span v-text="sortDictionary[lastSearch.sort] || lastSearch.sort" /></p>
-              <!--  in {{lastSearch.filter}} -->
-              <h2>{{results.length == 1000 ? '999+' : results.length}} results.</h2>
-            </div>
-            <div v-for="(page, i) in results" :key="page.key" class="result">
-              <h2>
-                <StoryPageLink titleOnly :mspaId='page.mspa_num'></StoryPageLink>
-              </h2>
-              <div class="chapter" v-html="`${$getChapter(page.mspa_num)} - ${$mspaOrVizNumber(page.mspa_num)}`" />
-              <div class="match">
-                <!-- <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="line" class="line" /> -->
-                <PageText startopen="true" :content="page.lines.join('<br />')" />
-              </div>
-            </div>
+  <GenericPage>
+    <div class="search">
+      <h2 class="pageTitle">Search</h2>
+      <div class="searchBox">
+        <input ref="input" class="searchInput" type="text" spellcheck="false" @keydown.enter="query = inputText" v-model="inputText" />
+        <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
+      </div>
+      <div class="results" ref="markup">
+        <div v-if="freshStart"><p class="summary">First search may take a few seconds!</p></div>
+        <div v-else-if="results.length < 1" class="result summary noResult">
+          <h2>No results found.</h2>
+        </div>
+        <div class="result summary" v-else>
+          <p>Searching for "<span v-text="lastSearch.input" class="highlight" />" sorting by <span v-text="sortDictionary[lastSearch.sort] || lastSearch.sort" /></p>
+          <!--  in {{lastSearch.filter}} -->
+          <h2>{{results.length == 1000 ? '999+' : results.length}} results.</h2>
+        </div>
+        <div v-for="(page, i) in results" :key="page.key" class="result">
+          <h2>
+            <StoryPageLink titleOnly :mspaId='page.mspa_num'></StoryPageLink>
+          </h2>
+          <div class="chapter" v-html="`${$getChapter(page.mspa_num)} - ${$mspaOrVizNumber(page.mspa_num)}`" />
+          <div class="match">
+            <!-- <p v-for="(line, i) in page.lines" :key="'line'+i"  v-html="line" class="line" /> -->
+            <PageText startopen="true" :content="page.lines.join('<br />')" />
           </div>
         </div>
       </div>
     </div>
-    <PageFooter />
-  </div>
+  </GenericPage>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import PageText from '@/components/Page/PageText.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
@@ -54,7 +47,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, PageFooter, StoryPageLink, PageText
+    GenericPage, StoryPageLink, PageText
   },
   title: () => "Search",
   data: function() {
@@ -175,120 +168,70 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pageBody {
-  color: var(--font-default);
-  background: var(--page-pageBody);
 
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-flow: column;
-  flex: 1 0 auto;
-  align-items: center;
+::v-deep .highlight {
+  background: var(--find--highlight);
+  color: var(--font-highlight, var(--font-default));
+}
 
-  > img {
-    align-self: center;
+.searchBox {
+  position: relative;
+  margin: 0 auto;
+  width: 450px;
+
+  .searchInput {
+    margin-top: 5px;
+    font-size: 20px;
+    width: 100%;
   }
+  .searchButton {
+    position: absolute;
+    background: none;
+    font-size: 20px;
+    display: block;
+    border: none;
+    height: 29px;
+    right: -8px;
+    top: 5px;
 
-  .pageFrame {
-    background: var(--page-pageFrame);
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
 
-    width: 950px;
-    padding-top: 7px;
-    padding-bottom: 23px;
-    margin: 0 auto;
+.results {
+  margin: 25px 0;
+  width: 600px;
+  text-align: center;
 
-    flex: 0 1 auto;
-    display: flex;
-    justify-content: center;
+  .result {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--page-pageBorder, var(--page-pageFrame));
 
-    ::v-deep a:not([disabled]) {
-      color: var(--page-links);
+    &.noResult {
+      padding-top: 20px;
     }
 
-    .pageContent {
-      background: var(--page-pageContent);
+    .chapter {
+      margin-top: 5px;
+      font-size: 16px;
+      // font-weight: normal;
+    }
 
-      width: 650px;
-      display: flex;
-      flex: 0 1 auto;
-      align-items: center;
-      flex-flow: column;
-      text-align: center;
+    ::v-deep .match {
+      padding-top: 10px;
 
-      h1 {
-        margin-top: 20px;
-      }
-      
-      a {
-        color: var(--page-links);
-      }
-
-      ::v-deep .highlight {
-        background: var(--find--highlight);
-        color: var(--font-highlight, var(--font-default));
-      }
-
-      .searchBox {
-        position: relative;
+      &:before {
+        border-top: 1px dashed var(--page-pageBorder, var(--page-pageFrame));
+        padding-top: 10px;
         margin: 0 auto;
-        width: 450px;
-
-        .searchInput {
-          margin-top: 5px;
-          font-size: 20px;
-          width: 100%;
-        }
-        .searchButton {
-          position: absolute;
-          background: none;
-          font-size: 20px;
-          display: block;
-          border: none;
-          height: 29px;
-          right: -8px;
-          top: 5px;
-
-          &:hover {
-            cursor: pointer;
-          }
-        }
+        display: block;
+        width: 400px;
+        content: '';
       }
-
-      .results {
-        margin: 25px 0;
-        width: 600px;
-
-        .result {
-          margin-top: 10px;
-          padding-top: 10px;
-          border-top: 1px solid var(--page-pageBorder, var(--page-pageFrame));
-
-          &.noResult {
-            padding-top: 20px;
-          }
-
-          .chapter {
-            margin-top: 5px;
-            font-size: 16px;
-            // font-weight: normal;
-          }
-
-          ::v-deep .match {
-            padding-top: 10px;
-
-            &:before {
-              border-top: 1px dashed var(--page-pageBorder, var(--page-pageFrame));
-              padding-top: 10px;
-              margin: 0 auto;
-              display: block;
-              width: 400px;
-              content: '';
-            }
-          }
-        }
-      }
-    }	
+    }
   }
 }
 
