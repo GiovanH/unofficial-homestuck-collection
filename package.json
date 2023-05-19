@@ -32,7 +32,7 @@
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "encoding": "^0.1.12",
-    "flexsearch": "^0.7.31",
+    "flexsearch": "^0.6.32",
     "global-agent": "^2.0.2",
     "global-tunnel-ng": "^2.7.1",
     "graceful-fs": "^4.1.6",
