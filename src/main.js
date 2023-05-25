@@ -392,13 +392,26 @@ window.vm = new Vue({
   },
   router,
   render: function (h) { return h(App, {ref: 'App'}) },
-  watch: {
-    '$localData.settings.devMode'(to, from){
+  methods: {
+    updateDevMode(to, from) {
       const is_dev = to
       log.transports.console.level = (is_dev ? "silly" : "info");
       this.$logger.silly("Verbose log message for devs")
       this.$logger.info("Log message for everybody")
       this.$localData.VM.saveLocalStorage()
+
+      IFrameSrcFix.setDevtoolsFix(to)
+    }
+  },
+  watch: {
+    '$localData.settings.devMode'(to, from){
+      this.updateDevMode(to, from)
+    }
+  },
+  mounted() {
+    // trigger the watcher after launch
+    if (this.$localData.settings.devMode) {
+      this.updateDevMode(true)
     }
   }
 }).$mount('#app')
