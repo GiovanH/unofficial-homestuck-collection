@@ -42,6 +42,9 @@ Resources.init({
   assets_root: `http://127.0.0.1:${port}/`
 })
 
+import IFrameSrcFix from "./iframeSrcFix.js"
+IFrameSrcFix.install()
+
 // Must init resources first.
 import Mods from "./mods.js"
 
