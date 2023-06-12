@@ -312,6 +312,7 @@ export default {
             }
           }
         <\/script>
+        ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
         </head>
         <body>
         <object type="application/x-shockwave-flash" 

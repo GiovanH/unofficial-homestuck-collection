@@ -67,7 +67,6 @@ Vue.mixin({
     }
   },
   computed: {
-    $localhost: () => `http://127.0.0.1:${port}/`,
     $archive() {return this.$root.archive},
     $isNewReader() {
       return this.$newReaderCurrent && this.$localData.settings.newReader.limit
@@ -200,11 +199,11 @@ Vue.mixin({
         return // don't reset non-new reader back to new-reader mode unless explicitly forced
 
       const isSetupMode = !this.$archive
-      const isNumericalPage = /\D/.test(thisPageId)
+      const isNumericalPage = /\d/.test(thisPageId)
       const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
       const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
-      if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      if (isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
@@ -379,13 +378,13 @@ window.vm = new Vue({
   data(){
     return {
       archive: undefined,
-      loadState: undefined
+      loadState: undefined,
+      tabTheme: {} // Modified by App (avoid reacting to refs)
     }
   },
   computed: {
     // Easy access
     app(){ return this.$refs.App },
-    tabTheme(){ return this.app.tabTheme }
   },
   router,
   render: function (h) { return h(App, {ref: 'App'}) },

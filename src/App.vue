@@ -156,7 +156,10 @@
     watch: {
       'theme'(to, from) {
         this.updateAppIcon()
-      } 
+      },
+      'tabTheme'(to, from) {
+        this.$root.tabTheme = to
+      }
     },
     mounted () {
       this.$nextTick(() => this.updateAppIcon())

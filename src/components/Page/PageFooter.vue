@@ -30,22 +30,22 @@ export default {
         bannerImage() {
             switch (this.$root.tabTheme.rendered) {
                 case 'mspa':
-                    return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
+                    return ['assets://images/mspalogo_mspa.png', 'assets://images/mspalogo_mspa.png']
                 case 'scratch':
-                    return ['/images/mspalogo_scratch.png', '/images/mspalogo_scratch.png']
+                    return ['assets://images/mspalogo_scratch.png', 'assets://images/mspalogo_scratch.png']
                 case 'sbahj':
-                    return ['/images/mspalogo_sbahj2.jpg', '/images/mspalogo_sbahj.jpg']
+                    return ['assets://images/mspalogo_sbahj2.jpg', 'assets://images/mspalogo_sbahj.jpg']
                 case 'trickster':
-                    return ['/images/mspalogo_trickster.gif', '/images/mspalogo_trickster.gif']
+                    return ['assets://images/mspalogo_trickster.gif', 'assets://images/mspalogo_trickster.gif']
                 case 'A6A6':
-                    return ['/images/mspalogo_a6a6.png', '/images/mspalogo_a6a6.png']
+                    return ['assets://images/mspalogo_a6a6.png', 'assets://images/mspalogo_a6a6.png']
                 case 'pxs':
-                    return ['/images/mspalogo_pxs.png', '/images/mspalogo_pxs.png']
+                    return ['assets://images/mspalogo_pxs.png', 'assets://images/mspalogo_pxs.png']
                 case undefined:
                     this.$logger.warn("Couldn't read root theme?", this.$root.tabTheme.rendered)
                 // eslint-disable-next-line no-fallthrough
                 default:
-                    return ['/images/mspalogo_mspa.png', '/images/mspalogo_mspa.png']
+                    return ['assets://images/mspalogo_mspa.png', 'assets://images/mspalogo_mspa.png']
             }
         }
     },

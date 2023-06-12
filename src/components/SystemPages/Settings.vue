@@ -456,6 +456,10 @@ export default {
           label: "Enable enhanced Flash effects",
           desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
         }, {
+          model: "ruffleFallback",
+          label: "Enable Ruffle flash emulation fallback",
+          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
+        }, {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
           desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"

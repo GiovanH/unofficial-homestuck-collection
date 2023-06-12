@@ -95,6 +95,7 @@ class LocalData {
       unpeachy: false,
       pxsTavros: false,
       cursedHistory: false,
+      ruffleFallback: true,
 
       modListEnabled: []  // name hardcoded in mods.js, be careful
     }
