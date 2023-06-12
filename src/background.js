@@ -479,16 +479,6 @@ ipcMain.on('win-close-sync', (e) => {
   e.returnValue = true;
 })
 
-ipcMain.handle('copy-image', async (event, payload) => {
-  // logger.info(payload.url)
-  Sharp(payload.url).png().toBuffer().then(buffer => {
-    // logger.info(buffer)
-    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-    // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-    clipboard.writeImage(sharpNativeImage)
-  })
-})
-
 ipcMain.handle('save-file', async (event, payload) => {
   const newPath = dialog.showSaveDialogSync(win, {
     defaultPath: path.basename(payload.url)
@@ -753,30 +743,44 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
-const Sharp = require('sharp')
-ipcMain.on('ondragstart', (event, filePath) => {
-  // logger.info("Dragging file", filePath)
-  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
-  try {
-    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
-    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
-    // if (!nativeIconFromPath.isEmpty()) {
-    //   logger.info("Native icon from path", nativeIconFromPath)
-    //   cb(nativeIconFromPath)
-    // } else {
-      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
-      .png().toBuffer().then(buffer => {
-        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-        cb(sharpNativeImage)
-      }).catch(err => {throw err;})
-    // }
-  } catch (err) {
-    logger.error("Couldn't process image", err)
-    // eslint-disable-next-line no-undef
-    cb(`${__static}/img/dragSmall.png`)
-  }
-})
+try {
+  const Sharp = require('sharp')
+  ipcMain.on('ondragstart', (event, filePath) => {
+    // logger.info("Dragging file", filePath)
+    const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+    try {
+      // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+      // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+      // if (!nativeIconFromPath.isEmpty()) {
+      //   logger.info("Native icon from path", nativeIconFromPath)
+      //   cb(nativeIconFromPath)
+      // } else {
+        Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+        .png().toBuffer().then(buffer => {
+          const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+          // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+          cb(sharpNativeImage)
+        }).catch(err => {throw err;})
+      // }
+    } catch (err) {
+      logger.error("Couldn't process image", err)
+      // eslint-disable-next-line no-undef
+      cb(`${__static}/img/dragSmall.png`)
+    }
+  })
+
+  ipcMain.handle('copy-image', async (event, payload) => {
+    // logger.info(payload.url)
+    Sharp(payload.url).png().toBuffer().then(buffer => {
+      // logger.info(buffer)
+      const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+      // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+      clipboard.writeImage(sharpNativeImage)
+    })
+  })
+} catch {
+  logger.error("Couldn't install sharp!")
+}
 
 let openedWithUrl
 const OPENWITH_PROTOCOL = 'mspa'

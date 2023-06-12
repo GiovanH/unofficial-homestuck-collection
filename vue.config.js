@@ -45,7 +45,8 @@ module.exports = {
                     },
                     artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
                     asarUnpack: [
-                        "**/node_modules/sharp/**"
+                        "**/node_modules/sharp/**",
+                        "**/*.node"
                     ]
                 },
                 mac: {
@@ -53,14 +54,16 @@ module.exports = {
                     category: "entertainment",
                     identity: null,
                     asarUnpack: [
-                        "**/node_modules/sharp/**"
+                        "**/node_modules/sharp/**",
+                        "**/*.node"
                     ]
                 },
                 linux: {
                     target: ["AppImage", "tar.gz"],
                     category: "game",
                     asarUnpack: [
-                        "**/node_modules/sharp/**"
+                        "**/node_modules/sharp/**",
+                        "**/*.node"
                     ]
                 }
             }
