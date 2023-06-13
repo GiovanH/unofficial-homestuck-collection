@@ -33,6 +33,7 @@ export default {
     ctx.$logger.info("Checked theme", ctx.gameOverThemeOverride)
     if (ctx.gameOverThemeOverride) return ctx.gameOverThemeOverride
   },
+  title: PAGE.title,
   data: function() {
     return {
       appThemeOverride: 'default'

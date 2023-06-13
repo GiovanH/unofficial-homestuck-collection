@@ -134,10 +134,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pixelated::v-deep img{
-  image-rendering: pixelated;
-}
-
 .pageBody {
   color: var(--font-default);
   background: var(--page-pageBody);

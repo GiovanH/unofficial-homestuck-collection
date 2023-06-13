@@ -120,10 +120,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .pixelated .candyCorn {
-    image-rendering: pixelated;
-  }
-
   .customNavBanner {
     background: var(--nav-bg);
 

@@ -334,7 +334,7 @@ export default {
             padding: 15px 5%;
             text-align: left;
             position: inherit;
-            z-index: 0;
+            z-index: 1;
         }
 
         &.logHidden {
@@ -350,7 +350,7 @@ export default {
             pointer-events: none;
             top: 0;
             left: 0;
-            z-index: -1;
+            z-index: 0;
         }
     }
 </style>

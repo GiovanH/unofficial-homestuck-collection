@@ -55,9 +55,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .pixelated img {
-        image-rendering: pixelated;
-    }
     .footer {
         height: 110px;
 

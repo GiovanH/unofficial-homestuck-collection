@@ -199,9 +199,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pixelated {
-  image-rendering: pixelated;
-}
 .fireflies {
   position: relative;
   width: 714px;

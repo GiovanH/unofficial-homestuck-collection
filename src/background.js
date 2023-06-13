@@ -344,7 +344,7 @@ try {
     })
   })
 } catch (error) {
-  logger.error(error)
+  logger.debug(error)
   logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.

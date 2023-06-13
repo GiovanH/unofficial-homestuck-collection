@@ -359,6 +359,11 @@
     .invisible {
       visibility: hidden !important;
     }
+
+    .pixelated img {
+        image-rendering: pixelated;
+    }
+
     .hidden {
       &.forceLoad {
         height: 0;
