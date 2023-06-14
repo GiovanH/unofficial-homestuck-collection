@@ -1,4 +1,7 @@
-window.webAppAssetPackHref = "{{ WEB_ASSET_HREF }}"
+{%- set ASSET_PACK_HREF = ASSET_PACK_HREF or environ('ASSET_PACK_HREF') -%}
+{%- set ASSET_DIR = ASSET_DIR or environ('ASSET_DIR') -%}
+
+window.webAppAssetPackHref = "{{ ASSET_PACK_HREF }}"
 window.webAppModsDir = "{{ ASSET_DIR }}mods/"
 window.webAppIModsDir = "{{ ASSET_DIR }}archive/imods/"
 

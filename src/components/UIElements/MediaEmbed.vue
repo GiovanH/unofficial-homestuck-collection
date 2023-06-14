@@ -700,9 +700,11 @@ document.addEventListener('click', function (e) {
       }
     },
     drag(e) {
-      e.preventDefault()
-      e.dataTransfer.effectAllowed = 'copy'
-      ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+      if (!this.$isWebApp) {
+        e.dataTransfer.effectAllowed = 'copy'
+        ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+        e.preventDefault()
+      }
     }
   },
   updated() {

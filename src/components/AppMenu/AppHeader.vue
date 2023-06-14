@@ -1,6 +1,6 @@
 <template>
     <div id="appHeader" :class="{hidden: isHidden}">
-      <TitleBar v-if="!$isWebApp" :style="{display: $localData.settings.useSystemWindowDecorations ? 'none' : 'inherit'}"/>
+      <TitleBar :style="{display: $localData.settings.useSystemWindowDecorations ? 'none' : 'inherit'}"/>
       <TabBar />
     </div>
 </template>

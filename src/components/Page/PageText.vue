@@ -166,11 +166,12 @@ export default {
                 let images = this.$el.getElementsByTagName('IMG')
                 for (let i = 0; i < images.length; i++) {
                     images[i].src = this.$getResourceURL(images[i].src)
-                    images[i].ondragstart = (e) => {
-                        e.preventDefault()
-                        e.dataTransfer.effectAllowed = 'copy'
-                        ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
-                    }
+                    if (!this.$isWebApp)
+                        images[i].ondragstart = (e) => {
+                            e.dataTransfer.effectAllowed = 'copy'
+                            ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
+                            e.preventDefault()
+                        }
                 }
                 if (this.$localData.settings.textOverride.highContrast) {
                     this.$el.querySelectorAll("span[style]").forEach(e => {

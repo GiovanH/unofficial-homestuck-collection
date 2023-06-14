@@ -21,11 +21,15 @@ test: install src/imods.tar
 	# yarn dev
 
 webapp: install webAppModTrees.json
-	j2 webapp/browser.js.j2 --data '{"ASSET_DIR": "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/", "WEB_ASSET_HREF": "https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/"}'
-	env ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" yarn run vue-cli-service build webapp/browser.js
+	env ASSET_DIR="L:/Archive/Homestuck/TUHC/AssetPackV2Lite/" \
+		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+		j2 webapp/browser.js.j2
+	yarn run vue-cli-service build webapp/browser.js
 
 serve: install webAppModTrees.json
-	j2 webapp/browser.js.j2 --data '{"ASSET_DIR": "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/", "WEB_ASSET_HREF": "http://localhost:8413/"}'
+	env ASSET_DIR="L:/Archive/Homestuck/TUHC/AssetPackV2Lite/" \
+		ASSET_PACK_HREF="http://localhost:8413/" \
+		j2 webapp/browser.js.j2
 	(cd "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/"; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
 	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js
 

@@ -436,7 +436,8 @@ window.addEventListener("mouseup", (e) => {
   }
 })
 
-
 // Expose for debugging
 window.Resources = Resources
 window.Mods = Mods
+
+window.onbeforeunload = () => "please.... stay";

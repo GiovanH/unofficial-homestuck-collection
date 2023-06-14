@@ -224,7 +224,7 @@ const UrlFilterMixin = {
 
       // Internal links in the renderer already have the localhost:8080 prefix, which is different
       // than how the other resources are handled.
-      const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO')]
+      const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO'), ...el.getElementsByTagName('AUDIO')]
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
@@ -233,12 +233,12 @@ const UrlFilterMixin = {
         //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
         // }
 
-        if (media[i].tagName == 'IMG' && !media[i].ondragstart) {
+        if (!isWebApp && media[i].tagName == 'IMG' && !media[i].ondragstart) {
           media[i].ondragstart = (e) => {
-            e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'
             const fileStreamPath = this.$mspaFileStream(media[i].src)
             ipcRenderer.send('ondragstart', fileStreamPath)
+            e.preventDefault()
           }
         }
       }

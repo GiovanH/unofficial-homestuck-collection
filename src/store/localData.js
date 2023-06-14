@@ -160,8 +160,6 @@ class LocalData {
             saveData,
             settings
           })
-
-          window.history.replaceState(null, "", this.tabData.tabs[this.tabData.activeTabKey].url);
         },
         reloadLocalStorage() {
           let back = store.get('localData', {})
@@ -526,6 +524,11 @@ class LocalData {
         SET_ASSET_DIR(path) {
           this.assetDir = path
           this.saveLocalStorage()
+        }
+      },
+      watch: {
+        'activeTabObject.url'(to, from) {
+          if (to != from) window.history.pushState(null, "", this.activeTabObject.url);
         }
       }
     })
