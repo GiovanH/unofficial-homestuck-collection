@@ -440,4 +440,4 @@ window.addEventListener("mouseup", (e) => {
 window.Resources = Resources
 window.Mods = Mods
 
-window.onbeforeunload = () => "please.... stay";
+// window.onbeforeunload = () => "please.... stay";

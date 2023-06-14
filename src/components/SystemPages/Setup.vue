@@ -120,7 +120,7 @@
         </div>
       </div>
 
-      <div v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
+      <div v-else-if="isLoading">
         <div class="loadcard" >
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
@@ -323,7 +323,7 @@ export default {
       return this.assetDir
     },
     isLoading() {
-      return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
+      return (!this.loadingTooLongTimeout) && (this.$root.loadState === undefined || this.$root.loadState == "LOADING")
     },
     loadText() {
       if (this.$root.loadStage === undefined) {
@@ -332,7 +332,7 @@ export default {
       return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
     },
     isNewUser() {
-      return !this.$localData.assetDir
+      return !this.$localData.assetDir && !this.$isWebApp
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
@@ -618,7 +618,11 @@ export default {
   }
 }
 
+div.loadcard {
+  filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+}
 .loadcard {
+
   margin: auto;
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;

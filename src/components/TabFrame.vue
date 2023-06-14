@@ -25,7 +25,7 @@
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
-        <FindBox    :tab="tab" ref="findbox" :class="theme"/>
+        <FindBox    :tab="tab" ref="findbox" :class="theme" v-if="!$isWebApp" />
         <JumpBox    :tab="tab" ref="jumpbox" :class="theme" />
     </div>
 </template>
@@ -34,8 +34,9 @@
 // const electron = require('electron')
 import Bookmarks from '@/components/UIElements/Bookmarks.vue'
 import MediaModal from '@/components/UIElements/MediaModal.vue'
-import FindBox from '@/components/UIElements/FindBox.vue'
 import JumpBox from '@/components/UIElements/JumpBox.vue'
+
+const FindBox = () => import('@/components/UIElements/FindBox.vue')
 
 import ERROR404 from '@/components/SystemPages/Error404.vue'
 import SPOILER from '@/components/SystemPages/Spoiler.vue'

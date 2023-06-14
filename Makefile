@@ -1,3 +1,5 @@
+include .env
+
 CONFIG_JSON_PATH = "${APPDATA}/unofficial-homestuck-collection/config.json"
 
 default: test
@@ -21,21 +23,23 @@ test: install src/imods.tar
 	# yarn dev
 
 webapp: install webAppModTrees.json
-	env ASSET_DIR="L:/Archive/Homestuck/TUHC/AssetPackV2Lite/" \
-		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+	env ASSET_DIR=${ASSET_DIR} \
+		ASSET_PACK_HREF=${ASSET_PACK_HREF} \
 		j2 webapp/browser.js.j2
 	yarn run vue-cli-service build webapp/browser.js
 
 serve: install webAppModTrees.json
-	env ASSET_DIR="L:/Archive/Homestuck/TUHC/AssetPackV2Lite/" \
+	env ASSET_DIR=${ASSET_DIR} \
 		ASSET_PACK_HREF="http://localhost:8413/" \
 		j2 webapp/browser.js.j2
-	(cd "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/"; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
+	(react webapp/browser.js.j2 env ASSET_DIR=${ASSET_DIR} \
+		ASSET_PACK_HREF="http://localhost:8413/" \
+		j2 webapp/browser.js.j2) &
+	(cd ${ASSET_DIR}; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
 	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js
 
 webAppModTrees.json:
-	(cd "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/"; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > webAppModTrees.json
-
+	(cd ${ASSET_DIR}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > webAppModTrees.json
 
 build: install src/imods.tar
 	yarn run vue-cli-service electron:build

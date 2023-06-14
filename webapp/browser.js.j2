@@ -11,6 +11,10 @@ window.webAppOpinionatedDefaults = {
   ruffleFallback: true
 }
 
+{% set mods = "HomestuckSlurReplacement Plaintext-Images Psycholonials semantic socialLinks tuhc-commentary/homestuckCommentary.js tuhc-damara tuhc-puzzlestuck tuhc-readmspa tuhc-themes/win95theme tuhc-themes/winXPtheme eraserhead.js".split() %}
+
+// violate ES6 strict mode: oddities
+
 window.webAppModJs = {
   _bolin: require('{{ ASSET_DIR }}archive/imods/_bolin.js'),
   _hqAudio: require('{{ ASSET_DIR }}archive/imods/_hqAudio.js'),
@@ -21,23 +25,28 @@ window.webAppModJs = {
   _twoToThree: require('{{ ASSET_DIR }}archive/imods/_twoToThree/mod.js'),
   _unpeachy: require('{{ ASSET_DIR }}archive/imods/_unpeachy.js'),
   'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
-  'noflash': require('{{ ASSET_DIR }}mods/noflash/mod.js'),
+  {% for mod in mods -%}
+  '{{ mod }}': require('{{ ASSET_DIR }}mods/{{ mod if mod.endswith(".js") else mod + "/mod.js" }}'),
+  {% endfor %}
+
 }
 
 window.webAppModTrees = require('../webAppModTrees.json')
 
-const data_template = {
-  // NB webpack require mandates full literal strings here, no paramterization.
-  ...require('{{ ASSET_DIR }}archive/data/version.json'),
-  mspa: require('{{ ASSET_DIR }}archive/data/mspa.json'),
-  social: require('{{ ASSET_DIR }}archive/data/social.json'),
-  news: require('{{ ASSET_DIR }}archive/data/news.json'),
-  music: require('{{ ASSET_DIR }}archive/data/music.json'),
-  comics: require('{{ ASSET_DIR }}archive/data/comics.json'),
-  extras: require('{{ ASSET_DIR }}archive/data/extras.json'),
-  tweaks: require('{{ ASSET_DIR }}archive/data/tweaks.json'),
-  audioData: {},
-  flags: {}
+async function getArchiveData() {
+  return {
+    // NB webpack require mandates full literal strings here, no paramterization.
+    ...(await import('{{ ASSET_DIR }}archive/data/version.json')),
+    mspa: await import('{{ ASSET_DIR }}archive/data/mspa.json'),
+    social: await import('{{ ASSET_DIR }}archive/data/social.json'),
+    news: await import('{{ ASSET_DIR }}archive/data/news.json'),
+    music: await import('{{ ASSET_DIR }}archive/data/music.json'),
+    comics: await import('{{ ASSET_DIR }}archive/data/comics.json'),
+    extras: await import('{{ ASSET_DIR }}archive/data/extras.json'),
+    tweaks: await import('{{ ASSET_DIR }}archive/data/tweaks.json'),
+    audioData: {},
+    flags: {}
+  }
 }
 
 // End configuration
@@ -76,8 +85,9 @@ window.searchWebAppModTrees = function(path) {
   return result
 }
 
-function loadArchiveData() {
-  let data = data_template
+async function loadArchiveData() {
+  // We have to de-module the data into raw json so it's not mutable, otherwise the content doesn't reset on reload.
+  let data = JSON.parse(JSON.stringify(await getArchiveData()))
 
   data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
     .filter(v => v.flag.includes('TZPASSWORD'))
@@ -102,12 +112,16 @@ function loadArchiveData() {
 const fakeIpc = require('./fakeIpc.js')
 
 fakeIpc.on('RELOAD_ARCHIVE_DATA', (event) => {
-  fakeIpc.send('ARCHIVE_UPDATE', loadArchiveData())
+  fakeIpc.send('SET_LOAD_STATE', "LOADING")
+  try {
+    fakeIpc.send('SET_LOAD_STAGE', "ARCHIVE")
+    loadArchiveData().then(data => {
+      fakeIpc.send('ARCHIVE_UPDATE', data)
+      fakeIpc.send('SET_LOAD_STATE', "DONE")
+    })
+  } catch (e) {
+    fakeIpc.send('SET_LOAD_STATE', "ERROR")
+  }
 })
 
 require('../src/main')
-
-// fakeIpc.send('ARCHIVE_UPDATE', loadArchiveData())
-
-// execute with
-// (cd "L:/Archive/Homestuck/TUHC/Asset Pack V2/"; python3 -m http.server) & yarn serve && fg

@@ -54,7 +54,7 @@ function giveWindow(new_win) {
 let validatedState = false
 function expectWorkingState(){
   if (validatedState || isWebApp) return true
-  validatedState = (assetDir && fs.existsSync(path.join(assetDir, "archive")))
+  validatedState = (modsDir && assetDir && fs.existsSync(path.join(assetDir, "archive")))
   return validatedState
 }
 
@@ -172,7 +172,7 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
+    if (!expectWorkingState())
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -195,7 +195,7 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
+    if (!expectWorkingState())
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -237,7 +237,7 @@ if (ipcMain) {
         <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
         <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
         <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
-        <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
+        <p>For troubleshooting, save this error message or the <a href="${log.transports ? log.transports.file.getFile() : ''}">log file</a></p><br />
         <p>Stacktrace:</p>
         <pre>${sanitizeHTML(e.stack)}</pre>
       </div>
@@ -352,7 +352,7 @@ function getEnabledMods() {
   if (isWebApp) {
     Object.keys(window.webAppModJs).forEach(key => {
       const modjs = window.webAppModJs[key]
-      if (modjs.hidden && !modjs._internal) {
+      if (!list.includes(key) && modjs.hidden && !modjs._internal) {
         logger.info("Webapp: force-enabling loaded, hidden, non-internal mod", key)
         list.push(key)
       }
@@ -382,10 +382,10 @@ function crawlFileTree(root, recursive=false) {
     for (const try_root of [root.replace(window.webAppIModsDir, ''), root.replace(window.webAppModsDir, '')]) {
       let result = window.searchWebAppModTrees(try_root)
       if (result) {
-        logger.info("Using cached filetree from", try_root)
+        // logger.info("Using cached filetree from", try_root)
         return result
       } else {
-        logger.info("Root", root, "not in cached", try_root)
+        logger.error("Root", root, "not in cached", try_root)
       }
     }
   }
@@ -476,7 +476,10 @@ function getModJs(mod_dir, options={}) {
 
     if (isWebApp) {
       mod = window.webAppModJs[mod_dir]
-      console.assert(Boolean(mod), mod_dir)
+      if (!Boolean(mod)) {
+        onModLoadFail([mod_dir], new Error("Mod missing from static webapp build"))
+        return
+      }
     } else {
       if (mod_dir.endsWith(".js")) {
         // logger.debug(mod_dir, "is explicit singlefile.")
@@ -586,7 +589,7 @@ function getModJs(mod_dir, options={}) {
     } else {
       // Singlefile found, other error
       logger.error("File found, other error")
-      !isWebApp && onModLoadFail([mod_dir], e1)
+      onModLoadFail([mod_dir], e1)
       throw e1
     }
   }

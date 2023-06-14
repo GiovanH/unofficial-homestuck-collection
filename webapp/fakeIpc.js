@@ -96,6 +96,9 @@ var invokables = {
         store.delete('localData')
         window.location.reload(false);
     },
+    'reload'(event, opts) {
+        window.location.reload(false)
+    },
     'STARTUP_GET_INFO'(event, args) {
         return {port: undefined, appVersion: require('../package.json').version}
     },

@@ -19,10 +19,11 @@ store = {
             // Dot index
             const tail = key.split(".").slice(-1)
             const body = key.split(".").slice(0, -1).join(".")
+            // console.log(`transforming get(${key}) to get(${body})[${tail}]`)
             return (store.get(body) || {})[tail]
         } else {
             value = JSON.parse(localStorage.getItem(key))
-            // console.log("getting", key, value)
+            // console.log("looked up", key, "=", value)
             return value
         }
         // }
@@ -40,12 +41,14 @@ store = {
             // Dot index
             const tail = key.split(".").slice(-1)
             const body = key.split(".").slice(0, -1).join(".")
-            const val2 = {
-                ...store.get(body),
-                tail: value
-            }
+
+            const val2 = {...store.get(body)}
+            val2[tail] = value
+
+            // console.log(`transforming set(${key}, ${value}) to set(${body}, ${val2})`)
             return store.set(body, val2)
         } else {
+            // console.log("setting", key, value)
             localStorage.setItem(key, JSON.stringify(value))
         }
 

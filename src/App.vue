@@ -23,12 +23,12 @@
 <script>
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
-  import TabFrame from '@/components/TabFrame.vue'
   import Notifications from '@/components/UIElements/Notifications.vue'
-  import Updater from '@/components/UIElements/Updater.vue'
 
-  import ContextMenu from '@/components/UIElements/ContextMenu.vue'
-  import UrlTooltip from '@/components/UIElements/UrlTooltip.vue'
+  const ContextMenu = () => import('@/components/UIElements/ContextMenu.vue')
+  const UrlTooltip = () => import('@/components/UIElements/UrlTooltip.vue')
+  const Updater = () => import('@/components/UIElements/Updater.vue')
+  const TabFrame = () => import('@/components/TabFrame.vue')
 
   import Mods from "./mods.js"
 
@@ -37,7 +37,6 @@
   var mixins = []
   var webFrame = undefined;
 
-  const user_path_target = window.location.pathname
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
@@ -185,6 +184,7 @@
     },
     mounted () {
       this.$nextTick(() => this.updateAppIcon())
+      const user_path_target = window.location.pathname
 
       this.$localData.root.TABS_SWITCH_TO()
       // Switch to the last tab (good) but replaces history (so we use the previously captured value)
@@ -192,7 +192,8 @@
       if (user_path_target != this.$localData.root.activeTabObject.url) {
         this.$logger.warn("Navigating user to", user_path_target)
         this.$nextTick(() => {
-          this.$localData.root.TABS_PUSH_URL(user_path_target)
+          // this.$localData.root.TABS_PUSH_URL(user_path_target)
+          this.$localData.root.TABS_NEW(user_path_target)
         })
       } else {
         this.$logger.info(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
@@ -272,68 +273,54 @@
         if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })
 
-      // TODO: click and auxclick seem to share a lot of code here, consider rewrite
+      const app = this
 
-      window.addEventListener('click', event => {
-        // ensure we use the link, in case the click has been received by a subelement
-        let { target } = event
+      const parentLinkElement = (target) => {
         while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
-        // handle only links that do not reference external resources
-        if (target && target.href) { //
+        return target
+      }
+
+      const onLinkClick = (event, force_aux_click=false) => {
+        // ensure we use the link, in case the click has been received by a subelement
+        const resolvedTarget = parentLinkElement(event.target)
+        if (resolvedTarget && resolvedTarget.href) {
           // some sanity checks taken from vue-router:
           // https://github.com/vuejs/vue-router/blob/dev/src/components/link.js#L106
-          const { altKey, ctrlKey, metaKey, shiftKey, button, defaultPrevented } = event
-          // don't handle when preventDefault called
-          if (defaultPrevented) return
-          // don't handle right clicks
-          if (button !== undefined && button !== 0) return
-          // don't handle if `target="_blank"`
-          const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false // unused?
+          if (event.defaultPrevented) return // don't handle when preventDefault called
+          const targetBlank = (resolvedTarget.getAttribute) ? (/\b_blank\b/i.test(resolvedTarget.getAttribute('target'))) : false // don't handle if `target="_blank"`
 
           if (event.preventDefault) {
             event.preventDefault()
-            const auxClick = metaKey || altKey || ctrlKey || shiftKey || targetBlank
-            this.$openLink(target.href, auxClick)
+            const { altKey, ctrlKey, metaKey, shiftKey } = event
+            const auxClick = (metaKey || altKey || ctrlKey || shiftKey) || targetBlank
+            app.$openLink(resolvedTarget.href, auxClick || force_aux_click)
           }
         }
+      }
+
+      window.addEventListener('click', event => {
+        if (event.button !== undefined && event.button !== 0) return // only handle left clicks
+        onLinkClick(event)
       })
 
       window.addEventListener('auxclick', event => {
         // ensure we use the link, in case the click has been received by a subelement
-        let { target, button } = event
-        if (button == 2) {
-          if (this.$refs.contextMenu) {
-            event.preventDefault()
-            this.$refs.contextMenu.open(event, target)
-          }
-          return
-        } else if (button == 3) {
+        if (event.button == 2 && this.$refs.contextMenu) {
+          event.preventDefault()
+          this.$refs.contextMenu.open(event, event.target)
+        } else {
+          if (event.button !== undefined && event.button !== 1) return // only handle middle clicks
+          onLinkClick(event, true)
+        }
+      })
+
+      window.addEventListener("mousedown", (event) => {
+        if (event.button == 3) {
           event.preventDefault()
           this.$localData.root.TABS_HISTORY_BACK()
-        } else if (button == 4) {
+        } else if (event.button == 4) {
           event.preventDefault()
           this.$localData.root.TABS_HISTORY_FORWARD()
-        }
-        while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
-        // handle only links that do not reference external resources
-        if (target && target.href) {
-          // some sanity checks taken from vue-router:
-          // https://github.com/vuejs/vue-router/blob/dev/src/components/link.js#L106
-          // const { altKey, ctrlKey, metaKey, shiftKey, defaultPrevented } = event
-          // don't handle with control keys
-          // if (metaKey || altKey || ctrlKey || shiftKey) return
-          // don't handle when preventDefault called
-          if (event.defaultPrevented) return
-
-          // don't handle if `target="_blank"`
-          // const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
-          // don't handle right clicks
-          if (button !== undefined && button !== 1) return
-
-          if (event.preventDefault) {    
-            event.preventDefault()
-            this.$openLink(target.href, true)
-          }
         }
       })
     }
@@ -351,6 +338,7 @@
     position: relative;
     height: 100%;
     width: 100%;
+    --nav-candyCornContent2: url(assets://images/candycorn.gif);
   }
 
   #app.busy {

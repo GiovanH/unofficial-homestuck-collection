@@ -206,8 +206,12 @@ class LocalData {
 
         TABS_PUSH_URL (url="/", key = this.tabData.activeTabKey) {
           window.getSelection().empty()
-          document.getElementById(key).scrollTop = 0
-          document.getElementById(key).scrollLeft = 0
+          try {
+            document.getElementById(key).scrollTop = 0
+            document.getElementById(key).scrollLeft = 0
+          } catch {
+            console.warn("Tab key element not loaded in document", key)
+          }
 
           this.tabData.tabs[key].history.push(this.tabData.tabs[key].url)
           this.tabData.tabs[key].future = []
