@@ -32,8 +32,8 @@ vuebuild: install src/imods.tar
 
 src/imods.tar: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 	cd src && tar -czf imods.tar imods/
-	-jq '.appVersion = "2.0.0"' ${CONFIG_JSON_PATH} > ${CONFIG_JSON_PATH}.tmp
-	-mv ${CONFIG_JSON_PATH}.tmp ${CONFIG_JSON_PATH}
+# 	-jq '.appVersion = "2.0.0"' ${CONFIG_JSON_PATH} > ${CONFIG_JSON_PATH}.tmp
+# 	-mv ${CONFIG_JSON_PATH}.tmp ${CONFIG_JSON_PATH}
 
 help:
 	@echo 'Usage:'

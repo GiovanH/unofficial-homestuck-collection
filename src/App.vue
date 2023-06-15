@@ -268,10 +268,10 @@
         // ensure we use the link, in case the click has been received by a subelement
         let { target, button } = event
         if (button == 2) {
-          event.preventDefault()
-          // TODO: Sometimes contextMenu is undefined?
-          console.assert(this.$refs.contextMenu, this.$refs)
-          this.$refs.contextMenu.open(event, target)
+          if (this.$refs.contextMenu) {
+            event.preventDefault()
+            this.$refs.contextMenu.open(event, target)
+          }
           return
         } else if (button == 3) {
           event.preventDefault()

@@ -1,11 +1,11 @@
 <template>
     <div class="tabFrame" 
         :id="tab.key" 
-        :class='{ 
+        :class="{
             hidden: !tabIsActive,
             forceScrollBar: $localData.settings.forceScrollBar,
-            forceLoad,  
-        }'
+            forceLoad
+        }"
         :tabindex="(tabIsActive) ? -1 : false" 
         v-if="isLoaded"
         @keyup.left="leftKeyUp"
@@ -511,6 +511,7 @@ export default {
                 const context = this
                 title = componentObj.title(context)
             } else {
+                this.$logger.warn("Missing title function for", componentObj, componentObj.title)
                 title = this.tab.url
             }
             

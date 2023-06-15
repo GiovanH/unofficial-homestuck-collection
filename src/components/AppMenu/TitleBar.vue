@@ -26,7 +26,7 @@ export default {
       return navigator.appVersion.indexOf('Macintosh') == -1
     },
     activeTabTitle() {
-      return this.$archive ? this.$localData.tabData.tabs[this.activeTabKey].title : 'The Unofficial Homestuck Collection'
+      return this.$archive ? this.$localData.root.activeTabObject.title : 'The Unofficial Homestuck Collection'
     },
     activeTabKey() {
       return this.$localData.tabData.activeTabKey

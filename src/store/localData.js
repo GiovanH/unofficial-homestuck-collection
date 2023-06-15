@@ -434,7 +434,7 @@ class LocalData {
         },
         
         TABS_HISTORY_FORWARD() {
-          let tab = this.tabData.tabs[this.tabData.activeTabKey]
+          let tab = this.activeTabObject
           if (tab.future.length > 0) {
             window.getSelection().empty()
             document.getElementById(tab.key).scrollTop = 0
@@ -447,7 +447,7 @@ class LocalData {
           this.saveLocalStorage()
         },
         TABS_HISTORY_BACK() {
-          let tab = this.tabData.tabs[this.tabData.activeTabKey]
+          let tab = this.activeTabObject
           if (tab.history.length > 0) {
             window.getSelection().empty()
             document.getElementById(tab.key).scrollTop = 0

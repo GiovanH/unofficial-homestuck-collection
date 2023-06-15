@@ -44,8 +44,8 @@ function expectWorkingState(){
 
 // Function exposed for SubSettingsModal, which directly writes to store
 function getModStoreKey(mod_id, k){
-  if (k) {return `mod.${mod_id}.${k}`}
-  return `mod.${mod_id}`
+  if (k) {return `${getModStoreKey(mod_id)}.${k}`}
+  return `mod.${mod_id.replace('.', '-')}`
 }
 
 function getAssetRoute(url) {

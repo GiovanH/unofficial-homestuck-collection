@@ -139,7 +139,7 @@ export default {
       return media
     },
     nextPagesArray() {
-      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
+      // this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
