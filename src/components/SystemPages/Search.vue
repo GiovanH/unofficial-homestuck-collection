@@ -42,6 +42,12 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 const Mark = require('../../../node_modules/mark.js/dist/mark.js')
 
+if (isWebApp) {
+  const search = require('@/search.js').default
+  search.giveArchive(vm.archive)
+  search.registerIpc(ipcRenderer)
+}
+
 export default {
   name: 'search',
   props: [
