@@ -4,7 +4,7 @@
       // $root.loadState != 'DONE' ? 'busy' : '',
         $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
         $root.platform // webapp or electron
-      ]" v-if="$archive && $root.loadState !== 'ERROR'">
+      ]" v-if="$localData.assetDir && $archive && $root.loadState !== 'ERROR'">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />
@@ -36,7 +36,6 @@
 
   var mixins = []
   var webFrame = undefined;
-
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
@@ -196,7 +195,7 @@
           this.$localData.root.TABS_NEW(user_path_target)
         })
       } else {
-        this.$logger.info(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
+        // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
 
       }
 

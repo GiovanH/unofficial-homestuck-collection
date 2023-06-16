@@ -14,7 +14,7 @@
     :autoplay="autoplay" @loadeddata="onVideoLoaded" />
   <iframe v-else-if="getMediaType(url) === 'swf'"
     :key="url" :srcdoc='flashSrc'
-    :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
+    :width='width || flashProps.width' :height='height || ($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
     @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
@@ -22,7 +22,7 @@
     :is="frameType"
     :src='resolveFrameUrl(url)'
     ref='frame'
-    :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
+    :style="`width: ${width || flashProps.width}px; height: ${height || flashProps.height}px; max-width: 100%; max-height: 100%;`"
     @did-finish-load="initHtmlFrame" seamless />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
@@ -326,8 +326,8 @@ export default {
         <object type="application/x-shockwave-flash" 
           width="${this.flashProps.width}" 
           height="${this.flashProps.height}" 
-          data="${this.$getResourceURL(this.url)}">
-            <param name='movie' value="${this.$getResourceURL(this.url)}"/>
+          data="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}">
+            <param name='movie' value="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}"/>
             <param name='play' value="true"/>
             <param name='loop' value="true"/>
             <param name='quality' value="high" />

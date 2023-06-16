@@ -32,7 +32,7 @@ const sass = require('sass')
 
 const logger = log.scope('Mods')
 
-const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+const assetDir = store.has('assetDir') ? store.get('assetDir') : undefined
 const modsDir = (isWebApp && window.webAppModsDir) || (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
@@ -42,8 +42,8 @@ const imodsAssetsRoot = "assets://archive/imods/"
 var modChoices
 var routes = undefined
 
-const store_modlist_key = 'localData.settings.modListEnabled'
-const store_devmode_key = 'localData.settings.devMode'
+const store_modlist_key = 'settings.modListEnabled'
+const store_devmode_key = 'settings.devMode'
 
 let win = null
 function giveWindow(new_win) {
@@ -318,42 +318,42 @@ function doFullRouteCheck(){
 
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
-  const list = (isWebApp && window.vm
+  const list = ((isWebApp && window.vm)
     ? [...window.vm.$localData.settings["modListEnabled"]]
     : (store.has(store_modlist_key)
         ? store.get(store_modlist_key)
         : []))
 
-  logger.info("got mod settings", store_modlist_key, list)
+  // logger.debug("got mod settings", store_modlist_key, list)
 
   list.push("_twoToThree")
 
-  if (store.get('localData.settings.unpeachy'))
+  if (store.get('settings.unpeachy'))
     list.push("_unpeachy")
-  if (store.get('localData.settings.pxsTavros'))
+  if (store.get('settings.pxsTavros'))
     list.push("_pxsTavros")
-  if (store.get('localData.settings.jsFlashes'))
+  if (store.get('settings.jsFlashes'))
     list.push("_replaybound")
 
   // Soluslunes must load after bolin
-  if (store.get('localData.settings.soluslunes'))
+  if (store.get('settings.soluslunes'))
     list.push("_soluslunes")
 
   // Bolin must come before hqaudio in the stack so it loads after it.
-  if (store.get('localData.settings.bolin'))
+  if (store.get('settings.bolin'))
     list.push("_bolin")
 
-  if (store.get('localData.settings.hqAudio'))
+  if (store.get('settings.hqAudio'))
     list.push("_hqAudio")
 
-  if (!store.get('localData.settings.newReader.limit'))
+  if (!store.get('settings.newReader.limit'))
     list.push("_secret")
 
   if (isWebApp) {
     Object.keys(window.webAppModJs).forEach(key => {
       const modjs = window.webAppModJs[key]
       if (!list.includes(key) && modjs.hidden && !modjs._internal) {
-        logger.info("Webapp: force-enabling loaded, hidden, non-internal mod", key)
+        // logger.debug("Webapp: force-enabling loaded, hidden, non-internal mod", key)
         list.push(key)
       }
     })
@@ -375,12 +375,36 @@ function getEnabledModsJs() {
   }
 }
 
+const searchWebAppModTrees = function(path) {
+  function *search(data, values) {
+    for (const value of values)
+      yield *search1(data, value)
+  }
+
+  function *search1(data, value) {
+    if (Object(data) === data) {
+      for (const key of Object.keys(data)) {
+        if (key === value)
+          yield data[key]
+        else
+          yield *search1(data[key], value)
+      }
+    }
+  }
+
+  let result
+  for (result of search(window.webAppModTrees, path.split('/')))
+    console.log(result)
+
+  return result
+}
+
 function crawlFileTree(root, recursive=false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
   if (isWebApp) {
     for (const try_root of [root.replace(window.webAppIModsDir, ''), root.replace(window.webAppModsDir, '')]) {
-      let result = window.searchWebAppModTrees(try_root)
+      let result = searchWebAppModTrees(try_root)
       if (result) {
         // logger.info("Using cached filetree from", try_root)
         return result
@@ -450,8 +474,6 @@ function buildApi(mod) {
 }
 
 function getModJs(mod_dir, options={}) {
-  console.debug("Loading mod", mod_dir)
-
   // Tries to load a mod from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
@@ -645,7 +667,7 @@ function editArchive(archive) {
     try {
       const editfn = js.edit
       if (editfn) {        
-        logger.info(js._id, "editing archive")
+        logger.debug(js._id, "editing archive")
         editfn(archive)
         console.assert(archive, js.title, "You blew it up! You nuked the archive!")
       
@@ -778,7 +800,7 @@ function getMixins(){
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
   }, {})
-  if (newPages) {
+  if (Object.keys(newPages).length) {
     var pageComponents = {}
     for (let k in newPages)
       pageComponents[k.toUpperCase()] = newPages[k].component

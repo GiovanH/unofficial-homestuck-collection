@@ -103,13 +103,13 @@
         <p class="hint" v-else>
           Enter a <strong>Homestuck.com</strong> page number between 1 and 8129.<br>
           e.g. www.homestuck.com/story/<strong>413</strong></p>
-        <div style="height: 60px;" v-if="$isNewReader">
+        <div style="height: 45px;" v-if="$isNewReader">
             <br />
           <div class="bigButtonRow">
             <button @click="clearNewReader()">Switch off new reader mode</button>
           </div>
         </div>
-        <div style="height: 60px;" v-else>
+        <div style="height: 45px;" v-else>
           <p class="hint">Or activate a preset:</p>
           <div class="bigButtonRow">
             <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
@@ -212,7 +212,7 @@ export default {
         {
           model: "mspaMode",
           label: "Use MSPA page numbers",
-          desc: "Instead of having individual sets of page numbers for each story, the original MS Paint Adventures website had one continuous page count that covered the beginning of Jailbreak all the way to the end of Homestuck."
+          desc: "Use the original 6-digit story.php page IDs used on mspaintadventures.com and the TopatoCo paperbacks instead of the new numbering Viz introduced."
         }
       ]
     }

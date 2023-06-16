@@ -32,9 +32,9 @@ serve: install webAppModTrees.json
 	env ASSET_DIR=${ASSET_DIR} \
 		ASSET_PACK_HREF="http://localhost:8413/" \
 		j2 webapp/browser.js.j2
-	(react webapp/browser.js.j2 env ASSET_DIR=${ASSET_DIR} \
-		ASSET_PACK_HREF="http://localhost:8413/" \
-		j2 webapp/browser.js.j2) &
+# 	(react webapp/browser.js.j2 env ASSET_DIR=${ASSET_DIR} \
+# 		ASSET_PACK_HREF="http://localhost:8413/" \
+# 		j2 webapp/browser.js.j2) &
 	(cd ${ASSET_DIR}; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
 	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js
 

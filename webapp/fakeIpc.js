@@ -5,11 +5,11 @@ const sendSync = function (channel, args) {
     if (listeners[channel]) {
         // const res = listeners[channel](args)
         const res = listeners[channel](null, args)
-        console.warn("fakeIpc responding:", channel, args, listeners[channel], res)
+        // console.warn("fakeIpc responding:", channel, args, listeners[channel], res)
         return res
     } else {
         console.error("fakeIpc has no resposne for send:", channel)
-        console.warn(listeners)
+        // console.warn(listeners)
     }
 }
 
@@ -56,7 +56,7 @@ const fakeIpc = {
     //   return (answer === 0)
     // })
     handle(channel, handler) {
-        console.warn("fakeIpc handling:", channel, "clobbering?", listeners[channel])
+        // console.warn("fakeIpc handling:", channel, "clobbering?", listeners[channel])
         listeners[channel] = handler
         // listeners[channel] = (args) => handler(null, args)
     },
@@ -92,8 +92,9 @@ var invokables = {
         window.open(opts, '_blank').focus()
     },
     'factory-reset'(event, opts) {
-        const store = require('@/../webapp/localstore.js')
-        store.delete('localData')
+        // const store = require('@/../webapp/localstore.js')
+        // store.delete('localData')
+        window.vm.$localData.VM.clearLocalStorage()
         window.location.reload(false);
     },
     'reload'(event, opts) {
@@ -104,6 +105,9 @@ var invokables = {
     },
     'set-title'(event, new_title) {
         document.title = new_title
+    },
+    'set-sys-icon'(event, new_icon) {
+        console.warn("ignoring set-sys-icon", new_icon)
     }
 }
 

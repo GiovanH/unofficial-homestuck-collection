@@ -62,9 +62,7 @@ const app_domain = window.location.host // (window.isWebApp ? window.webAppDomai
 
 window.doFullRouteCheck = Mods.doFullRouteCheck
 
-Vue.use(localData, {
-  store: new localData.Store(store.get('localData'))
-})
+Vue.use(localData) // Initializes and loads when Vue installs it
 
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
@@ -140,9 +138,9 @@ Vue.mixin({
 
       function _open(to_) {
         if (!isWebApp) {
-          shell.openExternal(Resources.resolveURL(to))
+          shell.openExternal(to_)
         } else {
-          window.open(Resources.resolveURL(to), '_blank').focus();
+          window.open(to_, '_blank').focus();
         }
       }
 
@@ -153,7 +151,7 @@ Vue.mixin({
         } else _open(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
-        _open(to)
+        _open(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
         this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
@@ -163,7 +161,17 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    $getResourceURL: Resources.getResourceURL,
+    $getResourceURL(url) {
+      const resource_url = Resources.getResourceURL(url)
+      if (isWebApp) {
+        // simulate  webRequest redirection here
+        return (url.startsWith("assets://")
+          ? Resources.resolveAssetsProtocol(url)
+          : Resources.resolveURL(url))
+      } else {
+        return url
+      }
+    },
     $getChapter: Resources.getChapter,
     $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){

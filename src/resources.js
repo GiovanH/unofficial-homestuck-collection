@@ -104,6 +104,11 @@ function getResourceURL(request_url){
 
   let resource_url = request_url
 
+  if (/\.[0-9a-f]{8}\..{3,4}$/.exec(request_url)) {
+    logger.error("URL", request_url, "is webpacked! Replacing would break it. This probably means you're running getResourceURL somewhere you shouldn't!")
+    return request_url // webpacked
+  }
+
   // Preliminary filtering
   resource_url = resource_url
     .replace(/^app:\/\/\.\//, "/") // app://./archive/ comes up on non-windows platforms, sometimes?
@@ -165,7 +170,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
   // Examples
   // assets://images/candycorn.gif to http://127.0.0.1:21780/images/candycorn.gif
 
-  console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
+  console.assert(asset_url.startsWith("assets://"), "resources", asset_url + " is not on the assets protocol!")
 
   if (Mods) {
     const mod_route = Mods.getAssetRoute(asset_url)

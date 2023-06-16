@@ -1,23 +1,20 @@
 <template>
-  <GenericPage>
-    <div class="pageContent">
-      <MediaEmbed url="images/v2_biglogo.gif" class="logo"/>
-      <h1>UNLOCKABLE CONTENT</h1>
-      <MediaEmbed url="images/unlock_gamecode.gif" />
-      <div class="unlocklist text">
-        <p>CONGRATULATIONS!!!<br><br>You have entered a valid GAME CODE and unlocked some exciting <strong>FAN-REQUESTED GAME COMMANDS!</strong> These were drawn and posted for fans who made <strong>DONATIONS!</strong></p>
-        <br />
-        <ol>
-          <li v-for="page in filteredCommands" :key="page.url">
-            <a :href="page.url" v-html="page.command" />
-          </li>
-          <li v-if="keepReading">Keep reading to unlock more extras!</li>
-        </ol>
-      </div>
-      <MediaEmbed url="images/unlock_codemachine.gif" ref="codemachine" />
-      <div class="text">
-        <p> The CODE MACHINE awaits additional GAME CODES to unlock more mysterious secrets! </p>
-      </div>
+  <GenericPage logo="images/v2_biglogo.gif">
+    <h1>UNLOCKABLE CONTENT</h1>
+    <MediaEmbed url="images/unlock_gamecode.gif" />
+    <div class="unlocklist text">
+      <p>CONGRATULATIONS!!!<br><br>You have entered a valid GAME CODE and unlocked some exciting <strong>FAN-REQUESTED GAME COMMANDS!</strong> These were drawn and posted for fans who made <strong>DONATIONS!</strong></p>
+      <br />
+      <ol>
+        <li v-for="page in filteredCommands" :key="page.url">
+          <a :href="page.url" v-html="page.command" />
+        </li>
+        <li v-if="keepReading">Keep reading to unlock more extras!</li>
+      </ol>
+    </div>
+    <MediaEmbed url="images/unlock_codemachine.gif" ref="codemachine" />
+    <div class="text">
+      <p> The CODE MACHINE awaits additional GAME CODES to unlock more mysterious secrets! </p>
     </div>
   </GenericPage>
 </template>

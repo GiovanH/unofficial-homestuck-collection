@@ -1,7 +1,7 @@
 var store = {}
 store = {
     has(key) {
-        return (null != localStorage.getItem(key))
+        return (null != store.get(key))
     },
     delete(key) {
         localStorage.removeItem(key)

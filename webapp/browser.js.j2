@@ -8,14 +8,18 @@ window.webAppIModsDir = "{{ ASSET_DIR }}archive/imods/"
 window.webAppOpinionatedDefaults = {
   showAddressBar: false,
   mspaMode: true,
-  ruffleFallback: true
+  ruffleFallback: true,
+  useTabbedBrowsing: false,
 }
 
-{% set mods = "HomestuckSlurReplacement Plaintext-Images Psycholonials semantic socialLinks tuhc-commentary/homestuckCommentary.js tuhc-damara tuhc-puzzlestuck tuhc-readmspa tuhc-themes/win95theme tuhc-themes/winXPtheme eraserhead.js".split() %}
+{% set mods = "HomestuckSlurReplacement Plaintext-Images Psycholonials semantic socialLinks homestuckCommentary.js oddities eraserhead.js".split() %}
 
+// use fs: tuhc-readmspa zombocom.js tuhc-puzzlestuck
 // violate ES6 strict mode: oddities
 
 window.webAppModJs = {
+  'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
+
   _bolin: require('{{ ASSET_DIR }}archive/imods/_bolin.js'),
   _hqAudio: require('{{ ASSET_DIR }}archive/imods/_hqAudio.js'),
   _pxsTavros: require('{{ ASSET_DIR }}archive/imods/_pxsTavros.js'),
@@ -24,12 +28,11 @@ window.webAppModJs = {
   _soluslunes: require('{{ ASSET_DIR }}archive/imods/_soluslunes.js'),
   _twoToThree: require('{{ ASSET_DIR }}archive/imods/_twoToThree/mod.js'),
   _unpeachy: require('{{ ASSET_DIR }}archive/imods/_unpeachy.js'),
-  'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
   {% for mod in mods -%}
   '{{ mod }}': require('{{ ASSET_DIR }}mods/{{ mod if mod.endswith(".js") else mod + "/mod.js" }}'),
   {% endfor %}
-
 }
+
 
 window.webAppModTrees = require('../webAppModTrees.json')
 
@@ -60,30 +63,6 @@ window.isWebApp = true
 const Mods = require("../src/mods.js").default
 
 const logger = console
-
-window.searchWebAppModTrees = function(path) {
-  function *search(data, values) {
-    for (const value of values)
-      yield *search1(data, value)
-  }
-
-  function *search1(data, value) {
-    if (Object(data) === data) {
-      for (const key of Object.keys(data)) {
-        if (key === value)
-          yield data[key]
-        else
-          yield *search1(data[key], value)
-      }
-    }
-  }
-
-  let result
-  for (result of search(webAppModTrees, path.split('/')))
-    console.log(result)
-
-  return result
-}
 
 async function loadArchiveData() {
   // We have to de-module the data into raw json so it's not mutable, otherwise the content doesn't reset on reload.

@@ -476,7 +476,12 @@ export default {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
           desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
-          platform_whitelist: ['electron']
+          platform_whitelist: ['electron'],
+        }, {
+          model: "useTabbedBrowsing",
+          label: "Use Tabbed Browsing",
+          desc: "By default, the web app only shows one page at a time, like a standard website. This setting re-enables the in-app tab bar, and the app will store your tabs in settings.",
+          platform_whitelist: ['webapp']
         }
       ],
       retconList: [
