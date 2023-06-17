@@ -2,15 +2,15 @@
   <div id="window" :class="theme">
     <div id="app" :class="[
       // $root.loadState != 'DONE' ? 'busy' : '',
-      $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
-        
+        $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        $root.platform // webapp or electron
       ]" v-if="$archive && $root.loadState !== 'ERROR'">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />
-      <ContextMenu :class="theme" ref="contextMenu" />
-      <Updater ref="Updater" />
-      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+      <ContextMenu :class="theme" ref="contextMenu" v-if="!$isWebApp" />
+      <Updater ref="Updater" v-if="!$isWebApp" />
+      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip && !$isWebApp"/>
       <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
     </div>
     <div id="app" class="mspa"  v-else>
@@ -32,11 +32,30 @@
 
   import Mods from "./mods.js"
 
-  const electron = require('electron')
+  const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+
+  var mixins = []
+  var webFrame = undefined;
+
+  const user_path_target = window.location.pathname
+
+  if (!window.isWebApp) {
+    webFrame = require('electron').webFrame
+    mixins = [
+      Mods.getMainMixin()
+    ]
+  } else {
+    const Resources = require('./resources.js')
+    mixins = [
+      Mods.getMainMixin(),
+      Resources.UrlFilterMixin
+    ]
+    webFrame = undefined
+  }
 
   export default {
     name: 'HomestuckCollection',
-    mixins: [Mods.getMainMixin()],
+    mixins,
     components: {
       Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
     },
@@ -105,7 +124,7 @@
     methods: {
       resetZoom() {
         this.zoomLevel = 0
-        electron.webFrame.setZoomLevel(this.zoomLevel)
+        webFrame.setZoomLevel(this.zoomLevel)
       },
       checkTheme() {
         this.needCheckTheme = !this.needCheckTheme;
@@ -113,13 +132,13 @@
       zoomIn() {
         if (this.zoomLevel < 5) {
           this.zoomLevel += 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       zoomOut() {
         if (this.zoomLevel > -5) {
           this.zoomLevel -= 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       openJumpbox() {
@@ -149,7 +168,7 @@
             return
           }
           this.$logger.info("Requesting icon change to", app_icon_var)
-          electron.ipcRenderer.send('set-sys-icon', app_icon_var)
+          ipcRenderer.send('set-sys-icon', app_icon_var)
         })
       }
     },
@@ -161,74 +180,89 @@
         this.$root.tabTheme = to
       }
     },
+    updated() {
+      if (this.$isWebApp) this.filterLinksAndImages(window.document.body)
+    },
     mounted () {
       this.$nextTick(() => this.updateAppIcon())
 
       this.$localData.root.TABS_SWITCH_TO()
+      // Switch to the last tab (good) but replaces history (so we use the previously captured value)
 
-      electron.webFrame.setZoomFactor(1)
+      if (user_path_target != this.$localData.root.activeTabObject.url) {
+        this.$logger.warn("Navigating user to", user_path_target)
+        this.$nextTick(() => {
+          this.$localData.root.TABS_PUSH_URL(user_path_target)
+        })
+      } else {
+        this.$logger.info(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
 
-      // Ask for a fresh copy of the archive
-      // Root must exist to receive it, so this calls from inside the app
-      electron.ipcRenderer.send("RELOAD_ARCHIVE_DATA") 
+      }
+
+      webFrame && webFrame.setZoomFactor(1)
 
       // Sets up listener for the main process
-      electron.ipcRenderer.on('TABS_NEW', (event, payload) => {
+      ipcRenderer.on('TABS_NEW', (event, payload) => {
         this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
       })
-      electron.ipcRenderer.on('TABS_CLOSE', (event, key) => {
+      ipcRenderer.on('TABS_CLOSE', (event, key) => {
         this.$localData.root.TABS_CLOSE(key)
       })
-      electron.ipcRenderer.on('TABS_DUPLICATE', (event) => {
+      ipcRenderer.on('TABS_DUPLICATE', (event) => {
         this.$localData.root.TABS_DUPLICATE()
       })
-      electron.ipcRenderer.on('TABS_RESTORE', (event) => {
+      ipcRenderer.on('TABS_RESTORE', (event) => {
         this.$localData.root.TABS_RESTORE()
       })
-      electron.ipcRenderer.on('TABS_CYCLE', (event, payload) => {
+      ipcRenderer.on('TABS_CYCLE', (event, payload) => {
         this.$localData.root.TABS_CYCLE(payload.amount)
       })
-      electron.ipcRenderer.on('TABS_PUSH_URL', (event, to) => {
+      ipcRenderer.on('TABS_PUSH_URL', (event, to) => {
         this.$pushURL(to)
       })
-      electron.ipcRenderer.on('TABS_HISTORY_BACK', (event) => {
+      ipcRenderer.on('TABS_HISTORY_BACK', (event) => {
         this.$localData.root.TABS_HISTORY_BACK()
       })
-      electron.ipcRenderer.on('TABS_HISTORY_FORWARD', (event) => {
+      ipcRenderer.on('TABS_HISTORY_FORWARD', (event) => {
         this.$localData.root.TABS_HISTORY_FORWARD()
       })
-      electron.ipcRenderer.on('ZOOM_IN', (event) => {
+      ipcRenderer.on('ZOOM_IN', (event) => {
         this.zoomIn()
       })
-      electron.ipcRenderer.on('ZOOM_OUT', (event) => {
+      ipcRenderer.on('ZOOM_OUT', (event) => {
         this.zoomOut()
       })
-      electron.ipcRenderer.on('ZOOM_RESET', (event) => {
+      ipcRenderer.on('ZOOM_RESET', (event) => {
         this.resetZoom()
       })
-      electron.ipcRenderer.on('OPEN_FINDBOX', (event) => {
+      ipcRenderer.on('OPEN_FINDBOX', (event) => {
         this.activeTabComponent.$refs.findbox.open()
-      })      
-      electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
+      })
+      ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
-      })      
+      })
 
-      electron.ipcRenderer.on('RELOAD_LOCALDATA', (event) => {
+      ipcRenderer.on('RELOAD_LOCALDATA', (event) => {
         this.$localData.VM.reloadLocalStorage()
       })
-      
-      electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
+
+      ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
         this.$root.archive = archive
       })
 
-      electron.ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
+      ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
         this.$root.loadState = state
       })
 
       this.$root.loadStage = "MOUNTED"
-      electron.ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
+      ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
         this.$root.loadStage = stage
       })
+
+      // Ask for a fresh copy of the archive
+      // Root must exist to receive it, so this calls from inside the app
+      // and the app must have registered the receipt listener first to accept it!
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
 
       document.addEventListener('dragover', event => event.preventDefault())
       document.addEventListener('drop', event => event.preventDefault())
@@ -378,28 +412,30 @@
     }
   }
 
-  a, .bookmarkUrlDisplay {
-    &.jumpboxLink::after{
-      @extend %fa-icon;
-      @extend .fas;
-      content: fa-content($fa-var-chevron-right);
-    }
-    &[href^="http://"], &[href^="https://"], &[href^="mailto"], &[href$=".pdf"], &[href$=".html"] {
-      &:not([href*="127.0.0.1"]):not([href*="localhost"]):not([href*="assets://"])::after{
+  .electron {
+    a, .bookmarkUrlDisplay {
+      &.jumpboxLink::after{
         @extend %fa-icon;
         @extend .fas;
-        content: fa-content($fa-var-external-link-alt);
-        margin: 0 1px 0 2px;
-        line-height: inherit;
+        content: fa-content($fa-var-chevron-right);
       }
-    }
-    &[href$=".jpg"], &[href$=".png"], &[href$=".gif"], &[href$=".swf"], &[href$=".txt"], &[href$=".mp3"], &[href$=".wav"], &[href$=".mp4"], &[href$=".webm"]{
-      &::after{
-        @extend %fa-icon;
-        @extend .fas;
-        content: fa-content($fa-var-file-image);
-        margin: 0 1px 0 2px;
-        line-height: inherit;
+      &[href^="http://"], &[href^="https://"], &[href^="mailto"], &[href$=".pdf"], &[href$=".html"] {
+        &:not([href*="127.0.0.1"]):not([href*="localhost"]):not([href*="assets://"])::after{
+          @extend %fa-icon;
+          @extend .fas;
+          content: fa-content($fa-var-external-link-alt);
+          margin: 0 1px 0 2px;
+          line-height: inherit;
+        }
+      }
+      &[href$=".jpg"], &[href$=".png"], &[href$=".gif"], &[href$=".swf"], &[href$=".txt"], &[href$=".mp3"], &[href$=".wav"], &[href$=".mp4"], &[href$=".webm"]{
+        &::after{
+          @extend %fa-icon;
+          @extend .fas;
+          content: fa-content($fa-var-file-image);
+          margin: 0 1px 0 2px;
+          line-height: inherit;
+        }
       }
     }
   }

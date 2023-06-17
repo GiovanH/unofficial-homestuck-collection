@@ -1,0 +1,110 @@
+window.webAppAssetPackHref = "{{ WEB_ASSET_HREF }}"
+window.webAppModsDir = "{{ ASSET_DIR }}mods/"
+window.webAppIModsDir = "{{ ASSET_DIR }}archive/imods/"
+
+window.webAppOpinionatedDefaults = {
+  showAddressBar: false,
+  mspaMode: true,
+  ruffleFallback: true
+}
+
+window.webAppModJs = {
+  _bolin: require('{{ ASSET_DIR }}archive/imods/_bolin.js'),
+  _hqAudio: require('{{ ASSET_DIR }}archive/imods/_hqAudio.js'),
+  _pxsTavros: require('{{ ASSET_DIR }}archive/imods/_pxsTavros.js'),
+  _replaybound: require('{{ ASSET_DIR }}archive/imods/_replaybound/mod.js'),
+  _secret: require('{{ ASSET_DIR }}archive/imods/_secret/mod.js'),
+  _soluslunes: require('{{ ASSET_DIR }}archive/imods/_soluslunes.js'),
+  _twoToThree: require('{{ ASSET_DIR }}archive/imods/_twoToThree/mod.js'),
+  _unpeachy: require('{{ ASSET_DIR }}archive/imods/_unpeachy.js'),
+  'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
+  'noflash': require('{{ ASSET_DIR }}mods/noflash/mod.js'),
+}
+
+window.webAppModTrees = require('../webAppModTrees.json')
+
+const data_template = {
+  // NB webpack require mandates full literal strings here, no paramterization.
+  ...require('{{ ASSET_DIR }}archive/data/version.json'),
+  mspa: require('{{ ASSET_DIR }}archive/data/mspa.json'),
+  social: require('{{ ASSET_DIR }}archive/data/social.json'),
+  news: require('{{ ASSET_DIR }}archive/data/news.json'),
+  music: require('{{ ASSET_DIR }}archive/data/music.json'),
+  comics: require('{{ ASSET_DIR }}archive/data/comics.json'),
+  extras: require('{{ ASSET_DIR }}archive/data/extras.json'),
+  tweaks: require('{{ ASSET_DIR }}archive/data/tweaks.json'),
+  audioData: {},
+  flags: {}
+}
+
+// End configuration
+
+function lockmod(modjs) { // hoisted
+  modjs.hidden = true
+  return modjs
+}
+
+window.isWebApp = true
+const Mods = require("../src/mods.js").default
+
+const logger = console
+
+window.searchWebAppModTrees = function(path) {
+  function *search(data, values) {
+    for (const value of values)
+      yield *search1(data, value)
+  }
+
+  function *search1(data, value) {
+    if (Object(data) === data) {
+      for (const key of Object.keys(data)) {
+        if (key === value)
+          yield data[key]
+        else
+          yield *search1(data[key], value)
+      }
+    }
+  }
+
+  let result
+  for (result of search(webAppModTrees, path.split('/')))
+    console.log(result)
+
+  return result
+}
+
+function loadArchiveData() {
+  let data = data_template
+
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
+  logger.debug("Applying mod archive edits")
+  Mods.editArchive(data)
+  // This isn't strictly part of loading the archive data,
+  // but we should do this only when we reload the archive
+  logger.debug("Baking mod routes")
+  Mods.bakeRoutes()
+
+  // Sanity checks
+  const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+  required_keys.forEach(key => {
+    if (!data[key]) throw new Error("Archive object missing required key", key)
+  })
+
+  return data
+}
+
+const fakeIpc = require('./fakeIpc.js')
+
+fakeIpc.on('RELOAD_ARCHIVE_DATA', (event) => {
+  fakeIpc.send('ARCHIVE_UPDATE', loadArchiveData())
+})
+
+require('../src/main')
+
+// fakeIpc.send('ARCHIVE_UPDATE', loadArchiveData())
+
+// execute with
+// (cd "L:/Archive/Homestuck/TUHC/Asset Pack V2/"; python3 -m http.server) & yarn serve && fg

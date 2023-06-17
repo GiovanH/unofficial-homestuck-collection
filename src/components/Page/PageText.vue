@@ -45,6 +45,7 @@
 <script>
 
 var Color = require('ts-color-class')
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 export default {
     name: 'pageText',
@@ -168,7 +169,7 @@ export default {
                     images[i].ondragstart = (e) => {
                         e.preventDefault()
                         e.dataTransfer.effectAllowed = 'copy'
-                        require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
+                        ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
                     }
                 }
                 if (this.$localData.settings.textOverride.highContrast) {

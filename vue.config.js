@@ -16,6 +16,26 @@ module.exports = {
             ]
         }
     },
+    chainWebpack: config => {
+        for (const rule of ['scss']) {
+            for (const oneOfCase of ['vue', 'vue-module', 'normal', 'normal-module']) {
+                // console.warn(oneOfCase)
+                config.module.rule('scss')
+                    .oneOf(oneOfCase)
+                    .use('string-replace-loader')
+                    .loader('string-replace-loader')
+                    // TODO: This isn't working on @imports (see candy corn)
+                    .after('scss-loader') // After css imports are resolved
+                    .tap(options => {
+                        return {
+                            search: 'assets://',
+                            replace: (process.env.ASSET_PACK_HREF || 'http://localhost:8413/'),
+                        }
+                    })
+                // console.warn(config.module.rule('scss').oneOf(oneOfCase).uses)
+            }
+        }
+    },
     pluginOptions: {
         electronBuilder: {
             nodeIntegration: true,

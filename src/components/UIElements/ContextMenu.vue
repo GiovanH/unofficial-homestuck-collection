@@ -73,7 +73,12 @@
 </template>
 
 <script>
-const {shell, clipboard, ipcRenderer} = require('electron')
+
+var shell, clipboard, ipcRenderer;
+if (!window.isWebApp) {
+  // This component should not be used in web app mode
+  var {shell, clipboard, ipcRenderer} = require('electron')
+}
 
 export default {
   name: 'contextMenu',

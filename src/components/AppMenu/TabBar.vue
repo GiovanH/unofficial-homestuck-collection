@@ -61,7 +61,7 @@ import Settings from '@/components/SystemPages/Settings.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
-const { ipcRenderer } = require('electron')
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 export default {
   name: 'tabBar',

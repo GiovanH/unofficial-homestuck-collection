@@ -1,9 +1,20 @@
 // Rules for transforming intercepted URLS
-const path = require('path')
-const Mods = require('@/mods.js').default
 
-const log = require('electron-log');
-const logger = log.scope('Resources');
+
+const Mods = require('@/mods.js').default
+// isWebApp for main-process electron execution
+const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
+const path = (isWebApp ? require('path-browserify') : require('path'))
+
+const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+
+var logger;
+if (!isWebApp) {
+  const log = require('electron-log');
+  logger = log.scope('Resources');
+} else {
+  logger = console
+}
 
 // ====================================
 // Asset resolution
@@ -156,15 +167,17 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 
   console.assert(asset_url.startsWith("assets://"), "resources", asset_url)
 
-  const mod_route = Mods.getAssetRoute(asset_url)
-  if (mod_route) {
-    // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
-    if (loopcheck.includes(mod_route)) {
-      loopcheck.push(mod_route)
-      throw Error("Circular asset path!" + loopcheck)
-    } else {
-      loopcheck.push(mod_route)
-      return resolveAssetsProtocol(mod_route, loopcheck)
+  if (Mods) {
+    const mod_route = Mods.getAssetRoute(asset_url)
+    if (mod_route) {
+      // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
+      if (loopcheck.includes(mod_route)) {
+        loopcheck.push(mod_route)
+        throw Error("Circular asset path!" + loopcheck)
+      } else {
+        loopcheck.push(mod_route)
+        return resolveAssetsProtocol(mod_route, loopcheck)
+      }
     }
   }
 
@@ -225,7 +238,7 @@ const UrlFilterMixin = {
             e.preventDefault()
             e.dataTransfer.effectAllowed = 'copy'
             const fileStreamPath = this.$mspaFileStream(media[i].src)
-            require('electron').ipcRenderer.send('ondragstart', fileStreamPath)
+            ipcRenderer.send('ondragstart', fileStreamPath)
           }
         }
       }

@@ -1,7 +1,12 @@
 import Vue from 'vue'
 
-const Store = require('electron-store')
-const store = new Store()
+var store;
+if (!window.isWebApp) {
+  const Store = require('electron-store')
+  store = new Store()
+} else {
+  store = require('@/../webapp/localstore.js')
+}
 
 const LOADED_TAB_LIMIT = 10
 const DEAD_TAB_LIMIT = 15
@@ -97,7 +102,8 @@ class LocalData {
       cursedHistory: false,
       ruffleFallback: true,
 
-      modListEnabled: []  // name hardcoded in mods.js, be careful
+      modListEnabled: [],  // name hardcoded in mods.js, be careful
+      ...(window.webAppOpinionatedDefaults || {})
     }
 
     // Data will only contain settings if the app has already been used.
@@ -154,6 +160,8 @@ class LocalData {
             saveData,
             settings
           })
+
+          window.history.replaceState(null, "", this.tabData.tabs[this.tabData.activeTabKey].url);
         },
         reloadLocalStorage() {
           let back = store.get('localData', {})

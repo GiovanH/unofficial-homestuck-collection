@@ -20,6 +20,19 @@ test: install src/imods.tar
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
 
+webapp: install webAppModTrees.json
+	j2 webapp/browser.js.j2 --data '{"ASSET_DIR": "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/", "WEB_ASSET_HREF": "https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/"}'
+	env ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" yarn run vue-cli-service build webapp/browser.js
+
+serve: install webAppModTrees.json
+	j2 webapp/browser.js.j2 --data '{"ASSET_DIR": "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/", "WEB_ASSET_HREF": "http://localhost:8413/"}'
+	(cd "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/"; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
+	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js
+
+webAppModTrees.json:
+	(cd "L:/Archive/Homestuck/TUHC/AssetPackV2Lite/"; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > webAppModTrees.json
+
+
 build: install src/imods.tar
 	yarn run vue-cli-service electron:build
 	# yarn electron:build
@@ -43,4 +56,4 @@ help:
 	@echo '  make lint       lints and fixes files'
 	
 	
-.PHONY: clean test build publish help lint test
+.PHONY: clean test build publish help lint test webapp

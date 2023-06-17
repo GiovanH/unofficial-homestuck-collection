@@ -36,9 +36,17 @@
 </template>
 
 <script>
-import fs from 'fs'
-import path from 'path'
 import Resources from "@/resources.js"
+
+const path = (window.isWebApp ? require('path-browserify') : require('path'))
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+
+var fs
+if (!window.isWebApp) {
+  fs = require('fs')
+} else {
+  fs = undefined
+}
 
 export default {
   name: "MediaEmbed",
@@ -656,7 +664,20 @@ document.addEventListener('click', function (e) {
     },
 
     getFile(url) {
-      return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      // Return the contents of the (text) file at url.
+      this.$logger.info("Retrieving file", url)
+      if (this.$isWebApp) {
+        const request = new XMLHttpRequest();
+        request.open("GET", url, false); // `false` makes the request synchronous
+        request.send(null);
+        if (request.status === 200) {
+          return request.responseText
+        } else {
+          console.error(request)
+        }
+      } else {
+        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      }
     },
     getMediaType (url) {
       url = url.toLowerCase()
@@ -681,7 +702,7 @@ document.addEventListener('click', function (e) {
     drag(e) {
       e.preventDefault()
       e.dataTransfer.effectAllowed = 'copy'
-      require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+      ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
     }
   },
   updated() {

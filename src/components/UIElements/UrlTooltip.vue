@@ -3,7 +3,11 @@
 </template>
 
 <script>
-const electron = require('electron')
+
+var electron;
+if (!window.isWebApp) {
+  var electron = require('electron')
+}
 
 export default {
   name: 'UrlTooltip',
