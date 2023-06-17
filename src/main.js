@@ -124,7 +124,7 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
-      const urlObject = new URL(url.replace(new RegExp(`(${app_domain}|app:\/\/\.\/)index\.html\??`), '$1'))
+      const urlObject = new URL(url.replace(new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\??`), '$1'))
 
       if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
@@ -144,7 +144,7 @@ Vue.mixin({
         }
       }
 
-      if (!(new RegExp(`(app:\/\/\.(index)?|\/\/${app_domain})`)).test(urlObject.origin)) {
+      if (!(new RegExp(`(app:\/\/\\.(index)?|\/\/${app_domain})`)).test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
@@ -169,7 +169,7 @@ Vue.mixin({
           ? Resources.resolveAssetsProtocol(url)
           : Resources.resolveURL(url))
       } else {
-        return url
+        return resource_url
       }
     },
     $getChapter: Resources.getChapter,

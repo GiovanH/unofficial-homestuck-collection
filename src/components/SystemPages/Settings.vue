@@ -760,12 +760,10 @@ export default {
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
-      this.$logger.info("Setting localData setting", setting_key, this.$localData.settings[setting_key])
 
       // Calculte needReload
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
-      this.$logger.info(diff)
 
       if (diff.some(key => this.$modChoices[key].needsHardReload)) {
         this.$logger.info("List change requires hard reload", diff)

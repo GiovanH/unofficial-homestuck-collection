@@ -22,7 +22,7 @@ store = {
             // console.log(`transforming get(${key}) to get(${body})[${tail}]`)
             return (store.get(body) || {})[tail]
         } else {
-            value = JSON.parse(localStorage.getItem(key))
+            const value = JSON.parse(localStorage.getItem(key))
             // console.log("looked up", key, "=", value)
             return value
         }

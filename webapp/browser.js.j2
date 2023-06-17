@@ -53,13 +53,18 @@ async function getArchiveData() {
 }
 
 // End configuration
+window.isWebApp = true
 
 function lockmod(modjs) { // hoisted
   modjs.hidden = true
   return modjs
 }
 
-window.isWebApp = true
+store = require('@/../webapp/localstore.js')
+if (!store.has("mod")) {
+  store.set("mod", window.webAppOpinionatedModDefaults)
+}
+
 const Mods = require("../src/mods.js").default
 
 const logger = console
