@@ -111,7 +111,7 @@ export default {
         '<a class="nav-btn nav-btn--center type-hs-small mar-b-md" data-gamenav-open="" href="javascript:void(0)" style="text-decoration:none; text-transform: none; font-size:14px; line-height:14px;"><span>Options</span> <i class="icon-menu" style="margin:0;"></i></a>',
         ext_link)
 
-      if (this.filter_content_warnings && this.tab.url == '/epilogues/') {
+      if (this.filter_content_warnings && /^\/epilogues\/?$/.exec(this.tab.url)) {
         // Index page
         const content_warnings =
           this.generateContentWarnings("Content Warning:", [...this.cw_super_serious.map(s => `<b>${s}</b>`), ...this.cws])
