@@ -69,7 +69,7 @@ export default {
       url_epub: 'assets://archive/wizardyherbert/WH.epub',
       url_browse: 'assets://archive/wizardyherbert/',
       max_pages: 209,
-      min_page: 0,
+      min_page: 1,
       renderer: undefined,
       rendition: undefined,
       book: undefined,
@@ -98,7 +98,7 @@ export default {
         this.$pushURL(this.next_page_url)
     },
     display(spine_num){
-      this.rendition.display(spine_num)
+      this.rendition.display(spine_num - 1)
     }
   },
   computed: {
@@ -147,7 +147,7 @@ export default {
   },
   watch: {
     'page_num': function (to, from) {
-      this.display(to)
+      if (to >= this.min_page) this.display(to)
     }
   }
 }
