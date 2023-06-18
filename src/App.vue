@@ -42,6 +42,13 @@
     mixins = [
       Mods.getMainMixin()
     ]
+  } else {
+    const Resources = require('./resources.js')
+    mixins = [
+      Mods.getMainMixin(),
+      Resources.UrlFilterMixin
+    ]
+    webFrame = undefined
   }
 
   export default {

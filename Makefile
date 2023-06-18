@@ -22,6 +22,25 @@ test: install src/imods.tar
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
 
+webapp: install webAppModTrees.json
+	env ASSET_DIR=${ASSET_DIR} \
+		ASSET_PACK_HREF=${ASSET_PACK_HREF} \
+		j2 webapp/browser.js.j2
+	yarn run vue-cli-service build webapp/browser.js
+
+serve: install webAppModTrees.json
+	env ASSET_DIR=${ASSET_DIR} \
+		ASSET_PACK_HREF="http://localhost:8413/" \
+		j2 webapp/browser.js.j2
+# 	(react webapp/browser.js.j2 env ASSET_DIR=${ASSET_DIR} \
+# 		ASSET_PACK_HREF="http://localhost:8413/" \
+# 		j2 webapp/browser.js.j2) &
+	(cd ${ASSET_DIR}; python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
+	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js
+
+webAppModTrees.json:
+	(cd ${ASSET_DIR}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > webAppModTrees.json
+
 build: install src/imods.tar
 	yarn run vue-cli-service electron:build
 	# yarn electron:build
@@ -45,4 +64,4 @@ help:
 	@echo '  make lint       lints and fixes files'
 	
 	
-.PHONY: clean test build publish help lint test
+.PHONY: clean test build publish help lint test webapp

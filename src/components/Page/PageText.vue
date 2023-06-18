@@ -45,6 +45,7 @@
 <script>
 
 var Color = require('ts-color-class')
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 export default {
     name: 'pageText',

@@ -47,9 +47,15 @@ if (!window.isWebApp) {
   Resources.init({
     assets_root: `http://127.0.0.1:${port}/`
   })
+} else {
+  store = require('@/../webapp/localstore.js')
+  log = { scope() { return console; } }
 
-// Must init resources first.
-import Mods from "./mods.js"
+  var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
+
+  Resources.init({
+    assets_root: window.webAppAssetPackHref
+  })
 }
 
 const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')

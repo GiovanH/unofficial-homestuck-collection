@@ -34,3 +34,5 @@ install
 
 # generated file
 src/imods.tar
+webapp/browser.js
+webAppModTrees.json

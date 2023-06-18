@@ -222,8 +222,7 @@ import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 // import Logo from '@/components/UIElements/Logo.vue'
 
-// import { parse } from 'querystring'
-const { ipcRenderer } = require('electron')
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 export default {
   name: 'setup',

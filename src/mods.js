@@ -18,6 +18,11 @@ if (!isWebApp) {
 
   fs = require('fs')
 
+} else {
+  store = require('@/../webapp/localstore.js')
+  log = {
+    scope() { return console; }
+  }
 }
 
 const path = (isWebApp ? require('path-browserify') : require('path'))
@@ -344,6 +349,16 @@ function getEnabledMods() {
   if (!store.get('settings.newReader.limit'))
     list.push("_secret")
 
+  if (isWebApp) {
+    Object.keys(window.webAppModJs).forEach(key => {
+      const modjs = window.webAppModJs[key]
+      if (!list.includes(key) && modjs.hidden && !modjs._internal) {
+        // logger.debug("Webapp: force-enabling loaded, hidden, non-internal mod", key)
+        list.push(key)
+      }
+    })
+  }
+
   return list
 }
 
@@ -360,9 +375,45 @@ function getEnabledModsJs() {
   }
 }
 
+const searchWebAppModTrees = function(path) {
+  function *search(data, values) {
+    for (const value of values)
+      yield *search1(data, value)
+  }
+
+  function *search1(data, value) {
+    if (Object(data) === data) {
+      for (const key of Object.keys(data)) {
+        if (key === value)
+          yield data[key]
+        else
+          yield *search1(data[key], value)
+      }
+    }
+  }
+
+  let result
+  for (result of search(window.webAppModTrees, path.split('/')))
+    console.log(result)
+
+  return result
+}
+
 function crawlFileTree(root, recursive=false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
+  if (isWebApp) {
+    for (const try_root of [root.replace(window.webAppIModsDir, ''), root.replace(window.webAppModsDir, '')]) {
+      let result = searchWebAppModTrees(try_root)
+      if (result) {
+        // logger.info("Using cached filetree from", try_root)
+        return result
+      } else {
+        logger.error("Root", root, "not in cached", try_root)
+      }
+    }
+  }
+
   const dir = fs.opendirSync(root)
   let ret = {}
   let dirent
@@ -446,9 +497,17 @@ function getModJs(mod_dir, options={}) {
     } 
 
     let is_singlefile = false
-    if (mod_dir.endsWith(".js")) {
-      // logger.debug(mod_dir, "is explicit singlefile.")
-      is_singlefile = true
+
+    if (isWebApp) {
+      mod = window.webAppModJs[mod_dir]
+      if (!Boolean(mod)) {
+        onModLoadFail([mod_dir], new Error("Mod missing from static webapp build"))
+        return
+      }
+    } else {
+      if (mod_dir.endsWith(".js")) {
+        // logger.debug(mod_dir, "is explicit singlefile.")
+        is_singlefile = true
         modjs_name = mod_dir
         modjs_path = path.join(thisModsDir, mod_dir)
       } else {
@@ -511,7 +570,8 @@ function getModJs(mod_dir, options={}) {
           return getModJs(mod_dir, {...options, noReextractImods: true})
         } else {
           console.log("mod", mod_dir, "is not imod, unrecoverable require error")
-        throw e
+          throw e
+        }
       }
     }
     // }
@@ -1014,6 +1074,15 @@ if (ipcMain) {
 function getModChoices() {
   if (ipcMain) {
     return modChoices
+  } else if (isWebApp) {
+    return Object.keys(window.webAppModJs).reduce((acc, dir) => {
+      const js = getModJs(dir, {liteload: true})
+      if (js === null || js.hidden === true || js._internal === true)
+        return acc // continue
+
+      acc[dir] = jsToChoice(js, dir)
+      return acc
+    }, {})
   } else {
     return ipcRenderer.sendSync('GET_AVAILABLE_MODS')
   }

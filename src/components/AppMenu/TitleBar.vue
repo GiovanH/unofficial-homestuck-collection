@@ -10,7 +10,9 @@
 </template>
 
 <script>
-const { ipcRenderer } = require('electron')
+
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+
 export default {
   name: 'titleBar',
   components: {
