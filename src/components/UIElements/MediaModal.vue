@@ -6,7 +6,11 @@
           <MediaEmbed :url="url" ref="media" webarchive="true" @blockedevent="onBlockedEvent"/>
         </div>
         <div class="modalLinks">
-          <span v-text="splitPath[0]" @click.prevent="openItemInFolder" /> - <span v-text="splitPath[1]" @click.prevent="openItem" />
+          <span v-if="$isWebApp"><a :href="url" v-text="url" /></span>
+          <div v-else>
+            <span v-text="splitPath[0]" @click.prevent="openItemInFolder" />
+            - <span v-text="splitPath[1]" @click.prevent="openItem" />
+          </div>
         </div>
         <FlashCredit :pageId="this.contentId"/>
       </div>
@@ -18,7 +22,12 @@
 <script>
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
-const { shell } = require('electron')
+
+
+var shell;
+if (!window.isWebApp) {
+  var { shell } = require('electron')
+}
 
 export default {
   name: 'modal',

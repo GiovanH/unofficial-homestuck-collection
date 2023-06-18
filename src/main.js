@@ -14,11 +14,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import Memoization from '@/memoization.js'
 
-const Store = require('electron-store')
-const store = new Store()
-
-const log = require('electron-log');
-log.transports.console.format = '[{level}] {text}';
+import Mods from "./mods.js"
+import Resources from "./resources.js"
 
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
@@ -26,26 +23,40 @@ library.add([
   faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 ])
 
+window.isWebApp = (window.isWebApp || false)
+
 Vue.component('fa-icon', FontAwesomeIcon)
 
 Vue.config.productionTip = false
 
-Vue.use(localData, {
-  store: new localData.Store(store.get('localData'))
-})
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
-const {shell, ipcRenderer} = require('electron')
-const {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
+// Must init resources first.
+var shell, store, log, port, appVersion
+if (!window.isWebApp) {
+  var {shell} = require('electron')
 
-const Resources = require("@/resources.js")
-Resources.init({
-  assets_root: `http://127.0.0.1:${port}/`
-})
+  const Store = require('electron-store')
+  store = new Store()
+
+  log = require('electron-log');
+  log.transports.console.format = '[{level}] {text}';
+
+  var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
+
+  Resources.init({
+    assets_root: `http://127.0.0.1:${port}/`
+  })
 
 // Must init resources first.
 import Mods from "./mods.js"
+}
+
+const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
 
 window.doFullRouteCheck = Mods.doFullRouteCheck
+
+Vue.use(localData) // Initializes and loads when Vue installs it
 
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))
@@ -75,7 +86,8 @@ Vue.mixin({
       return this.$localData.settings.newReader.current
     },
     $modChoices: Mods.getModChoices,
-    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
+    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")},
+    $isWebApp() { return window.isWebApp || false }
   },
   methods: {
     $resolvePath(to){
@@ -106,7 +118,7 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
-      const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+      const urlObject = new URL(url.replace(new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\??`), '$1'))
 
       if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
@@ -118,14 +130,22 @@ Vue.mixin({
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
              .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
-      if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
+      function _open(to_) {
+        if (!isWebApp) {
+          shell.openExternal(to_)
+        } else {
+          window.open(to_, '_blank').focus();
+        }
+      }
+
+      if (!(new RegExp(`(app:\/\/\\.(index)?|\/\/${app_domain})`)).test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
-        } else shell.openExternal(Resources.resolveURL(urlObject.href))
+        } else _open(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
-        shell.openExternal(Resources.resolveURL(to))
+        _open(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
         this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
@@ -135,7 +155,17 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    $getResourceURL: Resources.getResourceURL,
+    $getResourceURL(url) {
+      const resource_url = Resources.getResourceURL(url)
+      if (isWebApp) {
+        // simulate  webRequest redirection here
+        return (url.startsWith("assets://")
+          ? Resources.resolveAssetsProtocol(url)
+          : Resources.resolveURL(url))
+      } else {
+        return resource_url
+      }
+    },
     $getChapter: Resources.getChapter,
     $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
@@ -379,6 +409,7 @@ window.vm = new Vue({
     return {
       archive: undefined,
       loadState: undefined,
+      platform: (window.isWebApp ? "webapp" : "electron"),
       tabTheme: {} // Modified by App (avoid reacting to refs)
     }
   },
@@ -410,3 +441,5 @@ window.addEventListener("mouseup", (e) => {
 // Expose for debugging
 window.Resources = Resources
 window.Mods = Mods
+
+// window.onbeforeunload = () => "please.... stay";

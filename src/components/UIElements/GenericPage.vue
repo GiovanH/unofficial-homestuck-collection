@@ -2,6 +2,7 @@
   <div class="pageBody customStyles" :class="{pixelated: $localData.settings.pixelScaling}">
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
+      <MediaEmbed v-if="logo" :url="logo" class="logo"/>
       <div class="pageContent">
         <slot></slot>
       </div>
@@ -13,11 +14,13 @@
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 export default {
   name: 'GenericPage',
+  props: ['logo'],
   components: {
-    NavBanner, PageFooter
+    NavBanner, PageFooter, MediaEmbed
   }
 }
 </script>
@@ -49,9 +52,11 @@ export default {
       padding-bottom: 23px;
       margin: 0 auto;
 
+      // Elements position top-to-bottom, centered.
       flex: 0 1 auto;
       display: flex;
-      justify-content: center;
+      align-items: center;
+      flex-direction: column;
 
       .pageContent {
         background: var(--page-pageContent);
@@ -59,6 +64,7 @@ export default {
         max-width: 950px;
         min-width: 650px;
 
+        // Elements position top-to-bottom, centered.
         display: flex;
         flex: 0 1 auto;
         align-items: center;
@@ -102,13 +108,13 @@ export default {
     }
   }
   // MSPA logo hack (see /unlock/x)
-  .retro {
-    .pageContent {
-      background: #EEEEEE !important;
-    }
-    .mediaContent, .textContent {
-      background: white;
-    }
-  }
+  // .retro {
+  //   .pageContent {
+  //     background: #EEEEEE !important;
+  //   }
+  //   .mediaContent, .textContent {
+  //     background: white;
+  //   }
+  // }
 </style>
 

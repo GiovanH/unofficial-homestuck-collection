@@ -4,16 +4,63 @@ module.exports = {
         resolve: {
             alias: {
                 // Include the vue compiler so mods can use templates
-                "vue$": "vue/dist/vue.esm.js"
+                "vue$": "vue/dist/vue.esm.js",
+                "@/*": "./src/*"
             }
         },
         module: {
             rules: [
                 {
+                    test: /\.(?:js|mjs|cjs)$/,
+                    exclude: {
+                        and: [/node_modules/], // Exclude libraries in node_modules ...
+                        not: [
+                        ]
+                    },
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                ['@babel/preset-env', { targets: "defaults" }]
+                            ],
+                            plugins: [
+                                '@babel/plugin-proposal-nullish-coalescing-operator',
+                                '@babel/plugin-proposal-optional-chaining',
+                            ]
+                        }
+                    }
+                },
+                {
                     test: /\.node$/,
                     loader: "node-loader",
                 }
             ]
+        }
+    },
+    chainWebpack: config => {
+        const srl_options = options => {
+            return {
+                search: 'assets://',
+                replace: (process.env.ASSET_PACK_HREF || 'http://localhost:8413/'),
+                flags: 'g'
+            }
+        }
+        // config.module.rule('vue')
+        //     .use('string-replace-loader')
+        //     .loader('string-replace-loader')
+        //     .before('cache-loader') // After css imports are resolved
+        //     .tap(srl_options)
+
+        for (const rule of ['css', 'scss']) {
+            for (const oneOfCase of ['vue', 'vue-modules', 'normal', 'normal-modules']) {
+                // console.warn(oneOfCase)
+                config.module.rule(rule)
+                    .oneOf(oneOfCase)
+                    .use('string-replace-loader')
+                    .loader('string-replace-loader')
+                    .before('css-loader') // After css-loader processes imports (before means after)
+                    .tap(srl_options)
+            }
         }
     },
     pluginOptions: {

@@ -1,30 +1,44 @@
-import fs from 'fs'
-import path from 'path'
 import yaml from 'js-yaml'
 
-const {ipcMain, ipcRenderer, dialog} = require('electron')
+// isWebApp for main-process electron execution
+const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
+
+var ipcMain, dialog, unzipper, Tar, fs
+var store, log
+if (!isWebApp) {
+  var {ipcMain, dialog} = require('electron')
+
+  log = require('electron-log')
+
+  unzipper = require("unzipper")
+  Tar = require('tar');
+
+  const Store = require('electron-store')
+  store = new Store()
+
+  fs = require('fs')
+
+}
+
+const path = (isWebApp ? require('path-browserify') : require('path'))
+const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+
 const sass = require('sass')
-const unzipper = require("unzipper")
-const Tar = require('tar');
 
-const Store = require('electron-store')
-const store = new Store()
-
-const log = require('electron-log')
 const logger = log.scope('Mods')
 
-const assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
-const modsDir = (assetDir ? path.join(assetDir, "mods") : undefined)
+const assetDir = store.has('assetDir') ? store.get('assetDir') : undefined
+const modsDir = (isWebApp && window.webAppModsDir) || (assetDir ? path.join(assetDir, "mods") : undefined)
 const modsAssetsRoot = "assets://mods/"
 
-const imodsDir = (assetDir ? path.join(assetDir, "archive", "imods") : undefined)
+const imodsDir = (isWebApp && window.webAppIModsDir) || (assetDir ? path.join(assetDir, "archive", "imods") : undefined)
 const imodsAssetsRoot = "assets://archive/imods/"
 
 var modChoices
 var routes = undefined
 
-const store_modlist_key = 'localData.settings.modListEnabled'
-const store_devmode_key = 'localData.settings.devMode'
+const store_modlist_key = 'settings.modListEnabled'
+const store_devmode_key = 'settings.devMode'
 
 let win = null
 function giveWindow(new_win) {
@@ -34,8 +48,8 @@ function giveWindow(new_win) {
 
 let validatedState = false
 function expectWorkingState(){
-  if (validatedState) return true
-  validatedState = (assetDir && fs.existsSync(path.join(assetDir, "archive")))
+  if (validatedState || isWebApp) return true
+  validatedState = (modsDir && assetDir && fs.existsSync(path.join(assetDir, "archive")))
   return validatedState
 }
 
@@ -153,7 +167,7 @@ var onModLoadFail;
 
 if (ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
+    if (!expectWorkingState())
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -176,7 +190,7 @@ if (ipcMain) {
 } else {
   // We are in the renderer process.
   onModLoadFail = function (responsible_mods, e) {
-    if (modsDir == undefined || !fs.existsSync(modsDir) || !fs.existsSync(path.join(assetDir, "archive")))
+    if (!expectWorkingState())
       return // Pre-setup, we're probably fine ignoring this.
 
     store.set("needsRecovery", true)
@@ -218,7 +232,7 @@ if (ipcMain) {
         <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
         <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
         <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
-        <p>For troubleshooting, save this error message or the <a href="${log.transports.file.getFile()}">log file</a></p><br />
+        <p>For troubleshooting, save this error message or the <a href="${log.transports ? log.transports.file.getFile() : ''}">log file</a></p><br />
         <p>Stacktrace:</p>
         <pre>${sanitizeHTML(e.stack)}</pre>
       </div>
@@ -299,29 +313,35 @@ function doFullRouteCheck(){
 
 function getEnabledMods() {
   // Get modListEnabled from settings, even if vue is not loaded yet.
-  const list = store.has(store_modlist_key) ? store.get(store_modlist_key) : []
+  const list = ((isWebApp && window.vm)
+    ? [...window.vm.$localData.settings["modListEnabled"]]
+    : (store.has(store_modlist_key)
+        ? store.get(store_modlist_key)
+        : []))
+
+  // logger.debug("got mod settings", store_modlist_key, list)
 
   list.push("_twoToThree")
 
-  if (store.get('localData.settings.unpeachy'))
+  if (store.get('settings.unpeachy'))
     list.push("_unpeachy")
-  if (store.get('localData.settings.pxsTavros'))
+  if (store.get('settings.pxsTavros'))
     list.push("_pxsTavros")
-  if (store.get('localData.settings.jsFlashes'))
+  if (store.get('settings.jsFlashes'))
     list.push("_replaybound")
 
   // Soluslunes must load after bolin
-  if (store.get('localData.settings.soluslunes'))
+  if (store.get('settings.soluslunes'))
     list.push("_soluslunes")
 
   // Bolin must come before hqaudio in the stack so it loads after it.
-  if (store.get('localData.settings.bolin'))
+  if (store.get('settings.bolin'))
     list.push("_bolin")
 
-  if (store.get('localData.settings.hqAudio'))
+  if (store.get('settings.hqAudio'))
     list.push("_hqAudio")
 
-  if (!store.get('localData.settings.newReader.limit'))
+  if (!store.get('settings.newReader.limit'))
     list.push("_secret")
 
   return list
@@ -429,68 +449,68 @@ function getModJs(mod_dir, options={}) {
     if (mod_dir.endsWith(".js")) {
       // logger.debug(mod_dir, "is explicit singlefile.")
       is_singlefile = true
-      modjs_name = mod_dir
-      modjs_path = path.join(thisModsDir, mod_dir)
-    } else {
-      // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
-      try {
-        const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
-        if (!is_directory) throw new Error("Not a directory")
-
-        // logger.debug(mod_dir, "confirmed as directory.")
-        is_singlefile = false
-        modjs_name = path.join(mod_dir, "mod.js")
-        modjs_path = path.join(thisModsDir, modjs_name)
-      } catch (e) {
-        // Mod isn't an explicit singlefile or a directory
-        // logger.debug(mod_dir, "must be singlefile.")
-        is_singlefile = true
-        modjs_name = mod_dir + ".js"
-        modjs_path = path.join(thisModsDir, modjs_name)
-      }
-    }
-
-    // if (use_webpack_require) {
-    //   console.log(modjs_path)
-    //   mod = require(modjs_path)
-    // } else {
-    /* eslint-disable no-undef */
-    if (__non_webpack_require__.cache[modjs_path]) {
-      // logger.info("Removing cached version", modjs_path)
-      delete __non_webpack_require__.cache[modjs_path]
-    } else {
-      // logger.info(modjs_name, modjs_path, "not in cache")
-      Object.keys(__non_webpack_require__.cache)
-        .filter(cachepath => cachepath.endsWith(modjs_name))
-        .forEach(cachepath => {
-        logger.info("Removing partial match from cache", cachepath)
-        delete __non_webpack_require__.cache[cachepath]
-      })
-    }
-
-    try {
-      // eslint-disable-next-line no-undef
-      mod = __non_webpack_require__(modjs_path)
-    } catch (e) {
-      // imod 
-      if (mod_dir.startsWith("_")) {
-        console.log("Caught error importing imod")
-        if (options.noReextractImods) {
-          console.log("Already tried to re-extract imods, refusing to infinite loop")
-          throw e
-        }
-        if (expectWorkingState()) {
-          console.log("Couldn't load imod, trying re-extract")
-          extractimods()
-        } else {
-          console.log('Asset pack not found.')
-          throw e
-        }
-        console.log("Retrying import")
-        // eslint-disable-next-line no-undef
-        return getModJs(mod_dir, {...options, noReextractImods: true})
+        modjs_name = mod_dir
+        modjs_path = path.join(thisModsDir, mod_dir)
       } else {
-        console.log("mod", mod_dir, "is not imod, unrecoverable require error")
+        // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
+        try {
+          const is_directory = !fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile() // allow for junctions, symlinks
+          if (!is_directory) throw new Error("Not a directory")
+
+          // logger.debug(mod_dir, "confirmed as directory.")
+          is_singlefile = false
+          modjs_name = path.join(mod_dir, "mod.js")
+          modjs_path = path.join(thisModsDir, modjs_name)
+        } catch (e) {
+          // Mod isn't an explicit singlefile or a directory
+          // logger.debug(mod_dir, "must be singlefile.")
+          is_singlefile = true
+          modjs_name = mod_dir + ".js"
+          modjs_path = path.join(thisModsDir, modjs_name)
+        }
+      }
+
+      // if (use_webpack_require) {
+      //   console.log(modjs_path)
+      //   mod = require(modjs_path)
+      // } else {
+      /* eslint-disable no-undef */
+      if (__non_webpack_require__.cache[modjs_path]) {
+        // logger.info("Removing cached version", modjs_path)
+        delete __non_webpack_require__.cache[modjs_path]
+      } else {
+        // logger.info(modjs_name, modjs_path, "not in cache")
+        Object.keys(__non_webpack_require__.cache)
+          .filter(cachepath => cachepath.endsWith(modjs_name))
+          .forEach(cachepath => {
+          logger.info("Removing partial match from cache", cachepath)
+          delete __non_webpack_require__.cache[cachepath]
+        })
+      }
+
+      try {
+        // eslint-disable-next-line no-undef
+        mod = __non_webpack_require__(modjs_path)
+      } catch (e) {
+        // imod
+        if (mod_dir.startsWith("_")) {
+          console.log("Caught error importing imod")
+          if (options.noReextractImods) {
+            console.log("Already tried to re-extract imods, refusing to infinite loop")
+            throw e
+          }
+          if (expectWorkingState()) {
+            console.log("Couldn't load imod, trying re-extract")
+            extractimods()
+          } else {
+            console.log('Asset pack not found.')
+            throw e
+          }
+          console.log("Retrying import")
+          // eslint-disable-next-line no-undef
+          return getModJs(mod_dir, {...options, noReextractImods: true})
+        } else {
+          console.log("mod", mod_dir, "is not imod, unrecoverable require error")
         throw e
       }
     }
@@ -589,7 +609,7 @@ function editArchive(archive) {
     try {
       const editfn = js.edit
       if (editfn) {        
-        logger.info(js._id, "editing archive")
+        logger.debug(js._id, "editing archive")
         editfn(archive)
         console.assert(archive, js.title, "You blew it up! You nuked the archive!")
       
@@ -722,7 +742,7 @@ function getMixins(){
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
   }, {})
-  if (newPages) {
+  if (Object.keys(newPages).length) {
     var pageComponents = {}
     for (let k in newPages)
       pageComponents[k.toUpperCase()] = newPages[k].component
@@ -983,10 +1003,12 @@ if (ipcMain) {
     modChoices = loadModChoices()
     e.returnValue = true
   })
-} else {
+} else if (!isWebApp) {
   // We are in the renderer process.
   logger.info("Requesting modlist from main")
   modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+} else {
+  modChoices = getModChoices()
 }
 
 function getModChoices() {
@@ -1011,6 +1033,8 @@ export default {
   modChoices,
   modsDir, // fg
   extractimods, // bg
+
+  crawlFileTree, // debug
 
   doFullRouteCheck // fg
 }

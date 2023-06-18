@@ -47,7 +47,7 @@
         <h2>Application Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
-            <dt :key="boolSetting.model"><label>
+            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]" 
@@ -157,7 +157,7 @@
           </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
-            <dt :key="boolSetting.model"><label>
+            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]" 
@@ -250,22 +250,21 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <section class="modPrattle">
+        <section class="modPrattle" v-if="!$isWebApp">
           <p class="settingDesc">
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
-<!--           </p>
-          <p> -->
             You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
-<!--           </p>
-          <p> -->
+
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
             <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
-        </section>
-          
         <div class='hint'>
           <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
-          
         </div>
+        </section>
+        <section class="modPrattle" v-else>
+          <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
+        </section>
+
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
@@ -323,7 +322,7 @@
         <h2>System Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListSystem">
-            <dt :key="boolSetting.model"><label>
+            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
               <input type="checkbox" 
                 :name="boolSetting.model" 
                 v-model="$localData.settings[boolSetting.model]" 
@@ -344,14 +343,16 @@
             <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
           </span>
           <br><br>
-          <span class="hint">Asset pack directory:</span>
-          <br>
-          <strong>{{$localData.assetDir || 'None selected'}}</strong>
-          <br><br>
-          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
-          <br><br>
-          <button @click="locateAssets()">Relocate assets</button>
-          <br><br>
+          <div v-if="!$isWebApp">
+            <span class="hint">Asset pack directory:</span>
+            <br>
+            <strong>{{$localData.assetDir || 'None selected'}}</strong>
+            <br><br>
+            <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
+            <br><br>
+            <button @click="locateAssets()">Relocate assets</button>
+            <br><br>
+          </div>
           <button @click="factoryReset()">Factory reset</button>
         </div>
       </div>
@@ -370,8 +371,8 @@ import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 import draggable from "vuedraggable"
 import Mods from "@/mods.js"
 
-const log = require('electron-log')
-const { ipcRenderer } = require('electron')
+const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 export default {
   name: 'settings',
@@ -412,7 +413,8 @@ export default {
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
-          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
+          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "pixelScaling",
           label: "Pixelated image scaling",
@@ -420,7 +422,8 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>",
+          platform_whitelist: ['electron']
         }
       ],
       enhancementListBoolean: [
@@ -462,15 +465,23 @@ export default {
         }, {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
-          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "useSystemWindowDecorations",
           label: "Use system window decorations",
-          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
-          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is."
+          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
+          platform_whitelist: ['electron'],
+        }, {
+          model: "useTabbedBrowsing",
+          label: "Use Tabbed Browsing",
+          desc: "By default, the web app only shows one page at a time, like a standard website. This setting re-enables the in-app tab bar, and the app will store your tabs in settings.",
+          platform_whitelist: ['webapp']
         }
       ],
       retconList: [
@@ -753,6 +764,7 @@ export default {
       // Calculte needReload
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
+
       if (diff.some(key => this.$modChoices[key].needsHardReload)) {
         this.$logger.info("List change requires hard reload", diff)
         this.needReload = true

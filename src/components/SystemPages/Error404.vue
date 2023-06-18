@@ -2,7 +2,7 @@
   <GenericPage>
     <div class="mediaContent">
       <h2 class="pageTitle">That page doesn't exist!</h2>
-      <MediaEmbed url="/advimgs/jb/mspaintadventure08.gif" />
+      <MediaEmbed url="assets://advimgs/jb/mspaintadventure08.gif" />
     </div>
   </GenericPage>
 </template>
