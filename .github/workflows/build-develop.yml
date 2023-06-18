@@ -33,7 +33,7 @@ jobs:
     - name: Create tag string
       id: create_tag_str
       run: |
-        tag=$(basename "${{ github.ref }}")-$(date +%Y%m%d.%H%M%S)
+        tag=$(basename "${{ github.ref }}")-$(date +%Y%m%d)
         echo "tag=$tag" >> $GITHUB_OUTPUT
     - name: Update package.json snapshot version
       uses: jossef/action-set-json-field@v2.1
