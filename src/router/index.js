@@ -313,6 +313,19 @@ const routes = [
   {
     path: '/skaianet/:cursed_history',
     props: true
+  },
+  {
+    path: '/epilogues/:volume',
+    props: true,
+    children: [
+      {
+        path: '',
+        // redirect: '1'
+      },
+      {
+        path: ':page',
+      },
+    ]
   }
 ]
 
