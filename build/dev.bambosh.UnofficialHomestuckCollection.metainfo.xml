@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop">
+  <id>dev.bambosh.UnofficialHomestuckCollection</id>
+  <name>The Unofficial Homestuck Collection</name>
+  <summary>An offline collection of Homestuck and its related works</summary>
+  <developer_name>Bambosh</developer_name>
+  <developer_name>GiovanH</developer_name>
+  <launchable type="desktop-id">dev.bambosh.UnofficialHomestuckCollection.desktop</launchable>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+  <description>
+    <p>The Unofficial Homestuck Collection is a heavily customised browser built from the ground up
+      to support offline reading of Homestuck and its related works.</p>
+    <p>The Asset Pack V2 is required for the application to function. This is a separate
+      download that can be found on the homepage.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Collection interface</caption>
+      <image type="source" width="998" height="900">
+        https://bambosh.dev/unofficial-homestuck-collection/images/collection.gif</image>
+    </screenshot>
+    <screenshot>
+      <caption>Bandcamp interface</caption>
+      <image type="source" width="1015" height="708">
+        https://bambosh.dev/unofficial-homestuck-collection/images/bandcamp.gif</image>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="2.0.7" date="2023-05-13" type="stable">
+      <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/v2.0.7</url>
+      <description>
+        <p>This is a minor update that should formally fix the Sharp bug for all users.</p>
+      </description>
+    </release>
+    <release version="2.0.5" date="2023-02-21" type="stable">
+      <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/v2.0.5</url>
+      <description>
+        <p>Features</p>
+        <ul>
+          <li>Option to use native window decorations - by @GiovanH in #267</li>
+          <li>Genericise notification behavior for mods - by @GiovanH in #283</li>
+          <li>Dragging images now displays a preview of the image, instead of the placeholder
+            captcha card - by @GiovanH in #316</li>
+          <li>Several new context menu options, including "Copy Image" - by @GiovanH in #317</li>
+        </ul>
+        <p>Fixes</p>
+        <ul>
+          <li>Crash that occurred when upgrading from a previous version of the collection - by
+            @GiovanH in #285</li>
+          <li>Some cases where new reader progress wouldn't update correctly - by @GiovanH in #282</li>
+          <li>A local IP address being displayed with the path of certain images - by @Bambosh in
+            #326</li>
+          <li>Some HQ flashes with double &amp; incorrectly linked scarecrowking images in the news
+            section - by @GiovanH in #324</li>
+        </ul>
+      </description>
+    </release>
+    <release version="2.0.4" date="2022-02-14" type="stable">
+      <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/2.0.4</url>
+      <description>
+        <p>Known Issue: If you delete the old Asset Pack V1 before launching version 2.0 of the
+          program for the first time, you'll get a javascript error. This can be avoided by deleting
+          Asset Pack V1 after setting up version 2.0, or you can recover from the problem by
+          deleting your %appdata%/unofficial-homestuck-collection folder.</p>
+      </description>
+    </release>
+    <release version="1.1.0" date="2020-11-03" type="stable">
+      <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/V1.1.0</url>
+      <description>
+        <p>Changelog</p>
+        <ul>
+          <li>Added option to embed the jump bar in the header, just like a real address bar.</li>
+          <li>Added options to override how text is displayed on MSPA pages. There are controls for
+            font family, weight, size, and line height.</li>
+          <li>Added option to let theme overrides be overridden by other themed pages.</li>
+          <li>Added option to switch between pixelated/auto image scaling on MSPA pages.</li>
+          <li>Added option to disable smooth scrolling.</li>
+          <li>Fixed the zoom shortcut not working with the +/- buttons on the numpad, and added more
+            zoom increments.</li>
+          <li>Steam links now open in the client if you have it installed (thanks @leo60228).</li>
+          <li>Added context menu option to search highlighted text in Google.</li>
+          <li>Altered a credit that was deadnaming Gankra.</li>
+          <li>Fixed Ascend's track commentary being cut off.</li>
+          <li>A whole lot of UI fixes and polish.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.0" date="2020-10-26" type="stable">
+      <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/V1.0.0</url>
+      <description>
+        <p>This is the initial release of The Unofficial Homestuck Collection!</p>
+        <p>Requires V1 of the Asset Pack to function. You'll have to find it elsewhere, sorry! Once
+          you've got it downloaded, you'll have to tell the application where to find it during the
+          initial startup process. After that, you're set!</p>
+      </description>
+    </release>
+  </releases>
+  <url type="homepage">https://bambosh.dev/unofficial-homestuck-collection/</url>
+  <url type="bugtracker">https://github.com/Bambosh/unofficial-homestuck-collection/issues</url>
+  <url type="faq">https://bambosh.dev/unofficial-homestuck-collection/faq.html</url>
+  <url type="vcs-browser">https://github.com/Bambosh/unofficial-homestuck-collection</url>
+  <categories>
+    <category>Game</category>
+  </categories>
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">intense</content_attribute>
+    <content_attribute id="violence-fantasy">intense</content_attribute>
+    <content_attribute id="violence-bloodshed">intense</content_attribute>
+    <content_attribute id="violence-desecration">mild</content_attribute>
+    <content_attribute id="drugs-alcohol">moderate</content_attribute>
+    <content_attribute id="drugs-narcotics">moderate</content_attribute>
+    <content_attribute id="sex-themes">mild</content_attribute>
+    <content_attribute id="language-profanity">intense</content_attribute>
+    <content_attribute id="language-humor">intense</content_attribute>
+    <content_attribute id="language-discrimination">mild</content_attribute>
+  </content_rating>
+  <keywords>
+    <keyword>homestuck</keyword>
+    <keyword>andrew hussie</keyword>
+    <keyword>mspa</keyword>
+    <keyword>ms paint adventures</keyword>
+    <keyword>flash</keyword>
+  </keywords>
+</component>

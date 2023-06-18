@@ -36,16 +36,16 @@ jobs:
           tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
         fi
         echo "tag=$tag" >> $GITHUB_OUTPUT
-    # - name: Create Release
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     tag_name: ${{ steps.create_tag.outputs.tag }}
-    #     release_name: ${{ steps.create_tag.outputs.tag }}
-    #     draft: true
-    #     prerelease: "${{ steps.create_tag.outputs.tag != fromJson(steps.package_json.outputs.json).version }}"
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create_tag.outputs.tag }}
+        release_name: ${{ steps.create_tag.outputs.tag }}
+        draft: true
+        prerelease: false
 
   build-matrix:
     needs: [ prep-release ]
