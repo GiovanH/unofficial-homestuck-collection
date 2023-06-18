@@ -9,7 +9,9 @@
         <!-- First-run app setup, no error -->
         <div class="cardContent newUserSetup wizard">
           <div class="wizardSidebar">
-            <img class="logo" src="@/assets/collection_logo.png"> <br />
+            <img class="logo" src="@/assets/collection_logo.png" v-if="!$isWebApp">
+            <img class="logo" src="/archive/collection/logo_v2_static.png" v-else>
+            <br />
             <ol class="wizardProgress">
               <li v-for="name, i in newReaderCardNames" 
                 v-text="name" 
@@ -87,7 +89,18 @@
             ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
           </div>
 
-          <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
+          <div v-if="$root.platform == 'webapp'" class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
+            <h2>Getting Started</h2>
+
+            <p>You are currently using the <b>webapp</b> version of The Unofficial Homestuck Collection. Some features are unavailable (like Flash support and user mods) and others may work incorrectly or with degraded performance. The full program can be downloaded at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/releases'>GitHub repository</a>.</p>
+
+            <p>Consider this a "trial version" if you're wondering if Homestuck is something you're interested in downloading, or as a way to easily share specific pages or moments with friends by link.</p>
+
+            <div class="center">
+              <button class="letsroll" @click="$localData.root.SET_ASSET_DIR('web')">All done. Let's roll!</button>
+            </div>
+          </div>
+          <div v-else class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
@@ -120,7 +133,7 @@
         </div>
       </div>
 
-      <div v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
+      <div v-else-if="isLoading">
         <div class="loadcard" >
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
@@ -324,7 +337,7 @@ export default {
       return this.assetDir
     },
     isLoading() {
-      return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
+      return (!this.loadingTooLongTimeout) && (this.$root.loadState === undefined || this.$root.loadState == "LOADING")
     },
     loadText() {
       if (this.$root.loadStage === undefined) {
@@ -619,7 +632,11 @@ export default {
   }
 }
 
+div.loadcard {
+  filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+}
 .loadcard {
+
   margin: auto;
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;

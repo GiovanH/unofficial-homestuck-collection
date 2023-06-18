@@ -14,7 +14,7 @@
     :autoplay="autoplay" @loadeddata="onVideoLoaded" />
   <iframe v-else-if="getMediaType(url) === 'swf'"
     :key="url" :srcdoc='flashSrc'
-    :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
+    :width='width || flashProps.width' :height='height || ($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
     @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
@@ -22,7 +22,7 @@
     :is="frameType"
     :src='resolveFrameUrl(url)'
     ref='frame'
-    :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
+    :style="`width: ${width || flashProps.width}px; height: ${height || flashProps.height}px; max-width: 100%; max-height: 100%;`"
     @did-finish-load="initHtmlFrame" seamless />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
@@ -36,9 +36,17 @@
 </template>
 
 <script>
-import fs from 'fs'
-import path from 'path'
 import Resources from "@/resources.js"
+
+const path = (window.isWebApp ? require('path-browserify') : require('path'))
+const ipcRenderer = require('electron').ipcRenderer
+
+var fs
+if (!window.isWebApp) {
+  fs = require('fs')
+} else {
+  fs = undefined
+}
 
 export default {
   name: "MediaEmbed",
@@ -318,8 +326,8 @@ export default {
         <object type="application/x-shockwave-flash" 
           width="${this.flashProps.width}" 
           height="${this.flashProps.height}" 
-          data="${this.$getResourceURL(this.url)}">
-            <param name='movie' value="${this.$getResourceURL(this.url)}"/>
+          data="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}">
+            <param name='movie' value="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}"/>
             <param name='play' value="true"/>
             <param name='loop' value="true"/>
             <param name='quality' value="high" />
@@ -656,7 +664,20 @@ document.addEventListener('click', function (e) {
     },
 
     getFile(url) {
-      return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      // Return the contents of the (text) file at url.
+      this.$logger.info("Retrieving file", url)
+      if (this.$isWebApp) {
+        const request = new XMLHttpRequest();
+        request.open("GET", url, false); // `false` makes the request synchronous
+        request.send(null);
+        if (request.status === 200) {
+          return request.responseText
+        } else {
+          console.error(request)
+        }
+      } else {
+        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      }
     },
     getMediaType (url) {
       url = url.toLowerCase()
@@ -679,9 +700,11 @@ document.addEventListener('click', function (e) {
       }
     },
     drag(e) {
-      e.preventDefault()
-      e.dataTransfer.effectAllowed = 'copy'
-      require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+      if (!this.$isWebApp) {
+        e.dataTransfer.effectAllowed = 'copy'
+        ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+        e.preventDefault()
+      }
     }
   },
   updated() {

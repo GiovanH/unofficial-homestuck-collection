@@ -1,5 +1,5 @@
 <template>
-  <div id="tabBar">
+  <div id="tabBar" v-if="hasTabBarContainer">
     <div class="navigationButtons">
       <button class="systemButton historyButton historyBack" @click="historyBack" 
         @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory">
@@ -21,20 +21,22 @@
     </template>
 
     <div id="tabSection">
-      <div id="dragTab" class="tab activeTab" 
-        tabindex="-1" v-show="showDragTab">
-        <div class="tabTitle" :class="{dragTitleFade}"></div>
-        <button class="systemButton closeTabButton">✕</button>
+      <div v-if="$localData.settings.useTabbedBrowsing">
+        <div id="dragTab" class="tab activeTab"
+          tabindex="-1" v-show="showDragTab">
+          <div class="tabTitle" :class="{dragTitleFade}"></div>
+          <button class="systemButton closeTabButton">✕</button>
+        </div>
+        <transition-group name="tab-list" tag="ul" id="tabs">
+          <Tab v-for="key in sortedTabList"
+            :key="key" :tab="tabs[key]"
+            :ref="'tab_' + key"
+            @mousedown.left.native="initDrag()" />
+        </transition-group>
+        <!-- TODO: Replace this with an svg so it's consistent across systems -->
+        <button class="systemButton newTabButton" @click="newTab()" title="New tab">
+          <span>＋</span></button>
       </div>
-      <transition-group name="tab-list" tag="ul" id="tabs">
-        <Tab v-for="key in sortedTabList" 
-          :key="key" :tab="tabs[key]" 
-          :ref="'tab_' + key" 
-          @mousedown.left.native="initDrag()" />
-      </transition-group>
-      <!-- TODO: Replace this with an svg so it's consistent across systems -->
-      <button class="systemButton newTabButton" @click="newTab()" title="New tab">
-        <span>＋</span></button>
       <div class="sysActionButtons">
         <button class="systemButton sysActionButton jumpBoxButton" 
          v-if="!$localData.settings.showAddressBar" 
@@ -61,7 +63,7 @@ import Settings from '@/components/SystemPages/Settings.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
-const { ipcRenderer } = require('electron')
+const ipcRenderer = require('electron').ipcRenderer
 
 export default {
   name: 'tabBar',
@@ -94,6 +96,13 @@ export default {
   computed: {
     sortedTabList() {
       return this.$localData.tabData.sortedTabList
+    },
+    hasTabBarContainer() {
+      if (!this.$isWebApp) return true
+      else return (this.$localData.settings.useTabbedBrowsing)
+      //            Tabbed  Untabbed
+      // Webapp      Nav     None
+      // Electron    Nav     Nav
     },
     tabs() {
       return this.$localData.tabData.tabs
