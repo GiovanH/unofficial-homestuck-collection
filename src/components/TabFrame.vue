@@ -515,7 +515,7 @@ export default {
                 const context = this
                 title = componentObj.title(context)
             } else {
-                this.$logger.warn("Missing title function for", componentObj, componentObj.title)
+                this.$logger.warn("Missing title function for", component, componentObj.title)
                 title = this.tab.url
             }
             

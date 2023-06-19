@@ -39,7 +39,7 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 // import FlexSearch from 'flexsearch'
 const { ipcRenderer } = require('electron')
-const Mark = require('../../../node_modules/mark.js/dist/mark.js')
+const Mark = require('mark.js')
 
 export default {
   name: 'search',

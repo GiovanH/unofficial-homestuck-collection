@@ -18,7 +18,7 @@
 </template>
 
 <script>
-let Mark = require('../../../node_modules/mark.js/dist/mark.js')
+let Mark = require('mark.js')
 
 export default {
   name: 'findBox',

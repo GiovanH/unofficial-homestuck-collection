@@ -2,7 +2,8 @@
   <div class="pageBody customStyles" :class="{pixelated: $localData.settings.pixelScaling}">
     <NavBanner useCustomStyles="true" />
     <div class="pageFrame">
-      <div class="pageContent">
+      <slot v-if="noPageContent"></slot>
+      <div v-else class="pageContent">
         <slot></slot>
       </div>
     </div>
@@ -18,7 +19,8 @@ export default {
   name: 'GenericPage',
   components: {
     NavBanner, PageFooter
-  }
+  },
+  props: ['noPageContent']
 }
 </script>
 
@@ -41,6 +43,23 @@ export default {
       color: var(--page-links);
     }
 
+    //Small screen check
+    @media only screen and (max-width: 850px) {
+      &{
+        overflow-x: hidden;
+        height: max-content;
+        .navBanner {
+          max-width: 100%;
+        }
+        .pageFrame {
+          max-width: 100%;
+        }
+        ::v-deep div.footer {
+          max-width: 100%;
+        }
+      }
+    }
+
     .pageFrame {
       background: var(--page-pageFrame);
 
@@ -49,16 +68,18 @@ export default {
       padding-bottom: 23px;
       margin: 0 auto;
 
+      // Elements position top-to-bottom, centered.
       flex: 0 1 auto;
       display: flex;
-      justify-content: center;
+      align-items: center;
+      flex-direction: column;
 
       .pageContent {
         background: var(--page-pageContent);
-
         max-width: 950px;
         min-width: 650px;
 
+        // Elements position top-to-bottom, centered.
         display: flex;
         flex: 0 1 auto;
         align-items: center;
