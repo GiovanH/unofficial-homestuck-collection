@@ -1,5 +1,3 @@
--include .env
-
 CONFIG_JSON_PATH = "${APPDATA}/unofficial-homestuck-collection/config.json"
 
 default: test

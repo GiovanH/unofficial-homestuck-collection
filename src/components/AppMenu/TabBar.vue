@@ -21,7 +21,7 @@
     </template>
 
     <div id="tabSection">
-      <div v-if="$localData.settings.useTabbedBrowsing">
+      <template v-if="$localData.settings.useTabbedBrowsing">
         <div id="dragTab" class="tab activeTab"
           tabindex="-1" v-show="showDragTab">
           <div class="tabTitle" :class="{dragTitleFade}"></div>
@@ -36,7 +36,7 @@
         <!-- TODO: Replace this with an svg so it's consistent across systems -->
         <button class="systemButton newTabButton" @click="newTab()" title="New tab">
           <span>＋</span></button>
-      </div>
+      </template>
       <div class="sysActionButtons">
         <button class="systemButton sysActionButton jumpBoxButton" 
          v-if="!$localData.settings.showAddressBar" 

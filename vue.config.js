@@ -38,28 +38,31 @@ module.exports = {
         }
     },
     chainWebpack: config => {
-        const srl_options = options => {
-            return {
-                search: 'assets://',
-                replace: (process.env.ASSET_PACK_HREF || 'http://localhost:8413/'),
-                flags: 'g'
+        if (process.env.ASSET_PACK_HREF) {
+            console.log("Replacing for asset href", process.env.ASSET_PACK_HREF)
+            const srl_options = options => {
+                return {
+                    search: 'assets://',
+                    replace: process.env.ASSET_PACK_HREF,
+                    flags: 'g'
+                }
             }
-        }
-        // config.module.rule('vue')
-        //     .use('string-replace-loader')
-        //     .loader('string-replace-loader')
-        //     .before('cache-loader') // After css imports are resolved
-        //     .tap(srl_options)
+            // config.module.rule('vue')
+            //     .use('string-replace-loader')
+            //     .loader('string-replace-loader')
+            //     .before('cache-loader') // After css imports are resolved
+            //     .tap(srl_options)
 
-        for (const rule of ['css', 'scss']) {
-            for (const oneOfCase of ['vue', 'vue-modules', 'normal', 'normal-modules']) {
-                // console.warn(oneOfCase)
-                config.module.rule(rule)
-                    .oneOf(oneOfCase)
-                    .use('string-replace-loader')
-                    .loader('string-replace-loader')
-                    .before('css-loader') // After css-loader processes imports (before means after)
-                    .tap(srl_options)
+            for (const rule of ['css', 'scss']) {
+                for (const oneOfCase of ['vue', 'vue-modules', 'normal', 'normal-modules']) {
+                    // console.warn(oneOfCase)
+                    config.module.rule(rule)
+                        .oneOf(oneOfCase)
+                        .use('string-replace-loader')
+                        .loader('string-replace-loader')
+                        .before('css-loader') // After css-loader processes imports (before means after)
+                        .tap(srl_options)
+                }
             }
         }
     },

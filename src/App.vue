@@ -391,14 +391,17 @@
     }
   }
 
+  a.jumpboxLink::after{
+    // By default, show > in the jump bar
+    @extend %fa-icon;
+    @extend .fas;
+    content: fa-content($fa-var-chevron-right);
+  }
   .electron {
-    a, .bookmarkUrlDisplay {
-      &.jumpboxLink::after{
-        @extend %fa-icon;
-        @extend .fas;
-        content: fa-content($fa-var-chevron-right);
-      }
+    a, .urlDisplay {
+      // Link-like links...
       &[href^="http://"], &[href^="https://"], &[href^="mailto"], &[href$=".pdf"], &[href$=".html"] {
+        // ...that aren't on localhost
         &:not([href*="127.0.0.1"]):not([href*="localhost"]):not([href*="assets://"])::after{
           @extend %fa-icon;
           @extend .fas;
@@ -407,6 +410,7 @@
           line-height: inherit;
         }
       }
+      // Asset-like links
       &[href$=".jpg"], &[href$=".png"], &[href$=".gif"], &[href$=".swf"], &[href$=".txt"], &[href$=".mp3"], &[href$=".wav"], &[href$=".mp4"], &[href$=".webm"]{
         &::after{
           @extend %fa-icon;

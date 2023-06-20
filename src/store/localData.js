@@ -160,7 +160,7 @@ class LocalData {
           let back = {
             assetDir: store.get('assetDir'),
             saveData: store.get('saveData') || DEFAULT_SAVEDATA,
-            settings: store.get('settings') || DEFAULT_SETTINGS,
+            settings: {...DEFAULT_SETTINGS, ...store.get('settings')},
             tabData: store.get('tabData') || DEFAULT_TABDATA
           }
           if (store.has('localData')) {
@@ -557,14 +557,14 @@ class LocalData {
             const history_state = {
               tabData: this.tabData
             }
-            console.log("Saving", history_state)
+            // console.log("Saving", history_state)
             window.history.pushState(history_state, "", this.activeTabObject.url);
           }
         }
       },
       created() {
         window.addEventListener("popstate", (event) => {
-          console.log("Loading", event.state)
+          // console.log("Loading", event.state)
           this.temp.isPoppingState = true // next url change should not count as navigation
           this.tabData = {...this.tabData, ...event.state.tabData}
         });
