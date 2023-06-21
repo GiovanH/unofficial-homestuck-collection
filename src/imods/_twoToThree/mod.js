@@ -49,7 +49,7 @@ module.exports = {
 
     editFormspring('andrewhussie', 'andrewhussie550488999', '"/archive/formspring/00958_1.gif"', '"assets://archive/social/formspring/00958_1.gif"')
 
-    archive.extras['epilogues'] = api.readYaml('epilogues.yaml')
+    archive.extras['epilogues'] = api.readYaml('./epilogues.yaml')
   },
   computed(api_) {
     api = api_

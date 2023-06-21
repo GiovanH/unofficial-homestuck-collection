@@ -4,7 +4,7 @@ import yaml from 'js-yaml'
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 
 var ipcMain, dialog, unzipper, Tar, fs
-var store, log
+var store, store_mods, log
 if (!isWebApp) {
   var {ipcMain, dialog} = require('electron')
 
@@ -15,6 +15,18 @@ if (!isWebApp) {
 
   const Store = require('electron-store')
   store = new Store()
+
+  store_mods = new Store({
+    name: "mods",
+    migrations: {
+      '2.3.0': store_mods => {
+        if (store.has('mod')) {
+          store_mods.set(store.get('mod'));
+          store.delete('mod')
+        }
+      }
+    }
+  })
 
   fs = require('fs')
 
@@ -57,9 +69,15 @@ function expectWorkingState(){
 // Routing
 
 // Function exposed for SubSettingsModal, which directly writes to store
+
+// function getModStoreKey_legacy(mod_id, k){
+//   if (k) {return `${getModStoreKey(mod_id)}.${k}`}
+//   return `mod.${mod_id.replace('.', '-')}`
+// }
+
 function getModStoreKey(mod_id, k){
   if (k) {return `${getModStoreKey(mod_id)}.${k}`}
-  return `mod.${mod_id.replace('.', '-')}`
+  return `${mod_id.replace('.', '-')}`
 }
 
 function getAssetRoute(url) {
@@ -394,12 +412,12 @@ function buildApi(mod) {
 
   let api = {
     store: {
-      set: (k, v) => store.set(getModStoreKey(mod._id, k), v),
-      get: (k, default_) => store.get(getModStoreKey(mod._id, k), default_),
-      has: (k) => store.has(getModStoreKey(mod._id, k)),
-      delete: (k) => store.delete(getModStoreKey(mod._id, k)),
-      onDidChange: (k, cb) => store.onDidChange(getModStoreKey(mod._id, k), cb),
-      clear: () => store.clear(getModStoreKey(mod._id, null))
+      set: (k, v) => store_mods.set(getModStoreKey(mod._id, k), v),
+      get: (k, default_) => store_mods.get(getModStoreKey(mod._id, k), default_),
+      has: (k) => store_mods.has(getModStoreKey(mod._id, k)),
+      delete: (k) => store_mods.delete(getModStoreKey(mod._id, k)),
+      onDidChange: (k, cb) => store_mods.onDidChange(getModStoreKey(mod._id, k), cb),
+      clear: () => store_mods.clear(getModStoreKey(mod._id, null))
     }, 
     readFile(asset_path) {
       let data = readFileSyncLocal(asset_path, "readFile")
@@ -1020,6 +1038,8 @@ function getModChoices() {
 }
 
 export default {
+  store_mods,
+
   getEnabledModsJs,  // bg
   getEnabledMods,
   getModChoices, // fg

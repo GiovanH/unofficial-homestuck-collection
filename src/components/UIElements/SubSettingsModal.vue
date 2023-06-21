@@ -94,7 +94,7 @@
 
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
-const { getModStoreKey } = require('@/mods.js').default
+const { getModStoreKey, store_mods } = require('@/mods.js').default
 
 const Store = require('electron-store')
 const store = new Store()
@@ -135,7 +135,7 @@ export default {
       this.settingsModel = modopt.settingsmodel || {}
       this.modopt = modopt
       this.storeKey = getModStoreKey(modopt.key, null)
-      this.buffer = store.get(this.storeKey) || {}
+      this.buffer = store_mods.get(this.storeKey) || {}
       this.info_only = Boolean(info_only)
 
       this.isActive = true
@@ -165,12 +165,12 @@ export default {
       if (this.info_only) return
       if (!this.hasSettings) return
       this.$logger.debug("saving", this.buffer, this.storeKey)
-      store.set(this.storeKey, this.buffer)
+      store_mods.set(this.storeKey, this.buffer)
     },
     clearAll() {
       this.$logger.info("Clearing mod store key", this.storeKey)
-      store.set(this.storeKey, {})
-      this.buffer = store.get(this.storeKey) || {}
+      store_mods.set(this.storeKey, {})
+      this.buffer = store_mods.get(this.storeKey) || {}
     },
     forceReload() {
       this.close()

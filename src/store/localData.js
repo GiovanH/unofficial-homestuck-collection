@@ -3,7 +3,17 @@ import Vue from 'vue'
 var store;
 if (!window.isWebApp) {
   const Store = require('electron-store')
-  store = new Store()
+  store = new Store({
+    migrations: {
+      '2.3.0': store => {
+        // Migrate storage
+        console.log("Migrating localData monolith")
+        const local_data_prev = store.get('localData', {})
+        store.delete('localData')
+        store.set(local_data_prev)
+      }
+    }
+  })
 }
 
 const LOADED_TAB_LIMIT = 10
@@ -162,12 +172,6 @@ class LocalData {
             saveData: store.get('saveData') || DEFAULT_SAVEDATA,
             settings: {...DEFAULT_SETTINGS, ...store.get('settings')},
             tabData: store.get('tabData') || DEFAULT_TABDATA
-          }
-          if (store.has('localData')) {
-            // Migrate storage
-            console.log("Migrating localData monolith")
-            back = store.get('localData', {})
-            store.delete('localData')
           }
 
           this.assetDir = back.assetDir
