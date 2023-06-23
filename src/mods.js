@@ -410,14 +410,35 @@ function buildApi(mod) {
     return fs.readFileSync(path.join(mod._mod_root_dir, local_path), 'utf8')
   }
 
+  var this_store_cache = {}
+  var cached_undefined = "_CACHED_UNDEFINED_"
+
   let api = {
     store: {
-      set: (k, v) => store_mods.set(getModStoreKey(mod._id, k), v),
-      get: (k, default_) => store_mods.get(getModStoreKey(mod._id, k), default_),
-      has: (k) => store_mods.has(getModStoreKey(mod._id, k)),
-      delete: (k) => store_mods.delete(getModStoreKey(mod._id, k)),
+      set: (k, v) => {
+        this_store_cache[k] = (v == undefined ? cached_undefined : v)
+        return store_mods.set(getModStoreKey(mod._id, k), v)
+      },
+      get: (k, default_) => {
+        if (this_store_cache[k] != undefined) {
+          if (this_store_cache[k] == cached_undefined) return undefined
+          else return this_store_cache[k]
+        } else {
+          const v = store_mods.get(getModStoreKey(mod._id, k), default_)
+          this_store_cache[k] = (v == undefined ? cached_undefined : v)
+          return v
+        }
+      },
+      has: (k) => this_store_cache[k] || store_mods.has(getModStoreKey(mod._id, k)),
+      delete: (k) => {
+        delete this_store_cache[k]
+        store_mods.delete(getModStoreKey(mod._id, k))
+      },
       onDidChange: (k, cb) => store_mods.onDidChange(getModStoreKey(mod._id, k), cb),
-      clear: () => store_mods.clear(getModStoreKey(mod._id, null))
+      clear: () => {
+        this_store_cache = {}
+        store_mods.clear(getModStoreKey(mod._id, null))
+      }
     }, 
     readFile(asset_path) {
       let data = readFileSyncLocal(asset_path, "readFile")
