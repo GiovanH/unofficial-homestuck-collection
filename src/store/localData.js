@@ -127,7 +127,8 @@ class LocalData {
           visited: [],
           loadedTabList: [],
           tabChainIndex: undefined,
-          isPoppingState: false
+          isPoppingState: false,
+          saveDebounce: false
         }
       }),
       computed: {
@@ -152,26 +153,43 @@ class LocalData {
         }
       },
       methods: {
+        _saveLocalStorage() {
+          const all = store.get()
+          all["timestamp"] = Date.now()
+          all['assetDir'] = this.assetDir
+          all['tabData'] = this.tabData
+          all['saveData'] = this.saveData
+          all['settings'] = this.settings
+          store.set(all)
+        },
         saveLocalStorage() {
-          store.set("timestamp", Date.now())
-          store.set('assetDir', this.assetDir)
-          store.set('tabData', this.tabData)
-          store.set('saveData', this.saveData)
-          store.set('settings', this.settings)
+          if (this.saveDebounce) clearTimeout(this.saveDebounce)
+          this.saveDebounce = setTimeout(this._saveLocalStorage, 1000)
         },
         clearLocalStorage() {
-          store.delete("timestamp")
-          store.delete('assetDir')
-          store.delete('tabData')
-          store.delete('saveData')
-          store.delete('settings')
+          if (this.saveDebounce) {
+            clearTimeout(this.saveDebounce)
+            this._saveLocalStorage()
+          }
+          const all = store.get()
+          delete all["timestamp"]
+          delete all['assetDir']
+          delete all['tabData']
+          delete all['saveData']
+          delete all['settings']
+          store.set(all)
         },
         reloadLocalStorage() {
+          if (this.saveDebounce) {
+            clearTimeout(this.saveDebounce)
+            this._saveLocalStorage()
+          }
+          const all = store.get()
           let back = {
-            assetDir: store.get('assetDir'),
-            saveData: store.get('saveData') || DEFAULT_SAVEDATA,
-            settings: {...DEFAULT_SETTINGS, ...store.get('settings')},
-            tabData: store.get('tabData') || DEFAULT_TABDATA
+            assetDir: all['assetDir'],
+            saveData: all['saveData'] || DEFAULT_SAVEDATA,
+            settings: {...DEFAULT_SETTINGS, ...all['settings']},
+            tabData: all['tabData'] || DEFAULT_TABDATA
           }
 
           this.assetDir = back.assetDir
