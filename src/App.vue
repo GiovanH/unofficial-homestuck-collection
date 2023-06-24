@@ -181,15 +181,17 @@
       this.$localData.root.TABS_SWITCH_TO()
       // Switch to the last tab (good) but replaces history (so we use the previously captured value)
 
-      if (user_path_target != this.$localData.root.activeTabObject.url) {
-        this.$logger.warn("Navigating user to", user_path_target)
-        this.$nextTick(() => {
-          // this.$localData.root.TABS_PUSH_URL(user_path_target)
-          this.$localData.root.TABS_NEW(user_path_target)
-        })
-      } else {
-        // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
+      if (isWebApp) {
+        if (user_path_target != this.$localData.root.activeTabObject.url) {
+          this.$logger.warn("Navigating user to", user_path_target)
+          this.$nextTick(() => {
+            // this.$localData.root.TABS_PUSH_URL(user_path_target)
+            this.$localData.root.TABS_NEW(user_path_target)
+          })
+        } else {
+          // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
 
+        }
       }
 
       webFrame && webFrame.setZoomFactor(1)
