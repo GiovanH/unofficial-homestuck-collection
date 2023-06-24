@@ -41,57 +41,58 @@ import JumpBox from '@/components/UIElements/JumpBox.vue'
 
 const FindBox = () => import('@/components/UIElements/FindBox.vue')
 
-import ERROR404 from '@/components/SystemPages/Error404.vue'
-import SPOILER from '@/components/SystemPages/Spoiler.vue'
+const ERROR404 = () => import('@/components/SystemPages/Error404.vue')
+const SPOILER = () => import('@/components/SystemPages/Spoiler.vue')
 
-import HOMEPAGE from '@/components/SystemPages/Homepage.vue'
-import HELP from '@/components/SystemPages/Help.vue'
-import MAP from '@/components/SystemPages/Map.vue'
-import LOG from '@/components/SystemPages/Log.vue'
-import SEARCH from '@/components/SystemPages/Search.vue'
-import SETTINGS from '@/components/SystemPages/Settings.vue'
-import CREDITS from '@/components/SystemPages/Credits.vue'
+const HOMEPAGE = () => import('@/components/SystemPages/Homepage.vue')
+const HELP = () => import('@/components/SystemPages/Help.vue')
+const MAP = () => import('@/components/SystemPages/Map.vue')
+const LOG = () => import('@/components/SystemPages/Log.vue')
+const SEARCH = () => import('@/components/SystemPages/Search.vue')
+const SETTINGS = () => import('@/components/SystemPages/Settings.vue')
+const CREDITS = () => import('@/components/SystemPages/Credits.vue')
 
-import PAGE from '@/components/Page/Page.vue'
-import SINGLEPAGE from '@/components/Page/SinglePage.vue'
-import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
-import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
-import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
-import ECHIDNA from '@/components/SpecialPages/Echidna.vue'
-import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
+const PAGE = () => import('@/components/Page/Page.vue')
+const SINGLEPAGE = () => import('@/components/Page/SinglePage.vue')
+const FULLSCREENFLASH = () => import('@/components/SpecialPages/fullscreenFlash.vue')
+const X2COMBO = () => import('@/components/SpecialPages/x2Combo.vue')
+const TZPASSWORD = () => import('@/components/SpecialPages/TzPassword.vue')
+const ECHIDNA = () => import('@/components/SpecialPages/Echidna.vue')
+const ENDOFHS = () => import('@/components/SpecialPages/EndOfHS.vue')
 
-import UNLOCK from '@/components/Extras/Unlock.vue'
-import DECODE from '@/components/Extras/Decode.vue'
-import DESKTOPS from '@/components/Extras/Desktops.vue'
-import EXTRASPAGE from '@/components/Extras/ExtrasPage.vue'
-import PS_TITLESCREEN from '@/components/Extras/PS_titlescreen.vue'
-import TBIY from '@/components/Extras/theBabyIs.vue'
-import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
-import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
-import SKAIANET from '@/components/Extras/Skaianet.vue'
-import SQUIDDLES from '@/components/Extras/Squiddles.vue'
-import EVENMORE from '@/components/Extras/EvenMore.vue'
+const UNLOCK = () => import('@/components/Extras/Unlock.vue')
+const DECODE = () => import('@/components/Extras/Decode.vue')
+const DESKTOPS = () => import('@/components/Extras/Desktops.vue')
+const EXTRASPAGE = () => import('@/components/Extras/ExtrasPage.vue')
+const PS_TITLESCREEN = () => import('@/components/Extras/PS_titlescreen.vue')
+const TBIY = () => import('@/components/Extras/theBabyIs.vue')
+const NAMCOHIGH = () => import('@/components/Extras/NamcoHigh.vue')
+const VIGILPRINCE = () => import('@/components/Extras/VigilPrince.vue')
+const SKAIANET = () => import('@/components/Extras/Skaianet.vue')
+const SQUIDDLES = () => import('@/components/Extras/Squiddles.vue')
+const EVENMORE = () => import('@/components/Extras/EvenMore.vue')
 
-import EPILOGUES from '@/components/Beyond/Epilogues.vue'
+const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
 
-import MUSIC from '@/components/Music/MusicFrame.vue'
+const MUSIC = () => import('@/components/Music/MusicFrame.vue')
 
-import SOCIALS from '@/components/Socials/Socials.vue'
-import DSTRIDER from '@/components/Socials/DStrider.vue'
-import BLOGSPOT from '@/components/Socials/Blogspot.vue'
-import MAGICALJOURNEY from '@/components/Socials/MagicalJourney.vue'
-import OFFERYOUCANTREFUSE from '@/components/Socials/OfferYouCantRefuse.vue'
-import FORMSPRING from '@/components/Socials/Formspring.vue'
-import TUMBLR from '@/components/Socials/Tumblr.vue'
-import NEWS from '@/components/Socials/News.vue'
+const SOCIALS = () => import('@/components/Socials/Socials.vue')
+const DSTRIDER = () => import('@/components/Socials/DStrider.vue')
+const BLOGSPOT = () => import('@/components/Socials/Blogspot.vue')
+const MAGICALJOURNEY = () => import('@/components/Socials/MagicalJourney.vue')
+const OFFERYOUCANTREFUSE = () => import('@/components/Socials/OfferYouCantRefuse.vue')
+const FORMSPRING = () => import('@/components/Socials/Formspring.vue')
+const TUMBLR = () => import('@/components/Socials/Tumblr.vue')
+const NEWS = () => import('@/components/Socials/News.vue')
 
-import SBAHJ from '@/components/Comics/sbahj.vue'
-import PXS from '@/components/Comics/pxs.vue'
-import TSO from '@/components/Comics/tso.vue'
-import SNAPS from '@/components/Comics/Snaps.vue'
+const SBAHJ = () => import('@/components/Comics/sbahj.vue')
+const PXS = () => import('@/components/Comics/pxs.vue')
+const TSO = () => import('@/components/Comics/tso.vue')
+// import SNAPS from '@/components/Comics/Snaps.vue'
+const SNAPS = () => import('@/components/Comics/Snaps.vue')
 
-import TESTS from '@/components/Extras/tests.vue'
-import EDITOR from '@/components/CustomContent/PageEditor.vue'
+const TESTS = () => import('@/components/Extras/tests.vue')
+const EDITOR = () => import('@/components/CustomContent/PageEditor.vue')
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
@@ -161,7 +162,8 @@ export default {
         return {
             scrollTopPrev: 0,
             gameOverThemeOverride: false,
-            modBrowserPages: {}
+            modBrowserPages: {},
+            isImportWaiting: true
         }
     },
     created(){
@@ -402,17 +404,18 @@ export default {
                 || (component.toUpperCase() in this.modBrowserPages)
                 ? component.toUpperCase() 
                 : 'ERROR404'
-            this.setTitle(result)
             return result
         },
         contentTheme() {
             // Get the expected theme for this page, based on the content
             let theme = 'default'
+
             const component = this.resolveComponent
+            if (!component || this.isImportWaiting) return 'default'
 
             // if (this.gameOverThemeOverride) return this.gameOverThemeOverride
 
-            const componentObj = this.$options.components[component]
+            const componentObj = this.getPageComponent(component)
             if (componentObj && componentObj.theme) {
                 const context = this
                 theme = componentObj.theme(context) || theme
@@ -447,6 +450,11 @@ export default {
         }
     },
     methods: {
+        getPageComponent(component) {
+            var componentObj = this.$options.components[component]
+            componentObj = (componentObj.resolved?.extendOptions || componentObj) // un-promisify
+            return componentObj
+        },
         reload() {
             const u = this.tab.url
             this.tab.url = "blank"
@@ -517,16 +525,33 @@ export default {
             // you would not believe how bad this used to be
             let title
 
-            const componentObj = this.$options.components[component]
-            if (componentObj && componentObj.title) {
+            const componentObj = this.getPageComponent(component)
+
+            if (!componentObj || this.isImportWaiting) {
+                // Component object isn't import-loaded, use cached title.
+                return;
+            }
+
+            if (componentObj.title) {
                 const context = this
                 title = componentObj.title(context)
             } else {
                 this.$logger.warn("Missing title function for", component, componentObj.title)
                 title = this.tab.url
             }
-            
+
             this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
+        },
+        checkIsImportWaiting() {
+            const component_or_promise = this.getPageComponent(this.resolveComponent)
+            if (typeof component_or_promise == "function") {
+                this.isImportWaiting = true
+                component_or_promise().then(_ => {
+                    this.isImportWaiting = false
+                })
+            } else {
+                this.isImportWaiting = false
+            }
         }
     },
     updated(){
@@ -544,9 +569,14 @@ export default {
                     this.$el.style.borderTop = ''
                 }, 10)
             }
+        },
+        'resolveComponent'(to, from) {
+            this.checkIsImportWaiting()
+            this.setTitle(to)
         }
     },
     mounted(){
+        this.checkIsImportWaiting()
         this.setTitle()
         if (this.tabIsActive) {
             this.$nextTick(() => {
