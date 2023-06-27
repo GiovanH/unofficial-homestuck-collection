@@ -168,7 +168,8 @@
         this.updateAppIcon()
       },
       'tabTheme'(to, from) {
-        this.$root.tabTheme = to
+        if (to != undefined)
+          this.$root.tabTheme = to
       }
     },
     updated() {

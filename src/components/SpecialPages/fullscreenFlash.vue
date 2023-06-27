@@ -7,7 +7,7 @@
               <Media :url="flashUrl" ref="flash" />
           </div>      
           <div class="textContent">
-              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
+              <PageNav :thisPage="thisPage" ref="pageNav" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
           </div>
         <Footnotes :pageId="thisPage.pageId" />
       </div>

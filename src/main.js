@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import AsyncComputed from 'vue-async-computed'
 import App from './App'
 import router from './router'
 import localData from './store/localData'
@@ -54,6 +55,7 @@ const app_domain = window.location.host // (window.isWebApp ? window.webAppDomai
 window.doFullRouteCheck = Mods.doFullRouteCheck
 
 Vue.use(localData) // Initializes and loads when Vue installs it
+Vue.use(AsyncComputed)
 
 // Mixin mod mixins
 Mods.getMixins().forEach((m) => Vue.mixin(m))

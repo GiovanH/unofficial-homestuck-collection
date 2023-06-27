@@ -20,7 +20,7 @@
     >
         <component
             :class="theme"
-            :is="resolveComponent" 
+            :is="loadedResolvedComponent"
             :tab="tab" 
             :routeParams="routeParams" 
             ref="page"
@@ -161,9 +161,10 @@ export default {
     data() {
         return {
             scrollTopPrev: 0,
-            gameOverThemeOverride: false,
+            gameOverThemeOverride: false, // Set by fullscreenFlash.vue
             modBrowserPages: {},
-            isImportWaiting: true
+            lastContentTheme: undefined, // Cache the previous contentTheme for smoother transitions,
+            loadedResolvedComponent: undefined // Don't change component until it's loaded so the page "hangs" a second before changing, instead of blanking out.
         }
     },
     created(){
@@ -172,6 +173,22 @@ export default {
             if (!mixins.includes(ModBrowserPageMixin)) {
                 mixins.push(ModBrowserPageMixin)
                 this.modBrowserPages[COM].component.mixins = mixins
+            }
+        }
+    },
+    asyncComputed: {
+        async componentOptions() {
+            var component_or_promise = this.$options.components[this.resolveComponent]
+
+            // un-promisify if possible
+            component_or_promise = (component_or_promise.resolved?.extendOptions || component_or_promise)
+
+            if (typeof component_or_promise == "function") {
+                // console.debug("import is waiting for", this.resolveComponent)
+                return (await component_or_promise())?.default
+            } else {
+                // console.debug("already resolved promise for", this.resolveComponent)
+                return component_or_promise
             }
         }
     },
@@ -410,12 +427,13 @@ export default {
             // Get the expected theme for this page, based on the content
             let theme = 'default'
 
-            const component = this.resolveComponent
-            if (!component || this.isImportWaiting) return 'default'
+            const componentObj = this.componentOptions
+            if (!componentObj) {
+                return this.lastContentTheme || "default"
+            }
 
             // if (this.gameOverThemeOverride) return this.gameOverThemeOverride
 
-            const componentObj = this.getPageComponent(component)
             if (componentObj && componentObj.theme) {
                 const context = this
                 theme = componentObj.theme(context) || theme
@@ -450,11 +468,6 @@ export default {
         }
     },
     methods: {
-        getPageComponent(component) {
-            var componentObj = this.$options.components[component]
-            componentObj = (componentObj.resolved?.extendOptions || componentObj) // un-promisify
-            return componentObj
-        },
         reload() {
             const u = this.tab.url
             this.tab.url = "blank"
@@ -521,13 +534,13 @@ export default {
         openModal(url) {
             this.$refs.modal.open(url)
         },
-        setTitle(component = this.resolveComponent){
+        setTitle(){
             // you would not believe how bad this used to be
             let title
 
-            const componentObj = this.getPageComponent(component)
+            const componentObj = this.componentOptions
 
-            if (!componentObj || this.isImportWaiting) {
+            if (!componentObj) {
                 // Component object isn't import-loaded, use cached title.
                 return;
             }
@@ -541,23 +554,12 @@ export default {
             }
 
             this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
-        },
-        checkIsImportWaiting() {
-            const component_or_promise = this.getPageComponent(this.resolveComponent)
-            if (typeof component_or_promise == "function") {
-                this.isImportWaiting = true
-                component_or_promise().then(_ => {
-                    this.isImportWaiting = false
-                })
-            } else {
-                this.isImportWaiting = false
-            }
         }
     },
     updated(){
-      this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
-      })
+        this.$nextTick(function () {
+            this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        })
     },
     watch: {
         'tabIsActive'(to, from) {
@@ -570,13 +572,18 @@ export default {
                 }, 10)
             }
         },
-        'resolveComponent'(to, from) {
-            this.checkIsImportWaiting()
-            this.setTitle(to)
+        'loadedResolvedComponent'(to, from) {
+            this.setTitle()
+        },
+        'contentTheme'(to, from) {
+            this.lastContentTheme = to
+        },
+        'componentOptions'(to, from) {
+            // Promise finished, we've loaded the current resolved component.
+            this.loadedResolvedComponent = this.resolveComponent
         }
     },
     mounted(){
-        this.checkIsImportWaiting()
         this.setTitle()
         if (this.tabIsActive) {
             this.$nextTick(() => {
