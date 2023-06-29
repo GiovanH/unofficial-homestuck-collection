@@ -82,6 +82,7 @@ const DEFAULT_SETTINGS = {
   openLogs: false,
   hqAudio: true,
   jsFlashes: true,
+  reducedMotion: false,
   credits: true,
 
   fastForward: false,
