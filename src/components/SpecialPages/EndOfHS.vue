@@ -64,6 +64,8 @@ export default {
   props: [
     'tab', 'routeParams'
   ],
+  title: PAGE.title,
+  theme: PAGE.theme,
   components: {
     EndOfHSMedia, PageNav, Banner, FlashCredit, Footnotes
   },

@@ -112,6 +112,7 @@ export default {
     },
     thisPage() {
       // Add useful information to archive object
+      if (!this.pageNum) return undefined
       return {
         ...this.pageCollection[this.pageNum],
         storyId: this.storyId,

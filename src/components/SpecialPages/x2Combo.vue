@@ -51,6 +51,8 @@ export default {
   components: {
     PageNav
   },
+  title: PAGE.title,
+  theme: PAGE.theme,
   computed: {
     // pageNum: PAGE.computed.pageNum,  // Page number of one of the two pages (usually the left one)
     thisPages() {
