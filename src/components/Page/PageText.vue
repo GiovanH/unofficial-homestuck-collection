@@ -67,12 +67,19 @@ export default {
             const bgcolor_repr = this.textType == 'log'
                 ? this.getComputedStyle('--page-log-bg')
                 : this.textType == 'prattle'
-                ? this.getComputedStyle('--page-pageContent')
-                : this.textType == 'authorlog'
-                ? 'white'
-                : undefined
+                  ? this.getComputedStyle('--page-pageContent')
+                  : this.textType == 'authorlog'
+                    ? 'white'
+                    : undefined
 
-            return (new Color(bgcolor_repr || 'white').getLightness() < 0.5)
+            if (bgcolor_repr == undefined) {
+                // Not mounted; use last cached value to avoid extra recalculations
+                // this.$logger.debug(bgcolor_repr, "no bg yet, using previous value", this._computedWatchers.isDarkBackground.value || false)
+                return this._computedWatchers.isDarkBackground.value || false
+            }
+            const is_dark = (new Color(bgcolor_repr || 'white').getLightness() < 0.5)
+            // this.$logger.info("new color", bgcolor_repr, "is dark?", is_dark)
+            return is_dark
         },
         fontStyle() {
             const fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']

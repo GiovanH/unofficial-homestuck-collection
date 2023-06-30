@@ -1,15 +1,31 @@
 <template>
-  <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
-    <div class="pageFrame">
+  <div>
+    <GenericPage v-if="gameOverPreload"
+      :tab="tab" >
       <div class="pageContent">
-        <Footnotes :pageId="thisPage.pageId" preface />
+        <div class="mediaContent">
+          <h2 class="pageTitle">[S] GAME OVER.</h2>
+          <div class="media" ref="media">
+            <div class="panel"
+              style="width: 650px; height: 450px; background: #001800; border: none;" />
+          </div>
+        </div>
+        <div class="textContent" style="height: 70px;"></div>
+      </div>
+    </GenericPage>
+    <!-- <GenericPage v-if="gameOverPreload" /> -->
+    <div :style="{visibility: gameOverPreload ? 'hidden' : 'visible'}" class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
+      <div class="pageFrame">
+        <div class="pageContent">
+          <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
               <Media :url="flashUrl" ref="flash" />
-          </div>      
+          </div>
           <div class="textContent">
               <PageNav :thisPage="thisPage" ref="pageNav" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
           </div>
-        <Footnotes :pageId="thisPage.pageId" />
+          <Footnotes :pageId="thisPage.pageId" />
+        </div>
       </div>
     </div>
   </div>
@@ -20,6 +36,7 @@
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 
 import PAGE from '@/components/Page/Page.vue'
 
@@ -27,7 +44,7 @@ export default {
   extends: PAGE,
   name: 'fullscreenFlash',
   components: {
-    Media, PageNav, Footnotes
+    Media, PageNav, Footnotes, GenericPage
   },
   theme: function(ctx) {
     ctx.$logger.info("Checked theme", ctx.gameOverThemeOverride)
@@ -36,6 +53,7 @@ export default {
   title: PAGE.title,
   data: function() {
     return {
+      gameOverPreload: false,
       appThemeOverride: 'default'
     }
   },
@@ -72,6 +90,9 @@ export default {
   mounted() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
       this.$parent.gameOverThemeOverride = 'A6A6'
+      if (!this.needsNav) // only if we're using a modded flash
+        this.gameOverPreload = true // unset by MediaEmbed after we get gameOver signal
+
       this.$watch(
         "$refs.flash.gameOver.count", (count) => {
           switch(count) {

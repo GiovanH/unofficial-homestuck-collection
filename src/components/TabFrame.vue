@@ -95,6 +95,17 @@ const SNAPS = () => import('@/components/Comics/Snaps.vue')
 const TESTS = () => import('@/components/Extras/tests.vue')
 const EDITOR = () => import('@/components/CustomContent/PageEditor.vue')
 
+const preload_components = [
+    HOMEPAGE,
+
+    PAGE,
+    FULLSCREENFLASH,
+    X2COMBO,
+    TZPASSWORD,
+    ECHIDNA,
+    ENDOFHS
+]
+
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
 export default {
@@ -606,6 +617,22 @@ export default {
     },
     mounted(){
         this.setTitle()
+        if (!isWebApp) {
+            // Object.values(this.$options.components)
+            preload_components
+                .filter(v => (typeof v == "function"))
+                .filter(f => !f.resolved)
+                .forEach(f => {
+                    try {
+                        f()
+                        .then(module => {
+                            this.$logger.info("preloaded", module.default.name)
+                        })
+                    } catch {
+                        // f is a function but not a promise
+                    }
+                })
+        }
         if (this.tabIsActive) {
             this.$nextTick(() => {
                 // This fixes the "first loaded tab is unthemed"

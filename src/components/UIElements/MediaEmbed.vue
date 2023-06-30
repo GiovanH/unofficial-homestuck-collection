@@ -489,6 +489,7 @@ document.addEventListener('click', function (e) {
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
             this.$logger.info("Initializing dynamic game over page")
+            this.$parent.gameOverPreload = false
             this.gameOver.count = 0
             this.startTimer(() => {
               const next_step = this.gameOver.steps[this.gameOver.count]

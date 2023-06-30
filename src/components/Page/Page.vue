@@ -8,17 +8,17 @@
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
-              <div class="media" ref="media">
-                  <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
-              </div>
+            <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
+            <div class="media" ref="media">
+              <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
+            </div>
           </div>
           <div class="textContent">
-              <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
-              <PageNav :thisPage="thisPage" 
-                :nextPages="nextPagesArray" ref="pageNav"
-                :class="{'hidden': hideNav}" />
+            <FlashCredit :pageId="thisPage.pageId"/>
+            <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
+            <PageNav :thisPage="thisPage" 
+              :nextPages="nextPagesArray" ref="pageNav"
+              :class="{'hidden': hideNav}" />
           </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
@@ -42,7 +42,8 @@ import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 import Metadata from '@/components/Page/PageMetadata.vue'
 
-import Firefly from '@/components/SpecialPages/Firefly.vue'
+const Firefly = () => import('@/components/SpecialPages/Firefly.vue')
+
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
 export default {
@@ -113,6 +114,7 @@ export default {
     thisPage() {
       // Add useful information to archive object
       if (!this.pageNum) return undefined
+
       return {
         ...this.pageCollection[this.pageNum],
         storyId: this.storyId,
