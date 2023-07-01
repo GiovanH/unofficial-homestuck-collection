@@ -14,7 +14,7 @@ import PageNav from '@/components/Page/PageNav.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SinglePage from '@/components/Page/SinglePage.vue'
 
-const Sass = require('sass')
+const SassJsSync = require('sass.js/dist/sass.sync.js')
 
 const GlobalComponents = {
   NavBanner, 
@@ -73,16 +73,16 @@ export default {
     
     if (this.$options.scss) {
       this.$el.setAttribute('data-instance', instances) 
+      const sass = `.tabFrame [data-instance='${instances}'] {\n${reset_sass}\n${this.$options.scss}\n}`
 
-      const style = document.createElement("style")
-      style.id = `browserpage-style-${instances}`
-      style.rel = "stylesheet"
-      style.innerHTML = Sass.renderSync({
-        data: `.tabFrame [data-instance='${instances}'] {\n${reset_sass}\n${this.$options.scss}\n}`,
-        sourceComments: true
-      }).css.toString()
+      SassJsSync.compile(sass, (result) => {
+        const style = document.createElement("style")
+        style.id = `browserpage-style-${instances}`
+        style.rel = "stylesheet"
+        style.innerHTML = result.text
+        this.$el.appendChild(style)
+      });
       // this.$logger.info("MBP injected style")
-      this.$el.appendChild(style)
     }
   }
 }
