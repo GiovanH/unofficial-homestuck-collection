@@ -590,7 +590,14 @@ class LocalData {
           this.temp.isPoppingState = true // next url change should not count as navigation
           this.tabData = {...this.tabData, ...event.state.tabData}
         });
-      }
+      },
+      destroyed() {
+        if (this.saveDebounce) {
+          this.$logger.info("DESTROYING: flushing debounce")
+          clearTimeout(this.saveDebounce)
+          this._saveLocalStorage()
+        }
+      },
     })
     
     // this.VM.saveLocalStorage()

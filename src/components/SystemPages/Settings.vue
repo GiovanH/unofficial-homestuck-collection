@@ -799,6 +799,7 @@ export default {
     },
     forceReload: function() {
       ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this.$localData.VM._saveLocalStorage()
       ipcRenderer.invoke('reload')
       // this.$root.loadState = "LOADING"
       // this.$nextTick(function () {

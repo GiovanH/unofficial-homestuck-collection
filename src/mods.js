@@ -175,6 +175,7 @@ function removeModsFromEnabledList(responsible_mods) {
     window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
     logger.debug(window.vm.$localData.settings["modListEnabled"])
     window.vm.$localData.VM.saveLocalStorage()
+    window.vm.$localData.VM._saveLocalStorage()
   } else {
     logger.warn("Trying to change modlist before vm")
     store.set(store_modlist_key, new_enabled_mods)

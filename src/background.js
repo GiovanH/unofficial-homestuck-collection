@@ -555,7 +555,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
 })
 
 ipcMain.handle('restart', async (event) => {
-  app.relaunch()
+  (!isDevelopment) && app.relaunch() // Can't relaunch app and maintain debugger connection
   app.exit()
 })
 
