@@ -14,7 +14,8 @@
     :autoplay="autoplay" @loadeddata="onVideoLoaded" />
   <iframe v-else-if="getMediaType(url) === 'swf'"
     :key="url" :srcdoc='flashSrc'
-    :width='width || flashProps.width' :height='height || ($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
+    :width='width || flashProps.width'
+    :height='height || (($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height)'
     @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
