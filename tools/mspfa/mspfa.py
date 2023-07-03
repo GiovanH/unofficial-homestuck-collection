@@ -16,6 +16,10 @@ from lib import TriadLogger
 
 import ruamel.yaml
 
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions)
+
 yaml = ruamel.yaml.YAML()
 
 # Sensible multiline representer
@@ -143,8 +147,10 @@ def saveImageAs(story, src_url, target_name):
         _saveChunked(outpath, filestream)
         return outpath.replace("\\", "/")
     except requests.exceptions.HTTPError:
+        # print(f"""cp $(find L:/Archive/Homestuck/suptg.thisisnotatrueending.com/archive -iname '{os.path.split(src_url)[1]}') "{outpath}" """)
         logging.error(f"Could not download file '{src_url}' to '{outpath}'", exc_info=True)
         raise
+        # return outpath.replace("\\", "/")
 
 def getStream(url, prev_url=None):
     """Extremely light, dumb helper to get a stream from a url
@@ -163,11 +169,17 @@ def getStream(url, prev_url=None):
     if "photobucket" in url:
         headers['referer'] = "/".join(url.split("/")[:3])
 
+
     stream = requests.get(url, stream=True, headers=headers, verify=False)
     try:
+        # print(url, stream.url, stream.headers)
         if "tinypic.com" in url:
             raise requests.exceptions.HTTPError()
         if stream.url.endswith("/404.gif"):
+            raise requests.exceptions.HTTPError()
+        if stream.url.endswith("/403.html"):
+            raise requests.exceptions.HTTPError()
+        if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length')) == 0:
             raise requests.exceptions.HTTPError()
         stream.raise_for_status()
     except requests.exceptions.HTTPError as e:
@@ -175,6 +187,10 @@ def getStream(url, prev_url=None):
         try:
             stream = requests.get(wb_url, stream=True, headers=headers)
             if stream.url.endswith("/404.gif"):
+                raise requests.exceptions.HTTPError()
+            if stream.url.endswith("/403.html"):
+                raise requests.exceptions.HTTPError()
+            if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length')) == 0:
                 raise requests.exceptions.HTTPError()
             stream.raise_for_status()
             logging.warning(f"Got '{url}' from the wayback machine", exc_info=False)
@@ -386,7 +402,7 @@ def downloadStory(STORY_NUM, offline=True):
   edit: true,
 
   trees: {{
-      './': 'assets://mspfa/{story_name}/',
+    './': 'assets://mspfa/{story_name}/',
   }},
   computed(api) {{
     return {{
