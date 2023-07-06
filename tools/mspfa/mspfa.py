@@ -404,10 +404,11 @@ def downloadStory(STORY_NUM, offline=True):
   trees: {{
     './': 'assets://mspfa/{story_name}/',
   }},
-  computed(api) {{
+  async asyncComputed(api) {{
+    const story = await api.readYamlAsync("./story.yaml")
     return {{
       edit(archive){{
-        archive.mspfa['{story_name}'] = api.readYaml("./story.yaml")
+        archive.mspfa['{story_name}'] = story
       }}
     }}
   }}
