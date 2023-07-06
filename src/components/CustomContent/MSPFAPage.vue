@@ -15,6 +15,10 @@
               <div id="content">
                 <BBCode :code="page.b" />
               </div>
+              <div class="hidden">
+                <!-- Preload images -->
+                <BBCode v-for="n in page.n" :key="n" :code="story.p[n].b" />
+              </div>
               <div id="foot">
                 <div id="links">
                   <div v-for="n in page.n" :key="n">
@@ -97,7 +101,7 @@
                         </td>
                       </tr>
                       <tr>
-                        <td colspan="2" style="max-width: 575px; width: 575px; height: 162px;">
+                        <td colspan="2" >
                           <BBCode :code="story.r" />
                         </td>
                       </tr>
@@ -106,6 +110,20 @@
                 </div>
               </span>
             </div>
+            <footer>
+              <div class="umcontainer">
+                <div class="mspfalogo"></div>
+                <!-- <iframe class="um" src="/um/bottom.njs" if1225q65=""></iframe> -->
+              </div>
+              <div id="details" style="padding-top: 6px;">
+                <!-- © MS Paint Fan Adventures 2010-2023
+                <span class="vbar">|</span>
+                <a href="/privacy/">Privacy Policy</a>
+                <span class="vbar">|</span>
+                <a href="/terms/">Terms of Service</a>
+                <span class="vbar"><a href="https://www.youtube.com/watch?v=PjxV0jMpS34" style="text-decoration: none;">|</a></span> -->
+              </div>
+            </footer>
           </div>
         </div>
       </body>
@@ -141,7 +159,7 @@ export default {
     //   return this.routeParams.story
     // },
     cssClass(){
-      return this.storyId.replace(/^(\d)/, (match, num) => `css${num}`)
+      return this.storyId.replace(/ /, '_').replace(/^(\d)/, (match, num) => `css${num}`)
     },
     story(){
       return this.$archive.mspfa[this.storyId]
@@ -740,6 +758,18 @@ div[role="styleWrap"]::v-deep {
     &:hover {
       text-decoration: underline;
     }
+  }
+  .mspfalogo {
+    width: 208px;
+    height: 102px;
+    float: left;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-right: 4px solid #b8b8b8;
+    background-color: #eeeeee;
+  }
+  footer .mspfalogo {
+    background-image: url(https://mspfa.com/images/VorkedLarfleeze.gif);
   }
 }
 </style>

@@ -1,26 +1,22 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame" v-if="log">
-      <div class="pageContent">
-        <h2 class="pageTitle">Adventure Log</h2>
-        <a v-if="log.length > 0" @click="sortOrder = sortOrderNext" href="javascript:" class="switchOrder">{{ reverseText }}</a>
-        <div class="logItems" v-if="log.length > 0">
-          <template v-for="page in log">
-            {{page.date}} - <a :href="page.href">{{page.title || 'Next.'}}</a><br/>
-          </template>
-        </div>
-        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
-      </div>
+  <GenericPage v-if="log">
+    <h2 class="pageTitle">Adventure Log</h2>
+    <hr />
+    <h2 class="storyname" v-text="story.n" />
+    <hr />
+    <a v-if="log.length > 0" @click="sortOrder = sortOrderNext" class="link switchOrder">{{ reverseText }}</a>
+    <div class="logItems" v-if="log.length > 0">
+      <template v-for="page in log">
+        {{page.date}} - <a :href="page.href">{{page.title || 'Next.'}}</a><br/>
+      </template>
     </div>
-    <PageFooter />
-  </div>
+  </GenericPage>
+  <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
 </template>
 
 <script>
 
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 const { DateTime } = require('luxon');
@@ -38,7 +34,7 @@ export default {
     'tab', 'storyId'
   ],
   components: {
-    NavBanner, PageFooter, MediaEmbed
+    GenericPage, MediaEmbed
   },
   data: function() {
     return {
@@ -100,64 +96,45 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  ::v-deep a{
-    color: var(--page-links);
+  ::v-deep .pageContent {
+    width: 650px;
   }
-  .pageBody {
-    color: var(--font-default);
-    background: var(--page-pageBody);
-
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
-
-    .pageFrame {
-      background: var(--page-pageFrame);
-
-      width: 950px;
-      padding-top: 7px;
-      padding-bottom: 23px;
-      margin: 0 auto;
-
-      flex: 0 1 auto;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      align-content: center;
-      .pageContent{
-        background: var(--page-pageContent);
-
-        .pageContent img {
-            max-width: 100%;
-        }
-        
-        width: 650px;     
-        h2.pageTitle {
-          max-width: 590px;
-          text-align: center;
-          line-height: 1.1;
-          font-size: 32px;
-          padding: 15px 0;
-          margin: 0 auto;
-        }
-        .switchOrder {
-          padding-left: 30px;
-        }
-        .logItems {
-          padding: 30px;
-
-          font-family: Verdana, Geneva, Tahoma, sans-serif;
-          font-size: 12px;
-        }
-      }
+  a, .link {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  h2 {
+    font-weight: bold;
+    font-family: "Press Start 2P";
+    margin: 8px 0;
+    color: #cccccc;
+    text-shadow: 0 2px #888888;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    &.storyname {
+      color: #5caedf;
+      text-shadow: 0 2px #2a6b7d;
+      margin: 1em;
     }
-
   }
-  
+  hr {
+    width: 100%;
+    background: var(--page-pageFrame);
+    margin: 0;
+    height: 1em;
+    border: none;
+  }
+  .switchOrder {
+    padding-left: 30px;
+  }
+  .logItems {
+    padding: 30px;
+
+    // font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 12px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    // font-size: 10px;
+  }
 
 </style>
 

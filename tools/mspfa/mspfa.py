@@ -396,7 +396,7 @@ def downloadStory(STORY_NUM, offline=True):
 
     with open(f"{story_name}/mod.js", "w", encoding="utf-8") as fp:
         fp.write(f"""module.exports = {{
-  title: "{story_name}{' (online)' if not offline else ''}",
+  title: "{story_name.replace('_online', ' (online)')}",
   summary: "MSPFA",
   
   edit: true,
