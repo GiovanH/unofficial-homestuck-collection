@@ -8,7 +8,7 @@ on:
     branches: [ "develop" ]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ develop ]
+    branches: [ ] # "develop"
 
 jobs:
   prep-release:
@@ -72,4 +72,4 @@ jobs:
     - run: make publish_release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PUBLISH_FOR_PULL_REQUEST: true
+        # PUBLISH_FOR_PULL_REQUEST: true
