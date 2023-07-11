@@ -55,7 +55,7 @@
           <div class="legal">
             Legal:
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020-2022 Bambosh et al.
+Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
