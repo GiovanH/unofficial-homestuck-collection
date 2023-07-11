@@ -37,3 +37,23 @@ make lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Legal
+
+<div class="legal">
+<pre>The Unofficial Homestuck Collection
+Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+</pre>
+
+In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+
+As per section 7, the author attributions in Credits.vue must
+be preserved in all covered works. Modified versions may optionally
+extend this list as applicable, but modifications that remove
+attributions or otherwise misrepresent the origin of the material
+are not permitted.
