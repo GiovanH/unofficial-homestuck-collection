@@ -8,17 +8,17 @@
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
-            <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
-            <div class="media" ref="media">
-                <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
-            </div>
+              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
+              <div class="media" ref="media">
+                  <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
+              </div>
           </div>
           <div class="textContent">
-            <FlashCredit  :pageId="thisPage.pageId"/>
-            <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textcontent"/>
-            <PageNav :thisPage="thisPage"
-              :nextPages="nextPagesArray" ref="pageNav"
-              :class="{'hidden': hideNav}" />
+              <FlashCredit  :pageId="thisPage.pageId"/>
+              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
+              <PageNav :thisPage="thisPage" 
+                :nextPages="nextPagesArray" ref="pageNav"
+                :class="{'hidden': hideNav}" />
           </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
@@ -128,12 +128,14 @@ export default {
       this.deretcon(media)
       var mediakey = media[0]
 
-      if (this.audioData) {
-        const flashPath = mediakey.substring(0, mediakey.length - 4)
-        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
-        media[0] = `${flashPath}_hq.swf`
-      } else if (mediakey && mediakey.includes(".swf")) {
-        this.$logger.info("Found no audio for", mediakey, this.audioData)
+      if (mediakey) {
+        if (this.audioData) {
+          const flashPath = mediakey.substring(0, mediakey.length - 4)
+          this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+          media[0] = `${flashPath}_hq.swf`
+        } else if (mediakey.includes(".swf")) {
+          this.$logger.info("Found no audio for", mediakey, this.audioData)
+        }
       }
 
       return media
@@ -223,8 +225,8 @@ export default {
       if (this.hideNav && !this.forceKeyboardEnable)
         return
 
-      if (this.$refs.textcontent) {
-        this.$refs.textcontent.open()
+      if (this.$refs.textContent) {
+        this.$refs.textContent.open()
       }
     }
   },
