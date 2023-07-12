@@ -62,12 +62,6 @@ function readFilePromise(file_path) {
   })
 }
 
-let win = null
-function giveWindow(new_win) {
-  win = new_win
-  logger.debug("Got window")
-}
-
 let validatedState = false
 function expectWorkingState(){
   if (validatedState || isWebApp) return true
@@ -172,16 +166,17 @@ function removeModsFromEnabledList(responsible_mods) {
   logger.debug("Changing modlist", old_enabled_mods, new_enabled_mods)
 
   // Fully reactive settings clobber
-  if (ipcMain) {
-    logger.debug("Trying to change modlist from main")
-    store.set(store_modlist_key, new_enabled_mods)
-    if (win) {
-      win.webContents.send('RELOAD_LOCALDATA')
-    } else {
-      // probably pre-window, don't need to worry here
-      logger.warn("Don't have win!")
-    }
-  } else if (window.vm) {
+  // if (ipcMain) {
+  //   logger.debug("Trying to change modlist from main")
+  //   store.set(store_modlist_key, new_enabled_mods)
+  //   if (win) {
+  //     win.webContents.send('RELOAD_LOCALDATA')
+  //   } else {
+  //     // probably pre-window, don't need to worry here
+  //     logger.warn("Don't have win!")
+  //   }
+  // } else
+  if (window.vm) {
     logger.debug("Changing modlist from vm")
     window.vm.$localData.settings["modListEnabled"] = new_enabled_mods
     logger.debug(window.vm.$localData.settings["modListEnabled"])
@@ -195,31 +190,32 @@ function removeModsFromEnabledList(responsible_mods) {
 
 var onModLoadFail;
 
-if (ipcMain) {
-  onModLoadFail = function (responsible_mods, e) {
-    if (!expectWorkingState())
-      return // Pre-setup, we're probably fine ignoring this.
+// if (ipcMain) {
+//   onModLoadFail = function (responsible_mods, e) {
+//     if (!expectWorkingState())
+//       return // Pre-setup, we're probably fine ignoring this.
 
-    store.set("needsRecovery", true)
+//     store.set("needsRecovery", true)
 
-    if (win) {
-      console.error(e) // Error can't serialize to the window
-      win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
-    } else {
-      logger.warn("MAIN: Mod load failure with issues in", responsible_mods)
-      logger.error(e)
-      logger.error("Don't have win!")
-      // This only happens if we can't even display the pretty traceback. Absolute fallback.
-      dialog.showMessageBoxSync({
-        type: 'error',
-        title: 'Mod load error',
-        message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
-      })
-      removeModsFromEnabledList(responsible_mods)
-    }
-  }
-} else {
+//     if (win) {
+//       console.error(e) // Error can't serialize to the window
+//       win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
+//     } else {
+//       logger.warn("MAIN: Mod load failure with issues in", responsible_mods)
+//       logger.error(e)
+//       logger.error("Don't have win!")
+//       // This only happens if we can't even display the pretty traceback. Absolute fallback.
+//       dialog.showMessageBoxSync({
+//         type: 'error',
+//         title: 'Mod load error',
+//         message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
+//       })
+//       removeModsFromEnabledList(responsible_mods)
+//     }
+//   }
+// } else {
   // We are in the renderer process.
+// if (!ipcMain) {
   onModLoadFail = function (responsible_mods, e) {
     if (!expectWorkingState())
       return // Pre-setup, we're probably fine ignoring this.
@@ -269,10 +265,10 @@ if (ipcMain) {
       </div>
     </div>`
   }
-  ipcRenderer.on('MOD_LOAD_FAIL', (event, responsible_mods, e) => {
-    onModLoadFail(responsible_mods, e)
-  })
-}
+//   ipcRenderer.on('MOD_LOAD_FAIL', (event, responsible_mods, e) => {
+//     onModLoadFail(responsible_mods, e)
+//   })
+// }
 
 function bakeRoutes() {
   const enabled_mods = getEnabledMods()
@@ -1039,118 +1035,101 @@ function jsToChoice(js, dir){
   }
 }
 
-if (ipcMain) {
-  // We are in the main process.
-  function loadModChoices(){
-    // Get the list of mods players can choose to enable/disable
-    var mod_folders
-    try {
-      if (fs.existsSync(assetDir) && !fs.existsSync(modsDir)){
-        logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
-        fs.mkdirSync(modsDir)
-      }
-      const tree = crawlFileTree(modsDir, false)
-
-      // Extract zips
-      const outpath = path.join(assetDir, "mods")
-
-      if (!fs.existsSync(outpath))
-        fs.mkdirSync(outpath)
-
-      const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
-      zip_archives.forEach(zip_name => {
-        const zip_path = path.join(modsDir, zip_name)
-        console.log(`Extracting ${zip_path} to ${outpath}`)
-        fs.createReadStream(zip_path).pipe(
-          unzipper.Extract({
-            path: outpath, 
-            concurrency: 5
-          })
-        ).on('finish', function() {
-          setTimeout(() => fs.unlink(zip_path, err => {
-            if (err) console.log(err)
-          }), 200) // OS doesn't release it right away even after finish
-        })
-      })
-
-      // .js file or folder of some sort
-      mod_folders = Object.keys(tree).filter(p => 
-        /\.js$/.test(p) || 
-        (tree[p] === undefined && fs.existsSync(path.join(modsDir, p, "mod.js"))) || 
-        logger.warn("Not a mod:", p, path.join(p, "mod.js"))
-      )
-    } catch (e) {
-      // No mod folder at all. That's okay.
-      logger.error(e)
-      return []
+function loadModChoices(){
+  // Get the list of mods players can choose to enable/disable
+  var mod_folders
+  try {
+    if (fs.existsSync(assetDir) && !fs.existsSync(modsDir)){
+      logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
+      fs.mkdirSync(modsDir)
     }
+    const tree = crawlFileTree(modsDir, false)
 
-    var items = mod_folders.reduce((acc, dir) => {
-      try {
-        const js = getModJs(dir, {liteload: true, nocache: true})
-        if (js === null || js.hidden === true)
-          return acc // continue
+    // Extract zips
+    const outpath = path.join(assetDir, "mods")
 
-        acc[dir] = jsToChoice(js, dir)
-      } catch (e) {
-        // Catch import-time mod-level errors
-        logger.error("Couldn't load mod choice", e)
-        // Can't fail here: haven't loaded enough main to even show a dialog.
-        // onModLoadFail([dir], e)
-      }
-      return acc
-    }, {})
+    if (!fs.existsSync(outpath))
+      fs.mkdirSync(outpath)
 
-    logger.info("Mod choices loaded")
-    logger.debug(Object.keys(items))
-    return items
+    const zip_archives = Object.keys(tree).filter(p => /\.zip$/.test(p))
+    zip_archives.forEach(zip_name => {
+      const zip_path = path.join(modsDir, zip_name)
+      console.log(`Extracting ${zip_path} to ${outpath}`)
+      fs.createReadStream(zip_path).pipe(
+        unzipper.Extract({
+          path: outpath,
+          concurrency: 5
+        })
+      ).on('finish', function() {
+        setTimeout(() => fs.unlink(zip_path, err => {
+          if (err) console.log(err)
+        }), 200) // OS doesn't release it right away even after finish
+      })
+    })
+
+    // .js file or folder of some sort
+    mod_folders = Object.keys(tree).filter(p =>
+      /\.js$/.test(p) ||
+      (tree[p] === undefined && fs.existsSync(path.join(modsDir, p, "mod.js"))) ||
+      logger.warn("Not a mod:", p, path.join(p, "mod.js"))
+    )
+  } catch (e) {
+    // No mod folder at all. That's okay.
+    logger.error(e)
+    return []
   }
 
-  if (modsDir) {
-    modChoices = loadModChoices()
-  } else {
-    logger.warn("modsDir is not defined! First run?")
-  }
+  var items = mod_folders.reduce((acc, dir) => {
+    try {
+      const js = getModJs(dir, {liteload: true, nocache: true})
+      if (js === null || js.hidden === true)
+        return acc // continue
 
-  ipcMain.on('GET_AVAILABLE_MODS', (e) => {e.returnValue = modChoices})
-  ipcMain.on('MODS_FORCE_RELOAD', (e) => {
-    modChoices = loadModChoices()
-    e.returnValue = true
-  })
-} else if (!isWebApp) {
-  // We are in the renderer process.
-  logger.info("Requesting modlist from main")
-  modChoices = ipcRenderer.sendSync('GET_AVAILABLE_MODS')
-} else {
-  modChoices = getModChoices()
+      acc[dir] = jsToChoice(js, dir)
+    } catch (e) {
+      // Catch import-time mod-level errors
+      logger.error("Couldn't load mod choice", e)
+      // Can't fail here: haven't loaded enough main to even show a dialog.
+      // onModLoadFail([dir], e)
+    }
+    return acc
+  }, {})
+
+  logger.info("Mod choices loaded")
+  logger.debug(Object.keys(items))
+  return items
 }
 
 function getModChoices() {
-  if (ipcMain) {
+  if (modChoices) {
     return modChoices
   } else {
-    return ipcRenderer.sendSync('GET_AVAILABLE_MODS')
+    modChoices = loadModChoices()
+    return modChoices
   }
 }
 
 export default {
   store_mods,
+  extractimods, // async, bg awaits pre-load
 
-  getEnabledModsJs,  // bg
-  getEnabledMods,
-  getModChoices, // fg
-  getMixins, // fg
-  getMainMixin, // fg
-  editArchive, // bg
-  bakeRoutes, // bg
-  getAssetRoute, // bg, fg
-  getModStoreKey, // fg
-  giveWindow, // bg
-  modChoices,
-  modsDir, // fg
-  extractimods, // bg
+  getModStoreKey, // sync, pure, used by subsettingsmodal
+  modsDir, // var, referenced by settings
 
-  crawlFileTree, // debug
+  modChoices, // var
+  getModChoices, // sync, main mixin $modChoices
+  loadModChoices, // sync, called by settings to refresh
 
-  doFullRouteCheck // fg
+  getMixins, // Mixed in in main.js
+  getMainMixin, // Mixed in in app.vue to the main app only
+  editArchive, // async, awaited in app.vue after loading archive
+
+  getEnabledModsJs, // internal
+  getEnabledMods, // internal
+  bakeRoutes, // internal
+  getAssetRoute, // sync, used by resources
+
+  crawlFileTree, // internal/debug
+
+  doFullRouteCheck // internal/debug
 }

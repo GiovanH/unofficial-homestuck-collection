@@ -242,8 +242,17 @@
         this.$localData.VM.reloadLocalStorage()
       })
 
-      ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
-        this.$root.archive = archive
+      ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
+        this.$root.loadStage = "MODS"
+        try {
+          await Mods.editArchive(archive)
+          this.$root.archive = archive
+          this.$root.loadState = "DONE"
+        } catch (e) {
+          this.$logger.error(e)
+          this.$root.archive = undefined
+          this.$root.loadState = "ERROR"
+        }
       })
 
       ipcRenderer.on('SET_LOAD_STATE', (event, state) => {

@@ -247,13 +247,6 @@ async function loadArchiveData(){
   logger.info("Loading mods")
 
   try {
-    logger.debug("Applying mod archive edits")
-    await Mods.editArchive(data)
-    // This isn't strictly part of loading the archive data,
-    // but we should do this only when we reload the archive
-    logger.debug("Baking mod routes")
-    Mods.bakeRoutes()
-
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
     required_keys.forEach(key => {
@@ -455,10 +448,13 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   try {
     extractingImodsPromise && await extractingImodsPromise
     if (first_archive) {
+      // Use the preloaded "first archive"
       archive = first_archive
       first_archive = undefined;
-    } else archive = await loadArchiveData()
-
+    } else {
+      // Reload the archive data
+      archive = await loadArchiveData()
+    }
     search.giveArchive(archive)
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
@@ -518,7 +514,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
       logger.info("New asset directory", assetDir)
-      await loadArchiveData()
+      await loadArchiveData() // Run to check if this thows an error
 
       let flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
@@ -795,7 +791,7 @@ async function createWindow () {
   })
 
   // Give mods a reference to the window object so it can reload 
-  Mods.giveWindow(win);
+  // Mods.giveWindow(win);
 
   if (openedWithUrl)
     win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))

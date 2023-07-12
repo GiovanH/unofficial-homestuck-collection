@@ -26,10 +26,6 @@ library.add([
 
 window.isWebApp = (window.isWebApp || false)
 
-Vue.component('fa-icon', FontAwesomeIcon)
-
-Vue.config.productionTip = false
-
 const ipcRenderer = require('electron').ipcRenderer
 
 // Must init resources first.
@@ -53,6 +49,14 @@ if (!window.isWebApp) {
 const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
 
 window.doFullRouteCheck = Mods.doFullRouteCheck
+
+// Loading checks
+
+// Vue
+
+Vue.component('fa-icon', FontAwesomeIcon)
+
+Vue.config.productionTip = false
 
 Vue.use(localData) // Initializes and loads when Vue installs it
 Vue.use(AsyncComputed)

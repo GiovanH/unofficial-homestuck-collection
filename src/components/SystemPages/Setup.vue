@@ -337,7 +337,7 @@ export default {
       return this.assetDir
     },
     isLoading() {
-      return (!this.loadingTooLongTimeout) && (this.$root.loadState === undefined || this.$root.loadState == "LOADING")
+      return (!this.loadingTooLongTimeout) && (this.$root.loadState != "ERROR")
     },
     loadText() {
       if (this.$root.loadStage === undefined) {

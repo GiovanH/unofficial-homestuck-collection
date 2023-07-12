@@ -818,7 +818,8 @@ export default {
       // ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      Mods.loadModChoices()
+      // ipcRenderer.sendSync('MODS_FORCE_RELOAD')
       this._computedWatchers.$modChoices.run()
       this._computedWatchers.modsEnabled.run()
       this._computedWatchers.modsDisabled.run()
