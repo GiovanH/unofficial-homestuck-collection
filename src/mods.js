@@ -3,7 +3,7 @@ import yaml from 'js-yaml'
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 
-var ipcMain, dialog, unzipper, Tar, fs
+var ipcMain, dialog, unzipper, fs
 var store, store_mods, log
 if (!isWebApp) {
   var {ipcMain, dialog} = require('electron')
@@ -11,7 +11,6 @@ if (!isWebApp) {
   log = require('electron-log')
 
   unzipper = require("unzipper")
-  Tar = require('tar');
 
   const Store = require('electron-store')
   store = new Store()
@@ -137,10 +136,11 @@ async function extractimods() {
   }
   // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
+  const Tar = await import('tar');
   // eslint-disable-next-line import/no-webpack-loader-syntax
   let tardata
   try {
-    tardata = (await import("url-loader!./imods.tar")).default // Require *must* have a literal string here
+    tardata = (await import("!url-loader!./imods.tar")).default // Require *must* have a literal string here
   } catch (e) {
     logger.error(`Couldn't read bundled tar data from url-loader!./imods.tar: webpack issue?`)
     throw e

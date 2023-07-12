@@ -1,3 +1,6 @@
+// const { VueLoaderPlugin } = require('vue-loader')
+
+require('ofe').call()
 module.exports = {
     configureWebpack: {
         devtool: "source-map",

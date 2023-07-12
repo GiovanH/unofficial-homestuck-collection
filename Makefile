@@ -9,6 +9,7 @@ install: package.json yarn.lock
 
 clean:
 	-rm ./install src/imods.tar
+	-rm -r node_modules/.cache/
 	-rm -r dist/ dist_electron/*/
 
 lint: install 
