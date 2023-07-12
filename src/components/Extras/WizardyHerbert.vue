@@ -1,45 +1,47 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame">
-      <div class="pageContent">
-        <a :href="url_browse + 'index.html'" v-text="url_browse" class="book-srclink-header" />
+  <GenericPage>
+    <a :href="url_browse" v-text="url_browse" class="book-srclink-header" />
 
-        <div class="note" v-if="page_num == undefined">
-          <p>bambosh i know you'll want to write some hand-wringing preface thing here</p>
-          <MediaEmbed url="assets://archive/wizardyherbert/herbertsketch2_sm.jpg" />
-        </div>
-
-        <div
-          id="viewer"
-          ref="viewer"
-          :style="{
-            // Because this is managed in `created`, the element must exist
-            // as long as the component exists, so no v-if here.
-            height: (page_num == undefined ? '1px' : 'inherit'),
-            padding: (page_num == undefined ? '0' : undefined)
-          }"
-        />
-
-        <div class="comicNav">
-          <a :style="{visibility: (prev_page_url ? 'visible' : 'hidden')}" :href="prev_page_url" class="goBack" >
-            <MediaEmbed url="assets://images/msoffice_prev.png" />
-          </a>
-          <a :style="{visibility: (next_page_url ? 'visible' : 'hidden')}" :href="next_page_url" class="nextArrowLink">
-            <MediaEmbed url="assets://images/msoffice_next.png" />
-          </a>
-        </div>
-      </div>
+    <div class="note" v-if="page_num == undefined">
+      <p>bambosh i know you'll want to write some hand-wringing preface thing here</p>
+      <MediaEmbed url="assets://archive/wizardyherbert/herbertsketch2_sm.jpg" />
     </div>
-    <PageFooter />
-  </div>
+
+    <div
+      id="viewer"
+      ref="viewer"
+      :style="{
+        // Because this is managed in `created`, the element must exist
+        // as long as the component exists, so no v-if here.
+        height: (page_num == undefined ? '1px' : 'inherit'),
+        padding: (page_num == undefined ? '0' : undefined)
+      }"
+    />
+
+    <!-- <div class="comicNav">
+      <a :style="{visibility: (prev_page_url ? 'visible' : 'hidden')}" :href="prev_page_url" class="goBack" >
+        <MediaEmbed url="assets://images/msoffice_prev.png" />
+      </a>
+      <a :style="{visibility: (next_page_url ? 'visible' : 'hidden')}" :href="next_page_url" class="nextArrowLink">
+        <MediaEmbed url="assets://images/msoffice_next.png" />
+      </a>
+    </div> -->
+    <div class="comicNav">
+      <a :style="{visibility: (prev_page_url ? 'visible' : 'hidden')}" :href="prev_page_url" class="goBack" >
+        <MediaEmbed url="assets://images/msoffice_prev.png" />
+      </a>
+      <a :style="{visibility: (next_page_url ? 'visible' : 'hidden')}" :href="next_page_url" class="nextArrowLink">
+        <MediaEmbed url="assets://images/msoffice_next.png" />
+      </a>
+    </div>
+  </GenericPage>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
+import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'
 
@@ -54,7 +56,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, MediaEmbed, PageFooter, VuePdfEmbed
+    GenericPage, MediaEmbed, VuePdfEmbed
   },
   theme(ctx) {
     return 'msword'
@@ -120,7 +122,7 @@ export default {
     }
   },
   created(){
-    this.book = ePub(this.url_epub)
+    this.book = ePub(this.$getResourceURL(this.url_epub))
 
     // Wait for refs
     this.$nextTick(() => {
@@ -154,68 +156,21 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .pixelated::v-deep img{
-    image-rendering: pixelated;
-  }
-
   #viewer {
     padding: 3em 0;
     width: 900px;
     overflow: hidden;
   }
-
   .comicNav {
     a {
       cursor: pointer;
     }
-
     width: -webkit-fill-available;
-    display: block;
-    margin: 0 80px;
+    padding: 20px 80px;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .pageBody {
-    color: var(--font-default);
-    background: var(--page-pageBody);
-
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex: 1 0 auto;
-    flex-flow: column;
-    align-items: center;
-
-    .pageFrame {
-      background: var(--page-pageFrame);
-
-      width: 950px;
-      padding-top: 7px;
-      padding-bottom: 23px;
-      margin: 0 auto;
-      position: relative; // Allow things to align to the page
-
-      flex: 0 1 auto;
-      display: flex;
-      justify-content: center;
-
-      .pageContent {
-        background: var(--page-pageContent);
-
-        max-width: 950px;
-        min-width: 650px;
-        display: flex;
-        flex: 0 1 auto;
-        align-items: center;
-        flex-flow: column;
-
-        .note {
-          margin: 2em;
-        }
-      }
-    }
+    background: #BFDBFF;
+    border-top: 1px solid black;
   }
 </style>
 
