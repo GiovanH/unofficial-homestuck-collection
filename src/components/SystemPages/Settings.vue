@@ -602,10 +602,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key]).filter(val => !!val)
+        this.$root.$modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$modChoices).filter((choice) => 
+      return Object.values(this.$root.$modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -775,11 +775,11 @@ export default {
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
       try {
-        if (diff.some(key => this.$modChoices[key].needsHardReload)) {
+        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
           this.$logger.info("List change requires hard reload", diff)
           this.needReload = true
         }
-        if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
+        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
           this.$logger.info("List change requires archive reload", diff)
           this.queueArchiveReload()
         }
@@ -807,7 +807,7 @@ export default {
       this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      // ipcRenderer.sendSync('MODS_FORCE_RELOAD')
       this.$localData.VM._saveLocalStorage()
       ipcRenderer.invoke('reload')
       // this.$root.loadState = "LOADING"
@@ -818,12 +818,14 @@ export default {
       // ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      Mods.loadModChoices()
+      Mods.loadModChoicesAsync().then(_ => {
+        this.$asyncComputed.modChoices.update()
+        // this._computedWatchers.modsEnabled.run()
+        // this._computedWatchers.modsDisabled.run()
+        this.$forceUpdate()
+      })
       // ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      this._computedWatchers.$modChoices.run()
-      this._computedWatchers.modsEnabled.run()
-      this._computedWatchers.modsDisabled.run()
-      this.$forceUpdate()
+      // this._computedWatchers.modChoices.run()
       // this.queueArchiveReload()
     },
     scrollToSec(sectionClass) {

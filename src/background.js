@@ -2,7 +2,7 @@
 
 import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
 import yaml from 'js-yaml'
@@ -243,9 +243,6 @@ async function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  if (win) win.webContents.send('SET_LOAD_STAGE', "MODS")
-  logger.info("Loading mods")
-
   try {
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
@@ -253,13 +250,6 @@ async function loadArchiveData(){
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
   } catch (e) {
-    // Errors should already log/handle themselves by now
-    // but we need to update the application state to react to it
-    // This is probably due to a poorly written mod, somehow.
-    // specifically $localdata can be in an invalid state
-    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
-    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
-
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Archive load error',
@@ -284,6 +274,7 @@ async function loadArchiveData(){
 
   search.clearChapterIndex()
   
+  if (win) win.webContents.send('SET_LOAD_STAGE', "LOADED_ARCHIVE_VANILLA")
   return data
 }
 
@@ -408,7 +399,7 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
-var extractingImodsPromise = undefined
+var want_imods_extracted = false
 
 if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
@@ -421,7 +412,7 @@ if (assetDir && fs.existsSync(assetDir)) {
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
-    extractingImodsPromise = Mods.extractimods()
+    want_imods_extracted = true
   } else {
     logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
@@ -446,7 +437,6 @@ try {
 ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
-    extractingImodsPromise && await extractingImodsPromise
     if (first_archive) {
       // Use the preloaded "first archive"
       archive = first_archive
@@ -790,8 +780,10 @@ async function createWindow () {
     win.setTitle(new_title)
   })
 
-  // Give mods a reference to the window object so it can reload 
-  // Mods.giveWindow(win);
+  // Communicate version state to imods
+  if (want_imods_extracted) {
+    win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+  }
 
   if (openedWithUrl)
     win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))

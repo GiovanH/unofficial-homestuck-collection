@@ -294,7 +294,10 @@ export default {
         "MOUNTED": "Entangling connections",
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
-        "PATCHES": "Applying spackle"
+        "PATCHES": "Applying spackle",
+        "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
+        "EXTRACT_IMODS": "Applying day 1 patch",
+        "READ_MODS": "Indexing paraphernalia",
       },
       spiroPos: [
         "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
@@ -341,9 +344,9 @@ export default {
     },
     loadText() {
       if (this.$root.loadStage === undefined) {
-        return this.loadStages[""] || toString(this.$root.loadStage)
+        return this.loadStages[""]
       }
-      return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
+      return this.loadStages[this.$root.loadStage] || this.$root.loadStage
     },
     isNewUser() {
       return !this.$localData.assetDir

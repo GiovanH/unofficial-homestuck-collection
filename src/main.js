@@ -48,9 +48,11 @@ if (!window.isWebApp) {
 
 const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
 
-window.doFullRouteCheck = Mods.doFullRouteCheck
+var promises_loading = []
 
 // Loading checks
+
+
 
 // Vue
 
@@ -62,7 +64,10 @@ Vue.use(localData) // Initializes and loads when Vue installs it
 Vue.use(AsyncComputed)
 
 // Mixin mod mixins
-Mods.getMixins().forEach((m) => Vue.mixin(m))
+promises_loading.push((async function() {
+  const mixins = await Promise.resolve(Mods.getMixinsAsync())
+  mixins.forEach((m) => Vue.mixin(m))
+})());
 
 // eslint-disable-next-line no-extend-native
 Number.prototype.pad = function(size) {
@@ -88,8 +93,7 @@ Vue.mixin({
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current
     },
-    $modChoices: Mods.getModChoices,
-    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")},
+    $logger() { return log.scope(this.$options.name || this.$options._componentTag || "undefc!")},
     $isWebApp() { return window.isWebApp || false }
   },
   methods: {
@@ -407,31 +411,43 @@ Vue.mixin({
 })
 
 window.Vue = Vue;
-window.vm = new Vue({
-  data(){
-    return {
-      archive: undefined,
-      loadState: undefined,
-      platform: (window.isWebApp ? "webapp" : "electron"),
-      tabTheme: {} // Modified by App (avoid reacting to refs)
+
+// Resolve all promises, then make app
+Promise.all(promises_loading).then(_ => {
+  window.vm = new Vue({
+    data(){
+      return {
+        archive: undefined,
+        loadState: undefined,
+        loadStage: undefined,
+        platform: (window.isWebApp ? "webapp" : "electron"),
+        tabTheme: {} // Modified by App (avoid reacting to refs)
+      }
+    },
+    computed: {
+      // Easy access
+      app(){ return this.$refs.App },
+    },
+    asyncComputed: {
+      $modChoices: {
+        default: {},
+        get: Mods.getModChoicesAsync
+      },
+    },
+    router,
+    render: function (h) { return h(App, {ref: 'App'}) },
+    watch: {
+      '$localData.settings.devMode'(to, from){
+        const is_dev = to
+        log.transports.console.level = (is_dev ? "silly" : "info");
+        this.$logger.silly("Verbose log message for devs")
+        this.$logger.info("Log message for everybody")
+        this.$localData.VM.saveLocalStorage()
+      }
     }
-  },
-  computed: {
-    // Easy access
-    app(){ return this.$refs.App },
-  },
-  router,
-  render: function (h) { return h(App, {ref: 'App'}) },
-  watch: {
-    '$localData.settings.devMode'(to, from){
-      const is_dev = to
-      log.transports.console.level = (is_dev ? "silly" : "info");
-      this.$logger.silly("Verbose log message for devs")
-      this.$logger.info("Log message for everybody")
-      this.$localData.VM.saveLocalStorage()
-    }
-  }
-}).$mount('#app')
+  }).$mount('#app')
+})
+
 
 // Even though we cancel the auxclick, reallly *really* cancel mouse navigation.
 window.addEventListener("mouseup", (e) => {
@@ -444,5 +460,6 @@ window.addEventListener("mouseup", (e) => {
 // Expose for debugging
 window.Resources = Resources
 window.Mods = Mods
+window.doFullRouteCheck = Mods.doFullRouteCheck
 
 // window.onbeforeunload = () => "please.... stay";
