@@ -762,6 +762,7 @@ export default {
     onUpdateSortable: function(event){
       const el_active = event.target
       const setting_key = el_active.attributes['data-setting'].value
+      const reordered_item = event.item.attributes['data-value'].value
 
       // Get lists of values
       const old_list = this.$localData.settings[setting_key]
@@ -771,7 +772,8 @@ export default {
       this.$localData.settings[setting_key] = list_active
 
       // Calculte needReload
-      let diff = list_active.filter(x => !old_list.includes(x))
+      let diff = [reordered_item]
+      diff = diff.concat(list_active.filter(x => !old_list.includes(x)))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
       try {
@@ -939,6 +941,11 @@ export default {
       font-weight: normal;
     }
 
+    .needreload {
+      color: red;
+      font-weight: bold;
+    }
+
     .newReaderInput {
       margin-top: 20px;
       text-align: center;
@@ -1069,7 +1076,7 @@ export default {
       border-width: 5px 5px 0 0;
       padding-bottom: 6em;
       height: 100%;
-      max-height: 70vh;
+      max-height: 60vh;
       overflow: auto;
     }
 

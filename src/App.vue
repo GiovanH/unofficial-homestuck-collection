@@ -239,19 +239,6 @@
         this.$localData.VM.reloadLocalStorage()
       })
 
-      ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
-        this.$root.loadStage = "MODS"
-        try {
-          await Mods.editArchive(archive)
-          this.$root.archive = archive
-          this.$root.loadState = "DONE"
-        } catch (e) {
-          this.$logger.error(e)
-          this.$root.archive = undefined
-          this.$root.loadState = "ERROR"
-        }
-      })
-
       ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
         this.$root.loadState = state
       })
@@ -259,6 +246,20 @@
       this.$root.loadStage = "MOUNTED"
       ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
         this.$root.loadStage = stage
+      })
+
+      ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
+        this.$root.loadStage = "MODS"
+        try {
+          await Mods.editArchiveAsync(archive)
+          this.$root.archive = archive
+          this.$root.loadStage = "LOADED_ARCHIVE"
+          this.$root.loadState = "DONE"
+        } catch (e) {
+          this.$logger.error(e)
+          this.$root.archive = undefined
+          this.$root.loadState = "ERROR"
+        }
       })
 
       // Ask for a fresh copy of the archive

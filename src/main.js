@@ -65,7 +65,7 @@ Vue.use(AsyncComputed)
 
 // Mixin mod mixins
 promises_loading.push((async function() {
-  const mixins = await Promise.resolve(Mods.getMixinsAsync())
+  const mixins = await Mods.getMixinsAsync()
   mixins.forEach((m) => Vue.mixin(m))
 })());
 
