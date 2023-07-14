@@ -197,7 +197,16 @@ class LocalData {
           this.saveData = back.saveData
           this.settings = back.settings
           if (this.settings.useTabbedBrowsing) {
+
+            this.temp.isPoppingState = true
             this.tabData = back.tabData
+            this.$nextTick(_ => {
+              // Watcher runs here
+              this.$nextTick(_ => {
+                // If the watcher *didn't* run (path was root) unset flag now
+                this.temp.isPoppingState = false
+              })
+            })
           }
           // console.log(this.settings)
         },
@@ -637,6 +646,7 @@ export default {
   // Store: LocalData,
   install (Vue, options) {
     const the_store = new LocalData()
+
     the_store.VM.reloadLocalStorage()
     // the_store.VM.saveLocalStorage()
 

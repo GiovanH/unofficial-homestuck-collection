@@ -809,15 +809,9 @@ export default {
       this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
-      // ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this.$localData.VM.saveLocalStorage()
       this.$localData.VM._saveLocalStorage()
       ipcRenderer.invoke('reload')
-      // this.$root.loadState = "LOADING"
-      // this.$nextTick(function () {
-      //   ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      // })
-      // ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
       Mods.loadModChoicesAsync().then(_ => {
@@ -826,9 +820,6 @@ export default {
         // this._computedWatchers.modsDisabled.run()
         this.$forceUpdate()
       })
-      // ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      // this._computedWatchers.modChoices.run()
-      // this.queueArchiveReload()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)

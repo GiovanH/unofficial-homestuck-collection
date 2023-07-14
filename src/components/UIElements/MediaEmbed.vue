@@ -327,8 +327,8 @@ export default {
         <object type="application/x-shockwave-flash" 
           width="${this.flashProps.width}" 
           height="${this.flashProps.height}" 
-          data="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}">
-            <param name='movie' value="${Resources.resolveAssetsProtocol(this.$getResourceURL(this.url))}"/>
+          data="${this.$getResourceURL(this.url)}">
+            <param name='movie' value="${this.$getResourceURL(this.url)}"/>
             <param name='play' value="true"/>
             <param name='loop' value="true"/>
             <param name='quality' value="high" />
@@ -403,7 +403,7 @@ document.addEventListener('click', function (e) {
       this.$el.contentWindow.vm = this
     },
     resolveFrameUrl(url){
-      this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
+      // this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
       return Resources.resolveURL(url)
     },
     invokeFromFlash(func) {

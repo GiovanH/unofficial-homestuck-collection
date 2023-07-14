@@ -298,6 +298,8 @@ export default {
         "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
         "EXTRACT_IMODS": "Applying day 1 patch",
         "READ_MODS": "Indexing paraphernalia",
+        "BAKE_ROUTES": "Convoluting Routing Table",
+        "MODS_DONE": "Disparaging EMCAScript",
       },
       spiroPos: [
         "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
@@ -353,7 +355,7 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key]).filter(val => !!val)
+        this.$root.$modChoices[key]).filter(val => !!val)
     }
   },
   mounted() {

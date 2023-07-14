@@ -39,11 +39,12 @@
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
+    mixins = [ Mods.getMainMixin() ];
   }
 
   export default {
     name: 'HomestuckCollection',
-    mixins: [ Mods.getMainMixin() ],
+    mixins,
     components: {
       Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
     },

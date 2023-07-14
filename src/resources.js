@@ -187,7 +187,8 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
         throw Error("Circular asset path!" + loopcheck)
       } else {
         loopcheck.push(mod_route)
-        return resolveAssetsProtocol(mod_route, loopcheck)
+        // mod_route may no longer be an assets:// url, perform full resolve
+        return resolveURL(mod_route, loopcheck)
       }
     }
   }

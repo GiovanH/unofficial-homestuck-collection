@@ -79,4 +79,12 @@ export default {
 .pageBody .metadata p { 
   display: block; margin: 0.5em 0.35em; 
 }
+
+@media only screen and (max-width: 650px) {
+  .metadata {
+    display: none
+  }
+}
+
+
 </style>

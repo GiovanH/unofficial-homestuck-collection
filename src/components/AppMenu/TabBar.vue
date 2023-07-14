@@ -9,7 +9,7 @@
         <fa-icon icon="chevron-right"></fa-icon></button>
 
       <button class="systemButton historyButton refresh" 
-        @click="reloadTab" @click.middle="forceReload" @click.shift="ipcRenderer.sendSync('MODS_FORCE_RELOAD'); archiveReload();">
+        @click="reloadTab" @click.middle="forceReload" @click.shift="archiveReload">
         <fa-icon icon="redo"></fa-icon></button>
     </div>
     <template v-if="$localData.settings.showAddressBar">

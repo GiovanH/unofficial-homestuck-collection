@@ -79,7 +79,11 @@ if (ipcRenderer) {
     want_imods_extracted = true
   })
   setLoadStage = function(stage) {
-    ipcRenderer._events['SET_LOAD_STAGE'](null, stage)
+    try {
+      ipcRenderer._events['SET_LOAD_STAGE'](null, stage)
+    } catch (e) {
+      logger.warn(e)
+    }
   }
 }
 
@@ -186,34 +190,6 @@ function removeModsFromEnabledList(responsible_mods) {
   }
 }
 
-// var onModLoadFail;
-
-// if (ipcMain) {
-//   onModLoadFail = function (responsible_mods, e) {
-//     if (!expectWorkingState())
-//       return // Pre-setup, we're probably fine ignoring this.
-
-//     store.set("needsRecovery", true)
-
-//     if (win) {
-//       console.error(e) // Error can't serialize to the window
-//       win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
-//     } else {
-//       logger.warn("MAIN: Mod load failure with issues in", responsible_mods)
-//       logger.error(e)
-//       logger.error("Don't have win!")
-//       // This only happens if we can't even display the pretty traceback. Absolute fallback.
-//       dialog.showMessageBoxSync({
-//         type: 'error',
-//         title: 'Mod load error',
-//         message: `Something went wrong while loading mods ${responsible_mods}! These have been disabled for safety; you should remove them from the Active list and you may need to restart the application.\nCheck the console log for details`
-//       })
-//       removeModsFromEnabledList(responsible_mods)
-//     }
-//   }
-// } else {
-  // We are in the renderer process.
-// if (!ipcMain) {
 function onModLoadFail(responsible_mods, e) {
   if (!expectWorkingState())
     return // Pre-setup, we're probably fine ignoring this.
@@ -263,10 +239,6 @@ function onModLoadFail(responsible_mods, e) {
     </div>
   </div>`
 }
-//   ipcRenderer.on('MOD_LOAD_FAIL', (event, responsible_mods, e) => {
-//     onModLoadFail(responsible_mods, e)
-//   })
-// }
 
 async function bakeRoutes(enabled_mods_js) {
   const enabled_mods = getEnabledMods()
@@ -274,10 +246,10 @@ async function bakeRoutes(enabled_mods_js) {
     logger.warn("No asset directory set, not baking any routes")
     return
   }
-  logger.info("Baking routes for", enabled_mods)
+  // logger.info("Baking routes for", enabled_mods)
   const all_mod_routes = {}
   // Start with least-priority so they're overwritten
-  enabled_mods_js.reverse().forEach(js => {
+  for (const js of enabled_mods_js.reverse()) {
     try {
       // Lower priority: Auto routes
       if (js.trees) {
@@ -290,7 +262,8 @@ async function bakeRoutes(enabled_mods_js) {
           console.assert(asset_tree.endsWith("/"), asset_tree, "Tree paths must be directories! (end with /)")
           console.assert(asset_tree.startsWith("assets://"), asset_tree, "Asset paths must be on the assets:// protocol!")
 
-          const treeroutes = getTreeRoutes(crawlFileTree(path.join(js._mod_root_dir, mod_tree), true))
+          const tree = await crawlFileTree(path.join(js._mod_root_dir, mod_tree), true)
+          const treeroutes = getTreeRoutes(tree)
           treeroutes.forEach(route => {
             const route_href = new URL(asset_tree + route).href
             all_mod_routes[route_href] =
@@ -310,7 +283,7 @@ async function bakeRoutes(enabled_mods_js) {
       logger.error(js.trees, js.routes, e)
       onModLoadFail([js._id], e)
     }
-  })
+  }
 
   routes = all_mod_routes
 
@@ -404,7 +377,7 @@ async function getEnabledModsJsAsync(opts) {
   }
 }
 
-function searchWebAppModTrees(path) {
+async function searchWebAppModTrees(path) {
   function * search(data, values) {
     for (const value of values)
       yield * search1(data, value)
@@ -422,14 +395,15 @@ function searchWebAppModTrees(path) {
   }
 
   let result
-  for (result of search(window.webAppModTrees, path.split('/'))) {
+  const tree_root = await Promise.resolve(window.webAppModTrees)
+  for (result of search(tree_root, path.split('/'))) {
     // result = result
   }
 
   return result
 }
 
-function crawlFileTree(root, recursive = false) {
+async function crawlFileTree(root, recursive = false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
   const dir = fs.opendirSync(root)
@@ -440,7 +414,7 @@ function crawlFileTree(root, recursive = false) {
     if (dirent.isDirectory()) {
       if (recursive) {
         const subpath = path.join(root, dirent.name)
-        ret[dirent.name] = crawlFileTree(subpath, true)
+        ret[dirent.name] = await crawlFileTree(subpath, true)
       } else ret[dirent.name] = undefined // Is directory, but not doing a recursive scan
     } else {
       ret[dirent.name] = true
@@ -482,7 +456,7 @@ function buildApi(mod) {
         } else {
           const v = store_mods.get(getModStoreKey(mod._id, k), default_)
           this_store_cache[k] = (v == undefined ? cached_undefined : v)
-          return v
+          return v || default_
         }
       },
       has: (k) => this_store_cache[k] || store_mods.has(getModStoreKey(mod._id, k)),
@@ -588,20 +562,6 @@ async function getModJsAsync(mod_dir, options = {}) {
 
     // Perform actual import using __non_webpack_require__:
 
-    if (options.reload) {
-      /* eslint-disable no-undef */
-      if (__non_webpack_require__.cache[modjs_path]) {
-        delete __non_webpack_require__.cache[modjs_path]
-      } else {
-        // logger.info(modjs_name, modjs_path, "not in cache")
-        Object.keys(__non_webpack_require__.cache)
-          .filter(cachepath => cachepath.endsWith(modjs_name))
-          .forEach(cachepath => {
-          // logger.info("Removing partial match from cache", modjs_path, modjs_name, cachepath)
-          delete __non_webpack_require__.cache[cachepath]
-        })
-      }
-    }
     // else {
     //   if (mod_js_cache[modjs_path]) {
     //     // console.debug("Using cached", modjs_path)
@@ -610,8 +570,27 @@ async function getModJsAsync(mod_dir, options = {}) {
     // }
 
     try {
-      // eslint-disable-next-line no-undef
-      var mod_module = __non_webpack_require__(modjs_path)
+      var mod_module
+      if (isWebApp) {
+        throw Error("Webapp cannot use non-webpack require!")
+      } else {
+        if (options.reload) {
+          /* eslint-disable no-undef */
+          if (__non_webpack_require__.cache[modjs_path]) {
+            delete __non_webpack_require__.cache[modjs_path]
+          } else {
+            // logger.info(modjs_name, modjs_path, "not in cache")
+            Object.keys(__non_webpack_require__.cache)
+              .filter(cachepath => cachepath.endsWith(modjs_name))
+              .forEach(cachepath => {
+              // logger.info("Removing partial match from cache", modjs_path, modjs_name, cachepath)
+              delete __non_webpack_require__.cache[cachepath]
+            })
+          }
+        }
+        // eslint-disable-next-line no-undef
+        mod_module = __non_webpack_require__(modjs_path)
+      }
 
       mod_module._id = mod_dir
       mod_module._singlefile = is_singlefile
@@ -773,8 +752,11 @@ async function editArchiveAsync(archive) {
       onModLoadFail([js._id], e)
       throw e
     }
+    setLoadStage("READ_MODS")
   }
+  setLoadStage("BAKE_ROUTES")
   await bakeRoutesPromise
+  setLoadStage("MODS_DONE")
 }
 
 function mergeFootnotes(archive, footObj) {
@@ -815,7 +797,7 @@ function getMainMixin(){
     mounted() {
       const addScssStyle = (style_id, body) => {
         SassJs.compile(body, (result) => {
-          if (result.status !== 0) throw Error(result)
+          if (result.status !== 0) throw Error(JSON.stringify(result))
           this.stylesheets.push({
             id: style_id,
             body: result.text
@@ -824,43 +806,48 @@ function getMainMixin(){
       }
 
       enabledModsJsPromise.then(modules => {
-        modules.forEach(js => {
-          const modstyles = js.styles || []
-          if (!Array.isArray(modstyles)) {
-            throw Error(`${js._id} styles object is not a list`)
-          }
-
-          // Render stylesheets from mod css
-          modstyles.forEach((customstyle, i) => {
-            const style_id = `style-${js._id}-${i}`
-
-            if (customstyle.source && customstyle.body) {
-              throw Error("Styles cannot set both source and body. Use multiple style objects.")
+        modules.forEach(async js => {
+          await Promise.resolve(js._fullyLoadedPromise)
+          try {
+            const modstyles = js.styles || []
+            if (!Array.isArray(modstyles)) {
+              throw Error(`${js._id} styles object is not a list`)
             }
 
-            if (customstyle.source) {
-              const scss_path = path.resolve(js._mod_root_dir, customstyle.source)
+            // Render stylesheets from mod css
+            modstyles.forEach((customstyle, i) => {
+              const style_id = `style-${js._id}-${i}`
+
+              if (customstyle.source && customstyle.body) {
+                throw Error("Styles cannot set both source and body. Use multiple style objects.")
+              }
+
+              if (customstyle.source) {
+                const scss_path = path.resolve(js._mod_root_dir, customstyle.source)
+                fs.readFile(scss_path, 'utf8', (err, body) => {
+                  if (err) return onModLoadFail([js._id], err)
+                  addScssStyle(style_id, body)
+                })
+              } else if (customstyle.body) {
+                addScssStyle(style_id, customstyle.body)
+              } else {
+                throw Error("Styles must define some sort of body!")
+              }
+            })
+
+            // Render stylesheets from mod themes
+            const modThemes = js.themes || []
+            modThemes.forEach((theme, i) => {
+              const theme_class = `theme-${js._id}-${i}`
+              const scss_path = path.resolve(js._mod_root_dir, theme.source)
               fs.readFile(scss_path, 'utf8', (err, body) => {
                 if (err) return onModLoadFail([js._id], err)
-                addScssStyle(style_id, body)
+                addScssStyle(theme_class, `#app.${theme_class}, #app > .${theme_class} {\n${body}\n}`)
               })
-            } else if (customstyle.body) {
-              addScssStyle(style_id, customstyle.body)
-            } else {
-              throw Error("Styles must define some sort of body!")
-            }
-          })
-
-          // Render stylesheets from mod themes
-          const modThemes = js.themes || []
-          modThemes.forEach((theme, i) => {
-            const theme_class = `theme-${js._id}-${i}`
-            const scss_path = path.resolve(js._mod_root_dir, theme.source)
-            fs.readFile(scss_path, 'utf8', (err, body) => {
-              if (err) return onModLoadFail([js._id], err)
-              addScssStyle(theme_class, `#app.${theme_class}, #app > .${theme_class} {\n${body}\n}`)
             })
-          })
+          } catch (e) {
+            onModLoadFail([js._id], e)
+          }
         }) // end modules.foreach
       })
     }
@@ -1121,7 +1108,7 @@ async function loadModChoicesAsync(){
       logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
       fs.mkdirSync(modsDir)
     }
-    const tree = crawlFileTree(modsDir, false)
+    const tree = await crawlFileTree(modsDir, false)
 
     try {
       await tryExtractZipsForFilesystemIlliteratesAsync(tree)
@@ -1213,5 +1200,3 @@ export default {
   doFullRouteCheck, // internal/debug
   ipcRenderer
 }
-
-// TODO Double-check all cases of calling MOD_ or MODS_ ipc calls

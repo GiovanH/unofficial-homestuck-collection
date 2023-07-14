@@ -52,8 +52,6 @@ var promises_loading = []
 
 // Loading checks
 
-
-
 // Vue
 
 Vue.component('fa-icon', FontAwesomeIcon)
@@ -165,10 +163,8 @@ Vue.mixin({
     $getResourceURL(url) {
       const resource_url = Resources.getResourceURL(url)
       if (isWebApp) {
-        // simulate  webRequest redirection here
-        return (url.startsWith("assets://")
-          ? Resources.resolveAssetsProtocol(url)
-          : Resources.resolveURL(url))
+        // simulate webRequest redirection here
+        return Resources.resolveURL(url)
       } else {
         return resource_url
       }
@@ -414,6 +410,11 @@ window.Vue = Vue;
 
 // Resolve all promises, then make app
 Promise.all(promises_loading).then(_ => {
+  // Once JS loads from network, replace barebones preloader with vue preloader.
+  const preloader_div = document.getElementById("prepreloader")
+  if (preloader_div) preloader_div.remove()
+
+  // Mount vue
   window.vm = new Vue({
     data(){
       return {

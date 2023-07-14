@@ -3,6 +3,24 @@
 require('ofe').call()
 module.exports = {
     configureWebpack: {
+        // optimization: {
+        //     runtimeChunk: 'single',
+        //     splitChunks: {
+        //         cacheGroups: {
+        //             vendor: {
+        //                 test: /[\\/]node_modules[\\/]/,
+        //                 name: 'vendors',
+        //                 chunks: 'all'
+        //             }
+        //         }
+        //     }
+        // },
+        optimization: {
+          splitChunks: {
+            minSize: 10000,
+            maxSize: 250000,
+          }
+        },
         devtool: "source-map",
         resolve: {
             alias: {

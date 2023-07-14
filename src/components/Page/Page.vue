@@ -294,7 +294,7 @@ export default {
     }
 
     //Small screen check
-    @media only screen and (max-width: 850px) {
+    @media only screen and (max-width: 950px) {
       &{
         overflow-x: hidden;
         height: max-content;
