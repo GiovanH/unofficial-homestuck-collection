@@ -3,7 +3,14 @@
     <a :href="url_browse" v-text="url_browse" class="book-srclink-header" />
 
     <div class="note" v-if="page_num == undefined">
-      <p>bambosh i know you'll want to write some hand-wringing preface thing here</p>
+      <p>
+        Wizardy Herbert, as presented here, is an unfinished book draft of Andrew Hussie's, last revised July 2008.
+        The draft was accidently published to an open server and leaked <a href="https://web.archive.org/web/20160224201321/http://mspaforums.com/showthread.php?52179">on the mspa fourms in 2012</a>.
+      </p>
+      <p>
+        Themes from Wizardy Herbert heavily influenced the story, structure, and themes of Homestuck. Additionally, some characters were directly borrowed for Rose's <i>Complacency of the Learned</i> and Roxy's <i>Wizardy Herbert</i> (Herbert, Beatrix, Russet). Sketches of the characters also feature on the walls of Rose's room.
+      </p>
+      <p>Andrew directly discusses some of this in a <a href="/formspring/question159268867502284664">Feb 2011 formspring answer</a>.</p>
       <MediaEmbed url="assets://archive/wizardyherbert/herbertsketch2_sm.jpg" />
     </div>
 
@@ -171,6 +178,14 @@ export default {
     justify-content: space-between;
     background: #BFDBFF;
     border-top: 1px solid black;
+  }
+  .note {
+    padding: 0 110px;
+    font-family: sans-serif;
+    font-weight: normal;
+    p {
+      margin: revert;
+    }
   }
 </style>
 
