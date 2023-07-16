@@ -474,7 +474,7 @@ export default {
           desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
         }, {
           model: "reducedMotion",
-          label: "Use Reduced Motion",
+          label: "Reduce Motion",
           desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
         }, {
           model: "jsFlashes",

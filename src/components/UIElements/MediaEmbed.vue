@@ -1,6 +1,6 @@
 <template>
   <GifSeeker v-if="mediaType === 'gif' && reduceMotion"
-    :src='$getResourceURL(url)' />
+    :src='$getResourceURL(url)' :noanimate="$localData.settings.reducedMotion && (noncritical != undefined)" />
   <img v-else-if="mediaType === 'img' || mediaType === 'gif'"
     :src='$getResourceURL(url)'
     @dragstart="drag($event)" alt />
@@ -69,7 +69,7 @@ if (!window.isWebApp) {
 
 export default {
   name: "MediaEmbed",
-  props: ['url', 'gifmode', 'webarchive', 'width', 'height', 'autoplay'],
+  props: ['url', 'gifmode', 'webarchive', 'width', 'height', 'autoplay', 'noncritical'],
   components: {SpoilerBox, GifSeeker},
   emits: ['blockedevent'], 
   data() {

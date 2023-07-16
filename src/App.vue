@@ -1,10 +1,12 @@
 <template>
   <div id="window" :class="theme">
-    <div id="app" :class="[
-      // $root.loadState != 'DONE' ? 'busy' : '',
+    <div id="app"
+      :class="[
         $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        $localData.settings.reducedMotion ? 'reducedMotion' : '',
         $root.platform // webapp or electron
-      ]" v-if="$localData.assetDir && $archive && $root.loadState !== 'ERROR'">
+      ]"
+      v-if="$localData.assetDir && $archive && $root.loadState !== 'ERROR'">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />

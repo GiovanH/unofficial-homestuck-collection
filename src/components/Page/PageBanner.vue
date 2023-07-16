@@ -1,6 +1,6 @@
 <template>
   <div class="bannerDiv" v-if="!!banner"  @mouseover="mouseEnter" @mousemove="positionTooltip" @mouseleave="mouseLeave" >
-    <Media :url="banner.url" :title="banner.title" class="bannerImage" />
+    <Media :url="banner.url" :title="banner.title" class="bannerImage" noncritical />
     <img v-if="imgTooltip" :src="imgTooltip" class="imgTooltip" />
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
       }
       else if (this.page.theme == 'cascade')
         return {url: 'assets://images/header_cascade.gif', title: undefined}
-      else if (this.page.theme == 'trickster')
+      else if (this.page.theme == 'trickster' && !this.$localData.settings.reducedMotion)
         return {url: 'assets://images/trickster_sitegraphics/menu.swf', title: undefined}
       else if (this.page.flag.includes('X2COMBO'))
         return {url: 'assets://images/act6act5act1x2combo.gif', title: undefined}

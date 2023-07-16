@@ -413,6 +413,22 @@
 				content: url(assets://images/trickster_sitegraphics/sucker.gif);
 			}
 		}
+		.reducedMotion & {
+    		--page-pageFrame: repeating-linear-gradient(
+    			to bottom,
+    			#00117e,
+    			#00117e 40px,
+    			#0019b8 40px,
+    			#0019b8 80px
+    		);
+			.nextArrowLink{
+			    visibility: initial;
+			    font-size: inherit;
+			}
+			.nextArrowLink:after{
+				display: none;
+			}
+		}
 	}
 
 	&.A6A6 {

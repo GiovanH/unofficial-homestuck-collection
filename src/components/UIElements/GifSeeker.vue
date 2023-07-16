@@ -1,8 +1,9 @@
 <template>
   <div class='media'>
     <img v-if="frame" :src="frame.dataURL" />
-    <div class='controls'
-      v-if="frames.length > 1">
+    <!-- <img v-else :src="$getResourceURL(src)" :style="{'padding-bottom': '20px'}" /> -->
+    <div v-else :style="{width: '650px', height: '450px', 'padding-bottom': '20px'}" />
+    <div class='controls' v-if="frames.length > 1">
       <span>GIF</span>
       <input
         type="checkbox"
@@ -27,9 +28,14 @@
 const gifFrames = require('gif-frames');
 const DELAY_TO_MS = 10
 
+// Cache panel lists globally in order to make use of
+// pre-page resource caching (like images do natively)
+const LRUCache = require('mnemonist/lru-cache');
+const GLOBAL_FRAME_CACHE = new LRUCache(100)
+
 export default {
   name: "GifSeeker",
-  props: ['src'],
+  props: ['src', 'noanimate'],
   data() {
     return {
       selected_index: 0,
@@ -42,16 +48,25 @@ export default {
     frames: {
       default: [],
       async get() {
-        const frameData = await gifFrames({
-          url: this.$getResourceURL(this.src),
-          frames: 'all',
-          outputType: 'canvas',
-          cumulative: true
-        })
-        return frameData.map(frame => ({
-          ...frame,
-          dataURL: frame.getImage().toDataURL()
-        }))
+        const resource_url = this.$getResourceURL(this.src)
+        const disable_animation = (this.noanimate == true)
+        const arg_key = [resource_url, disable_animation]
+        if (GLOBAL_FRAME_CACHE.has(arg_key)) {
+          return GLOBAL_FRAME_CACHE.get(arg_key)
+        } else {
+          const frameData = await gifFrames({
+            url: resource_url,
+            frames: (disable_animation ? 0 : 'all'),
+            outputType: 'canvas',
+            cumulative: true
+          })
+          const frameArray = frameData.map(frame => ({
+            ...frame,
+            dataURL: frame.getImage().toDataURL()
+          }))
+          GLOBAL_FRAME_CACHE.set(arg_key, frameArray)
+          return frameArray
+        }
       }
     }
   },
