@@ -625,9 +625,9 @@ export default {
                 .forEach(f => {
                     try {
                         f()
-                        .then(module => {
-                            this.$logger.info("preloaded", module.default.name)
-                        })
+                        // .then(module => {
+                        //     this.$logger.info("preloaded", module.default.name)
+                        // })
                     } catch {
                         // f is a function but not a promise
                     }

@@ -52,6 +52,17 @@ var routes = undefined
 const store_modlist_key = 'settings.modListEnabled'
 const store_devmode_key = 'settings.devMode'
 
+const NOP_PROMISE = new Promise((resolve, reject) => {resolve()})
+
+function readFilePromise(file_path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(file_path, (err, buffer) => {
+      if (err) reject(err);
+      else resolve(buffer);
+    });
+  })
+}
+
 let win = null
 function giveWindow(new_win) {
   win = new_win
@@ -119,7 +130,7 @@ function getTreeRoutes(tree, parent=""){
 // ====================================
 // Installation and list managment
 
-function extractimods(){
+async function extractimods() {
   if (!expectWorkingState()) {
     logger.info("Not yet in working state, not extracting imods.")
     return
@@ -129,7 +140,7 @@ function extractimods(){
   // eslint-disable-next-line import/no-webpack-loader-syntax
   let tardata
   try {
-    tardata = require("url-loader!./imods.tar").default // Require *must* have a literal string here
+    tardata = (await import("url-loader!./imods.tar")).default // Require *must* have a literal string here
   } catch (e) {
     logger.error(`Couldn't read bundled tar data from url-loader!./imods.tar: webpack issue?`)
     throw e
@@ -192,6 +203,7 @@ if (ipcMain) {
     store.set("needsRecovery", true)
 
     if (win) {
+      console.error(e) // Error can't serialize to the window
       win.webContents.send('MOD_LOAD_FAIL', responsible_mods, e)
     } else {
       logger.warn("MAIN: Mod load failure with issues in", responsible_mods)
@@ -366,17 +378,43 @@ function getEnabledMods() {
   return list
 }
 
-function getEnabledModsJs() {
+function getEnabledModsJs(opts) {
+  var options = opts || {}
   if (!modsDir) {
     logger.warn("No asset directory set, can't load any mods.")
     return []
   }
   try {
-    return getEnabledMods().map((dir) => getModJs(dir)).filter(Boolean)
+    return getEnabledMods().map((dir) => getModJs(dir, options)).filter(Boolean)
   } catch (e) {
     logger.error("Couldn't load enabled mod js'", e)
     return []
   }
+}
+
+const searchWebAppModTrees = function(path) {
+  function *search(data, values) {
+    for (const value of values)
+      yield *search1(data, value)
+  }
+
+  function *search1(data, value) {
+    if (Object(data) === data) {
+      for (const key of Object.keys(data)) {
+        if (key === value)
+          yield data[key]
+        else
+          yield *search1(data[key], value)
+      }
+    }
+  }
+
+  let result
+  for (result of search(window.webAppModTrees, path.split('/'))) {
+    // result = result
+  }
+
+  return result
 }
 
 function crawlFileTree(root, recursive=false) {
@@ -402,13 +440,18 @@ function crawlFileTree(root, recursive=false) {
 
 function buildApi(mod) {
   const Resources = require("@/resources.js")
+  function safetyChecks(local_path) {
+    if (mod._singlefile) throw new Error(`Singlefile mods cannot use api.${method_name}`)
+    if (!local_path.startsWith("./")) throw new Error(local_path, `${method_name} paths must be mod relative (./)`)
+    if (local_path.includes("/..")) throw new Error(local_path, "You know what you did")
+  }
   function readFileSyncLocal(local_path, method_name) {
-    console.assert(!mod._singlefile, `Singlefile mods cannot use api.${method_name}`)
-    console.assert(local_path.startsWith("./"), local_path, `${method_name} paths must be mod relative (./)`)
-    console.assert(!local_path.includes("/.."), local_path, "You know what you did")
-
-    // TODO probably unsafe
+    safetyChecks(local_path)
     return fs.readFileSync(path.join(mod._mod_root_dir, local_path), 'utf8')
+  }
+  function readFileAsyncLocal(local_path, method_name) {
+    safetyChecks(local_path)
+    return readFilePromise(path.join(mod._mod_root_dir, local_path))
   }
 
   var this_store_cache = {}
@@ -442,14 +485,22 @@ function buildApi(mod) {
       }
     }, 
     readFile(asset_path) {
-      let data = readFileSyncLocal(asset_path, "readFile")
-      return data
+      return readFileSyncLocal(asset_path, "readFile")
     },
     readJson(asset_path) {
       return JSON.parse(readFileSyncLocal(asset_path, "readJson"))
     },
     readYaml(asset_path) {
       return yaml.safeLoad(readFileSyncLocal(asset_path, "readYaml"))
+    },
+    readFileAsync(asset_path, callback) {
+      return readFileAsyncLocal(asset_path, "readFileAsync").then(callback)
+    },
+    readJsonAsync(asset_path, callback) {
+      return readFileAsyncLocal(asset_path, "readJsonAsync").then(text => JSON.parse(text)).then(callback)
+    },
+    readYamlAsync(asset_path, callback) {
+      return readFileAsyncLocal(asset_path, "readYamlAsync").then(text => yaml.safeLoad(text)).then(callback)
     },
     Resources
   }
@@ -464,8 +515,10 @@ function buildApi(mod) {
   return api
 }
 
+const mod_js_cache = {}
+
 function getModJs(mod_dir, options={}) {
-  // Tries to load a mod from a directory
+  // Tries to load a mod (`require'd module) from a directory
   // If mod_dir/mod.js is not found, tries to load mod_dir.js as a single file
   // Errors passed to onModLoadFail and raised
   let modjs_path // full path to js file
@@ -510,22 +563,25 @@ function getModJs(mod_dir, options={}) {
         }
       }
 
-      // if (use_webpack_require) {
-      //   console.log(modjs_path)
-      //   mod = require(modjs_path)
-      // } else {
-      /* eslint-disable no-undef */
-      if (__non_webpack_require__.cache[modjs_path]) {
-        // logger.info("Removing cached version", modjs_path)
-        delete __non_webpack_require__.cache[modjs_path]
+      if (options.nocache) {
+        /* eslint-disable no-undef */
+        if (__non_webpack_require__.cache[modjs_path]) {
+          // logger.info("Removing cached version", modjs_path)
+          delete __non_webpack_require__.cache[modjs_path]
+        } else {
+          // logger.info(modjs_name, modjs_path, "not in cache")
+          Object.keys(__non_webpack_require__.cache)
+            .filter(cachepath => cachepath.endsWith(modjs_name))
+            .forEach(cachepath => {
+            // logger.info("Removing partial match from cache", modjs_path, modjs_name, cachepath)
+            delete __non_webpack_require__.cache[cachepath]
+          })
+        }
       } else {
-        // logger.info(modjs_name, modjs_path, "not in cache")
-        Object.keys(__non_webpack_require__.cache)
-          .filter(cachepath => cachepath.endsWith(modjs_name))
-          .forEach(cachepath => {
-          logger.info("Removing partial match from cache", cachepath)
-          delete __non_webpack_require__.cache[cachepath]
-        })
+        if (mod_js_cache[modjs_path]) {
+          console.debug("Using cached", modjs_path)
+          return mod_js_cache[modjs_path]
+        }
       }
 
       try {
@@ -554,7 +610,6 @@ function getModJs(mod_dir, options={}) {
         throw e
       }
     }
-    // }
 
     mod._id = mod_dir
     mod._singlefile = is_singlefile
@@ -565,15 +620,26 @@ function getModJs(mod_dir, options={}) {
       mod._mod_root_url = new URL(mod._id, thisModsAssetRoot).href + "/"
     }
 
-    if (!options.liteload && (mod.computed != undefined)) {
-      const api = buildApi(mod)
-      Object.assign(mod, mod.computed(api))
+    if (!options.liteload) {
+      let api = undefined
+      if (mod.computed != undefined) {
+        api = api || buildApi(mod)
+        Object.assign(mod, mod.computed(api))
+      }
+      if (mod.asyncComputed != undefined) {
+        api = api || buildApi(mod)
+        mod._fullyLoadedPromise = mod.asyncComputed(api).then(result => {
+          Object.assign(mod, result)
+        })
+      } else {
+        mod._fullyLoadedPromise = NOP_PROMISE
+      }
     }
 
     // Computed properties don't automatically require a reload because
     // the object has been assigned any computed properties by now.
     mod._needsArchiveReload = [
-      'edit', 'mspfa'
+      'edit', 'mspfa', 'footnotes'
     // eslint-disable-next-line no-prototype-builtins
     ].some(k => mod.hasOwnProperty(k))
     mod._needsHardReload = [
@@ -581,6 +647,11 @@ function getModJs(mod_dir, options={}) {
       'browserPages', 'browserActions', 'browserToolbars'
     // eslint-disable-next-line no-prototype-builtins
     ].some(k => mod.hasOwnProperty(k))
+
+    if (!options.liteload) {
+      // console.debug("Caching", modjs_path)
+      mod_js_cache[modjs_path] = mod
+    }
 
     return mod
   } catch (e1) {
@@ -604,7 +675,7 @@ const footnote_categories = ['story']
 // ====================================
 // Interface
 
-function editArchive(archive) {
+async function editArchive(archive) {
   if (!expectWorkingState()) {
     logger.warn("No asset directory set, probably in new reader setup mode. Not editing the archive.")
     return
@@ -617,8 +688,10 @@ function editArchive(archive) {
     archive.footnotes[category] = []
   })
 
-  const enabledModsJs = getEnabledModsJs()
-  enabledModsJs.reverse().forEach((js) => {
+  const enabledModsJs = getEnabledModsJs({nocache: true})
+  for (const js of enabledModsJs.reverse()) {
+    // console.log("Waiting for", js.title, js._fullyLoadedPromise)
+    await js._fullyLoadedPromise // Must fully await since this happens in the background process
     // Load footnotes into archive
     try {
       if (js.footnotes) {
@@ -632,27 +705,28 @@ function editArchive(archive) {
 
           logger.info(js.title, "Loading footnotes from file", json_path)
           const footObj = JSON.parse(
-            fs.readFileSync(json_path, 'utf8')
+            await readFilePromise(json_path)
           )
           mergeFootnotes(archive, footObj)
         } else if (Array.isArray(js.footnotes)) {
           logger.info(js.title, "Loading footnotes from object")
           mergeFootnotes(archive, js.footnotes)
         } else {
-          throw new Error(js.title, `Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
+          throw new Error(`${js.title} Incorrectly formatted mod. Expected string or array, got '${typeof jsfootnotes}'`)
         }
       }
     } catch (e) {
+      console.error(e)
       onModLoadFail([js._id], e)
     }
     // Run archive edit function
     try {
       const editfn = js.edit
-      if (editfn) {        
+      if (editfn) {
         logger.debug(js._id, "editing archive")
         editfn(archive)
         console.assert(archive, js.title, "You blew it up! You nuked the archive!")
-      
+
         // Sanity checks
         // let required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
         // required_keys.forEach(key => {
@@ -663,7 +737,7 @@ function editArchive(archive) {
       onModLoadFail([js._id], e)
       throw e
     }
-  })
+  }
 }
 
 function mergeFootnotes(archive, footObj) {
@@ -873,7 +947,7 @@ function getMixins(){
     })
   })
 
-  const mixin =  {
+  const mixin = {
     created() {
       const vueComponent = this
 
@@ -1013,7 +1087,7 @@ if (ipcMain) {
 
     var items = mod_folders.reduce((acc, dir) => {
       try {
-        const js = getModJs(dir, {liteload: true})
+        const js = getModJs(dir, {liteload: true, nocache: true})
         if (js === null || js.hidden === true)
           return acc // continue
 

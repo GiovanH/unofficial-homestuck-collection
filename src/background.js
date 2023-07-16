@@ -206,10 +206,10 @@ var menuTemplate = [
   }
 ]
 
-function loadArchiveData(){
+async function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-  // This returns an `archive` object, and does not modify the global archive directly. 
-  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+  // This returns an `archive` object, and does not modify the global archive directly.
+  if (win) win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
@@ -243,12 +243,12 @@ function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  win.webContents.send('SET_LOAD_STAGE', "MODS")
+  if (win) win.webContents.send('SET_LOAD_STAGE', "MODS")
   logger.info("Loading mods")
 
   try {
     logger.debug("Applying mod archive edits")
-    Mods.editArchive(data)
+    await Mods.editArchive(data)
     // This isn't strictly part of loading the archive data,
     // but we should do this only when we reload the archive
     logger.debug("Baking mod routes")
@@ -276,7 +276,7 @@ function loadArchiveData(){
     throw e
   }
 
-  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
+  if (win) win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   logger.info("Loading patches")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   if (data.version == "1") {
@@ -415,6 +415,8 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
+var extractingImodsPromise = undefined
+
 if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
@@ -426,7 +428,7 @@ if (assetDir && fs.existsSync(assetDir)) {
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
-    Mods.extractimods()
+    extractingImodsPromise = Mods.extractimods()
   } else {
     logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
@@ -440,27 +442,30 @@ if (assetDir && fs.existsSync(assetDir)) {
 var first_archive
 var archive // Also, keep a reference to the latest archive, for lazy eval
 try {
-  archive = first_archive = loadArchiveData()
+  loadArchiveData().then(result => {
+    archive = first_archive = result
+  })
 } catch (e) {
   // logger.warn(e)
   // don't even warn, honestly
 }
 
-ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
+    extractingImodsPromise && await extractingImodsPromise
     if (first_archive) {
       archive = first_archive
       first_archive = undefined;
-    } else archive = loadArchiveData()
+    } else archive = await loadArchiveData()
 
     search.giveArchive(archive)
     win.webContents.send('ARCHIVE_UPDATE', archive)
-    win.webContents.send('SET_LOAD_STATE', "DONE")
   } catch (e) {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
   }
+  win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 search.registerIpc(ipcMain)
@@ -513,7 +518,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
       logger.info("New asset directory", assetDir)
-      loadArchiveData()
+      await loadArchiveData()
 
       let flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
@@ -539,8 +544,10 @@ ipcMain.handle('locate-assets', async (event, payload) => {
         if (confirmation == 0) {
           store.set('assetDir', newPath[0])
         
-          app.relaunch()
-          app.exit()
+          if (!isDevelopment) {
+            app.relaunch()
+            app.exit()
+          }
         }
       } else return newPath[0]
     } else {
@@ -561,16 +568,6 @@ ipcMain.handle('restart', async (event) => {
 
 ipcMain.handle('reload', async (event) => {
   win.reload()
-})
-
-
-ipcMain.handle('factory-reset', async (event, confirmation) => {
-  if (confirmation === true) {
-    store.delete('localData')
-  
-    app.relaunch()
-    app.exit()
-  }
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {

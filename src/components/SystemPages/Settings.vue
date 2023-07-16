@@ -753,7 +753,9 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          ipcRenderer.invoke('factory-reset', answer)
+          this.$localData.root.clearLocalStorage()
+          Mods.store_mods.clear()
+          // ipcRenderer.invoke('restart')
         }
       })
     },
@@ -772,12 +774,19 @@ export default {
       let diff = list_active.filter(x => !old_list.includes(x))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
-      if (diff.some(key => this.$modChoices[key].needsHardReload)) {
-        this.$logger.info("List change requires hard reload", diff)
+      try {
+        if (diff.some(key => this.$modChoices[key].needsHardReload)) {
+          this.$logger.info("List change requires hard reload", diff)
+          this.needReload = true
+        }
+        if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
+          this.$logger.info("List change requires archive reload", diff)
+          this.queueArchiveReload()
+        }
+      } catch (e) {
+        // Sometimes keys aren't in modChoices yet
+        this.$logger.error(e)
         this.needReload = true
-      }
-      if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
-        this.$logger.info("List change requires archive reload", diff)
         this.queueArchiveReload()
       }
     },

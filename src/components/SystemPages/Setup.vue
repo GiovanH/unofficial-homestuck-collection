@@ -387,7 +387,7 @@ export default {
     },
     clearEnabledMods(){
       this.$localData.settings["modListEnabled"] = []
-      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
 
       this.loadingTooLongTimeout = false
 

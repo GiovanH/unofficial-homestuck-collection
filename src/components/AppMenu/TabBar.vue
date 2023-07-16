@@ -343,7 +343,10 @@ export default {
   }
   .historyBack > svg { padding-right: 0.1em; }
   .refresh, .jumpBoxButton { 
-    > svg { font-size: calc(var(--symbol-font-size) * 0.9) } 
+    > svg {
+      height: 22px;
+      font-size: calc(var(--symbol-font-size) * 0.9)
+    }
   }
 
   .sysActionButton {

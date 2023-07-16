@@ -21,8 +21,14 @@ if (!isWebApp) {
 
 var assets_root = undefined
 
+const app_domain = ((typeof window !== 'undefined') ? window.location.host : "localhost:8080")
+const RE_THIS_DOMAIN = new RegExp(`https?://${app_domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`)
+
 function linkIsOutlink(url) {
-  return /^http(s{0,1}):\/\//.test(url) && !/^http(s{0,1}):\/\/localhost/.test(url) && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url)
+  return (/^http(s{0,1}):\/\//.test(url)
+    && !/^http(s{0,1}):\/\/localhost/.test(url)
+    && !RE_THIS_DOMAIN.test(url)
+    && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url))
 }
 
 // Pure
@@ -216,8 +222,8 @@ const UrlFilterMixin = {
       // else
       el.querySelectorAll("A").forEach((link) => {
         if (link.href) {
-          const pseudLinkHref = link.href // link.href.replace(/^http:\/\/localhost:8080\//, '/')
-          link.href = getResourceURL(pseudLinkHref)
+          const pseudLinkHref = link.href.replace(RE_THIS_DOMAIN, '/')
+          link.href = getResourceURL(pseudLinkHref) // Resolved in onLinkClick
           // if (link.href != pseudLinkHref) {
           //   logger.debug("[filterL]", pseudLinkHref, "->", link.href)
           // }
@@ -231,8 +237,9 @@ const UrlFilterMixin = {
       // than how the other resources are handled.
       const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO'), ...el.getElementsByTagName('AUDIO')]
 
+
       for (let i = 0; i < media.length; i++) {
-        const pseudMediaSrc = media[i].src // media[i].src.replace(/^http:\/\/localhost:8080\//, '/')
+        const pseudMediaSrc = media[i].src.replace(RE_THIS_DOMAIN, '/')
         media[i].src = resolveURL(pseudMediaSrc)
         // if (media[i].src != pseudMediaSrc) {
         //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)

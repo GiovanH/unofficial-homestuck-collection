@@ -23,8 +23,8 @@
 <script>
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
-  import Notifications from '@/components/UIElements/Notifications.vue'
 
+  const Notifications = () => '@/components/UIElements/Notifications.vue'
   const ContextMenu = () => import('@/components/UIElements/ContextMenu.vue')
   const UrlTooltip = () => import('@/components/UIElements/UrlTooltip.vue')
   const Updater = () => import('@/components/UIElements/Updater.vue')
@@ -288,7 +288,8 @@
             event.preventDefault()
             const { altKey, ctrlKey, metaKey, shiftKey } = event
             const auxClick = (metaKey || altKey || ctrlKey || shiftKey) || targetBlank
-            app.$openLink(resolvedTarget.href, auxClick || force_aux_click)
+            const resolved_href = Resources.resolveURL(resolvedTarget.href)
+            app.$openLink(resolved_href, auxClick || force_aux_click)
           }
         }
       }

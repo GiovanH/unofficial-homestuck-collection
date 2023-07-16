@@ -154,6 +154,10 @@ class LocalData {
       },
       methods: {
         _saveLocalStorage() {
+          if (this.saveDebounce) {
+            clearTimeout(this.saveDebounce)
+            this.saveDebounce = undefined
+          }
           const all = store.get()
           all["timestamp"] = Date.now()
           all['assetDir'] = this.assetDir
@@ -168,20 +172,17 @@ class LocalData {
         },
         clearLocalStorage() {
           if (this.saveDebounce) {
-            clearTimeout(this.saveDebounce)
             this._saveLocalStorage()
           }
-          const all = store.get()
-          delete all["timestamp"]
-          delete all['assetDir']
-          delete all['tabData']
-          delete all['saveData']
-          delete all['settings']
-          store.set(all)
+          store.delete('timestamp')
+          store.delete('assetDir')
+          store.delete('tabData')
+          store.delete('saveData')
+          store.delete('settings')
+          this.reloadLocalStorage()
         },
         reloadLocalStorage() {
           if (this.saveDebounce) {
-            clearTimeout(this.saveDebounce)
             this._saveLocalStorage()
           }
           const all = store.get()
@@ -565,7 +566,7 @@ class LocalData {
         },
         SET_ASSET_DIR(path) {
           this.assetDir = path
-          this.saveLocalStorage()
+          this._saveLocalStorage()
         }
       },
       watch: {
@@ -594,7 +595,6 @@ class LocalData {
       destroyed() {
         if (this.saveDebounce) {
           this.$logger.info("DESTROYING: flushing debounce")
-          clearTimeout(this.saveDebounce)
           this._saveLocalStorage()
         }
       },
