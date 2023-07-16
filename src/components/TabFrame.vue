@@ -1,11 +1,14 @@
 <template>
     <div class="tabFrame" 
         :id="tab.key" 
-        :class="{
-            hidden: !tabIsActive,
-            forceScrollBar: $localData.settings.forceScrollBar,
-            forceLoad
-        }"
+        :class="[
+            theme,
+            {
+                hidden: !tabIsActive,
+                forceScrollBar: $localData.settings.forceScrollBar,
+                forceLoad
+            }
+        ]"
         :tabindex="(tabIsActive) ? -1 : false" 
         v-if="isLoaded"
         @keyup.left="leftKeyUp"
