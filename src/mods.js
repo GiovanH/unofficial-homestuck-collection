@@ -845,6 +845,46 @@ function getMainMixin(){
                 addScssStyle(theme_class, `#app.${theme_class}, #app > .${theme_class} {\n${body}\n}`)
               })
             })
+
+            // Render stylesheets from mod pages
+            const reset_sass = `
+            .pageFrame {
+              h1, h2, h3, h4, h5, h6, p, ul, ol, li, div {
+                margin: unset;
+                padding: unset;
+              }
+              p {
+                display: block;
+                margin-block-start: 1em;
+                margin-block-end: 1em;
+                margin-inline-start: 0px;
+                margin-inline-end: 0px;
+              }
+              ul {
+                display: block;
+                list-style-type: disc;
+                margin-block-start: 1em;
+                margin-block-end: 1em;
+                margin-inline-start: 0px;
+                margin-inline-end: 0px;
+                padding-inline-start: 40px;
+              }
+              & {
+                font-family: unset;
+                font-size: unset;
+                font-weight: normal;
+                overflow-wrap: initial;
+              }
+            }`
+            const modPages = js.browserPages || {}
+            Object.entries(modPages).forEach((t, i) => {
+              const [componentTag, {component}] = t
+              if (component.scss) {
+                const style_id = `browserpage-style-${componentTag}`
+                const sass_body = `.tabFrame [data-component='${componentTag}'] {\n${reset_sass}\n${component.scss}\n}`
+                addScssStyle(style_id, sass_body)
+              }
+            })
           } catch (e) {
             onModLoadFail([js._id], e)
           }

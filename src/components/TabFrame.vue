@@ -24,6 +24,7 @@
             :tab="tab" 
             :routeParams="passedRouteParams || routeParams"
             ref="page"
+            :data-component="loadedResolvedComponent"
         />
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
