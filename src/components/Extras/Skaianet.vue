@@ -280,6 +280,16 @@ export default {
              <p><em>2 April 2018 - Present</em></p>`
         },
         {
+          icon: "archive/skaianet/spoon.gif",
+          title: `
+            <a href="https://topatoco.com/products/mspa-sb-spoon" target="_blank">SPOON.PDF</a>
+            <img src="assets://archive/skaianet/book.gif" align="middle" />`,
+          content: `
+             <p>Journey with Sweet Bro as he joroneys to recover his spoon over a long jounrey. </p>
+             <p><a href='https://www.kickstarter.com/projects/1724736026/sweet-bro-and-hella-jeff-by-hussie-dril-and-kc-gre/'>Kickstarter</a></p>
+             <p><em>8 November 2018</em></p>`
+        },
+        {
           icon: "archive/skaianet/fs.gif",
           title: `<a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/" target="_blank">FRIENDSIM.EXE</a>
           <img src="assets://archive/skaianet/exe.gif" align="middle" />
