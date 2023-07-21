@@ -406,7 +406,14 @@ export default {
 }
 </script>
 
+
 <style scoped lang="scss">
+  @mixin tablet-size {
+    @media only screen and (max-width: 950px) {
+      @content;
+    }
+  }
+
   .pageBody {
     margin: 0;
     padding: 0;
@@ -437,6 +444,7 @@ export default {
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: var(--page-pageContent);
 
     flex: 0 1 auto;
@@ -457,7 +465,7 @@ export default {
     }
     .logo {
       position: relative;
-      max-width: 920px;
+      max-width: min(920px, 100vw);
       // position: absolute;
       &.hsLogo {
         // padding: 10px 0;
@@ -522,6 +530,11 @@ export default {
           }
           img {
             display: block;
+
+            @include tablet-size {
+              max-width: 65px;
+              max-height: 65px;
+            }
           }
         }
         .description  {
@@ -535,6 +548,9 @@ export default {
           .links {
             margin-top: 10px;
             display: flex;
+            @include tablet-size {
+              display: block;
+            }
             align-items: center;
             font-family: Verdana,Arial,Helvetica,sans-serif;
 

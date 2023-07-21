@@ -348,6 +348,9 @@ export default {
             line-height: 1.1;
             font-size: 32px;
             padding: 15px 0;
+            @media only screen and (max-width: 650px) {
+              font-size: 2em;
+            }
           }
 
           .media {

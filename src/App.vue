@@ -359,7 +359,7 @@
   html, body {
     height: 100%;
   }
-  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, div{
+  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, div {
     margin: 0;
     padding: 0;
   }
@@ -368,6 +368,11 @@
     font-size: 14px;
     font-weight: bolder;
     overflow-wrap: break-word;
+  }
+  @media only screen and (max-width: 650px) {
+    body {
+      font-size: 14px;
+    }
   }
   .tabFrame {
     input, img {

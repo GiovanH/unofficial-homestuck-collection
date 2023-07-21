@@ -887,6 +887,7 @@ export default {
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: var(--page-pageContent);
 
     flex: 0 1 auto;

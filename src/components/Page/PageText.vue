@@ -279,6 +279,7 @@ export default {
 
     .prattle {
         width: 600px;
+        max-width: 100%;
         text-align: center;
         margin: 0 0 30px 0;
         
@@ -303,6 +304,7 @@ export default {
 
     .authorlog {
         width: 600px;
+        max-width: 100%;
         margin: 0 0 30px 0;
         border: 3px solid var(--page-pageBorder, var(--page-pageFrame));
         background: white;
@@ -318,6 +320,7 @@ export default {
 
     .log {
         width: 600px;
+        max-width: 100%;
         margin: 0 0 30px 0;
         border: 1px dashed var(--page-log-border);
         background: var(--page-log-bg);

@@ -514,6 +514,9 @@ export default {
     }
   .wizard {
     .wizardSidebar {
+      @media only screen and (max-width: 650px) {
+        display: none;
+      }
       width: 210px;
       float: left;
       height: 100%;
@@ -606,6 +609,7 @@ export default {
     border: solid 5px #c6c6c6;
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: #eeeeee;
 
     flex: 0 1 auto;
