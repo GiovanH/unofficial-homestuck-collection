@@ -1,5 +1,5 @@
 <template>
-    <div id="appHeader" :class="{hidden: isHidden}">
+    <div id="appHeader">
       <TitleBar :style="{display: $localData.settings.useSystemWindowDecorations ? 'none' : 'inherit'}"/>
       <TabBar />
     </div>
@@ -16,30 +16,18 @@ export default {
   },
   data(){
     return {
-      windowHeight: window.innerHeight
     }
   },
   computed: {
-    isHidden() {
-      const isFullscreen = (this.windowHeight === screen.height)
-      return isFullscreen && this.$localData.settings.hideFullscreenHeader
-    }
   },
   methods: {
-
   },
   mounted () {
-    // Vue won't let us use innerWidth in a computed function otherwise
-    // since the window object isn't a reactive vue element
-    window.onresize = () => {
-      this.windowHeight = window.innerHeight
-    }
   }
 }
 </script>
 
 <style lang="scss">
-  
 #appHeader {
   z-index: 4;
   background: var(--header-bg);
@@ -61,5 +49,4 @@ export default {
     }
   }
 }
-  
 </style>
