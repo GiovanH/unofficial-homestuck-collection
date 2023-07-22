@@ -17,11 +17,11 @@
               </div>
               <div class="hidden">
                 <!-- Preload images -->
-                <BBCode v-for="n in page.n" :key="n" :code="story.p[n].b" />
+                <BBCode v-for="n in page.n.filter(n => story.p[n])" :key="n" :code="story.p[n].b" />
               </div>
               <div id="foot">
                 <div id="links">
-                  <div v-for="n in page.n" :key="n">
+                  <div v-for="n in page.n.filter(n => story.p[n])" :key="n">
                     <a :href="`/mspfa/${storyId}/${n}`">
                       <span v-text="getPageCommand(n)" />
                     </a>
