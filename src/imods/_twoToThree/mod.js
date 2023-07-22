@@ -26,6 +26,22 @@ module.exports = {
     archive.music.albums['hiveswap-act-2-ost'].art = [] // Fix tobyfox crash
     archive.music.tracks['flying-car'].bandcampId = 415056291 // Bowman - Fly to ES - Flying Car
 
+    //Correct Red Sucker misattribution - RJ Lake -> Kalibration
+    archive.music.tracks['red-sucker'].artists[1].who = "kalibration"
+    archive.music.tracks['red-sucker'].contributors[1].who = "kalibration"
+    archive.music.artists['robert-j-lake'].credits[12].music.pop()
+    archive.music.artists['kalibration'].credits.splice(5, 0, {
+      "directory": "cherubim",
+      "coverArt": null,
+      "music": [
+        {
+          "track": "red-sucker",
+          "what": "arrangement, production"
+        }
+      ],
+      "art": []
+    })
+
     archive.social.blogspot[8].html = archive.social.blogspot[8].html.replace('archive/tso/blurbs', 'archive/comics/tso/blurbs')
 
     editFormspring('andrewhussie', 'andrewhussie550488999', '"/archive/formspring/00958_1.gif"', '"assets://archive/social/formspring/00958_1.gif"')
