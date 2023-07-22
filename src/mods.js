@@ -76,10 +76,12 @@ var setLoadStage
 
 if (ipcRenderer) {
   ipcRenderer.on('MODS_EXTRACT_IMODS_PLEASE', (event, payload) => {
+    logger.info("mods will extract imods")
     want_imods_extracted = true
   })
   setLoadStage = function(stage) {
     try {
+      logger.debug(stage)
       ipcRenderer._events['SET_LOAD_STAGE'](null, stage)
     } catch (e) {
       logger.warn(e)
@@ -122,19 +124,19 @@ function getAssetRoute(url) {
 }
 
 function getTreeRoutes(tree, parent = "") {
-  let routes = []
+  let temp_routes = []
   for (const name in tree) {
     const dirent = tree[name]
     const subpath = (parent ? parent + "/" + name : name)
     if (dirent == true) {
       // Path points to a file of some sort
-      routes.push(subpath)
+      temp_routes.push(subpath)
     } else {
       // Recurse through subpaths
-      routes = routes.concat(getTreeRoutes(dirent, subpath))
+      temp_routes = temp_routes.concat(getTreeRoutes(dirent, subpath))
     }
   }
-  return routes
+  return temp_routes
 }
 
 // ====================================
@@ -428,8 +430,8 @@ function buildApi(mod) {
   const Resources = require("@/resources.js")
   function safetyChecks(local_path) {
     if (mod._singlefile) throw new Error(`Singlefile mods cannot use this method`)
-    if (!local_path.startsWith("./")) throw new Error(local_path, `Paths must be mod relative (./)`)
-    if (local_path.includes("/..")) throw new Error(local_path, "You know what you did")
+    if (!local_path.startsWith("./")) throw new Error(`${local_path}: Paths must be mod relative (./)`)
+    if (local_path.includes("/..")) throw new Error(`${local_path}: You know what you did`)
   }
   function readFileSyncLocal(local_path, method_name) {
     safetyChecks(local_path)
@@ -649,7 +651,7 @@ async function getModJsAsync(mod_dir, options = {}) {
         }
         if (expectWorkingState()) {
           console.log("Couldn't load imod, trying re-extract")
-          extractimods()
+          await extractimods()
         } else {
           console.log('Asset pack not found.')
           throw e
@@ -690,6 +692,7 @@ async function editArchiveAsync(archive) {
   }
 
   if (want_imods_extracted) {
+    logger.info("Extracting imods")
     setLoadStage("EXTRACT_IMODS")
     await extractimods()
     want_imods_extracted = false // we did it
@@ -737,6 +740,7 @@ async function editArchiveAsync(archive) {
       }
     } catch (e) {
       logger.error(e)
+      if (js._id.startsWith("_")) await extractimods()
       onModLoadFail([js._id], e)
     }
 
@@ -749,6 +753,7 @@ async function editArchiveAsync(archive) {
         editfn(archive)
       }
     } catch (e) {
+      if (js._id.startsWith("_")) await extractimods()
       onModLoadFail([js._id], e)
       throw e
     }
@@ -1181,7 +1186,7 @@ async function loadModChoicesAsync(){
   const choice_promises = mod_folders.map(async (dir) => {
     try {
       const js = await getModJsAsync(dir, {liteload: true, reload: true})
-      if (js === null || js.hidden === true)
+      if (js === null || js.hidden === true || js._internal)
         return false
 
       return jsToChoice(js, dir)

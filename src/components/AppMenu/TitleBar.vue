@@ -1,5 +1,5 @@
 <template>
-    <div id="titleBar" v-if="!$isWebApp">
+    <div id="titleBar">
       <div id="titleBarText" v-text="activeTabTitle" />
       <div id="titleBarButtons" tabindex="-1" v-if="showButtons">
         <div class="systemButton" id="minButton" @click="minimize()" >‒</div>
