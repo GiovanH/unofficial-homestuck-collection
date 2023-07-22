@@ -140,6 +140,11 @@ export default {
           desc: `For using their godlike audio magic powers to absolutely save my life during the process of editing the high quality flash audio.`
         },
         {
+          name: "Grace Medley",
+          link: "https://power464646.tumblr.com/",
+          desc: `For stepping in to completely rework one of the less satisfactory HQ flash edits.`
+        },
+        {
           name: "wheals",
           link: "https://wheals.github.io",
           desc: `For archiving all the old social media accounts, that I proceeded to cram into this thing.`
