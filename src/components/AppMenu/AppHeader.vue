@@ -1,5 +1,5 @@
 <template>
-    <div id="appHeader">
+    <div id="appHeader" :class="{hidden: isHidden}">
       <TitleBar :style="{display: $localData.settings.useSystemWindowDecorations ? 'none' : 'inherit'}"/>
       <TabBar />
     </div>
@@ -16,13 +16,20 @@ export default {
   },
   data(){
     return {
+      windowHeight: 0
     }
   },
   computed: {
-  },
-  methods: {
+    isHidden() {
+      const window_is_fullscreen = (this.windowHeight === screen.height)
+      return this.$localData.settings.hideFullscreenHeader && window_is_fullscreen
+    }
   },
   mounted () {
+    // Window object isn't a reactive vue element; react to size w/ listener
+    window.addEventListener("resize", (e) => {
+      this.windowHeight = window.outerHeight
+    })
   }
 }
 </script>

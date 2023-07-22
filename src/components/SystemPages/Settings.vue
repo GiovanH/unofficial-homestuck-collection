@@ -414,8 +414,8 @@ export default {
           desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
         }, {
           model: 'hideFullscreenHeader', 
-          label: "Hide fullscreen header", 
-          desc: "Hide header content (such as the jump bar, title and tab bars) in fullscreen mode (F11)."
+          label: "Hide header in fullscreen",
+          desc: "Hide the application header (title bar, address bar, and tabs) in fullscreen mode (F11)."
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
