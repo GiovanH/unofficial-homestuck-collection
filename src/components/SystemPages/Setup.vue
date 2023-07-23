@@ -137,10 +137,7 @@
         <div class="loadcard" >
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
-    <!-- <circle cx="0" cy="0" r="3" fill="orange"/> -->
-    <g id="halfSpiro" class="left">
-      <!-- <circle cx="0" cy="0" r="2" fill="blue"/> -->
-      <!-- <path v-if="copiedPath" :d="copiedPath" style="stroke: blue; stroke-width: 22px;" /> -->
+    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c">
       <path id="thePath" :d="spiroPos[spiroTestindex]">
         <animate v-if="spiroTestAnimate"
           attributeName="d"
@@ -152,9 +149,7 @@
         v-for="n in 9"  :key="`p${n}`"
         :style="{transform: `rotate(${(n) * (360/10)}deg)`}"/>
     </g>
-    <use href="#halfSpiro" class="right" />
   </g>
-    <!-- <circle cx="0" cy="0" r="4" fill="red"/> -->
 </svg>
           <p v-text="loadText"></p>
         </div>
@@ -670,10 +665,10 @@ div.loadcard {
     animation-duration: 8000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    > g, use {
+    > g {
     // container
       transform: translate(0, 145px);
-      > g, use { // Spirograph half
+      > g { // Spirograph half
         height: 520px;
         width: 520px;
         stroke: rgb(56, 244, 61);
@@ -681,13 +676,11 @@ div.loadcard {
         stroke-linejoin: round;
         stroke-width: 8;
         fill: transparent;
-        &.left { // Left
+        &.left {
           transform: translate(24px, 0);
-          // stroke: orange;
         }
-        &.right { // Right
-          // transform: translate(-24px, 0) scale(-1, 1);
-          transform: scale(-1, 1);
+        &.right {
+          transform: translate(-24px, 0) scale(-1, 1);
         }
         path, use {
           transform-origin: -24px -145px;
