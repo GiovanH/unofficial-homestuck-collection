@@ -11,6 +11,8 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 
+const Resources = require('@/resources.js')
+
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
@@ -18,6 +20,7 @@ function capitalize(string) {
 export default {
   name: 'epilogues',
   components: { NavBanner, PageFooter },
+  mixins: [ Resources.UrlFilterMixin ],
   data: function() {
     return {
       fakechat: false,
@@ -131,6 +134,9 @@ export default {
         return "NotImplemented"
       }
     }
+  },
+  updated() {
+    this.filterLinksAndImages(this.$el)
   }
 }
 </script>
