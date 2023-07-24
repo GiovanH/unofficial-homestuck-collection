@@ -47,16 +47,18 @@
         <h2>Application Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
-            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
       </div>
@@ -164,14 +166,18 @@
           </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
-            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass still -->
-            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
+              <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
 
         </dl>
@@ -329,16 +335,18 @@
         <h2>System Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListSystem">
-            <dt :key="boolSetting.model" v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
         <div class="system">
@@ -453,7 +461,8 @@ export default {
         }, {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
-          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.",
+          platform_whitelist: ['electron']
         }
       ],
       settingListSystem: [
@@ -823,12 +832,19 @@ export default {
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
+    },
+    trackSettings() {
+      // Log settings, for debugging
+      this.$logger.info(this.$localData.settings)
     }
   },
   mounted(){
     if (this.routeParams.sec) {
       this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
+  },
+  destroyed() {
+    this.trackSettings()
   },
   watch: {
     'tab.history': function (to, from) {
@@ -838,8 +854,7 @@ export default {
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (to == this.tab.key || from == this.tab.key) {
-        // Log settings, for debugging
-        this.$logger.info(this.$localData.settings)
+
         if (this.needReload) {
           this.forceReload()
           // forceReload includes archiveReload
