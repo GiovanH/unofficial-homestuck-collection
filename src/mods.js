@@ -269,7 +269,7 @@ async function bakeRoutes(enabled_mods_js) {
           treeroutes.forEach(route => {
             const route_href = new URL(asset_tree + route).href
             all_mod_routes[route_href] =
-              new URL(path.posix.join(mod_tree, route), js._mod_root_url).href
+              new URL((path.posix || path).join(mod_tree, route), js._mod_root_url).href
           })
         }
       }
@@ -402,6 +402,9 @@ async function searchWebAppModTrees(path) {
     // result = result
   }
 
+  if (Object.values(tree_root).includes(result)) {
+    throw new Error(`Failed to find '${path} in webapp mod trees! Old data?'`)
+  }
   return result
 }
 
