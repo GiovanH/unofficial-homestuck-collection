@@ -114,6 +114,7 @@
               <div class="umcontainer">
                 <div class="mspfalogo"></div>
                 <!-- <iframe class="um" src="/um/bottom.njs" if1225q65=""></iframe> -->
+                <Ad v-if="show_ad" />
               </div>
               <div id="details" style="padding-top: 6px;">
                 <!-- © MS Paint Fan Adventures 2010-2023
@@ -135,6 +136,7 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import BBCode from '@/components/CustomContent/bbcode.vue'
 import Error404 from '@/components/SystemPages/Error404.vue'
+import Ad from '@/components/UIElements/Ad.vue'
 
 const sass = require('sass');
 
@@ -146,12 +148,13 @@ export default {
     'storyId', 'pageNum'
   ],
   components: {
-    NavBanner, BBCode, Error404
+    NavBanner, BBCode, Error404, Ad
   },
   data: function() {
     return {
       DateTime: require('luxon').DateTime,
-      time_zone: "America/New_York"
+      time_zone: "America/New_York",
+      show_ad: true,
     }
   },
   computed: {
@@ -255,7 +258,7 @@ export default {
           pad = 50
       }
       var loadImg = () => {
-          if (this.offsetWidth + pad < this.$refs['slide'].offsetWidth) {
+          if (this.$refs['slide'] && (this.offsetWidth + pad < this.$refs['slide'].offsetWidth)) {
               this.classList.remove("major")
           }
       }
@@ -359,6 +362,7 @@ div[role="styleWrap"]::v-deep {
     overflow-y: auto;
     // background-color: var(--page-pageBody);
     color: var(--font-default);
+    min-height: 100vh;
   }
 
   #main {

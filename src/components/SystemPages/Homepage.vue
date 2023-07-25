@@ -147,9 +147,9 @@
         </div>
         <div class="description">
           <h2><a href="/mspfa/" >MS Paint Fan Adventures</a></h2>
-          <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nyxshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
+          <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nixshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
           <br />
-          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nyxshadow retired, and the site is currently run by Grant.</p>
+          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nixshadow retired, and the site is currently run by Grant.</p>
           <div class="links autocol">
             <span v-for="advlink in mspfaLinks" :key="advlink.href">
               &gt; <a :href="advlink.href"><span v-text="advlink.label" /></a>
