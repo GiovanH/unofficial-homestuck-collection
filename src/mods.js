@@ -46,6 +46,8 @@ const imodsAssetsRoot = "assets://archive/imods/"
 var modChoices = undefined
 var routes = undefined
 
+var Resources // lazy
+
 const store_modlist_key = 'settings.modListEnabled'
 // const store_devmode_key = 'settings.devMode'
 
@@ -304,10 +306,10 @@ if (ipcMain) {
   })
 }
 
-function doFullRouteCheck(){
+async function doFullRouteCheck(){
   logger.debug("Doing full resources check (devMode on)")
   const enabled_mods = getEnabledMods()
-  const Resources = require("@/resources.js")
+  Resources = Resources || await import("@/resources.js")
   if (Resources.isReady()) {
     Object.keys(routes).forEach(url => {
       try {
@@ -430,7 +432,6 @@ async function crawlFileTree(root, recursive = false) {
 }
 
 function buildApi(mod) {
-  const Resources = require("@/resources.js")
   function safetyChecks(local_path) {
     if (mod._singlefile) throw new Error(`Singlefile mods cannot use this method`)
     if (!local_path.startsWith("./")) throw new Error(`${local_path}: Paths must be mod relative (./)`)
@@ -608,6 +609,8 @@ async function getModJsAsync(mod_dir, options = {}) {
 
       if (!options.liteload) {
         let api
+        // precompute for buildApi, which is sync
+        Resources = Resources || await import("@/resources.js")
         if (mod_module.computed != undefined) {
           api = api || buildApi(mod_module)
           Object.assign(mod_module, mod_module.computed(api))

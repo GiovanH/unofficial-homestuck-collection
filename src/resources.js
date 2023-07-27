@@ -224,7 +224,7 @@ const UrlFilterMixin = {
       el.querySelectorAll("A").forEach((link) => {
         if (link.href) {
           const pseudLinkHref = link.href.replace(RE_THIS_DOMAIN, '/')
-          link.href = getResourceURL(pseudLinkHref) // Resolved in onLinkClick
+          link.href = this.$getResourceURL(pseudLinkHref) // Resolved in onLinkClick
           // if (link.href != pseudLinkHref) {
           //   logger.debug("[filterL]", pseudLinkHref, "->", link.href)
           // }
@@ -241,7 +241,8 @@ const UrlFilterMixin = {
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src.replace(RE_THIS_DOMAIN, '/')
-        media[i].src = resolveURL(pseudMediaSrc)
+        // Need to use overwritable getResourceURL here to route before strict resolution
+        media[i].src = resolveURL(this.$getResourceURL(pseudMediaSrc))
         // if (media[i].src != pseudMediaSrc) {
         //   logger.debug("[filterL]", pseudMediaSrc, "->", media[i].src)
         // }
