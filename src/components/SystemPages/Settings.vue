@@ -383,7 +383,9 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
-import draggable from "vuedraggable"
+
+const draggable = () => import("vuedraggable")
+
 import Mods from "@/mods.js"
 
 const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
@@ -1077,6 +1079,12 @@ export default {
     font-weight: normal;
     margin: 1em 0;
     
+    // Ignore card margins for sortable on tiny screens
+    @media only screen and (max-width: 650px) {
+      margin: 1em -50px;
+    }
+
+
     ul, ol {  
       text-align: left;        
       border: solid var(--page-pageBorder, var(--page-pageFrame));

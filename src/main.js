@@ -1,28 +1,31 @@
 import Vue from 'vue'
-import AsyncComputed from 'vue-async-computed'
+
 import App from './App'
 import router from './router'
 import localData from './store/localData'
-// import path from 'path'
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import Memoization from '@/memoization.js'
 
 import Mods from "./mods.js"
 import Resources from "./resources.js"
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft,
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock,
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+} from '@fortawesome/free-solid-svg-icons'
+
+const importAsyncComputed = import('vue-async-computed')
+const importFontAwesomeIconObj = import('@fortawesome/vue-fontawesome')
+
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
   faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 ])
+
+// Global prereqs
 
 window.isWebApp = (window.isWebApp || false)
 
@@ -46,33 +49,44 @@ if (!window.isWebApp) {
   })
 }
 
-const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
-
-var promises_loading = []
-
-// Loading checks
-
-// Vue
-
-Vue.component('fa-icon', FontAwesomeIcon)
-
-Vue.config.productionTip = false
-
-Vue.use(localData) // Initializes and loads when Vue installs it
-Vue.use(AsyncComputed)
-
-// Mixin mod mixins
-promises_loading.push((async function() {
-  const mixins = await Mods.getMixinsAsync()
-  mixins.forEach((m) => Vue.mixin(m))
-})());
-
 // eslint-disable-next-line no-extend-native
 Number.prototype.pad = function(size) {
   if (isNaN(this))
     return undefined
   return this.toString().padStart(size || 2, '0')
 }
+
+
+const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
+
+// Loading checks
+
+// Vue
+//
+// Promises that all need to complete before we launch the Vue VM
+var promises_loading = []
+
+Vue.config.productionTip = false
+
+Vue.use(localData) // Initializes and loads when Vue installs it
+
+// FontAwesomeIconComponent
+promises_loading.push((async function() {
+  const { FontAwesomeIcon } = await importFontAwesomeIconObj
+  Vue.component('fa-icon', FontAwesomeIcon)
+})());
+
+// Mixin asynccomputed
+promises_loading.push((async function() {
+  const AsyncComputed = await importAsyncComputed
+  Vue.use(AsyncComputed)
+})());
+
+// Mixin mod mixins
+promises_loading.push((async function() {
+  const mixins = await Mods.getMixinsAsync()
+  mixins.forEach((m) => Vue.mixin(m))
+})());
 
 Vue.mixin(Memoization.mixin)
 

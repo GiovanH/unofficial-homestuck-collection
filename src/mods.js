@@ -1,7 +1,12 @@
-import yaml from 'js-yaml'
-
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
+
+const importSassJs = import('sass.js')
+const importYaml = import('js-yaml')
+const importResources = import("@/resources.js")
+
+var Resources // lazy
+var yaml
 
 var ipcMain, dialog, fs
 var store, store_mods, log
@@ -32,8 +37,7 @@ const path = (isWebApp ? require('path-browserify') : require('path'))
 const ipcRenderer = require('electron').ipcRenderer
 
 // const sass = require('sass')
-const SassJs = require('sass.js')
-
+// const SassJs = require('sass.js')
 const logger = log.scope('Mods')
 
 const assetDir = store.has('assetDir') ? store.get('assetDir') : undefined
@@ -46,7 +50,6 @@ const imodsAssetsRoot = "assets://archive/imods/"
 var modChoices = undefined
 var routes = undefined
 
-var Resources // lazy
 
 const store_modlist_key = 'settings.modListEnabled'
 // const store_devmode_key = 'settings.devMode'
@@ -309,7 +312,7 @@ if (ipcMain) {
 async function doFullRouteCheck(){
   logger.debug("Doing full resources check (devMode on)")
   const enabled_mods = getEnabledMods()
-  Resources = Resources || await import("@/resources.js")
+  Resources = Resources || await importResources
   if (Resources.isReady()) {
     Object.keys(routes).forEach(url => {
       try {
@@ -431,7 +434,10 @@ async function crawlFileTree(root, recursive = false) {
   return ret
 }
 
-function buildApi(mod) {
+async function buildApi(mod) {
+  Resources = Resources || await importResources
+  yaml = yaml || await importYaml
+
   function safetyChecks(local_path) {
     if (mod._singlefile) throw new Error(`Singlefile mods cannot use this method`)
     if (!local_path.startsWith("./")) throw new Error(`${local_path}: Paths must be mod relative (./)`)
@@ -609,14 +615,12 @@ async function getModJsAsync(mod_dir, options = {}) {
 
       if (!options.liteload) {
         let api
-        // precompute for buildApi, which is sync
-        Resources = Resources || await import("@/resources.js")
         if (mod_module.computed != undefined) {
-          api = api || buildApi(mod_module)
+          api = api || await buildApi(mod_module)
           Object.assign(mod_module, mod_module.computed(api))
         }
         if (mod_module.asyncComputed != undefined) {
-          api = api || buildApi(mod_module)
+          api = api || await buildApi(mod_module)
           mod_module._fullyLoadedPromise = mod_module.asyncComputed(api).then(result => {
             Object.assign(mod_module, result)
           })
@@ -807,11 +811,13 @@ function getMainMixin(){
   return {
     mounted() {
       const addScssStyle = (style_id, body) => {
-        SassJs.compile(body, (result) => {
-          if (result.status !== 0) throw Error(JSON.stringify(result))
-          this.stylesheets.push({
-            id: style_id,
-            body: result.text
+        importSassJs.then(SassJs => {
+          SassJs.compile(body, (result) => {
+            if (result.status !== 0) throw Error(JSON.stringify(result))
+            this.stylesheets.push({
+              id: style_id,
+              body: result.text
+            })
           })
         })
       }
