@@ -320,6 +320,13 @@ export default {
               })
             }
           }
+          navigation && navigation.addEventListener("navigate", (e) => {
+            if (!e.destination.sameDocument) {
+              console.log("srcdoc navigating: ", e)
+              console.log(e.destination.url)
+              vm.invokeFromFlash("link?" + e.destination.url)
+            }
+          });
         <\/script>
         ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
         </head>
@@ -428,8 +435,9 @@ document.addEventListener('click', function (e) {
 
       // getURL "about:srcdoc#gameOver" "" <- Get ready for some bullshit
 
-      this.$logger.debug(func)
-      const [funcName, param] = func.split('?')
+      this.$logger.debug("flash invoked function", func)
+      const [funcName, ...params] = func.split('?')
+      const param = params.join('?') // reconstitute params with ? in them
       switch (funcName) {
         case 'audioInit':
           this.$logger.debug(`Creating audio`)
@@ -460,7 +468,7 @@ document.addEventListener('click', function (e) {
           this.audioVolume(param)
           break
         case 'link':
-          this.$pushURL(param, this.$parent.tab.key)
+          this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
