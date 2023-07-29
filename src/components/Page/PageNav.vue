@@ -112,7 +112,7 @@ export default {
     ::v-deep a {
       color: var(--page-links);
     }
-    @media only screen and (max-width: 650px) {
+    @media (max-width: 650px) {
       font-size: 1.8em;
     }
   }

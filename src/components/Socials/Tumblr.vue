@@ -107,8 +107,8 @@ export default {
 
 <style lang="scss" scoped>
 .frame {
-	background: #3b627e;
-	font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  background: #3b627e;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
   font-weight: initial;
 
   .navBanner {

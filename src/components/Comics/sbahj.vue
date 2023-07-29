@@ -130,8 +130,8 @@ export default {
 
 <style scoped lang="scss">
 .pageBody {
-	font-family: "Comic Sans MS", "Comic Sans", cursive;
-	background: #0707ec;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  background: #0707ec;
   .navBanner {
     background-color: #000;
     width: 100%;
@@ -139,7 +139,7 @@ export default {
 
   .pageFrame {
     min-width: 800px;
-		background: #f400ec;
+    background: #f400ec;
 
     ::v-deep .comic {
       margin: 16px 0;

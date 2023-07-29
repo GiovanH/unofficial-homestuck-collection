@@ -1080,7 +1080,7 @@ export default {
     margin: 1em 0;
     
     // Ignore card margins for sortable on tiny screens
-    @media only screen and (max-width: 650px) {
+    @media (max-width: 650px) {
       margin: 1em -50px;
     }
 

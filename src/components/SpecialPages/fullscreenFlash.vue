@@ -217,7 +217,7 @@ export default {
           align-items: center;
           flex-flow: column;
         }
-      }	
+      }
     }
   }
 </style>

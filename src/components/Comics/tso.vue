@@ -410,70 +410,70 @@ export default {
         }
         &.p14, &.p15, &.p16, &.p17, &.p18, &.p19, &.p20 {
           &::before {
-	          background: linear-gradient(#4F8DBE, #43D367);
+            background: linear-gradient(#4F8DBE, #43D367);
           }
           .title{
             color: #4F8DBE;
           }
           .archive {
-            color: #43D367;            
+            color: #43D367;
           }
         }
         &.p21, &.p22 {
           &::before {
             background: linear-gradient(#CF8940, #D95253) no-repeat, linear-gradient(#3D7AB3, #489695) no-repeat;
             background-size: 50% 100%, 50% 100%;
-            background-position: 0 0, 100% 0; 
+            background-position: 0 0, 100% 0;
           }
           .title{
             color: #CF8940;
           }
           .archive {
-            color: #489695;            
+            color: #489695;
           }
         }
         &.p23 {
           &::before {
             background: linear-gradient(#3997BB, #50C1AB) no-repeat, linear-gradient(#BC664D, #C54D7E) no-repeat;
             background-size: 50% 100%, 50% 100%;
-            background-position: 0 0, 100% 0; 
+            background-position: 0 0, 100% 0;
           }
           .title{
             color: #3997BB;
           }
           .archive {
-            color: #C54D7E;            
+            color: #C54D7E;
           }
         }
         &.p24 {
           &::before {
             background: linear-gradient(#5D5DC2, #5085BF) no-repeat, linear-gradient(#B9AB0A, #CE7A36) no-repeat;
             background-size: 50% 100%, 50% 100%;
-            background-position: 0 0, 100% 0; 
+            background-position: 0 0, 100% 0;
           }
           .title{
             color: #5D5DC2;
           }
           .archive {
-            color: #CE7A36;            
+            color: #CE7A36;
           }
         }
         &.p25 {
           &::before {
             background: linear-gradient(#F7C62E, #D6D02E) no-repeat, linear-gradient(#369BF8, #4149B4) no-repeat;
             background-size: 50% 100%, 50% 100%;
-            background-position: 0 0, 100% 0; 
+            background-position: 0 0, 100% 0;
           }
           .title{
             color: #F7C62E;
           }
           .archive {
-            color: #4149B4;            
+            color: #4149B4;
           }
         }
         &.p26, &.p27 {
           &::before {
-	          background: linear-gradient(#C2C2C2, #797979);
+            background: linear-gradient(#C2C2C2, #797979);
           }
           .title{
             color: #C2C2C2;

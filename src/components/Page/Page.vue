@@ -14,12 +14,12 @@
             </div>
           </div>
           <div class="textContent">
-            <FlashCredit :pageId="thisPage.pageId"/>
-            <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
-            <PageNav :thisPage="thisPage" 
-              :nextPages="nextPagesArray" ref="pageNav"
-              :class="{'hidden': hideNav}" />
-          </div>
+          <FlashCredit :pageId="thisPage.pageId"/>
+          <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
+          <PageNav :thisPage="thisPage"
+            :nextPages="hideNav ? [] : nextPagesArray" ref="pageNav" />
+            <!-- :class="{'hidden': hideNav}" /> -->
+        </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
       <div class="hidden">
@@ -294,7 +294,7 @@ export default {
     }
 
     //Small screen check
-    @media only screen and (max-width: 950px) {
+    @media (max-width: 950px) {
       &{
         overflow-x: hidden;
         height: max-content;
@@ -348,7 +348,7 @@ export default {
             line-height: 1.1;
             font-size: 32px;
             padding: 15px 0;
-            @media only screen and (max-width: 650px) {
+            @media (max-width: 650px) {
               font-size: 2em;
             }
           }

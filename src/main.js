@@ -199,7 +199,7 @@ Vue.mixin({
       // Takes a user-formatted string and returns a MSPA page number.
       // The output page number may not be real!
       if (Number.isInteger(userInput)) {
-        this.$logger.warning("parseMspaOrViz got int, not string: ", userInput)
+        this.$logger.warn("parseMspaOrViz got int, not string: ", userInput)
         userInput = String(userInput)
       }
       if (this.$localData.settings.mspaMode) {
@@ -332,10 +332,22 @@ Vue.mixin({
       return this.$localData.settings[retcon_id]
     },
     $popNotifFromPageId(pageId) {
-      this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
+      // Don't error even if triggered from setup page
+      const notifications = this.$root.$children[0].$refs.notifications
+      if (notifications) {
+        notifications.queueFromPageId(pageId)
+      } else {
+        this.$logger.warn("Missing notifications ref!")
+      }
     },
     $pushNotif(notif) {
-      this.$root.$children[0].$refs.notifications.queueNotif(notif)
+      // Don't error even if triggered from setup page
+      const notifications = this.$root.$children[0].$refs.notifications
+      if (notifications) {
+        notifications.queueNotif(notif)
+      } else {
+        this.$logger.warn("Missing notifications ref!")
+      }
     },
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false

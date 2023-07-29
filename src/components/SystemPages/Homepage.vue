@@ -409,7 +409,7 @@ export default {
 
 <style scoped lang="scss">
   @mixin tablet-size {
-    @media only screen and (max-width: 950px) {
+    @media (max-width: 950px) {
       @content;
     }
   }

@@ -7,7 +7,7 @@ const electron = require('electron')
 
 export default {
   name: 'UrlTooltip',
-	props: [],
+  props: [],
   data() {
     return {
       url: "",

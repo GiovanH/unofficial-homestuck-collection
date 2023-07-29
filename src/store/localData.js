@@ -598,7 +598,8 @@ class LocalData {
         window.addEventListener("popstate", (event) => {
           // console.log("Loading", event.state)
           this.temp.isPoppingState = true // next url change should not count as navigation
-          this.tabData = {...this.tabData, ...event.state.tabData}
+          if (event?.state?.tabData)
+            this.tabData = {...this.tabData, ...event.state.tabData}
         });
       },
       destroyed() {

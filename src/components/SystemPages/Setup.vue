@@ -509,7 +509,7 @@ export default {
     }
   .wizard {
     .wizardSidebar {
-      @media only screen and (max-width: 650px) {
+      @media (max-width: 650px) {
         display: none;
       }
       width: 210px;
@@ -571,6 +571,10 @@ export default {
         position: absolute;
         margin-bottom: -1em;
         bottom: 0;
+        @media (max-width: 650px) {
+          position: revert;
+          margin: revert;
+        }
       }
       ::v-deep .spoilerbox .logContent {
         padding: 0 1em;
@@ -598,6 +602,9 @@ export default {
     }
   }
   .card {
+    @media (max-width: 650px) {
+      width: 100%;
+    }
     position: relative;
     margin: auto;
     padding: 0 25px;

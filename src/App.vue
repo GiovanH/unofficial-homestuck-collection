@@ -369,7 +369,7 @@
     font-weight: bolder;
     overflow-wrap: break-word;
   }
-  @media only screen and (max-width: 650px) {
+  @media (max-width: 650px) {
     body {
       font-size: 14px;
     }
