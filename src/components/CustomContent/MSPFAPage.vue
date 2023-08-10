@@ -251,6 +251,10 @@ export default {
       }
     },
     bindMajor(){
+      if (!this.$refs['slide']) {
+        this.$logger.warn("slide ref not set!", this.$refs)
+        return
+      }
       var pad = getComputedStyle(this.$refs['slide'])
       if (pad) {
           pad = parseFloat(pad.paddingLeft) + parseFloat(pad.paddingRight)
