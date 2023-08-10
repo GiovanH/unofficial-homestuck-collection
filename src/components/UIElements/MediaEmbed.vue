@@ -540,7 +540,8 @@ document.addEventListener('click', function (e) {
 
       return audioElement
     },
-    audioStart(n = 1) {
+    audioStart(n) {
+      n = (n === "" ? 1 : n)
       this.audioInit()
       let cascadeDelay = 0
       if (this.flashProps.id == '04106') {
