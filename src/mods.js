@@ -256,7 +256,7 @@ async function bakeRoutes(enabled_mods_js) {
   // logger.info("Baking routes for", enabled_mods)
   const all_mod_routes = {}
   // Start with least-priority so they're overwritten
-  for (const js of enabled_mods_js.reverse()) {
+  for (const js of enabled_mods_js.toReversed()) {
     try {
       // Lower priority: Auto routes
       if (js.trees) {
@@ -919,10 +919,10 @@ async function getMixinsAsync(){
   const enabledModsJs = await getEnabledModsJsAsync()
 
   // List of mods, ordered
-  var mixable_mods = enabledModsJs.reverse()
+  var mixable_mods = enabledModsJs.toReversed()
 
   // Add mod that contains vue hooks for custom themes
-  var newThemes = enabledModsJs.reverse().reduce((themes, js) => {
+  var newThemes = mixable_mods.reduce((themes, js) => {
     if (!js.themes) return themes
     return themes.concat(js.themes.map((theme, i) => 
         ({text: theme.label, value: `theme-${js._id}-${i}`})
@@ -939,7 +939,7 @@ async function getMixinsAsync(){
   }
 
   // Add mod that contains vue hooks custom pages
-  var newPages = enabledModsJs.reverse().reduce((pages, js) => {
+  var newPages = mixable_mods.reduce((pages, js) => {
     if (!js.browserPages) return pages
     return {...js.browserPages, ...pages}
   }, {})
@@ -961,7 +961,7 @@ async function getMixinsAsync(){
   }
 
   // Add mod that contains custom browser actions
-  var newBrowserActions = enabledModsJs.reverse().reduce((actions, js) => {
+  var newBrowserActions = mixable_mods.reduce((actions, js) => {
     if (js.browserActions) {
       for (const k in js.browserActions) {
         const componentkey = `${js._id}-${k}`
@@ -986,7 +986,7 @@ async function getMixinsAsync(){
   }
 
   // Add mod that contains custom browser toolbars
-  var newBrowserToolbars = enabledModsJs.reverse().reduce((toolbars, js) => {
+  var newBrowserToolbars = mixable_mods.reduce((toolbars, js) => {
     if (js.browserToolbars) {
       for (const k in js.browserToolbars) {
         const componentkey = `${js._id}-${k}`
