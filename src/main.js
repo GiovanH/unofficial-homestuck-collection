@@ -465,10 +465,12 @@ Promise.all(promises_loading).then(_ => {
     render: function (h) { return h(App, {ref: 'App'}) },
     watch: {
       '$localData.settings.devMode'(to, from){
-        const is_dev = to
-        log.transports.console.level = (is_dev ? "silly" : "info");
-        this.$logger.silly("Verbose log message for devs")
-        this.$logger.info("Log message for everybody")
+        if (log.transports) {
+          const is_dev = to
+          log.transports.console.level = (is_dev ? "silly" : "info");
+          this.$logger.silly("Verbose log message for devs")
+          this.$logger.info("Log message for everybody")
+        }
         this.$localData.VM.saveLocalStorage()
       }
     }

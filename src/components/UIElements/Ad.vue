@@ -60,7 +60,7 @@ export default {
       }
     }
     .projectWonderful {
-      width: 600px;
+      max-width: 600px;
 
       color: #0000ff;
       background: white;

@@ -320,13 +320,17 @@ export default {
               })
             }
           }
-          navigation && navigation.addEventListener("navigate", (e) => {
-            if (!e.destination.sameDocument) {
-              console.log("srcdoc navigating: ", e)
-              console.log(e.destination.url)
-              vm.invokeFromFlash("link?" + e.destination.url)
-            }
-          });
+          if (navigation) {
+            navigation.addEventListener("navigate", (e) => {
+              console.log("srcdoc navigating: ", e, e.destination)
+              if (!e.destination.sameDocument) {
+                console.log(e.destination.url)
+                vm.invokeFromFlash("link?" + e.destination.url)
+              }
+            })
+          } else {
+            console.warn("Browser does not support 'navigation' listener")
+          }
         <\/script>
         ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
         </head>

@@ -22,7 +22,7 @@ function clearChapterIndex() {
   chapterIndex = undefined
 }
 
-function buildChapterIndex(){
+function buildChapterIndex(archive){
   logger.info("Building new search index")
   chapterIndex = new FlexSearch({
     doc: {
@@ -70,7 +70,7 @@ function doSearch(payload) {
     "darkcage2": 6927.5
   }
 
-  let limit = 1000
+  const limit = 1000
 
   function separateNonConsecutive(array, delimiter) {
     // Given an array and a delimiter, separate the non-consecutive members of the array.
@@ -78,7 +78,7 @@ function doSearch(payload) {
     // [1, 2, 3, "f", 5]
 
     let next_v = array[0]
-    let newarray = []
+    const newarray = []
     for (const i in array) {
       const v = array[i]
       if (v != next_v) newarray.push(delimiter)
@@ -134,7 +134,7 @@ function doSearch(payload) {
 
     const spread_indexes = Array.from(
       indexes.reduce((acc, i) => {
-        const spread = 2;
+        const spread = 2
         for (let j = Math.max(0, i - spread); j < Math.min(page_lines.length, i + spread); j++) {
           acc.add(j)
         }
@@ -170,7 +170,7 @@ function registerIpc(ipc) {
   // Register IPC (usually main, but renderer in webapp) to handle search queries.
   ipc.handle('search', async (event, payload) => {
     if (chapterIndex == undefined)
-      buildChapterIndex()
+      buildChapterIndex(window.vm.archive)
 
     if (payload == undefined)
       return // Just wanted to ensure the index
