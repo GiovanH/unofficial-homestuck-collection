@@ -24,20 +24,20 @@ export default {
       let num = parseInt(this.page.pageId)
       if (this.page.theme == 'scratch') {
         return {
-          url: `/storyfiles/hs2/scratch/${this.page.scratchBanner}`, 
+          url: `assets://storyfiles/hs2/scratch/${this.page.scratchBanner}`,
           title: this.page.scratchTooltip ? this.page.scratchTooltip : undefined
         }
       }
       else if (this.page.theme == 'cascade')
-        return {url: '/images/header_cascade.gif', title: undefined}
+        return {url: 'assets://images/header_cascade.gif', title: undefined}
       else if (this.page.theme == 'trickster')
-        return {url: '/images/trickster_sitegraphics/menu.swf', title: undefined}
+        return {url: 'assets://images/trickster_sitegraphics/menu.swf', title: undefined}
       else if (this.page.flag.includes('X2COMBO'))
-        return {url: '/images/act6act5act1x2combo.gif', title: undefined}
+        return {url: 'assets://images/act6act5act1x2combo.gif', title: undefined}
       else if (num == 9987)
-        return {url: '/images/collide_header.gif', title: undefined}
+        return {url: 'assets://images/collide_header.gif', title: undefined}
       else if (num == 10027)
-        return {url: '/images/act7_header.gif', title: undefined}
+        return {url: 'assets://images/act7_header.gif', title: undefined}
       else 
         return undefined
     },

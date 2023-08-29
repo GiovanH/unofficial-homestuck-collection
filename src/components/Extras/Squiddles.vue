@@ -102,11 +102,11 @@ export default {
           ]
         },
         {
-          name: "Jessica Allison",
-          link: "https://jessicaallison.carbonmade.com",
+          name: "Kara Roas",
+          link: "https://kararoasart.carrd.co",
 
           socials: [
-            "https://twitter.com/PurgatoryRose"
+            "https://bsky.app/profile/kararoas.bsky.social"
           ]
         },
         {
