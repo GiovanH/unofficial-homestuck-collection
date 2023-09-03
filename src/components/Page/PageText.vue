@@ -21,7 +21,8 @@
 
 <script>
 
-var Color = require('ts-color-class')
+const ipcRenderer = require('electron').ipcRenderer
+const Color = require('ts-color-class')
 
 export default {
   name: 'pageText',

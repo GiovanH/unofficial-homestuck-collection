@@ -320,7 +320,7 @@ export default {
               })
             }
           }
-          if (navigation) {
+          if (typeof navigation !== 'undefined') {
             navigation.addEventListener("navigate", (e) => {
               console.log("srcdoc navigating: ", e, e.destination)
               if (!e.destination.sameDocument) {

@@ -8,6 +8,11 @@ const importResources = import("@/resources.js")
 var Resources // lazy
 var yaml
 
+if (!Array.prototype.toReversed) {
+  const toReversed = require('array.prototype.toreversed');
+  var shimmed = toReversed.shim();
+}
+
 var ipcMain, dialog, fs
 var store, store_mods, log
 if (!isWebApp) {
@@ -449,7 +454,7 @@ async function buildApi(mod) {
   }
   function readFileAsyncLocal(local_path, method_name) {
     safetyChecks(local_path)
-    return fs.promises.readFile(path.join(mod._mod_root_dir, local_path))
+    return fs.promises.readFile(path.join(mod._mod_root_dir, local_path), 'utf8')
   }
 
   var this_store_cache = {}

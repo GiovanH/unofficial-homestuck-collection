@@ -38,6 +38,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/vue-fontawesome": "^0.1.10",
+    "array.prototype.toreversed": "^1.1.1",
     "babel-loader": "^8.1.2",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
