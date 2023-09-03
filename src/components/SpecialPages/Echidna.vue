@@ -22,6 +22,7 @@ import PAGE from '@/components/Page/Page.vue'
 
 export default {
   extends: PAGE,
+  title: PAGE.title,
   name: 'echidna'
 }
 </script>
