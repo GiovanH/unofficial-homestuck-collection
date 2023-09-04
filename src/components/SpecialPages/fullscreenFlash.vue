@@ -187,19 +187,21 @@ export default {
 
     &.dota {
       background: #000;
+      height: 100%;
     }
     &.shes8ack {
       background: #fff;
+      height: 100%;
     }
     // banging
     // &[data-pageid="6/007395"] {
     //   background: #5a5a5a;
     // }
-    &.gameover {
-      background: linear-gradient(to right, #042300 50%, #535353 50%);
-      background-size: 200% 100%;
-      background-position: left bottom;
-    }
+    // &.gameover {
+    //   background: linear-gradient(to right, #042300 50%, #535353 50%);
+    //   background-size: 200% 100%;
+    //   background-position: left bottom;
+    // }
 
     .pageFrame {
     flex: 0 1 auto;
