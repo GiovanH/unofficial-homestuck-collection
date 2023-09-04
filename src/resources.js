@@ -1,6 +1,5 @@
 // Rules for transforming intercepted URLS
 
-
 const Mods = require('@/mods.js').default
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
@@ -8,10 +7,10 @@ const path = (isWebApp ? require('path-browserify') : require('path'))
 
 const ipcRenderer = require('electron').ipcRenderer
 
-var logger;
+var logger
 if (!isWebApp) {
-  const log = require('electron-log');
-  logger = log.scope('Resources');
+  const log = require('electron-log')
+  logger = log.scope('Resources')
 } else {
   logger = console
 }
@@ -25,10 +24,10 @@ const app_domain = ((typeof window !== 'undefined') ? window.location.host : "lo
 const RE_THIS_DOMAIN = new RegExp(`https?://${app_domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`)
 
 function linkIsOutlink(url) {
-  return (/^http(s{0,1}):\/\//.test(url)
-    && !/^http(s{0,1}):\/\/localhost/.test(url)
-    && !RE_THIS_DOMAIN.test(url)
-    && !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url))
+  return (/^http(s{0,1}):\/\//.test(url) &&
+    !/^http(s{0,1}):\/\/localhost/.test(url) &&
+    !RE_THIS_DOMAIN.test(url) &&
+    !/^http(s{0,1}):\/\/((www|cdn)\.)?mspaintadventures\.com/.test(url))
 }
 
 // Pure
@@ -123,7 +122,7 @@ function getResourceURL(request_url){
     .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1") // Covers for story links without page numbers
     .replace(/.*mspaintadventures.com\/extras\/(.+?)\.html/, "/unlock/$1") // Links to unlock pages
     .replace(/.*mspaintadventures.com\/extras\/PS_titlescreen\//, "/unlock/PS_titlescreen") // Link from CD rack flash
-    .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1") // TODO double-check this regex
+    .replace(/.*mspaintadventures.com\/sweetbroandhellajeff\/(?:(?:comoc\.php)?\?cid=0(\d{2})\.jpg)?/, "/sbahj/$1")
     .replace(/^http(s{0,1}):\/\/www\.sweetcred\.com/, `assets://archive/sweetcred`)
     .replace(/^http(s{0,1}):\/\/www\.timelesschaos\.com\/transferFiles/, `assets://storyfiles/hs2/03318`) // return to core - 618heircut.mp3
     .replace(/^http(s{0,1}):\/\/(www\.turner\.com\/planet\/mp3|fozzy42\.com\/SoundClips\/Themes\/Movies|pasko\.webs\.com\/foreign)/, `assets://storyfiles/hs2/00338`) // phat beat machine
@@ -188,7 +187,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
       } else {
         loopcheck.push(mod_route)
         // mod_route may no longer be an assets:// url, perform full resolve
-        return resolveURL(mod_route, loopcheck)
+        return resolveURL(mod_route)
       }
     }
   }
@@ -237,7 +236,6 @@ const UrlFilterMixin = {
       // Internal links in the renderer already have the localhost:8080 prefix, which is different
       // than how the other resources are handled.
       const media = [...el.getElementsByTagName('IMG'), ...el.getElementsByTagName('VIDEO'), ...el.getElementsByTagName('AUDIO')]
-
 
       for (let i = 0; i < media.length; i++) {
         const pseudMediaSrc = media[i].src.replace(RE_THIS_DOMAIN, '/')
@@ -442,7 +440,7 @@ function isVizBase(base){
 function getChapter(key) {
   // Given an MSPA page number, return what section of the comic the page is in,
   // including chapter/act information.
-  let p = parseInt(key)
+  const p = parseInt(key)
   if (!p) {
     switch (key) {
       case 'jb2_000000': return 'Jailbreak'
@@ -559,5 +557,5 @@ module.exports = {
   vizToMspa,
   mspaToViz,
 
-  fileIsAsset, // for test suite only
+  fileIsAsset // for test suite only
 }

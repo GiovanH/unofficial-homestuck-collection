@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     fontFamily() {
-      let result = []
+      const result = []
       if (this.$localData.settings.textOverride.bold || !this.$localData.settings.textOverride.fontFamily) result.push('bold')
       if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
       if (this.$localData.settings.textOverride.paragraphSpacing) result.push("paragraphSpacing")
@@ -64,6 +64,7 @@ export default {
       return this.forcetheme || this.$root.tabTheme.rendered
     },
     isDarkBackground() {
+      // eslint-disable-next-line no-unused-expressions, semi
       this.theme; this.isMounted;
       const bgcolor_repr = this.textType == 'log'
         ? this.getComputedStyle('--page-log-bg')
@@ -99,11 +100,9 @@ export default {
 
       if (/P4SSWORD H1NT/i.test(text)){
         return text
-      }
-      else if (/trkstrlog/i.test(text)){
+      } else if (/trkstrlog/i.test(text)){
         text = 'tricksterlog'
-      }
-      else if (/sriousbiz/i.test(text)){
+      } else if (/sriousbiz/i.test(text)){
         text = 'serious business'
       }
       return state + text.toLowerCase()
@@ -111,6 +110,7 @@ export default {
     filteredPrattle() {
       let result = this.content
       if (/<img src="/.test(result)){
+        // TODO: Rewrite this to not depend on side effects of Array.prototype.some
         this.fullwidthImages.some(img => {
           result = result.replace(`${img}" `, `${img}" class='fullWidth'`)
         })
@@ -142,13 +142,13 @@ export default {
     },
     filterDOM() {
       if (this.$el.nodeType !== 8){
-        let links = this.$el.getElementsByTagName('A')
+        const links = this.$el.getElementsByTagName('A')
         for (let i = 0; i < links.length; i++) {
-          let filteredLink = this.$filterURL(links[i].href)
+          const filteredLink = this.$filterURL(links[i].href)
           links[i].href = filteredLink
           if (this.usePurpleLinks && this.$localData.allHistory.includes(filteredLink)) links[i].classList.add('visited')
         }
-        let images = this.$el.getElementsByTagName('IMG')
+        const images = this.$el.getElementsByTagName('IMG')
         for (let i = 0; i < images.length; i++) {
           images[i].src = this.$getResourceURL(images[i].src)
           if (!this.$isWebApp)
@@ -196,13 +196,14 @@ export default {
       }
     },
     getComputedStyle(var_name, default_){
+      // eslint-disable-next-line no-unused-expressions, semi
       this.theme; this.isMounted;
       try {
         return getComputedStyle(this.$el).getPropertyValue(var_name).trim() || default_
       } catch {
         return getComputedStyle(document.body).getPropertyValue(var_name).trim() || default_
       }
-    },
+    }
   },
   mounted() {
     if (this.$localData.settings.openLogs || this.startopen) {
@@ -230,7 +231,7 @@ export default {
       this.$nextTick(() => {
         this.filterDOM()
       })
-    },
+    }
   }
 }
 </script>
@@ -364,5 +365,3 @@ export default {
     }
   }
 </style>
-
-

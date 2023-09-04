@@ -13,10 +13,10 @@ if (!Array.prototype.toReversed) {
   var shimmed = toReversed.shim();
 }
 
-var ipcMain, dialog, fs
+var ipcMain, fs
 var store, store_mods, log
 if (!isWebApp) {
-  var {ipcMain, dialog} = require('electron')
+  var {ipcMain} = require('electron')
 
   log = require('electron-log')
 
@@ -54,7 +54,6 @@ const imodsAssetsRoot = "assets://archive/imods/"
 
 var modChoices = undefined
 var routes = undefined
-
 
 const store_modlist_key = 'settings.modListEnabled'
 // const store_devmode_key = 'settings.devMode'
@@ -516,13 +515,6 @@ async function buildApi(mod) {
     }
   })
   return api
-}
-
-const mod_js_cache = {}
-
-async function postProcessModJsAsync(mod) {
-
-  return mod
 }
 
 async function getModJsAsync(mod_dir, options = {}) {
