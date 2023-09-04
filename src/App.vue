@@ -296,8 +296,10 @@
             event.preventDefault()
             const { altKey, ctrlKey, metaKey, shiftKey } = event
             const auxClick = (metaKey || altKey || ctrlKey || shiftKey) || targetBlank
-            const resolved_href = Resources.resolveURL(resolvedTarget.href)
-            app.$openLink(resolved_href, auxClick || force_aux_click)
+
+            app.$openLink(resolvedTarget.href, auxClick || force_aux_click)
+            // const resolved_href = Resources.resolveURL(resolvedTarget.href)
+            // app.$openLink(resolved_href, auxClick || force_aux_click)
           }
         }
       }

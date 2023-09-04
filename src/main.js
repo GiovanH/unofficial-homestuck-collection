@@ -137,7 +137,12 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
-      const urlObject = new URL(url.replace(new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\\??`), '$1'))
+      const re_local = new RegExp(`(${app_domain}|app:\/\/\\.(index)?)`)
+      const re_local_index = new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\\??`)
+      // const re_local_asset = new RegExp(`(http:\/\/127.0.0.1:${port}\/|assets:\/\/)`)
+
+      const url_str = url.replace(re_local_index, '$1')
+      const urlObject = new URL(url_str)
 
       if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
@@ -149,7 +154,7 @@ Vue.mixin({
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
              .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
-      function _open(to_) {
+      function _openExternal(to_) {
         if (!isWebApp) {
           shell.openExternal(to_)
         } else {
@@ -157,14 +162,14 @@ Vue.mixin({
         }
       }
 
-      if (!(new RegExp(`(app:\/\/\\.(index)?|\/\/${app_domain})`)).test(urlObject.origin)) {
+      if (!re_local.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
-        } else _open(urlObject.href)
+        } else _openExternal(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
-        _open(Resources.resolveURL(to))
+        _openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
         this.$logger.error("UNCAUGHT ASSET?", to)
         this.$openModal(to)
