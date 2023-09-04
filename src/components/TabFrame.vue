@@ -10,7 +10,7 @@
             }
         ]"
         :tabindex="(tabIsActive) ? -1 : false" 
-        v-if="isLoaded"
+        v-if="isElementRendered"
         @keyup.left="leftKeyUp"
         @keyup.right="rightKeyUp"
         @keydown.space="spaceBarDown"
@@ -21,10 +21,10 @@
         <component
             :class="theme"
             :is="loadedResolvedComponent"
+            :data-component="loadedResolvedComponent"
             :tab="tab" 
             :routeParams="passedRouteParams || routeParams"
             ref="page"
-            :data-component="loadedResolvedComponent"
         />
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
@@ -106,6 +106,8 @@ const preload_components = [
     ECHIDNA,
     ENDOFHS
 ]
+
+const COMPONENT_LOADING = undefined // "GenericPage"
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
@@ -212,6 +214,9 @@ export default {
         tab() {
             return this.$localData.tabData.tabs[this.tabKey]
         },
+        isComponentLoaded() {
+            return (this.loadedResolvedComponent == this.resolveComponent)
+        },
         routeParams() {
             let base = this.tab.url.split('/').filter(Boolean)[0]
             return  {
@@ -222,7 +227,7 @@ export default {
         tabIsActive() {
             return this.tab.key == this.$localData.tabData.activeTabKey
         },
-        isLoaded() {
+        isElementRendered() {
             if (this.tabIsActive){
                 this.$localData.root.TABS_PUSH_TO_LOADED_LIST(this.tab.key)
             }
@@ -599,8 +604,17 @@ export default {
             }
         },
         'loadedResolvedComponent'(to, from) {
+            // Component and url changes
             this.setTitle()
             this.passedRouteParams = this.routeParams
+        },
+        'tab.url'(to, from) {
+            this.setTitle()
+            // Has the component loaded yet? If not, clean screen.
+            if (COMPONENT_LOADING && !this.isComponentLoaded) {
+                this.loadedResolvedComponent = COMPONENT_LOADING
+            }
+
         },
         'contentTheme'(to, from) {
             this.lastContentTheme = to
@@ -611,7 +625,7 @@ export default {
         },
         'routeParams'(to, from) {
             // If the route params change without the component changing, update the component too. Otherwise wait for the component.
-            if (this.resolveComponent == this.loadedResolvedComponent) {
+            if (this.isComponentLoaded) {
                 this.passedRouteParams = this.routeParams
             }
         }

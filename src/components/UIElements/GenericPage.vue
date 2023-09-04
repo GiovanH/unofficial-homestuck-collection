@@ -5,7 +5,13 @@
       <MediaEmbed v-if="logo" :url="logo" class="logo"/>
       <slot v-if="noPageContent"></slot>
       <div v-else class="pageContent">
-        <slot></slot>
+        <slot>
+          <h2 class="pageTitle"> </h2>
+          <div class="media" ref="media">
+            <div class="panel"
+              style="width: 650px; height: 450px; border: none;" />
+          </div>
+        </slot>
       </div>
     </div>
     <PageFooter />
