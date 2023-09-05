@@ -47,16 +47,18 @@
         <h2>Application Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
       </div>
@@ -164,14 +166,18 @@
           </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass still -->
-            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
+              <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
 
         </dl>
@@ -257,22 +263,21 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <section class="modPrattle">
+        <section class="modPrattle" v-if="!$isWebApp">
           <p class="settingDesc">
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
-<!--           </p>
-          <p> -->
             You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
-<!--           </p>
-          <p> -->
+
             For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
             <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
-        </section>
-          
         <div class='hint'>
           <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
-          
         </div>
+        </section>
+        <section class="modPrattle" v-else>
+          <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
+        </section>
+
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
@@ -330,16 +335,18 @@
         <h2>System Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListSystem">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
         <div class="system">
@@ -351,14 +358,16 @@
             <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
           </span>
           <br><br>
-          <span class="hint">Asset pack directory:</span>
-          <br>
-          <strong>{{$localData.assetDir || 'None selected'}}</strong>
-          <br><br>
-          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
-          <br><br>
-          <button @click="locateAssets()">Relocate assets</button>
-          <br><br>
+          <div v-if="!$isWebApp">
+            <span class="hint">Asset pack directory:</span>
+            <br>
+            <strong>{{$localData.assetDir || 'None selected'}}</strong>
+            <br><br>
+            <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
+            <br><br>
+            <button @click="locateAssets()">Relocate assets</button>
+            <br><br>
+          </div>
           <button @click="factoryReset()">Factory reset</button>
         </div>
       </div>
@@ -374,11 +383,13 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
-import draggable from "vuedraggable"
+
+const draggable = () => import("vuedraggable")
+
 import Mods from "@/mods.js"
 
-const log = require('electron-log')
-const { ipcRenderer } = require('electron')
+const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
+const ipcRenderer = require('electron').ipcRenderer
 
 export default {
   name: 'settings',
@@ -419,7 +430,8 @@ export default {
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
-          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
+          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "pixelScaling",
           label: "Pixelated image scaling",
@@ -427,7 +439,8 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>",
+          platform_whitelist: ['electron']
         }
       ],
       enhancementListBoolean: [
@@ -450,7 +463,8 @@ export default {
         }, {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
-          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.",
+          platform_whitelist: ['electron']
         }
       ],
       settingListSystem: [
@@ -469,15 +483,23 @@ export default {
         }, {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
-          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "useSystemWindowDecorations",
           label: "Use system window decorations",
-          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
-          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is."
+          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
+          platform_whitelist: ['electron'],
+        }, {
+          model: "useTabbedBrowsing",
+          label: "Use Tabbed Browsing",
+          desc: "By default, the web app only shows one page at a time, like a standard website. This setting re-enables the in-app tab bar, and the app will store your tabs in settings.",
+          platform_whitelist: ['webapp']
         }
       ],
       retconList: [
@@ -591,10 +613,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key]).filter(val => !!val)
+        this.$root.$modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$modChoices).filter((choice) => 
+      return Object.values(this.$root.$modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -742,13 +764,16 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          ipcRenderer.invoke('factory-reset', answer)
+          this.$localData.root.clearLocalStorage()
+          Mods.store_mods.clear()
+          // ipcRenderer.invoke('restart')
         }
       })
     },
     onUpdateSortable: function(event){
       const el_active = event.target
       const setting_key = el_active.attributes['data-setting'].value
+      const reordered_item = event.item.attributes['data-value'].value
 
       // Get lists of values
       const old_list = this.$localData.settings[setting_key]
@@ -758,14 +783,23 @@ export default {
       this.$localData.settings[setting_key] = list_active
 
       // Calculte needReload
-      let diff = list_active.filter(x => !old_list.includes(x))
+      let diff = [reordered_item]
+      diff = diff.concat(list_active.filter(x => !old_list.includes(x)))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
-      if (diff.some(key => this.$modChoices[key].needsHardReload)) {
-        this.$logger.info("List change requires hard reload", diff)
+
+      try {
+        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
+          this.$logger.info("List change requires hard reload", diff)
+          this.needReload = true
+        }
+        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
+          this.$logger.info("List change requires archive reload", diff)
+          this.queueArchiveReload()
+        }
+      } catch (e) {
+        // Sometimes keys aren't in modChoices yet
+        this.$logger.error(e)
         this.needReload = true
-      }
-      if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
-        this.$logger.info("List change requires archive reload", diff)
         this.queueArchiveReload()
       }
     },
@@ -786,31 +820,33 @@ export default {
       this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
       ipcRenderer.invoke('reload')
-      // this.$root.loadState = "LOADING"
-      // this.$nextTick(function () {
-      //   ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      // })
-      // ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      this._computedWatchers.$modChoices.run()
-      this._computedWatchers.modsEnabled.run()
-      this._computedWatchers.modsDisabled.run()
-      this.$forceUpdate()
-      // this.queueArchiveReload()
+      Mods.loadModChoicesAsync().then(_ => {
+        this.$asyncComputed.modChoices.update()
+        // this._computedWatchers.modsEnabled.run()
+        // this._computedWatchers.modsDisabled.run()
+        this.$forceUpdate()
+      })
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
+    },
+    trackSettings() {
+      // Log settings, for debugging
+      this.$logger.info(this.$localData.settings)
     }
   },
   mounted(){
     if (this.routeParams.sec) {
       this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
+  },
+  destroyed() {
+    this.trackSettings()
   },
   watch: {
     'tab.history': function (to, from) {
@@ -820,8 +856,7 @@ export default {
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (to == this.tab.key || from == this.tab.key) {
-        // Log settings, for debugging
-        this.$logger.info(this.$localData.settings)
+
         if (this.needReload) {
           this.forceReload()
           // forceReload includes archiveReload
@@ -869,6 +904,7 @@ export default {
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: var(--page-pageContent);
 
     flex: 0 1 auto;
@@ -912,6 +948,11 @@ export default {
       margin-top: 20px;
       text-align: center;
       font-weight: normal;
+    }
+
+    .needreload {
+      color: red;
+      font-weight: bold;
     }
 
     .newReaderInput {
@@ -1038,13 +1079,19 @@ export default {
     font-weight: normal;
     margin: 1em 0;
     
+    // Ignore card margins for sortable on tiny screens
+    @media (max-width: 650px) {
+      margin: 1em -50px;
+    }
+
+
     ul, ol {  
       text-align: left;        
       border: solid var(--page-pageBorder, var(--page-pageFrame));
       border-width: 5px 5px 0 0;
       padding-bottom: 6em;
       height: 100%;
-      max-height: 70vh;
+      max-height: 60vh;
       overflow: auto;
     }
 

@@ -27,7 +27,7 @@ export default {
     }
   },
   props: [
-    'tab', 'routeParams'
+    'tab', 'routeParams', 'args'
   ],
   theme: function(ctx) {
     const args = urlToArgObj(ctx.tab.url)
@@ -67,7 +67,7 @@ export default {
       return this.$archive.mspa['story']
     },
     queryArgs() {
-      return urlToArgObj(this.tab.url)
+      return this.args || urlToArgObj(this.tab.url)
     },
     thisPage() {
       // Add useful information to archive object

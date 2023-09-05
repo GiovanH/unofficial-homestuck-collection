@@ -126,17 +126,17 @@ export default {
     background: white;
     font: 16px normal Verdana, Geneva, Tahoma, sans-serif;
     height: 100vh;
-    @media only screen and (max-height: 1555px) {
+    @media (max-height: 1555px) {
       height: auto;
     }
-    >div{
-        margin: 0 auto 24px;
-        .navBanner {
-            width: 100%;
-        }
-        p, h2 {
-            margin-top: 16px;
-        }
+    > div{
+      margin: 0 auto 24px;
+      .navBanner {
+        width: 100%;
+      }
+      p, h2 {
+        margin-top: 16px;
+      }
     }
  }
 </style>

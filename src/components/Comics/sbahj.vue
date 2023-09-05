@@ -1,46 +1,42 @@
 <template>
-  <div class="pageBody">
-    <div class="pageFrame">
-      <NavBanner />
-      <MediaEmbed url="/sweetbroandhellajeff/logo.jpg" />
-      <div class="comicNav">
-        <a href="/sbahj/1"><MediaEmbed url="/sweetbroandhellajeff/first.jpg" /></a>
-        <a :href="prevPage" class="goBack"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
-        <a :href="nextPage" class="nextArrowLink"><MediaEmbed url="/sweetbroandhellajeff/next.jpg" /></a>
-        <a href="/sbahj/54"><MediaEmbed url="/sweetbroandhellajeff/new.jpg" /></a>     
-      </div>
-      <MediaEmbed class="comic" :url="comicUrl" :key="comicUrl" />
-      <div class="comicNav">
-        <a href="/sbahj/1"><MediaEmbed url="/sweetbroandhellajeff/first.jpg" /></a>
-        <a :href="prevPage"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
-        <a :href="nextPage"><MediaEmbed url="/sweetbroandhellajeff/next.jpg" /></a>
-        <a href="/sbahj/54"><MediaEmbed url="/sweetbroandhellajeff/new.jpg" /></a>     
-      </div>
-      <div class="awyeahbitches">
-        <MediaEmbed url="/sweetbroandhellajeff/awyeahbitches.gif" />
-        <div class="ad">
-          <a href="/tbiy" target="_blank"><MediaEmbed url="/sweetbroandhellajeff/becomebaby.jpg" /></a>
-          <div class="projectWonderful">Ads by Project Wonderful! Your ad here, right now: {{projectWonderfulBid}}</div>
-        </div>
-        <MediaEmbed url="/sweetbroandhellajeff/makemesomemoney.gif" />
-        <MediaEmbed url="/sweetbroandhellajeff/madlewwtz.gif" />
-      </div>
-      <div class="linkhole">
-        <div>ARFTER #46: a bunch of other comomics to!</div>
-        <template v-for="comic, i in listedPages">
-          <br :key="`comic${i}br`"/>
-          <a :href="comic.url" v-html="comic.title" :key="`comic${i}`"/>
-        </template>
-        <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
-      </div>
+  <GenericPage>
+    <MediaEmbed url="/sweetbroandhellajeff/logo.jpg" />
+    <div class="comicNav">
+      <a href="/sbahj/1"><MediaEmbed url="/sweetbroandhellajeff/first.jpg" /></a>
+      <a :href="prevPage" class="goBack"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
+      <a :href="nextPage" class="nextArrowLink"><MediaEmbed url="/sweetbroandhellajeff/next.jpg" /></a>
+      <a href="/sbahj/54"><MediaEmbed url="/sweetbroandhellajeff/new.jpg" /></a>
     </div>
-  </div>
+    <MediaEmbed class="comic" :url="comicUrl" :key="comicUrl" />
+    <div class="comicNav">
+      <a href="/sbahj/1"><MediaEmbed url="/sweetbroandhellajeff/first.jpg" /></a>
+      <a :href="prevPage"><MediaEmbed url="/sweetbroandhellajeff/back.jpg" /></a>
+      <a :href="nextPage"><MediaEmbed url="/sweetbroandhellajeff/next.jpg" /></a>
+      <a href="/sbahj/54"><MediaEmbed url="/sweetbroandhellajeff/new.jpg" /></a>
+    </div>
+    <div class="awyeahbitches">
+      <MediaEmbed url="/sweetbroandhellajeff/awyeahbitches.gif" />
+      <Ad href="/tbiy" src="/sweetbroandhellajeff/becomebaby.jpg" />
+      <MediaEmbed url="/sweetbroandhellajeff/makemesomemoney.gif" />
+      <MediaEmbed url="/sweetbroandhellajeff/madlewwtz.gif" />
+    </div>
+    <div class="linkhole">
+      <div>ARFTER #46: a bunch of other comomics to!</div>
+      <template v-for="comic, i in listedPages">
+        <br :key="`comic${i}br`"/>
+        <a :href="comic.url" v-html="comic.title" :key="`comic${i}`"/>
+      </template>
+      <MediaEmbed class="skateboarder" url="/sweetbroandhellajeff/skaterboarder.jpg" />
+    </div>
+  </GenericPage>
 </template>
 
 <script>
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
+import Ad from '@/components/UIElements/Ad.vue'
 
 export default {
   name: 'SweetBroAndHellaJeff',
@@ -48,13 +44,12 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, MediaEmbed
+    NavBanner, MediaEmbed, GenericPage, Ad
   },
   title: () => "sweet bro and hella jeff",
   theme: () => 'sbahj',
   data: function() {
     return {
-      projectWonderfulBid: "$9999999999999",
       listedPages: [
         {url: "/sbahj/46", title: "COMIC #46: the game........... is afoof"},
         {url: "/sbahj/45", title: "COMIC #45: cloink"},
@@ -134,88 +129,48 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .pageBody {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
-    
-		font-family: "Comic Sans MS", "Comic Sans", cursive;
-		background: #0707ec;
-    .navBanner {
-      background-color: #000;
-      width: 100%;
-    }
-
-    .pageFrame {
-      min-width: 800px;
-      margin: 0 auto;
-
-      flex: 0 1 auto;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-
-			background: #f400ec;
-      
-      ::v-deep .comic {
-        margin: 16px 0;
-      }
-
-      .awyeahbitches {
-        margin: 16px 0;
-        width: 100%;
-        background-image: url(assets://sweetbroandhellajeff/moneytile.gif) ;
-        text-align: center;
-        .ad {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          img{
-            display: block;
-          }
-          .projectWonderful {
-            width: 600px;
-            background: white;
-            font-size:10px;
-            color:#0000ff;
-            text-decoration:none;
-            line-height:1.2;
-            font-weight:bold;
-            font-family:Tahoma, verdana,arial,helvetica,sans-serif;
-            text-transform: none;
-            letter-spacing:normal;
-            text-shadow:none;
-            white-space:normal;
-            word-spacing:normal;
-          }
-        }
-      }
-
-      .linkhole {
-        width: 600px;
-        background-color: white;
-        font-weight: normal;
-        font-size: 12px;
-        padding-top: 32px;
-        text-align: center;
-
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: center;
-        align-items: center;
-
-        .skateboarder {
-          margin-top: 32px;
-        }
-      }
-    }
-
+.pageBody {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  background: #0707ec;
+  .navBanner {
+    background-color: #000;
+    width: 100%;
   }
-  
+
+  .pageFrame {
+    min-width: 800px;
+    background: #f400ec;
+
+    ::v-deep .comic {
+      margin: 16px 0;
+    }
+  }
+}
+
+.awyeahbitches {
+  margin: 16px 0;
+  width: 100%;
+  background-image: url(assets://sweetbroandhellajeff/moneytile.gif) ;
+  text-align: center;
+}
+
+.linkhole {
+  width: 600px;
+  background-color: white;
+  font-weight: normal;
+  font-size: 12px;
+  padding-top: 32px;
+  text-align: center;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  .skateboarder {
+    margin-top: 32px;
+  }
+}
 
 </style>
 

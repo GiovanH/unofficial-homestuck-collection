@@ -1,121 +1,134 @@
 import Vue from 'vue'
 
-const Store = require('electron-store')
-const store = new Store()
+var store;
+if (!window.isWebApp) {
+  const Store = require('electron-store')
+  store = new Store({
+    migrations: {
+      '2.3.0': store => {
+        // Migrate storage
+        console.log("Migrating localData monolith")
+        const local_data_prev = store.get('localData', {})
+        store.delete('localData')
+        store.set(local_data_prev)
+      }
+    }
+  })
+}
 
 const LOADED_TAB_LIMIT = 10
 const DEAD_TAB_LIMIT = 15
 const HISTORY_LIMIT = 350
 
+const DEFAULT_TABDATA = {
+  activeTabKey: "000",
+  tabs: {
+    "000": {
+      key: "000",
+      url: '/',
+      title: '',
+      hasEmbed: false,
+      history: [],
+      future: []
+    }
+  },
+  tabList: [
+    "000"
+  ],
+  sortedTabList: [
+    "000"
+  ],
+  closedTabList: [
+  ]
+}
+
+const DEFAULT_SETTINGS = {
+  newReader: {
+    current: '001901',
+    limit: '001902'
+  },
+  notifications: true,
+  subNotifications: false,
+
+  showAddressBar: true,
+  urlTooltip: true,
+  switchToNewTabs: false,
+  forceScrollBar: true,
+  hideFullscreenHeader: false,
+  smoothScrolling: true,
+  pixelScaling: true,
+  mspaMode: false,
+  bandcampEmbed: true,
+  allowSysUpdateNotifs: true,
+  devMode: false,
+  enableHardwareAcceleration: false,
+  useSystemWindowDecorations: false,
+  useTabbedBrowsing: true,
+
+  themeOverride: "default",
+  themeOverrideUI: "default",
+  forceThemeOverride: false,
+  forceThemeOverrideUI: false,
+
+  textOverride: {
+    fontFamily: "",
+    bold: false,
+    fontSize: 0,
+    lineHeight: 0,
+    paragraphSpacing: false,
+    highContrast: false,
+  },
+  arrowNav: true,
+  openLogs: false,
+  hqAudio: true,
+  jsFlashes: true,
+  credits: true,
+
+  fastForward: false,
+
+  retcon1: true,
+  retcon2: true,
+  retcon3: true,
+  retcon4: true,
+  retcon5: true,
+  retcon6: true,
+
+  bolin: false,
+  soluslunes: false,
+  unpeachy: false,
+  pxsTavros: false,
+  cursedHistory: false,
+  ruffleFallback: true,
+
+  modListEnabled: [],  // name hardcoded in mods.js, be careful
+  ...(window.webAppOpinionatedDefaults || {})
+}
+
+const DEFAULT_SAVEDATA = {
+  saves: {
+  },
+  saveList: [
+  ]
+}
+
 class LocalData {
   constructor(init) {
     let data = init || {
       assetDir: '',
-      tabData: {
-        activeTabKey: "000",
-        tabs: {
-          "000": {
-            key: "000",
-            url: '/',
-            title: '',
-            hasEmbed: false,
-            history: [],
-            future: []
-          }
-        },
-        tabList: [
-          "000"
-        ],
-        sortedTabList: [
-          "000"
-        ],
-        closedTabList: [
-        ]
-      },
-      saveData: {
-        saves: {
-        },
-        saveList: [
-        ]
-      }
+      tabData: DEFAULT_TABDATA,
+      saveData: DEFAULT_SAVEDATA,
+      settings: DEFAULT_SETTINGS
     }
 
-    const initSettings = {
-      newReader: {
-        current: '001901',
-        limit: '001902'
-      },
-      notifications: true,
-      subNotifications: false,
-
-      showAddressBar: true,
-      urlTooltip: true,
-      switchToNewTabs: false,
-      forceScrollBar: true,
-      hideFullscreenHeader: false,
-      smoothScrolling: true,
-      pixelScaling: true,
-      mspaMode: false,
-      bandcampEmbed: true,
-      allowSysUpdateNotifs: true,
-      devMode: false,
-      enableHardwareAcceleration: false,
-      useSystemWindowDecorations: false,
-
-      themeOverride: "default",
-      themeOverrideUI: "default",
-      forceThemeOverride: false,
-      forceThemeOverrideUI: false,
-
-      textOverride: {
-        fontFamily: "",
-        bold: false,
-        fontSize: 0,
-        lineHeight: 0,
-        paragraphSpacing: false,
-        highContrast: false,
-      },
-      arrowNav: true,
-      openLogs: false,
-      hqAudio: true,
-      jsFlashes: true,
-      credits: true,
-
-      fastForward: false,
-
-      retcon1: true,
-      retcon2: true,
-      retcon3: true,
-      retcon4: true,
-      retcon5: true,
-      retcon6: true,
-
-      bolin: false,
-      soluslunes: false,
-      unpeachy: false,
-      pxsTavros: false,
-      cursedHistory: false,
-      ruffleFallback: true,
-
-      modListEnabled: []  // name hardcoded in mods.js, be careful
-    }
-
-    // Data will only contain settings if the app has already been used.
-    // In this case, copy replace all default values with the user's values
-    if (data.settings) {
-      Object.keys(data.settings).forEach(setting => {
-        if (setting in initSettings) initSettings[setting] = data.settings[setting]
-      })
-      delete data.settings
-    }
     this.VM = new Vue({ 
       data: () => ({
         ...data,
-        settings: initSettings,
         temp: {
           visited: [],
           loadedTabList: [],
-          tabChainIndex: undefined
+          tabChainIndex: undefined,
+          isPoppingState: false,
+          saveDebounce: false
         }
       }),
       computed: {
@@ -140,29 +153,62 @@ class LocalData {
         }
       },
       methods: {
+        _saveLocalStorage() {
+          if (this.saveDebounce) {
+            clearTimeout(this.saveDebounce)
+            this.saveDebounce = undefined
+          }
+          const all = store.get()
+          all["timestamp"] = Date.now()
+          all['assetDir'] = this.assetDir
+          all['tabData'] = this.tabData
+          all['saveData'] = this.saveData
+          all['settings'] = this.settings
+          store.set(all)
+        },
         saveLocalStorage() {
-          let timestamp = Date.now()
-          let assetDir = this.assetDir
-          let tabData = this.tabData
-          let saveData = this.saveData
-          let settings = this.settings
-          
-          store.set("localData", {
-            assetDir,
-            timestamp,
-            tabData,
-            saveData,
-            settings
-          })
+          if (this.saveDebounce) clearTimeout(this.saveDebounce)
+          this.saveDebounce = setTimeout(this._saveLocalStorage, 1000)
+        },
+        clearLocalStorage() {
+          if (this.saveDebounce) {
+            this._saveLocalStorage()
+          }
+          store.delete('timestamp')
+          store.delete('assetDir')
+          store.delete('tabData')
+          store.delete('saveData')
+          store.delete('settings')
+          this.reloadLocalStorage()
         },
         reloadLocalStorage() {
-          let back = store.get('localData', {})
+          if (this.saveDebounce) {
+            this._saveLocalStorage()
+          }
+          const all = store.get()
+          let back = {
+            assetDir: all['assetDir'],
+            saveData: all['saveData'] || DEFAULT_SAVEDATA,
+            settings: {...DEFAULT_SETTINGS, ...all['settings']},
+            tabData: all['tabData'] || DEFAULT_TABDATA
+          }
 
           this.assetDir = back.assetDir
-          this.tabData = back.tabData
           this.saveData = back.saveData
           this.settings = back.settings
-          console.log(this.settings)
+          if (this.settings.useTabbedBrowsing) {
+
+            this.temp.isPoppingState = true
+            this.tabData = back.tabData
+            this.$nextTick(_ => {
+              // Watcher runs here
+              this.$nextTick(_ => {
+                // If the watcher *didn't* run (path was root) unset flag now
+                this.temp.isPoppingState = false
+              })
+            })
+          }
+          // console.log(this.settings)
         },
         HISTORY_CLEAR() {
           this.tabData.tabList.forEach(k => {
@@ -200,8 +246,12 @@ class LocalData {
 
         TABS_PUSH_URL (url="/", key = this.tabData.activeTabKey) {
           window.getSelection().empty()
-          document.getElementById(key).scrollTop = 0
-          document.getElementById(key).scrollLeft = 0
+          try {
+            document.getElementById(key).scrollTop = 0
+            document.getElementById(key).scrollLeft = 0
+          } catch {
+            console.warn("Tab key element not loaded in document", key)
+          }
 
           this.tabData.tabs[key].history.push(this.tabData.tabs[key].url)
           this.tabData.tabs[key].future = []
@@ -212,6 +262,9 @@ class LocalData {
         },
 
         TABS_NEW (url = '/', adjacent = false) {
+          if (!this.settings.useTabbedBrowsing) {
+            return this.TABS_PUSH_URL(url)
+          }
           let key
           do {
             key = Math.random().toString(36).substring(2, 5)
@@ -250,6 +303,9 @@ class LocalData {
 
         TABS_DUPLICATE (target = this.tabData.activeTabKey, adjacent = true, historyMode = false) {
           if (target in this.tabData.tabs) {
+            if (!this.settings.useTabbedBrowsing) {
+              return
+            }
             let key
             do {
               key = Math.random().toString(36).substring(2, 5)
@@ -441,6 +497,7 @@ class LocalData {
             document.getElementById(tab.key).scrollLeft = 0
 
             tab.history.push(tab.url)
+            this.temp.isPoppingState = true
             tab.url = tab.future.pop()
           }
           
@@ -454,6 +511,7 @@ class LocalData {
             document.getElementById(tab.key).scrollLeft = 0
 
             tab.future.push(tab.url)
+            this.temp.isPoppingState = true
             tab.url = tab.history.pop()
           }
 
@@ -517,12 +575,42 @@ class LocalData {
         },
         SET_ASSET_DIR(path) {
           this.assetDir = path
-          this.saveLocalStorage()
+          this._saveLocalStorage()
         }
-      }
+      },
+      watch: {
+        'activeTabObject.url'(to, from) {
+          if (to != from) {
+            if (this.temp.isPoppingState) {
+              // Consume URL change from popped history state (navigation backwards)
+              this.temp.isPoppingState = false;
+              return
+            }
+            const history_state = {
+              tabData: this.tabData
+            }
+            // console.log("Saving", history_state)
+            window.history.pushState(history_state, "", this.activeTabObject.url);
+          }
+        }
+      },
+      created() {
+        window.addEventListener("popstate", (event) => {
+          // console.log("Loading", event.state)
+          this.temp.isPoppingState = true // next url change should not count as navigation
+          if (event?.state?.tabData)
+            this.tabData = {...this.tabData, ...event.state.tabData}
+        });
+      },
+      destroyed() {
+        if (this.saveDebounce) {
+          this.$logger.info("DESTROYING: flushing debounce")
+          this._saveLocalStorage()
+        }
+      },
     })
     
-    this.VM.saveLocalStorage()
+    // this.VM.saveLocalStorage()
   }
 
   get root() {
@@ -554,12 +642,19 @@ class LocalData {
   }
 }
 
+
 export default {
-  Store: LocalData,
+  // Store: LocalData,
   install (Vue, options) {
+    const the_store = new LocalData()
+
+    the_store.VM.reloadLocalStorage()
+    // the_store.VM.saveLocalStorage()
+
     Vue.mixin({
       beforeCreate() {
-        this.$localData = options.store
+        this.$localData = the_store
+        // this.reloadLocalStorage()
       }
     })
   },

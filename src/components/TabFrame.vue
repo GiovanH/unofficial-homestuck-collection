@@ -10,7 +10,7 @@
             }
         ]"
         :tabindex="(tabIsActive) ? -1 : false" 
-        v-if="isLoaded"
+        v-if="isElementRendered"
         @keyup.left="leftKeyUp"
         @keyup.right="rightKeyUp"
         @keydown.space="spaceBarDown"
@@ -20,15 +20,16 @@
     >
         <component
             :class="theme"
-            :is="resolveComponent" 
+            :is="loadedResolvedComponent"
+            :data-component="loadedResolvedComponent"
             :tab="tab" 
-            :routeParams="routeParams" 
+            :routeParams="passedRouteParams || routeParams"
             ref="page"
         />
         
         <Bookmarks  :tab="tab" ref="bookmarks" :class="theme" />
         <MediaModal :tab="tab" ref="modal" />
-        <FindBox    :tab="tab" ref="findbox" :class="theme"/>
+        <FindBox    :tab="tab" ref="findbox" :class="theme" v-if="!$isWebApp" />
         <JumpBox    :tab="tab" ref="jumpbox" :class="theme" />
     </div>
 </template>
@@ -37,60 +38,76 @@
 // const electron = require('electron')
 import Bookmarks from '@/components/UIElements/Bookmarks.vue'
 import MediaModal from '@/components/UIElements/MediaModal.vue'
-import FindBox from '@/components/UIElements/FindBox.vue'
 import JumpBox from '@/components/UIElements/JumpBox.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 
-import ERROR404 from '@/components/SystemPages/Error404.vue'
-import SPOILER from '@/components/SystemPages/Spoiler.vue'
+const FindBox = () => import('@/components/UIElements/FindBox.vue')
 
-import HOMEPAGE from '@/components/SystemPages/Homepage.vue'
-import HELP from '@/components/SystemPages/Help.vue'
-import MAP from '@/components/SystemPages/Map.vue'
-import LOG from '@/components/SystemPages/Log.vue'
-import SEARCH from '@/components/SystemPages/Search.vue'
-import SETTINGS from '@/components/SystemPages/Settings.vue'
-import CREDITS from '@/components/SystemPages/Credits.vue'
+const ERROR404 = () => import('@/components/SystemPages/Error404.vue')
+const SPOILER = () => import('@/components/SystemPages/Spoiler.vue')
 
-import PAGE from '@/components/Page/Page.vue'
-import SINGLEPAGE from '@/components/Page/SinglePage.vue'
-import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
-import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
-import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
-import ECHIDNA from '@/components/SpecialPages/Echidna.vue'
-import ENDOFHS from '@/components/SpecialPages/EndOfHS.vue'
+const HOMEPAGE = () => import('@/components/SystemPages/Homepage.vue')
+const HELP = () => import('@/components/SystemPages/Help.vue')
+const MAP = () => import('@/components/SystemPages/Map.vue')
+const LOG = () => import('@/components/SystemPages/Log.vue')
+const SEARCH = () => import('@/components/SystemPages/Search.vue')
+const SETTINGS = () => import('@/components/SystemPages/Settings.vue')
+const CREDITS = () => import('@/components/SystemPages/Credits.vue')
 
-import UNLOCK from '@/components/Extras/Unlock.vue'
-import DECODE from '@/components/Extras/Decode.vue'
-import DESKTOPS from '@/components/Extras/Desktops.vue'
-import EXTRASPAGE from '@/components/Extras/ExtrasPage.vue'
-import PS_TITLESCREEN from '@/components/Extras/PS_titlescreen.vue'
-import TBIY from '@/components/Extras/theBabyIs.vue'
-import NAMCOHIGH from '@/components/Extras/NamcoHigh.vue'
-import VIGILPRINCE from '@/components/Extras/VigilPrince.vue'
-import SKAIANET from '@/components/Extras/Skaianet.vue'
-import SQUIDDLES from '@/components/Extras/Squiddles.vue'
-import EVENMORE from '@/components/Extras/EvenMore.vue'
+const PAGE = () => import('@/components/Page/Page.vue')
+const SINGLEPAGE = () => import('@/components/Page/SinglePage.vue')
+const FULLSCREENFLASH = () => import('@/components/SpecialPages/fullscreenFlash.vue')
+const X2COMBO = () => import('@/components/SpecialPages/x2Combo.vue')
+const TZPASSWORD = () => import('@/components/SpecialPages/TzPassword.vue')
+const ECHIDNA = () => import('@/components/SpecialPages/Echidna.vue')
+const ENDOFHS = () => import('@/components/SpecialPages/EndOfHS.vue')
 
-import EPILOGUES from '@/components/Beyond/Epilogues.vue'
+const UNLOCK = () => import('@/components/Extras/Unlock.vue')
+const DECODE = () => import('@/components/Extras/Decode.vue')
+const DESKTOPS = () => import('@/components/Extras/Desktops.vue')
+const EXTRASPAGE = () => import('@/components/Extras/ExtrasPage.vue')
+const PS_TITLESCREEN = () => import('@/components/Extras/PS_titlescreen.vue')
+const TBIY = () => import('@/components/Extras/theBabyIs.vue')
+const NAMCOHIGH = () => import('@/components/Extras/NamcoHigh.vue')
+const VIGILPRINCE = () => import('@/components/Extras/VigilPrince.vue')
+const SKAIANET = () => import('@/components/Extras/Skaianet.vue')
+const SQUIDDLES = () => import('@/components/Extras/Squiddles.vue')
+const EVENMORE = () => import('@/components/Extras/EvenMore.vue')
 
-import MUSIC from '@/components/Music/MusicFrame.vue'
+const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
 
-import SOCIALS from '@/components/Socials/Socials.vue'
-import DSTRIDER from '@/components/Socials/DStrider.vue'
-import BLOGSPOT from '@/components/Socials/Blogspot.vue'
-import MAGICALJOURNEY from '@/components/Socials/MagicalJourney.vue'
-import OFFERYOUCANTREFUSE from '@/components/Socials/OfferYouCantRefuse.vue'
-import FORMSPRING from '@/components/Socials/Formspring.vue'
-import TUMBLR from '@/components/Socials/Tumblr.vue'
-import NEWS from '@/components/Socials/News.vue'
+const MUSIC = () => import('@/components/Music/MusicFrame.vue')
 
-import SBAHJ from '@/components/Comics/sbahj.vue'
-import PXS from '@/components/Comics/pxs.vue'
-import TSO from '@/components/Comics/tso.vue'
-import SNAPS from '@/components/Comics/Snaps.vue'
+const SOCIALS = () => import('@/components/Socials/Socials.vue')
+const DSTRIDER = () => import('@/components/Socials/DStrider.vue')
+const BLOGSPOT = () => import('@/components/Socials/Blogspot.vue')
+const MAGICALJOURNEY = () => import('@/components/Socials/MagicalJourney.vue')
+const OFFERYOUCANTREFUSE = () => import('@/components/Socials/OfferYouCantRefuse.vue')
+const FORMSPRING = () => import('@/components/Socials/Formspring.vue')
+const TUMBLR = () => import('@/components/Socials/Tumblr.vue')
+const NEWS = () => import('@/components/Socials/News.vue')
 
-import TESTS from '@/components/Extras/tests.vue'
-import EDITOR from '@/components/CustomContent/PageEditor.vue'
+const SBAHJ = () => import('@/components/Comics/sbahj.vue')
+const PXS = () => import('@/components/Comics/pxs.vue')
+const TSO = () => import('@/components/Comics/tso.vue')
+// import SNAPS from '@/components/Comics/Snaps.vue'
+const SNAPS = () => import('@/components/Comics/Snaps.vue')
+
+const TESTS = () => import('@/components/Extras/tests.vue')
+const EDITOR = () => import('@/components/CustomContent/PageEditor.vue')
+
+const preload_components = [
+    HOMEPAGE,
+
+    PAGE,
+    FULLSCREENFLASH,
+    X2COMBO,
+    TZPASSWORD,
+    ECHIDNA,
+    ENDOFHS
+]
+
+const COMPONENT_LOADING = undefined // "GenericPage"
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
@@ -100,6 +117,8 @@ export default {
         'tabKey'
     ],
     components: {
+        GenericPage,
+
         Bookmarks,
         FindBox,
         JumpBox,
@@ -159,8 +178,11 @@ export default {
     data() {
         return {
             scrollTopPrev: 0,
-            gameOverThemeOverride: false,
-            modBrowserPages: {}
+            gameOverThemeOverride: false, // Set by fullscreenFlash.vue
+            modBrowserPages: {},
+            lastContentTheme: undefined, // Cache the previous contentTheme for smoother transitions,
+            loadedResolvedComponent: undefined, // Don't change component until it's loaded so the page "hangs" a second before changing, instead of blanking out.
+            passedRouteParams: undefined // Keep routeParams tied to the resolved component so templates don't get unexpected input (e.g. unexpected params from the next, as-of-yet unloaded page component)
         }
     },
     created(){
@@ -172,9 +194,28 @@ export default {
             }
         }
     },
+    asyncComputed: {
+        async componentOptions() {
+            var component_or_promise = this.$options.components[this.resolveComponent]
+
+            // un-promisify if possible
+            component_or_promise = (component_or_promise.resolved?.extendOptions || component_or_promise)
+
+            if (typeof component_or_promise == "function") {
+                // console.debug("import is waiting for", this.resolveComponent)
+                return (await component_or_promise())?.default
+            } else {
+                // console.debug("already resolved promise for", this.resolveComponent)
+                return component_or_promise
+            }
+        }
+    },
     computed: {
         tab() {
             return this.$localData.tabData.tabs[this.tabKey]
+        },
+        isComponentLoaded() {
+            return (this.loadedResolvedComponent == this.resolveComponent)
         },
         routeParams() {
             let base = this.tab.url.split('/').filter(Boolean)[0]
@@ -186,7 +227,7 @@ export default {
         tabIsActive() {
             return this.tab.key == this.$localData.tabData.activeTabKey
         },
-        isLoaded() {
+        isElementRendered() {
             if (this.tabIsActive){
                 this.$localData.root.TABS_PUSH_TO_LOADED_LIST(this.tab.key)
             }
@@ -361,10 +402,10 @@ export default {
                 }
                 case "DECODE":
                     if (this.routeParams.mode) {
-                    if (!['morse','alternian','damaramegido'].includes(this.routeParams.mode)) component ='Error404' 
+                    if (!['morse','alternian','damaramegido'].includes(this.routeParams.mode)) component ='Error404'
                     if (
                         (this.routeParams.mode === 'alternian' && this.$pageIsSpoiler('003890')) ||
-                        (this.routeParams.mode === 'damaramegido' && this.$pageIsSpoiler('007298')) 
+                        (this.routeParams.mode === 'damaramegido' && this.$pageIsSpoiler('007298'))
                     ) component = 'Spoiler'
                     }
                     break
@@ -401,20 +442,26 @@ export default {
                 || (component.toUpperCase() in this.modBrowserPages)
                 ? component.toUpperCase() 
                 : 'ERROR404'
-            this.setTitle(result)
             return result
         },
         contentTheme() {
             // Get the expected theme for this page, based on the content
             let theme = 'default'
-            const component = this.resolveComponent
+
+            const componentObj = this.componentOptions
+            if (!componentObj || (this.resolveComponent != this.loadedResolvedComponent)) {
+                return this.lastContentTheme || "default"
+            }
 
             // if (this.gameOverThemeOverride) return this.gameOverThemeOverride
 
-            const componentObj = this.$options.components[component]
             if (componentObj && componentObj.theme) {
                 const context = this
-                theme = componentObj.theme(context) || theme
+                try {
+                    theme = componentObj.theme(context) || theme
+                } catch (e) {
+                    this.$logger.error("Error in theme function", e)
+                }
             }
 
             return theme
@@ -425,7 +472,7 @@ export default {
             let set_theme = this.$localData.settings.themeOverride
             let theme = page_theme
 
-            if (set_theme) {
+            if (set_theme != 'default') {
               // Treat 'retro' for bq/ps/jb as "no special theme", for override/dark mode purposes.
               if (page_theme != 'default' && page_theme != 'retro') {
                 // Page has a special theme
@@ -448,9 +495,10 @@ export default {
     methods: {
         reload() {
             const u = this.tab.url
-            this.tab.url = "blank"
+            const component = this.loadedResolvedComponent
+            this.loadedResolvedComponent = "GenericPage"
             this.$nextTick(function () {
-                this.tab.url = u
+                this.loadedResolvedComponent = component
             })
         },
         leftKeyUp(e) {
@@ -512,26 +560,37 @@ export default {
         openModal(url) {
             this.$refs.modal.open(url)
         },
-        setTitle(component = this.resolveComponent){
+        setTitle(){
             // you would not believe how bad this used to be
             let title
 
-            const componentObj = this.$options.components[component]
-            if (componentObj && componentObj.title) {
+            const componentObj = this.componentOptions
+
+            if (!componentObj) {
+                // Component object isn't import-loaded, use cached title.
+                return;
+            }
+
+            if (componentObj.title) {
                 const context = this
-                title = componentObj.title(context)
+                try {
+                    title = componentObj.title(context)
+                } catch (e) {
+                    this.$logger.error("Error in theme function", e)
+                }
             } else {
-                this.$logger.warn("Missing title function for", component, componentObj.title)
+                this.$logger.warn("Missing title function for", componentObj.name, componentObj.title)
                 title = this.tab.url
             }
-            
-            this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
+
+            if (title)
+                this.$localData.root.TABS_SET_TITLE(this.tab.key, title)
         }
     },
     updated(){
-      this.$nextTick(function () {
-        this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
-      })
+        this.$nextTick(function () {
+            this.$localData.root.TABS_SET_HASEMBED(this.tab.key, (this.$el.querySelectorAll && this.$el.querySelectorAll(`iframe, video:not([muted]), audio`).length > 0))
+        })
     },
     watch: {
         'tabIsActive'(to, from) {
@@ -543,10 +602,52 @@ export default {
                     this.$el.style.borderTop = ''
                 }, 10)
             }
+        },
+        'loadedResolvedComponent'(to, from) {
+            // Component and url changes
+            this.setTitle()
+            this.passedRouteParams = this.routeParams
+        },
+        'tab.url'(to, from) {
+            this.setTitle()
+            // Has the component loaded yet? If not, clean screen.
+            if (COMPONENT_LOADING && !this.isComponentLoaded) {
+                this.loadedResolvedComponent = COMPONENT_LOADING
+            }
+
+        },
+        'contentTheme'(to, from) {
+            this.lastContentTheme = to
+        },
+        'componentOptions'(to, from) {
+            // Promise finished, we've loaded the current resolved component.
+            this.loadedResolvedComponent = this.resolveComponent
+        },
+        'routeParams'(to, from) {
+            // If the route params change without the component changing, update the component too. Otherwise wait for the component.
+            if (this.isComponentLoaded) {
+                this.passedRouteParams = this.routeParams
+            }
         }
     },
     mounted(){
         this.setTitle()
+        if (!isWebApp) {
+            // Object.values(this.$options.components)
+            preload_components
+                .filter(v => (typeof v == "function"))
+                .filter(f => !f.resolved)
+                .forEach(f => {
+                    try {
+                        f()
+                        // .then(module => {
+                        //     this.$logger.info("preloaded", module.default.name)
+                        // })
+                    } catch {
+                        // f is a function but not a promise
+                    }
+                })
+        }
         if (this.tabIsActive) {
             this.$nextTick(() => {
                 // This fixes the "first loaded tab is unthemed"

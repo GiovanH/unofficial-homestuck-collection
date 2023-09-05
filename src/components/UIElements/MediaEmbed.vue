@@ -14,7 +14,8 @@
     :autoplay="autoplay" @loadeddata="onVideoLoaded" />
   <iframe v-else-if="getMediaType(url) === 'swf'"
     :key="url" :srcdoc='flashSrc'
-    :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height'
+    :width='width || flashProps.width'
+    :height='height || (($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height)'
     @load="initIframe()" seamless/>
   <!-- HTML iframes must not point to assets :c -->
 
@@ -22,7 +23,7 @@
     :is="frameType"
     :src='resolveFrameUrl(url)'
     ref='frame'
-    :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
+    :style="`width: ${width || flashProps.width}px; height: ${height || flashProps.height}px; max-width: 100%; max-height: 100%;`"
     @did-finish-load="initHtmlFrame" seamless />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
@@ -36,9 +37,17 @@
 </template>
 
 <script>
-import fs from 'fs'
-import path from 'path'
 import Resources from "@/resources.js"
+
+const path = (window.isWebApp ? require('path-browserify') : require('path'))
+const ipcRenderer = require('electron').ipcRenderer
+
+var fs
+if (!window.isWebApp) {
+  fs = require('fs')
+} else {
+  fs = undefined
+}
 
 export default {
   name: "MediaEmbed",
@@ -311,6 +320,17 @@ export default {
               })
             }
           }
+          if (typeof navigation !== 'undefined') {
+            navigation.addEventListener("navigate", (e) => {
+              console.log("srcdoc navigating: ", e, e.destination)
+              if (!e.destination.sameDocument) {
+                console.log(e.destination.url)
+                vm.invokeFromFlash("link?" + e.destination.url)
+              }
+            })
+          } else {
+            console.warn("Browser does not support 'navigation' listener")
+          }
         <\/script>
         ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
         </head>
@@ -394,7 +414,7 @@ document.addEventListener('click', function (e) {
       this.$el.contentWindow.vm = this
     },
     resolveFrameUrl(url){
-      this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
+      // this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
       return Resources.resolveURL(url)
     },
     invokeFromFlash(func) {
@@ -419,8 +439,9 @@ document.addEventListener('click', function (e) {
 
       // getURL "about:srcdoc#gameOver" "" <- Get ready for some bullshit
 
-      this.$logger.debug(func)
-      const [funcName, param] = func.split('?')
+      this.$logger.debug("flash invoked function", func)
+      const [funcName, ...params] = func.split('?')
+      const param = params.join('?') // reconstitute params with ? in them
       switch (funcName) {
         case 'audioInit':
           this.$logger.debug(`Creating audio`)
@@ -451,7 +472,7 @@ document.addEventListener('click', function (e) {
           this.audioVolume(param)
           break
         case 'link':
-          this.$pushURL(param, this.$parent.tab.key)
+          this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
@@ -481,6 +502,7 @@ document.addEventListener('click', function (e) {
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
             this.$logger.info("Initializing dynamic game over page")
+            this.$parent.gameOverPreload = false
             this.gameOver.count = 0
             this.startTimer(() => {
               const next_step = this.gameOver.steps[this.gameOver.count]
@@ -522,7 +544,8 @@ document.addEventListener('click', function (e) {
 
       return audioElement
     },
-    audioStart(n = 1) {
+    audioStart(n) {
+      n = (n === "" ? 1 : n)
       this.audioInit()
       let cascadeDelay = 0
       if (this.flashProps.id == '04106') {
@@ -656,7 +679,20 @@ document.addEventListener('click', function (e) {
     },
 
     getFile(url) {
-      return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      // Return the contents of the (text) file at url.
+      this.$logger.info("Retrieving file", url)
+      if (this.$isWebApp) {
+        const request = new XMLHttpRequest();
+        request.open("GET", url, false); // `false` makes the request synchronous
+        request.send(null);
+        if (request.status === 200) {
+          return request.responseText
+        } else {
+          console.error(request)
+        }
+      } else {
+        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      }
     },
     getMediaType (url) {
       url = url.toLowerCase()
@@ -679,9 +715,11 @@ document.addEventListener('click', function (e) {
       }
     },
     drag(e) {
-      e.preventDefault()
-      e.dataTransfer.effectAllowed = 'copy'
-      require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+      if (!this.$isWebApp) {
+        e.dataTransfer.effectAllowed = 'copy'
+        ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+        e.preventDefault()
+      }
     }
   },
   updated() {

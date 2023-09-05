@@ -174,6 +174,7 @@ export default {
   nav {
     background: #5a5a5a;
     width: 950px;
+    max-width: 100vw;
     height: 17px;
     display: flex;
     align-content: center;

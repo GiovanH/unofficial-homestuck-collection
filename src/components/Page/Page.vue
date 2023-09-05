@@ -8,18 +8,18 @@
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
-              <div class="media" ref="media">
-                  <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
-              </div>
+            <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
+            <div class="media" ref="media">
+              <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
+            </div>
           </div>
           <div class="textContent">
-              <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
-              <PageNav :thisPage="thisPage" 
-                :nextPages="nextPagesArray" ref="pageNav"
-                :class="{'hidden': hideNav}" />
-          </div>
+          <FlashCredit :pageId="thisPage.pageId"/>
+          <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
+          <PageNav :thisPage="thisPage"
+            :nextPages="hideNav ? [] : nextPagesArray" ref="pageNav" />
+            <!-- :class="{'hidden': hideNav}" /> -->
+        </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
       <div class="hidden">
@@ -42,7 +42,8 @@ import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 import Metadata from '@/components/Page/PageMetadata.vue'
 
-import Firefly from '@/components/SpecialPages/Firefly.vue'
+const Firefly = () => import('@/components/SpecialPages/Firefly.vue')
+
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
 export default {
@@ -112,6 +113,8 @@ export default {
     },
     thisPage() {
       // Add useful information to archive object
+      if (!this.pageNum) return undefined
+
       return {
         ...this.pageCollection[this.pageNum],
         storyId: this.storyId,
@@ -291,7 +294,7 @@ export default {
     }
 
     //Small screen check
-    @media only screen and (max-width: 850px) {
+    @media (max-width: 950px) {
       &{
         overflow-x: hidden;
         height: max-content;
@@ -345,6 +348,9 @@ export default {
             line-height: 1.1;
             font-size: 32px;
             padding: 15px 0;
+            @media (max-width: 650px) {
+              font-size: 2em;
+            }
           }
 
           .media {

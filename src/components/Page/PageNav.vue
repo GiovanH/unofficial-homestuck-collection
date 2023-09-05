@@ -112,6 +112,9 @@ export default {
     ::v-deep a {
       color: var(--page-links);
     }
+    @media (max-width: 650px) {
+      font-size: 1.8em;
+    }
   }
   .footerNav{
     overflow: hidden;

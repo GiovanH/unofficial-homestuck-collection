@@ -1,12 +1,12 @@
 <template>
-    <div id="titleBar">
-      <div id="titleBarText" v-text="activeTabTitle" />
-      <div id="titleBarButtons" tabindex="-1" v-if="showButtons">
-        <div class="systemButton" id="minButton" @click="minimize()" >‒</div>
-        <div class="systemButton" id="maxButton" @click="maximize()" >☐</div>
-        <div class="systemButton" id="closeButton" @click="close()" >✕</div>
-    </div>
-    </div>
+  <div id="titleBar">
+    <div id="titleBarText" v-text="activeTabTitle" />
+    <div id="titleBarButtons" tabindex="-1" v-if="showButtons">
+    <div class="systemButton" id="minButton" @click="minimize()" >‒</div>
+    <div class="systemButton" id="maxButton" @click="maximize()" >☐</div>
+    <div class="systemButton" id="closeButton" @click="close()" >✕</div>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -105,7 +105,7 @@ export default {
     }
     #closeButton:hover {
       color: white;
-			background: rgb(255, 73, 73);
-		}
+      background: rgb(255, 73, 73);
+    }
   }
 </style>

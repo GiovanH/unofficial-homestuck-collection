@@ -27,7 +27,7 @@
                 <span v-text="`${$archive.mspa.story[$newReaderCurrent].title}`" />
               </a>
               <div class="options">
-                <span class="bookmarkUrlDisplay"
+                <span class="urlDisplay"
                   :href="`/mspa/${$newReaderCurrent}`"
                   v-text="$resolvePath(`/mspa/${$newReaderCurrent}`)" />
                 <button class="systemButton editButton" @click="$openLink('app://./settings/newReader', true)" ><fa-icon icon="map-pin" ></fa-icon></button>
@@ -45,7 +45,7 @@
                 <span v-text="unsanitizeHtml($localData.saveData.saves[key].name)" />
               </a>
               <div class="options">
-                <span class="bookmarkUrlDisplay" :href="$localData.saveData.saves[key].url" v-text="$localData.saveData.saves[key].url" />
+                <span class="urlDisplay" :href="$localData.saveData.saves[key].url" v-text="$localData.saveData.saves[key].url" />
                 <button class="systemButton editButton" @click.capture.prevent="startEditSave(key)"><fa-icon icon="pen" ></fa-icon></button>
               </div>
             </div>

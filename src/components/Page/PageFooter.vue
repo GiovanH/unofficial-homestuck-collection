@@ -1,24 +1,26 @@
 <template>
     <div :class="['footer', this.$root.tabTheme.rendered, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
         <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" />
+        <Ad v-if="show_ad" />
         <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" />
     </div>
 </template>
 
-
 <script>
 import Media from '@/components/UIElements/MediaEmbed.vue'
+import Ad from '@/components/UIElements/Ad.vue'
 
 export default {
     name: 'pageFooter',
     components: {
-        Media
+        Media, Ad
     },
     props: [
         'pageWidth'
     ],
     data() {
-        return{
+        return {
+            show_ad: false,
         }
     },
     computed: {
@@ -85,5 +87,7 @@ export default {
             transform: scaleX(-1);
         }
     }
+
+
 
 </style>

@@ -3,14 +3,76 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <meta name="viewport" content="initial-scale=0.0, width=650">
+    <link rel="icon" href="<%= BASE_URL %>icons/default.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    <div id="prepreloader">
+      <div class="loadcard">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520" class="spiro"><g><g id="halfSpiro" class="left"><path id="thePath" d="M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g><g id="halfSpiro" class="right"><path id="thePath" d="M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g></g></svg>
+      </div>
+    <style>
+      body {
+        background-color: #35bfff;
+      }
+      div.loadcard {
+        text-align: center;
+        filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+      }
+      svg.spiro {
+        max-width: 100%;
+        -webkit-animation-name: spin;
+                animation-name: spin;
+        -webkit-animation-duration: 8000ms;
+                animation-duration: 8000ms;
+        -webkit-animation-iteration-count: infinite;
+                animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+                animation-timing-function: linear;
+      }
+      @-webkit-keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes spin {
+      from {
+          transform: rotate(0deg);
+      }
+      to {
+          transform: rotate(360deg);
+      }
+      }
+      .loadcard svg.spiro > g {
+        transform: translate(0, 145px);
+      }
+      .loadcard svg.spiro > g > g {
+        height: 520px;
+        width: 520px;
+        stroke: #38f43d;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8;
+        fill: transparent;
+      }
+      .loadcard svg.spiro > g > g.left {
+        transform: translate(24px, 0);
+      }
+      .loadcard svg.spiro > g > g.right {
+        transform: translate(-24px, 0) scale(-1, 1);
+      }
+      .loadcard svg.spiro > g > g path, .loadcard svg.spiro > g > g use {
+        transform-origin: -24px -145px;
+      }
+      </style>
+    </div>
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>

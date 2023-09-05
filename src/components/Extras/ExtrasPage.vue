@@ -1,6 +1,6 @@
 <template>
   <GenericPage>
-    <MediaEmbed url="images/logo.gif" class="logo"/>
+    <MediaEmbed url="images/logo.gif" />
     <div v-html="thisPage" class="slot" :class="{faq: /^\/faqs\//.test(this.tab.url)}" />
   </GenericPage>
 </template>

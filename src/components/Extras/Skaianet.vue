@@ -742,7 +742,8 @@ export default {
         "34-2050-Flooding.txt",
         "35-2040-2424-PreparingAlterniaC.txt",
         "36-RIPHIC.txt"
-      ]
+      ],
+      cursedText: { }
     }
   },
   computed: {
@@ -772,8 +773,24 @@ export default {
       }
     },
     getFile(url) {
-			return require('fs').readFileSync(this.$mspaFileStream(url), 'utf8')
-		},
+      this.$logger.info("Retrieving file", url)
+      if (this.$isWebApp) {
+        if (this.cursedText[url]) return this.cursedText[url]
+
+        const request = new XMLHttpRequest();
+        request.open("GET", url, false); // `false` makes the request synchronous
+        request.send(null);
+        if (request.status === 200) {
+          this.cursedText[url] = request.responseText
+          return this.cursedText[url]
+        } else {
+          console.error(request)
+        }
+      } else {
+        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      }
+      // require('fs').readFileSync(this.$mspaFileStream(url), 'utf8')
+    },
   },
   updated() {
   },

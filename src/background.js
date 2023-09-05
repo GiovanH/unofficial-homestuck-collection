@@ -2,9 +2,8 @@
 
 import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
-import FlexSearch from 'flexsearch'
 
 import yaml from 'js-yaml'
 
@@ -25,6 +24,8 @@ const store = new Store()
 const log = require('electron-log')
 const logger = log.scope('ElectronMain')
 
+const search = require('./search.js').default
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
@@ -33,7 +34,7 @@ const gotTheLock = app.requestSingleInstanceLock()
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
 
-if (!store.get('localData.settings.enableHardwareAcceleration')) {
+if (!store.get('settings.enableHardwareAcceleration')) {
   logger.info("Disabling hardware acceleration")
   app.disableHardwareAcceleration()
 } else {
@@ -41,7 +42,7 @@ if (!store.get('localData.settings.enableHardwareAcceleration')) {
 }
 
 // Log settings, for debugging
-logger.info(store.get('localData.settings'))
+logger.info(store.get('settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -68,10 +69,9 @@ function zoomOut() {
   }
 }
 
-var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+var assetDir = store.has('assetDir') ? store.get('assetDir') : undefined
 
 var port
-var chapterIndex;
 
 // Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
 var menuTemplate = [
@@ -206,10 +206,10 @@ var menuTemplate = [
   }
 ]
 
-function loadArchiveData(){
+async function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-  // This returns an `archive` object, and does not modify the global archive directly. 
-  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+  // This returns an `archive` object, and does not modify the global archive directly.
+  if (win) win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
@@ -243,30 +243,13 @@ function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  win.webContents.send('SET_LOAD_STAGE', "MODS")
-  logger.info("Loading mods")
-
   try {
-    logger.debug("Applying mod archive edits")
-    Mods.editArchive(data)
-    // This isn't strictly part of loading the archive data,
-    // but we should do this only when we reload the archive
-    logger.debug("Baking mod routes")
-    Mods.bakeRoutes()
-
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
   } catch (e) {
-    // Errors should already log/handle themselves by now
-    // but we need to update the application state to react to it
-    // This is probably due to a poorly written mod, somehow.
-    // specifically $localdata can be in an invalid state
-    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
-    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
-
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Archive load error',
@@ -276,7 +259,7 @@ function loadArchiveData(){
     throw e
   }
 
-  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
+  if (win) win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   logger.info("Loading patches")
   // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
   if (data.version == "1") {
@@ -289,8 +272,9 @@ function loadArchiveData(){
     data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
   }
 
-  chapterIndex = undefined
+  search.clearChapterIndex()
   
+  if (win) win.webContents.send('SET_LOAD_STAGE', "LOADED_ARCHIVE_VANILLA")
   return data
 }
 
@@ -326,7 +310,7 @@ try {
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
+    if (store.has('settings.smoothScrolling') && !store.get('settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   } else throw Error(`Flash plugin not located at ${flashPath}`)
   
   // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
@@ -415,6 +399,8 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
+var want_imods_extracted = false
+
 if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
   var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
@@ -426,7 +412,7 @@ if (assetDir && fs.existsSync(assetDir)) {
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
-    Mods.extractimods()
+    want_imods_extracted = true
   } else {
     logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
@@ -440,19 +426,26 @@ if (assetDir && fs.existsSync(assetDir)) {
 var first_archive
 var archive // Also, keep a reference to the latest archive, for lazy eval
 try {
-  archive = first_archive = loadArchiveData()
+  loadArchiveData().then(result => {
+    archive = first_archive = result
+  })
 } catch (e) {
   // logger.warn(e)
   // don't even warn, honestly
 }
 
-ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
     if (first_archive) {
+      // Use the preloaded "first archive"
       archive = first_archive
       first_archive = undefined;
-    } else archive = loadArchiveData()
+    } else {
+      // Reload the archive data
+      archive = await loadArchiveData()
+    }
+    search.giveArchive(archive)
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
@@ -460,6 +453,8 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   }
   win.webContents.send('SET_LOAD_STATE', "DONE")
 })
+
+search.registerIpc(ipcMain)
 
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()
@@ -509,7 +504,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
       logger.info("New asset directory", assetDir)
-      loadArchiveData()
+      await loadArchiveData() // Run to check if this thows an error
 
       let flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
@@ -533,10 +528,12 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           message: 'This will restart the application. Continue?'
         })
         if (confirmation == 0) {
-          store.set('localData.assetDir', newPath[0])
+          store.set('assetDir', newPath[0])
         
-          app.relaunch()
-          app.exit()
+          if (!isDevelopment) {
+            app.relaunch()
+            app.exit()
+          }
         }
       } else return newPath[0]
     } else {
@@ -551,22 +548,12 @@ ipcMain.handle('locate-assets', async (event, payload) => {
 })
 
 ipcMain.handle('restart', async (event) => {
-  app.relaunch()
+  (!isDevelopment) && app.relaunch() // Can't relaunch app and maintain debugger connection
   app.exit()
 })
 
 ipcMain.handle('reload', async (event) => {
   win.reload()
-})
-
-
-ipcMain.handle('factory-reset', async (event, confirmation) => {
-  if (confirmation === true) {
-    store.delete('localData')
-  
-    app.relaunch()
-    app.exit()
-  }
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {
@@ -585,156 +572,6 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
     message: args.message
   })
   return (answer === 0)
-})
-
-function buildChapterIndex(){
-  logger.info("Building new search index")
-  chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: ['mspa_num', 'content'],
-      tag: 'chapter'
-    }
-  })
-
-  const storytextList = Object.keys(archive.mspa.story).map(page_num => {
-    const page = archive.mspa.story[page_num]
-    return {
-      key: page_num,
-      mspa_num: page_num,
-      chapter: Resources.getChapter(page_num),
-      content: page.content
-    }
-  })
-
-  logger.info("Populating search index with", storytextList.length, "page documents")
-  chapterIndex.add(storytextList)
-
-  const footnoteList = Object.keys(archive.footnotes.story).map(page_num => {
-    return {
-      key: `${page_num}-notes`, // Duplicate keys are not allowed.
-      mspa_num: page_num,
-      chapter: Resources.getChapter(page_num),
-      content: archive.footnotes.story[page_num].map(
-        note => note.content
-      ).join("###")
-    }
-  })
-
-  logger.info("Populating search index with", footnoteList.length, "footnote documents")
-  chapterIndex.add(footnoteList)
-}
-
-ipcMain.handle('search', async (event, payload) => {
-  if (chapterIndex == undefined)
-    buildChapterIndex()
-
-  if (payload == undefined)
-    return // Just wanted to ensure the index
-
-  const keyAlias = {
-    "mc0001": 1892.5,
-    "jb2_000000": 135.5,
-    "pony": 2838.5,
-    "pony2": 6517.5,
-    "darkcage": 6273.5,
-    "darkcage2": 6927.5
-  }
-  
-  let limit = 1000
-
-  function separateNonConsecutive(array, delimiter) {
-    // Given an array and a delimiter, separate the non-consecutive members of the array.
-    // > separateNonConsecutive([1, 2, 3, 5], "f")
-    // [1, 2, 3, "f", 5]
-
-    let next_v = array[0]
-    let newarray = []
-    for (const i in array) {
-      const v = array[i]
-      if (v != next_v) newarray.push(delimiter)
-      newarray.push(v)
-      next_v = v + 1
-    }
-    return newarray
-  }
-
-  // Generate results from FlexSearch object
-  const sortFn = (a, b) => {
-    const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
-    const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
-    return (payload.sort == 'desc')
-      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0
-      : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
-  }
-  // "Where" function to make sure any IN: tag matches the *start* of the chapter
-  const where = payload.chapter ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0) : undefined
-
-  // Run search
-  const searchOpts = {field: ['content'], where, limit, sort: sortFn}
-  const results = chapterIndex.search(payload.input, searchOpts)
-
-  const foundText = []
-  for (const page of results) {
-    const intraPageSearch = new FlexSearch({
-      doc: {
-        id: 'index',
-        field: ['index', 'content']
-      }
-    })
-
-    // Split page by breaks, and also split apart very long paragraphs by sentences.
-    const page_lines = page.content.split('<br />').map(line => {
-      if (line.length > 160) {
-        return line.split(/(?<=\. )/) // non-consuming split
-      } else {
-        return [line]
-      }
-    }).flat()
-
-    for (let i = 0; i < page_lines.length; i++) {
-      intraPageSearch.add({index: i, content: page_lines[i]})
-    }
-    // Search matching lines *again* for input and return matching indexes
-    const intraResults = intraPageSearch.search(payload.input, {limit, bool: "or"})
-    var indexes = intraResults.map(k => k.index)
-
-    //
-    if (indexes.length > 0)
-      indexes.push(0) // always include first line, primarily for pesterlog formatting reasons
-
-    const spread_indexes = Array.from(
-      indexes.reduce((acc, i) => {
-        const spread = 2;
-        for (let j = Math.max(0, i - spread); j < Math.min(page_lines.length, i + spread); j++) {
-          acc.add(j)
-        }
-        return acc
-      }, new Set())
-    ).sort()
-
-    const matching_lines = separateNonConsecutive(
-      spread_indexes.filter(i => page_lines[i]),
-      "..."
-    ).map(i => i == '...' ? i : page_lines[i])
-
-    if (matching_lines.length > 0) {
-      foundText.push({
-        key: page.key,
-        mspa_num: page.mspa_num,
-        lines: matching_lines
-      })
-    } else {
-      // Couldn't find text within match, despite having already matched. Matching text is spread between lines.
-      // Behaviour: Filter out entirely.
-      // foundText.push({
-      //   key: page.key,
-      //   mspa_num: page.mspa_num,
-      //   lines: page_lines
-      // })
-    }
-  }
-  return foundText
 })
 
 ipcMain.handle('steam-open', async (event, browserUrl) => {
@@ -799,7 +636,7 @@ async function createWindow () {
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: store.get('localData.settings.useSystemWindowDecorations'),
+    frame: store.get('settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
     webPreferences: {
@@ -943,8 +780,10 @@ async function createWindow () {
     win.setTitle(new_title)
   })
 
-  // Give mods a reference to the window object so it can reload 
-  Mods.giveWindow(win);
+  // Communicate version state to imods
+  if (want_imods_extracted) {
+    win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+  }
 
   if (openedWithUrl)
     win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))

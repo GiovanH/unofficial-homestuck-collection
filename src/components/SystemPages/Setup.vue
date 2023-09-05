@@ -9,7 +9,9 @@
         <!-- First-run app setup, no error -->
         <div class="cardContent newUserSetup wizard">
           <div class="wizardSidebar">
-            <img class="logo" src="@/assets/collection_logo.png"> <br />
+            <img class="logo" src="@/assets/collection_logo.png" v-if="!$isWebApp">
+            <img class="logo" src="/archive/collection/logo_v2_static.png" v-else>
+            <br />
             <ol class="wizardProgress">
               <li v-for="name, i in newReaderCardNames" 
                 v-text="name" 
@@ -87,7 +89,18 @@
             ref="ffcontrol" @ffchange="_computedWatchers.wizardForwardButtonDisabled.run(); $forceUpdate()"/>
           </div>
 
-          <div class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
+          <div v-if="$root.platform == 'webapp'" class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
+            <h2>Getting Started</h2>
+
+            <p>You are currently using the <b>webapp</b> version of The Unofficial Homestuck Collection. Some features are unavailable (like Flash support and user mods) and others may work incorrectly or with degraded performance. The full program can be downloaded at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/releases'>GitHub repository</a>.</p>
+
+            <p>Consider this a "trial version" if you're wondering if Homestuck is something you're interested in downloading, or as a way to easily share specific pages or moments with friends by link.</p>
+
+            <div class="center">
+              <button class="letsroll" @click="$localData.root.SET_ASSET_DIR('web')">All done. Let's roll!</button>
+            </div>
+          </div>
+          <div v-else class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
             <h2>Getting Started</h2>
             <p><em>The Unofficial Homestuck Collection</em> comes in two parts:</p>
             <ol>
@@ -120,14 +133,11 @@
         </div>
       </div>
 
-      <div v-else-if="isLoading && !(loadingTooLongTimeout || $root.loadState === 'ERROR')">
+      <div v-else-if="isLoading">
         <div class="loadcard" >
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
-    <!-- <circle cx="0" cy="0" r="3" fill="orange"/> -->
-    <g id="halfSpiro" class="left">
-      <!-- <circle cx="0" cy="0" r="2" fill="blue"/> -->
-      <!-- <path v-if="copiedPath" :d="copiedPath" style="stroke: blue; stroke-width: 22px;" /> -->
+    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c">
       <path id="thePath" :d="spiroPos[spiroTestindex]">
         <animate v-if="spiroTestAnimate"
           attributeName="d"
@@ -139,9 +149,7 @@
         v-for="n in 9"  :key="`p${n}`"
         :style="{transform: `rotate(${(n) * (360/10)}deg)`}"/>
     </g>
-    <use href="#halfSpiro" class="right" />
   </g>
-    <!-- <circle cx="0" cy="0" r="4" fill="red"/> -->
 </svg>
           <p v-text="loadText"></p>
         </div>
@@ -281,7 +289,12 @@ export default {
         "MOUNTED": "Entangling connections",
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
-        "PATCHES": "Applying spackle"
+        "PATCHES": "Applying spackle",
+        "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
+        "EXTRACT_IMODS": "Applying day 1 patch",
+        "READ_MODS": "Indexing paraphernalia",
+        "BAKE_ROUTES": "Convoluting Routing Table",
+        "MODS_DONE": "Disparaging EMCAScript",
       },
       spiroPos: [
         "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
@@ -324,20 +337,20 @@ export default {
       return this.assetDir
     },
     isLoading() {
-      return this.$root.loadState === undefined || this.$root.loadState == "LOADING"
+      return (!this.loadingTooLongTimeout) && (this.$root.loadState != "ERROR")
     },
     loadText() {
       if (this.$root.loadStage === undefined) {
-        return this.loadStages[""] || toString(this.$root.loadStage)
+        return this.loadStages[""]
       }
-      return this.loadStages[this.$root.loadStage] || toString(this.$root.loadStage)
+      return this.loadStages[this.$root.loadStage] || this.$root.loadStage
     },
     isNewUser() {
       return !this.$localData.assetDir
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key]).filter(val => !!val)
+        this.$root.$modChoices[key]).filter(val => !!val)
     }
   },
   mounted() {
@@ -374,7 +387,7 @@ export default {
     },
     clearEnabledMods(){
       this.$localData.settings["modListEnabled"] = []
-      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
 
       this.loadingTooLongTimeout = false
 
@@ -496,6 +509,9 @@ export default {
     }
   .wizard {
     .wizardSidebar {
+      @media (max-width: 650px) {
+        display: none;
+      }
       width: 210px;
       float: left;
       height: 100%;
@@ -555,6 +571,10 @@ export default {
         position: absolute;
         margin-bottom: -1em;
         bottom: 0;
+        @media (max-width: 650px) {
+          position: revert;
+          margin: revert;
+        }
       }
       ::v-deep .spoilerbox .logContent {
         padding: 0 1em;
@@ -582,12 +602,16 @@ export default {
     }
   }
   .card {
+    @media (max-width: 650px) {
+      width: 100%;
+    }
     position: relative;
     margin: auto;
     padding: 0 25px;
     border: solid 5px #c6c6c6;
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: #eeeeee;
 
     flex: 0 1 auto;
@@ -619,7 +643,11 @@ export default {
   }
 }
 
+div.loadcard {
+  filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+}
 .loadcard {
+
   margin: auto;
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -644,10 +672,10 @@ export default {
     animation-duration: 8000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    > g, use {
+    > g {
     // container
       transform: translate(0, 145px);
-      > g, use { // Spirograph half
+      > g { // Spirograph half
         height: 520px;
         width: 520px;
         stroke: rgb(56, 244, 61);
@@ -655,13 +683,11 @@ export default {
         stroke-linejoin: round;
         stroke-width: 8;
         fill: transparent;
-        &.left { // Left
+        &.left {
           transform: translate(24px, 0);
-          // stroke: orange;
         }
-        &.right { // Right
-          // transform: translate(-24px, 0) scale(-1, 1);
-          transform: scale(-1, 1);
+        &.right {
+          transform: translate(-24px, 0) scale(-1, 1);
         }
         path, use {
           transform-origin: -24px -145px;
