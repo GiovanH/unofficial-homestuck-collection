@@ -1,6 +1,6 @@
 // const { VueLoaderPlugin } = require('vue-loader')
 
-require('ofe').call()
+// require('ofe').call()
 module.exports = {
   configureWebpack: {
     // optimization: {
