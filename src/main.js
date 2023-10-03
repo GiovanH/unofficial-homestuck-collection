@@ -158,7 +158,7 @@ Vue.mixin({
         if (!isWebApp) {
           shell.openExternal(to_)
         } else {
-          window.open(to_, '_blank').focus();
+          window.open(Resources.resolveURL(to_), '_blank').focus();
         }
       }
 

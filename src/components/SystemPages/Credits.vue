@@ -107,7 +107,7 @@ export default {
         },
         {
           name: "GiovanH",
-          link: "https://im.giovanh.com",
+          link: "https://im.giovanh.com/?ref=uhc",
           desc: `After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since.`
         },
         {
