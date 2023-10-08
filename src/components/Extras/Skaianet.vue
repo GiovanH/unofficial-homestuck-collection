@@ -305,7 +305,7 @@ export default {
         {
           icon: "archive/skaianet/epi.gif",
           title: `
-            <a href="https://www.homestuck.com/epilogues" target="_blank">EPILOGUES.TXT</a>
+            <a href="/epilogues">EPILOGUES.TXT</a>
             <img src="assets://archive/skaianet/txt.gif" align="middle" />
             <a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154" target="_blank">VIZ</a>
             <img src="assets://archive/skaianet/book.gif" align="middle" />`,
