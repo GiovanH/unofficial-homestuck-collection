@@ -217,10 +217,10 @@
               <a href="/mspa/005953" v-show="!$pageIsSpoiler('005953')" ><Media url="/maps/map_06_052_37.gif" /></a>
               <a href="/mspa/005961" v-show="!$pageIsSpoiler('005961')" ><Media url="/maps/map_06_052_38.gif" /></a>
               <a href="/mspa/005973" v-show="!$pageIsSpoiler('005973')" ><Media url="/maps/map_06_052_39.gif" /></a>
-              <a href="/mspa/005981" v-show="!$pageIsSpoiler('005981')" ><Media url="/maps/map_06_052_40.gif" /></a>
+              <a href="/mspa/005981" v-show="!$pageIsSpoiler('005981')" ><Media url="/maps/map_06_052_40.gif"  noncritical /></a>
             </div>
             <a class="banner" href="/mspa/006009" v-show="!$pageIsSpoiler('006009')" ><Media url="/maps/map_06_cascade.gif" /></a>
-            <a class="banner" href="/mspa/006011" v-show="!$pageIsSpoiler('006011')" ><Media url="/maps/map_06_int2.gif" /></a>
+            <a class="banner" href="/mspa/006011" v-show="!$pageIsSpoiler('006011')" ><Media url="/maps/map_06_int2.gif" noncritical /></a>
           </div>
 
           <div class="actSeparator" v-if="!$pageIsSpoiler('006195')">
@@ -699,6 +699,7 @@ export default {
 
   .pageContent.hsMap {
     width: auto;
+    line-height: 0;
     .mapFrame{
       background-color: #fff;
       display: flex;
@@ -720,12 +721,13 @@ export default {
           display: none !important;
         }
       }
-      .acts{
-        .act{
-          img {
+      .acts {
+        .act {
+          .mediaembed {
+            display: block;
             margin-bottom: 3px;
           }
-          .row{
+          .row {
             box-sizing: border-box;
             padding: 0 35px;
             width: 610px;
@@ -744,7 +746,4 @@ export default {
       }
     }
   }
-  
-
 </style>
-

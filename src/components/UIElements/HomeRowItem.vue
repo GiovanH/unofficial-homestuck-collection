@@ -1,6 +1,8 @@
 <template>
   <div class="rowItem" v-if="!isSpoiler">
-    <a class="thumbnail" :href="href"><Media :url="thumbsrc"/></a>
+    <a class="thumbnail" :href="href">
+      <Media :url="thumbsrc" noncritical/>
+    </a>
     <div class="description">
       <h2><a :href="href">
         <slot name="title"></slot>
@@ -10,7 +12,7 @@
     </div>
   </div>
   <div class="rowItem" v-else>
-    <Media url="/archive/collection/spoiler_small.png"/>
+    <Media url="/archive/collection/spoiler_small.png" noncritical/>
     <div class="description">
       <h2>??????</h2>
       <p class="date" v-text="date_" />
@@ -69,7 +71,7 @@ export default {
   align-items: center;
   
   .thumbnail {
-    img {
+    .mediaembed {
       display: block;
       max-width: 65px;
       max-height: 65px;

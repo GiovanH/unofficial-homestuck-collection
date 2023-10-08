@@ -1,24 +1,28 @@
 <template>
   <GifSeeker v-if="mediaType === 'gif' && reduceMotion"
-    :src='$getResourceURL(url)' :noanimate="$localData.settings.reducedMotion && (noncritical != undefined)" />
+    :src='$getResourceURL(url)' :noanimate="$localData.settings.reducedMotion && (noncritical != undefined)"
+    class='mediaembed' />
   <img v-else-if="mediaType === 'img' || mediaType === 'gif'"
     :src='$getResourceURL(url)'
-    @dragstart="drag($event)" alt />
+    @dragstart="drag($event)" alt
+    class='mediaembed' />
   <video v-else-if="mediaType ==='vid' && gifmode != undefined"
     :src='$getResourceURL(url)'
     :width="videoWidth"
     disablePictureInPicture
     autoplay="true" muted="true"
-    loop />
+    loop
+    class='mediaembed' />
   <video v-else-if="mediaType ==='vid' && gifmode == undefined"
     :src='$getResourceURL(url)'
     :width="videoWidth"
     disablePictureInPicture alt
-    :autoplay="autoplay" @loadeddata="onVideoLoaded" />
+    :autoplay="autoplay" @loadeddata="onVideoLoaded"
+    class='mediaembed' />
 
   <button v-else-if="mediaType === 'swf' && (reduceMotion && !reducedMotionFlashConfirmed)"
-    class="confirm-button"
-    @click="reducedMotionFlashConfirmed = true">
+    class="mediaembed confirm-button"
+    @click="reducedMotionFlashConfirmed = true" >
     <div class="play-button">
       <div></div>
     </div>
@@ -31,7 +35,8 @@
     :key="url" :srcdoc='flashSrc'
     :width='width || flashProps.width'
     :height='height || (($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height)'
-    @load="initIframe" seamless />
+    @load="initIframe" seamless
+    class='mediaembed' />
   <!-- HTML iframes must not point to assets :c -->
 
   <component v-else-if="mediaType === 'html'"
@@ -39,7 +44,8 @@
     :src='resolveFrameUrl(url)'
     ref='frame'
     :style="`width: ${width || flashProps.width}px; height: ${height || flashProps.height}px; max-width: 100%; max-height: 100%;`"
-    @did-finish-load="initHtmlFrame" seamless />
+    @did-finish-load="initHtmlFrame" seamless
+    class='mediaembed' />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
   <div v-else-if="mediaType === 'txt'"

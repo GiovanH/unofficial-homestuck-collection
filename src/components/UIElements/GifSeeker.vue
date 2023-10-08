@@ -1,5 +1,6 @@
 <template>
-  <div class='media'>
+  <img v-if="frames && frames.length == 1" :src="frame.dataURL" />
+  <div v-else class="wrapper">
     <img v-if="frame" :src="frame.dataURL" />
     <!-- <img v-else :src="$getResourceURL(src)" :style="{'padding-bottom': '20px'}" /> -->
     <div v-else :style="{width: '650px', height: '450px', 'padding-bottom': '20px'}" />
@@ -103,5 +104,12 @@ export default {
 .controls {
   display: flex;
   align-items: center;
+}
+div.wrapper {
+  line-height: 0;
+  img {
+    max-width: inherit;
+    max-height: inherit;
+  }
 }
 </style>
