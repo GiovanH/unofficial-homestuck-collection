@@ -144,7 +144,7 @@ Vue.mixin({
       const url_str = url.replace(re_local_index, '$1')
       const urlObject = new URL(url_str)
 
-      if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
+      if (urlObject.protocol == "assets:" && !/\.(html|pdf|epub)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
         return
       }
