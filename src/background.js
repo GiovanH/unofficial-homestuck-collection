@@ -24,7 +24,7 @@ const store = new Store()
 const log = require('electron-log')
 const logger = log.scope('ElectronMain')
 
-const search = require('./search.js').default
+// const search = require('./search.js').default
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -261,18 +261,6 @@ async function loadArchiveData(){
 
   if (win) win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   logger.info("Loading patches")
-  // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  if (data.version == "1") {
-    logger.warn("Applying asset pack v1 patches")
-    const gankraSearchPage = data.search.find(x => x.key == '002745')
-    if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
-
-    data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
-    data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
-    data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
-  }
-
-  search.clearChapterIndex()
   
   if (win) win.webContents.send('SET_LOAD_STAGE', "LOADED_ARCHIVE_VANILLA")
   return data
@@ -445,7 +433,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
       // Reload the archive data
       archive = await loadArchiveData()
     }
-    search.giveArchive(archive)
+    // search.giveArchive(archive)
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
@@ -454,7 +442,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
-search.registerIpc(ipcMain)
+// search.registerIpc(ipcMain)
 
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()

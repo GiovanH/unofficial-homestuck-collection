@@ -61,6 +61,12 @@ function buildChapterIndex(archive){
 }
 
 function doSearch(payload) {
+  if (chapterIndex == undefined)
+      buildChapterIndex(archive || window.vm.archive)
+
+  if (payload == undefined)
+    return // Just wanted to ensure the index
+
   const keyAlias = {
     "mc0001": 1892.5,
     "jb2_000000": 135.5,
@@ -169,12 +175,6 @@ function doSearch(payload) {
 function registerIpc(ipc) {
   // Register IPC (usually main, but renderer in webapp) to handle search queries.
   ipc.handle('search', async (event, payload) => {
-    if (chapterIndex == undefined)
-      buildChapterIndex(window.vm.archive)
-
-    if (payload == undefined)
-      return // Just wanted to ensure the index
-
     return doSearch(payload)
   })
 }
