@@ -356,7 +356,7 @@ export default {
   mounted() {
     setTimeout(function() {
       this.loadingTooLongTimeout = true
-    }.bind(this), 8000)
+    }.bind(this), 16000)
   },
   methods: {
     wizardNextPage(direction){
