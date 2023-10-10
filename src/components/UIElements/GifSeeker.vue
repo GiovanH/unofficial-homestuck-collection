@@ -32,7 +32,7 @@ const DELAY_TO_MS = 10
 // Cache panel lists globally in order to make use of
 // pre-page resource caching (like images do natively)
 const LRUCache = require('mnemonist/lru-cache');
-const GLOBAL_FRAME_CACHE = new LRUCache(100)
+const GLOBAL_FRAME_CACHE = new LRUCache(1000)
 
 export default {
   name: "GifSeeker",
