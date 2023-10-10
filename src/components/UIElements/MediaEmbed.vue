@@ -797,6 +797,7 @@ document.addEventListener('click', function (e) {
     border: none;
     padding: 0;
     line-height: 0;
+    background: var(--page-pageContent);
 
     .play-button {
       width: 60px;
