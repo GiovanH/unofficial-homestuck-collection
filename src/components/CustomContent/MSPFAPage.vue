@@ -162,7 +162,7 @@ export default {
     //   return this.routeParams.story
     // },
     cssClass(){
-      return this.storyId.replace(/ /, '_').replace(/^(\d)/, (match, num) => `css${num}`)
+      return this.storyId.replace(/ /g, '_').replace(/^(\d)/, (match, num) => `css${num}`)
     },
     story(){
       return this.$archive.mspfa[this.storyId]
