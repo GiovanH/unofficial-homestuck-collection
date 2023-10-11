@@ -830,7 +830,7 @@ export default {
     },
     reloadModList: function() {
       Mods.loadModChoicesAsync().then(_ => {
-        this.$asyncComputed.modChoices.update()
+        this.$root.$asyncComputed.$modChoices.update()
         // this._computedWatchers.modsEnabled.run()
         // this._computedWatchers.modsDisabled.run()
         this.$forceUpdate()
