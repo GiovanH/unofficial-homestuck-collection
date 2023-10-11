@@ -3,6 +3,18 @@ import MSPFAPage from '@/components/CustomContent/MSPFAPage.vue'
 import MSPFALog from '@/components/CustomContent/MSPFALog.vue'
 import MSPFAIndex from '@/components/CustomContent/MSPFAIndex.vue'
 
+function resolveStory(ctx, input) {
+  if (input in ctx.parent.$archive.mspfa) {
+    return input
+  } else {
+    // Resolve numerical ID
+    const query = Object.entries(ctx.parent.$archive.mspfa).filter(t => t[1].i == input)
+    if (query.length == 1) {
+      return query[0][0]
+    }
+  }
+}
+
 export default {
   name: 'MSPFADisambig',
   props: [
@@ -16,11 +28,12 @@ export default {
     if (!ctx.routeParams.story)
       return 'MSPFA' 
     else {
-      const comic = ctx.$archive.mspfa[ctx.routeParams.story].n
+      const story_id = resolveStory(ctx, ctx.routeParams.story)
+      const comic = ctx.$archive.mspfa[story_id].n
       if (ctx.routeParams.p == 'log') {
         return `Adventure Log - ${comic}`
       } else {
-        const command = ctx.$archive.mspfa[ctx.routeParams.story].p[Number(ctx.routeParams.p - 1)].c
+        const command = ctx.$archive.mspfa[story_id].p[Number(ctx.routeParams.p - 1)].c
         return command ? `${command} - ${comic}` : comic
       }
     }
@@ -33,7 +46,7 @@ export default {
     options['ref'] = ctx.data.ref
 
     // compute props globally, yolo
-    options.props['storyId'] = ctx.props.routeParams.story
+    options.props['storyId'] = resolveStory(ctx, ctx.props.routeParams.story)
     options.props['pageNum'] = Number(ctx.props.routeParams.p)
     // these will be invalid values sometimes but only on pages that don't use them
 

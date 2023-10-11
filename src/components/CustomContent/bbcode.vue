@@ -48,14 +48,17 @@ export default {
       return this.parseBBCode(this.code).innerHTML
     }
   },
-  // updated() {
-  //   this.bindButtons()
-  // },  
-  // mounted() {
-  //   this.bindButtons()
-  // },  
+  updated() {
+    this.filterDOM()
+    this.bindButtons()
+  },
+  mounted() {
+    this.filterDOM()
+    this.bindButtons()
+  },
   watch: {
     'computedHTML'(to, from) {
+      this.filterDOM()
       this.bindButtons()
     }
   },
@@ -129,6 +132,13 @@ export default {
         }
       } catch (err) { }
       return e
+    },
+    filterDOM() {
+      if (this.$el.nodeType !== 8){
+        for (const link of [...this.$el.getElementsByTagName('A')]) {
+          link.href = link.href.replace(/^http(?:s{0,1}):\/\/(?:mspfa|mspfanventures)?\.com\/\?s=(\d+)&p=(\d+)/, "/mspfa/$1/$2")
+        }
+      }
     },
     bindButtons(){
       this.$nextTick(() => {
