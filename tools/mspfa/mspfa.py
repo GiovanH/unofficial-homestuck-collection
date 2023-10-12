@@ -380,16 +380,49 @@ def downloadStory(STORY_NUM, offline=True):
     except Exception as e:
         logger.warn(e)
 
-    yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w", encoding="utf-8"))
-
-    story_resp.pop("p")
-
     for key, filename in RAW_FILES.items():
         val = story_resp.pop(key)
         if val:
             with open(f"{story_name}/{filename}", "w") as fp:
                 fp.write(val)
 
+    css_stack = [f"{story_name}/adventure.css"]
+    root_body = ""
+    # css_body_total = ""
+    while len(css_stack) > 0:
+        css_filepath = css_stack.pop()
+
+        with open(css_filepath, "r") as fp:
+            css_body = fp.read()
+        if css_filepath == f"{story_name}/adventure.css":
+            root_body = css_body
+
+        for match in [*re.finditer(r'@import url\((\"?)(?P<src>.+?)\1\);', css_body)]:
+            src_url = match.groupdict()['src']
+
+            dependency_path = f"{story_name}/{re.sub(r'[^A-Za-z0-9_-]', '', src_url)}"
+            if not dependency_path.endswith(".css"):
+                dependency_path += ".css"
+
+            _saveChunked(dependency_path, getStream(src_url, "https://mspfa.com/"))
+            css_stack.append(dependency_path)
+
+            # Flatten imports for root css
+            with open(dependency_path, 'r') as fp:
+                root_body = root_body.replace(
+                    match.group(0),
+                    f"/* {css_filepath} */\n{fp.read()}\n\n",
+                    1
+                )
+
+    with open(f"{story_name}/adventure.scss", 'w') as fp:
+        fp.write(f'div.s{story_resp["i"]}[role="styleWrap"] {{\n')
+        fp.write(root_body)
+        fp.write("\n}\n")
+
+    yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w", encoding="utf-8"))
+
+    story_resp.pop("p")
     yaml.dump(story_resp, open(f"{story_name}/story_meta.yaml", "w", encoding="utf-8"))
 
     logger.info(f"{story_resp['n']}: {len(page_list)} pages")
@@ -407,12 +440,16 @@ def downloadStory(STORY_NUM, offline=True):
   async asyncComputed(api) {{
     const story = await api.readYamlAsync("./story.yaml")
     return {{
+      styles: [
+        {{body: await api.readFileAsync("./adventure.scss")}}
+      ],
       edit(archive){{
         archive.mspfa['{story_name}'] = story
       }}
     }}
   }}
-}}""")
+}}
+""")
 
 
 if __name__ == "__main__":

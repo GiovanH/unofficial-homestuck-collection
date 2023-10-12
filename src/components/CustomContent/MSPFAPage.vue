@@ -4,7 +4,6 @@
   <Error404 v-if="!page" />
   <div v-else class="pageBody" role="styleWrap"
     :class="[cssClass]" >
-    <component :is="'style'" v-if="story.y" v-html="storyCss"></component>
     <div :class="[`p${pageNum}`].concat(pageRangeClasses)">
       <body>
         <div id="main">
@@ -138,8 +137,6 @@ import BBCode from '@/components/CustomContent/bbcode.vue'
 import Error404 from '@/components/SystemPages/Error404.vue'
 import Ad from '@/components/UIElements/Ad.vue'
 
-const sass = require('sass');
-
 // TODO: Compute "Major"
 
 export default {
@@ -162,7 +159,8 @@ export default {
     //   return this.routeParams.story
     // },
     cssClass(){
-      return this.storyId.replace(/ /g, '_').replace(/^(\d)/, (match, num) => `css${num}`)
+      // return this.storyId.replace(/ /g, '_').replace(/^(\d)/, (match, num) => `css${num}`)
+      return `s${this.story.i}`
     },
     story(){
       return this.$archive.mspfa[this.storyId]
@@ -170,28 +168,11 @@ export default {
     // pageNum(){
     //   return Number(this.routeParams.p)
     // },
+    cssBody() {
+      return this.story.whole_css || this.story.y
+    },
     page(){
       return this.story.p[this.pageNum - 1]
-    },
-    storyCss(){
-      try {
-       return sass.renderSync({
-          data: `div.${this.cssClass}[role="styleWrap"] {\n${this.story.y}\n}\n`,
-          sourceComments: true
-        }).css.toString()
-      } catch (e) {
-        try {
-         const rendered = sass.renderSync({
-            data: `div.${this.cssClass}[role="styleWrap"] {\n${this.story.y}\n}\n}\n`,
-            sourceComments: true
-          }).css.toString()
-         this.$logger.warn("Had to inject closing css bracket", e)
-         return rendered
-        } catch (e2) {
-          this.$logger.error(`Couldn't render css for adventure '${this.storyId}'`, e)
-          return null
-        }
-      }
     },
     pageRanges(){
       // see mspaf.js `registerPageRanges`
@@ -202,7 +183,7 @@ export default {
       var pageRanges = {}
       var pageRangeMatch
       // eslint-disable-next-line no-cond-assign
-      while (pageRangeMatch = findPageRanges.exec(this.story.y)) {
+      while (pageRangeMatch = findPageRanges.exec(this.cssBody)) {
         if (!pageRanges["p" + pageRangeMatch[1]]) {
           var pageRange = pageRangeMatch[1].split("-")
           pageRange[0] = parseInt(pageRange[0])
