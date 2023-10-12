@@ -11,7 +11,7 @@
           <NavBanner useCustomStyles="false" />
           <div id="container">
             <div id="slide" ref="slide">
-              <div id="command" v-text="page.c"></div>
+              <div id="command" v-html="page.c"></div>
               <div id="content">
                 <BBCode :code="page.b" />
               </div>
@@ -23,7 +23,7 @@
                 <div id="links">
                   <div v-for="n in page.n.filter(n => story.p[n])" :key="n">
                     <a :href="`/mspfa/${storyId}/${n}`">
-                      <span v-text="getPageCommand(n)" />
+                      <span v-html="getPageCommand(n)" />
                     </a>
                   </div>
                 </div>

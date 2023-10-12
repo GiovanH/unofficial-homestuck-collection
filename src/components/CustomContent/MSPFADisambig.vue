@@ -4,13 +4,17 @@ import MSPFALog from '@/components/CustomContent/MSPFALog.vue'
 import MSPFAIndex from '@/components/CustomContent/MSPFAIndex.vue'
 
 function resolveStory(ctx, input) {
-  if (input in ctx.parent.$archive.mspfa) {
+  const archive = (ctx?.$archive || ctx.parent.$archive)
+  if (input in archive.mspfa) {
     return input
   } else {
     // Resolve numerical ID
-    const query = Object.entries(ctx.parent.$archive.mspfa).filter(t => t[1].i == input)
-    if (query.length == 1) {
+    const query = Object.entries(archive.mspfa).filter(t => t[1].i == input)
+    if (query.length > 0) {
+      // If you have the same adventure installed twice, we're picking one. Sorry!
       return query[0][0]
+    } else {
+      throw Error(`MSPFA with id ${input} not loaded!`)
     }
   }
 }
@@ -40,7 +44,7 @@ export default {
   },
   functional: true,
   render: function (h, ctx) {
-    let options = ctx // pass through everything
+    const options = ctx // pass through everything
     // some special changes here
     options['class'] = ctx.data.class
     options['ref'] = ctx.data.ref
