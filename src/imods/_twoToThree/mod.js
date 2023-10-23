@@ -4,6 +4,7 @@ module.exports = {
   modVersion: 0.1,
   trees: {
     "./pxs/": "assets://archive/comics/pxs/",
+    "./archive/": "assets://archive/",
   },
   routes: {
     //replace flashes that don't mute when HQ audio is enabled

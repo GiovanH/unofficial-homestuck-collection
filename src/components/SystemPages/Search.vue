@@ -41,6 +41,10 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 const { ipcRenderer } = require('electron')
 const Mark = require('mark.js')
 
+const search = require('@/search.js').default
+
+// search.registerIpc(ipcRenderer)
+
 export default {
   name: 'search',
   props: [
@@ -98,7 +102,8 @@ export default {
   },
   methods: {
     invokeSearch(params){
-      return ipcRenderer.invoke('search', params)
+      return Promise.resolve(search.doSearch(params))
+      // return ipcRenderer.invoke('search', params)
     },
     async search() {
       let input = this.query // this.inputText
@@ -127,7 +132,7 @@ export default {
           // TODO: Now that chapters are strings, rewrite this
           // if (value in this.chapters)
           if (chapter) {
-            logger.warn("Can only have one selected IN: chapter. ")
+            this.$logger.warn("Can only have one selected IN: chapter. ")
           }
           chapter = value.replace(/&quot;/gi, '')
         }

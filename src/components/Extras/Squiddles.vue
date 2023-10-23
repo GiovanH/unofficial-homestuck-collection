@@ -231,6 +231,10 @@ export default {
           &::before { content: "twitter"; }
           &::after { content: "" !important; }
         }
+        &[href*="//bsky.app"] {
+          &::before { content: "bluesky"; }
+          &::after { content: "" !important; }
+        }
         &[href*="deviantart.com/"] {
           &::before { content: "deviantart"; }
           &::after { content: "" !important; }
