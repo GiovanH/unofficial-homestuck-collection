@@ -1060,8 +1060,8 @@ async function getMixinsAsync(){
         }
         // Computed
         for (const cname in (hook.computed || {})) {
-          // Precomputed super function
-          const sup = () => this._computedWatchers[cname].getter.call(this) || nop
+          // Precomputed super value
+          const sup = this._computedWatchers[cname].getter.call(this)
           Object.defineProperty(this, cname, {
             get: hook.computed[cname].bind(vueComponent, sup),
             configurable: true
@@ -1069,6 +1069,7 @@ async function getMixinsAsync(){
         }
         // Methods w/ optional super argument
         for (const mname in (hook.methods || {})) {
+          // Super function
           const sup = this[mname] || nop
           const bound = hook.methods[mname].bind(vueComponent)
           this[mname] = function(){return bound(...arguments, sup)}
