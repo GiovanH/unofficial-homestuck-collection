@@ -14,7 +14,7 @@
       </div>
     </GenericPage>
     <!-- <GenericPage v-if="gameOverPreload" /> -->
-    <div :style="{visibility: gameOverPreload ? 'hidden' : 'visible'}" class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
+    <div :style="{visibility: gameOverPreload ? 'hidden' : 'visible', height: gameOverPreload ? '0' : undefined}" class="pageBody" :class="[bgClass, {hiddenGameOver: gameOverPreload}]" :data-pageid="`${storyId}/${thisPage.pageId}`">
       <div class="pageFrame">
         <div class="pageContent">
           <Footnotes :pageId="thisPage.pageId" preface />
@@ -90,7 +90,7 @@ export default {
   mounted() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
       this.$parent.gameOverThemeOverride = 'A6A6'
-      if (!this.needsNav) // only if we're using a modded flash
+      if (!this.needsNav && !this.$localData.settings.reducedMotion) // only if we're using stock flash
         this.gameOverPreload = true // unset by MediaEmbed after we get gameOver signal
 
       this.$watch(
@@ -173,6 +173,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .hiddenGameOver {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+  }
   .pageBody {
     margin: 0;
     padding: 0;

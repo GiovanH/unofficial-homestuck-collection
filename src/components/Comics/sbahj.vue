@@ -152,6 +152,9 @@ export default {
   width: 100%;
   background-image: url(assets://sweetbroandhellajeff/moneytile.gif) ;
   text-align: center;
+  .reducedMotion & {
+    background: #f7fedf
+  }
 }
 
 .linkhole {

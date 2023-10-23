@@ -10,9 +10,12 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 export default {
   name: 'logo',
   components: {Media},
-  data: function(){
-    return {
-      logo_src: "assets://archive/collection/logo_v2_full.webm"
+  computed: {
+    logo_src() {
+      if (this.$localData.settings.reducedMotion)
+        return "assets://archive/collection/logo_v2_reduced.webm"
+
+      return "assets://archive/collection/logo_v2_full.webm"
     }
   }
 }

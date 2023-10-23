@@ -8,12 +8,12 @@
       {{ logButtonText }}
     </button>
     <p class="logContent text" :class="fontFamily" :style="fontStyle"
-     v-html="content.replace(/\|.*?\| *\<br \/\>/, '')"></p>
+     v-html="buttonContent"></p>
   </div>
 
   <div class="authorlog" v-else-if="textType == 'authorlog'">
     <p class="logContent text" :class="fontFamily" :style="fontStyle"
-      v-html="content.replace(/\|.*?\| *\<br ?\/?\>/, '')"></p>
+      v-html="buttonContent"></p>
   </div>
   <span v-else data-placeholder />
 
@@ -59,6 +59,9 @@ export default {
       if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
       if (this.$localData.settings.textOverride.paragraphSpacing) result.push("paragraphSpacing")
       return result
+    },
+    buttonContent() {
+      return this.content.replace(/\|.*?\| *\<br ?\/?\>/, '')
     },
     theme(){
       return this.forcetheme || this.$root.tabTheme.rendered
@@ -110,8 +113,7 @@ export default {
     filteredPrattle() {
       let result = this.content
       if (/<img src="/.test(result)){
-        // TODO: Rewrite this to not depend on side effects of Array.prototype.some
-        this.fullwidthImages.some(img => {
+        this.fullwidthImages.forEach(img => {
           result = result.replace(`${img}" `, `${img}" class='fullWidth'`)
         })
       }
@@ -149,12 +151,15 @@ export default {
           if (this.usePurpleLinks && this.$localData.allHistory.includes(filteredLink)) links[i].classList.add('visited')
         }
         const images = this.$el.getElementsByTagName('IMG')
-        for (let i = 0; i < images.length; i++) {
-          images[i].src = this.$getResourceURL(images[i].src)
+        for (const image of [...images]) {
+          image.src = this.$getResourceURL(image.src)
+          if (image.src.endsWith(".gif") && this.$localData.settings.reducedMotion) {
+            image.outerHTML = `<a href=${image.src}>${image.src}</a>`
+          }
           if (!this.$isWebApp)
-            images[i].ondragstart = (e) => {
+            image.ondragstart = (e) => {
               e.dataTransfer.effectAllowed = 'copy'
-              ipcRenderer.send('ondragstart', this.$mspaFileStream(images[i].src))
+              ipcRenderer.send('ondragstart', this.$mspaFileStream(image.src))
               e.preventDefault()
             }
         }

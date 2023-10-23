@@ -1,8 +1,8 @@
 <template>
-    <div :class="['footer', this.$root.tabTheme.rendered, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
-        <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" />
+    <div :class="['footer', $root.tabTheme.rendered, $localData.settings.pixelScaling ? 'pixelated' : false ]" :style="styleObject">
+        <Media :url="bannerImage[0]" class="bannerImage left" draggable="false" noncritical />
         <Ad v-if="show_ad" />
-        <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" />
+        <Media :url="bannerImage[1]" class="bannerImage right" draggable="false" noncritical />
     </div>
 </template>
 
