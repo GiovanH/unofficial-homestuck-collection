@@ -221,7 +221,7 @@ export default {
       const next = this.page.n[0]
       if (dir == 'left' && (this.pageNum - 1) &&  frame.$el.scrollLeft == 0) 
         this.$pushURL(`/mspfa/${this.storyId}/${this.pageNum - 1}`)
-      else if (dir == 'right' && next && frame.$el.scrollLeft + frame.$el.clientWidth == frame.$el.scrollWidth)
+      else if (dir == 'right' && this.story.p[next] && frame.$el.scrollLeft + frame.$el.clientWidth == frame.$el.scrollWidth)
         this.$pushURL(`/mspfa/${this.storyId}/${next}`)
     },
     getPageCommand(n, default_="Next."){

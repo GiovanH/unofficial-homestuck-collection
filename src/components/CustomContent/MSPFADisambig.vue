@@ -50,8 +50,10 @@ export default {
     options['ref'] = ctx.data.ref
 
     // compute props globally, yolo
-    options.props['storyId'] = resolveStory(ctx, ctx.props.routeParams.story)
-    options.props['pageNum'] = Number(ctx.props.routeParams.p)
+    if (ctx.props.routeParams.story) {
+      options.props['storyId'] = resolveStory(ctx, ctx.props.routeParams.story)
+      options.props['pageNum'] = Number(ctx.props.routeParams.p)
+    }
     // these will be invalid values sometimes but only on pages that don't use them
 
     // {
