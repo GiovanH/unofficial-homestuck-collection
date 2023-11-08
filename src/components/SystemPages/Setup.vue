@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <div v-else-if="isLoading">
+      <div v-else-if="isLoading || !loadingTooLongTimeout">
         <div class="loadcard" >
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
@@ -337,7 +337,7 @@ export default {
       return this.assetDir
     },
     isLoading() {
-      return (!this.loadingTooLongTimeout) && (this.$root.loadState != "ERROR") && (this.$root.loadState != "DONE")
+      return (this.$root.loadState != "ERROR") && (this.$root.loadState != "DONE")
     },
     loadText() {
       if (this.$root.loadStage === undefined) {

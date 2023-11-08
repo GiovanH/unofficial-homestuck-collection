@@ -817,6 +817,8 @@ export default {
 
       this.$root.loadState = "LOADING"
       this.$nextTick(function () {
+        // Don't show loading screen, "soft" reload
+        // this.$root.loadState = "LOADING"
         ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       })
     },
@@ -826,6 +828,7 @@ export default {
     forceReload: function() {
       this.$localData.VM.saveLocalStorage()
       this.$localData.VM._saveLocalStorage()
+      this.$root.loadState = "LOADING"
       ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
