@@ -247,11 +247,11 @@ export default {
               this.classList.remove("major")
           }
       }
-      var imgs = this.$el.querySelectorAll("img, video, iframe, canvas, object")
+      var imgs = this.$el.querySelector("#content").querySelectorAll("span > img, span > video, span > iframe, span > canvas, span > object")
       for (var i = 0; i < imgs.length; i++) {
-          imgs[i].classList.add("major")
-          imgs[i].addEventListener("load", loadImg)
-          imgs[i].addEventListener("error", loadImg)
+        imgs[i].classList.add("major")
+        imgs[i].addEventListener("load", loadImg)
+        imgs[i].addEventListener("error", loadImg)
       }
     },
     bindButtons(){
@@ -649,8 +649,7 @@ div[role="styleWrap"]::v-deep {
 
     img {
       max-width: 950px;
-      // TODO: Set major elements
-      margin: 0 -25px;
+      // margin: 0 -25px;
 
       &.major {
         margin: 0 -25px;
