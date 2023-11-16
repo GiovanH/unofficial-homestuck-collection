@@ -57,3 +57,7 @@ be preserved in all covered works. Modified versions may optionally
 extend this list as applicable, but modifications that remove
 attributions or otherwise misrepresent the origin of the material
 are not permitted.
+
+**Succession Policy**
+
+If either person GiovanH or Bambosh lose the capacity to maintain this project, the other may assume ownership of the project if he so opts.
