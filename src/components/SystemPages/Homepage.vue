@@ -115,7 +115,7 @@
           afterpage="010030"
           date="Oct 2016 - Aug 2017">
           <template v-slot:title>Snapchat</template>
-          <p>Snapshots of life on Earth C. No longer canon as of The Epilogues.</p>
+          <p>Extra snapshots of life on Earth C, continuing from the credits. No longer canon as of The Epilogues.</p>
         </HomeRowItem>
         <HomeRowItem
           class="rowItem"
