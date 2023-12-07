@@ -505,7 +505,11 @@ document.addEventListener('click', function (e) {
           this.audioVolume(param)
           break
         case 'link':
-          this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
+          if (param != 'about:srcdoc') {
+            this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
+          } else {
+            this.$logger.warn("Tried to navigate page to srcdoc!")
+          }
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
