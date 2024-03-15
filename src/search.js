@@ -27,7 +27,7 @@ function buildChapterIndex(archive){
   chapterIndex = new FlexSearch({
     doc: {
       id: 'key',
-      field: ['mspa_num', 'content'],
+      field: ['mspa_num', 'content', 'command'],
       tag: 'chapter'
     }
   })
@@ -37,6 +37,7 @@ function buildChapterIndex(archive){
     return {
       key: page_num,
       mspa_num: page_num,
+      command: page.title,
       chapter: Resources.getChapter(page_num),
       content: page.content
     }
@@ -102,11 +103,17 @@ function doSearch(payload) {
       ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0
       : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
   }
+
   // "Where" function to make sure any IN: tag matches the *start* of the chapter
   const where = payload.chapter ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0) : undefined
 
   // Run search
-  const searchOpts = {field: ['content'], where, limit, sort: sortFn}
+  const searchOpts = {
+    field: ['command', 'content'],
+    where,
+    limit,
+    sort: sortFn
+  }
   const results = chapterIndex.search(payload.input, searchOpts)
 
   const foundText = []
@@ -161,12 +168,12 @@ function doSearch(payload) {
       })
     } else {
       // Couldn't find text within match, despite having already matched. Matching text is spread between lines.
-      // Behaviour: Filter out entirely.
-      // foundText.push({
-      //   key: page.key,
-      //   mspa_num: page.mspa_num,
-      //   lines: page_lines
-      // })
+      // Behaviour: Push stub (might be title or footnote).
+      foundText.push({
+        key: page.key,
+        mspa_num: page.mspa_num,
+        lines: [] // page_lines
+      })
     }
   }
   return foundText
