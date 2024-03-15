@@ -69,7 +69,7 @@ export default {
   title: function(ctx) {
     var title
     
-    const exceptions = {
+    const title_exceptions = {
       '006715': 'DOTA',
       '008801': 'GAME OVER',
       '009305': 'shes8ack',
@@ -83,8 +83,8 @@ export default {
     else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
       title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
     } else {
-      if (p in exceptions) {
-        title = exceptions[p]
+      if (p in title_exceptions) {
+        title = title_exceptions[p]
       } else {
         title = ctx.$archive.mspa.story[p].title + [
           " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"

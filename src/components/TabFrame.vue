@@ -609,12 +609,15 @@ export default {
             this.passedRouteParams = this.routeParams
         },
         'tab.url'(to, from) {
-            this.setTitle()
+            if (this.isComponentLoaded) {
+                // If componentObj still points to the old component,
+                // don't try to call setTitle with the new url params!
+                this.setTitle()
+            }
             // Has the component loaded yet? If not, clean screen.
             if (COMPONENT_LOADING && !this.isComponentLoaded) {
                 this.loadedResolvedComponent = COMPONENT_LOADING
             }
-
         },
         'contentTheme'(to, from) {
             this.lastContentTheme = to
