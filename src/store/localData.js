@@ -160,6 +160,8 @@ class LocalData {
             this.saveDebounce = undefined
           }
           const all = store.get()
+          delete all['__internal__'] // Not allowed to save this key
+
           all["timestamp"] = Date.now()
           all['assetDir'] = this.assetDir
           all['tabData'] = this.tabData
