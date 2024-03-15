@@ -401,10 +401,11 @@ export default {
     errorModeRestart() {
       if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
-      // ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+      // SET_ASSET_DIR flushes persistent store for us
       ipcRenderer.invoke('restart')
     },
     modSoftRestart() {
+      this.$localData.root.applySaveIfPending()
       ipcRenderer.send("RELOAD_ARCHIVE_DATA")
     }
   },

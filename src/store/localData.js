@@ -169,14 +169,17 @@ class LocalData {
           all['settings'] = this.settings
           store.set(all)
         },
+        applySaveIfPending() {
+          if (this.saveDebounce) {
+            this._saveLocalStorage()
+          }
+        },
         saveLocalStorage() {
           if (this.saveDebounce) clearTimeout(this.saveDebounce)
           this.saveDebounce = setTimeout(this._saveLocalStorage, 1000)
         },
         clearLocalStorage() {
-          if (this.saveDebounce) {
-            this._saveLocalStorage()
-          }
+          this.applySaveIfPending()
           store.delete('timestamp')
           store.delete('assetDir')
           store.delete('tabData')
@@ -185,9 +188,7 @@ class LocalData {
           this.reloadLocalStorage()
         },
         reloadLocalStorage() {
-          if (this.saveDebounce) {
-            this._saveLocalStorage()
-          }
+          this.applySaveIfPending()
           const all = store.get()
           let back = {
             assetDir: all['assetDir'],
@@ -603,14 +604,14 @@ class LocalData {
           this.temp.isPoppingState = true // next url change should not count as navigation
           if (event?.state?.tabData)
             this.tabData = {...this.tabData, ...event.state.tabData}
-        });
+        })
       },
       destroyed() {
         if (this.saveDebounce) {
           this.$logger.info("DESTROYING: flushing debounce")
-          this._saveLocalStorage()
+          this.applySaveIfPending()
         }
-      },
+      }
     })
     
     // this.VM.saveLocalStorage()

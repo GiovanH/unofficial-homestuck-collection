@@ -742,20 +742,22 @@ export default {
           thumb: '/archive/collection/archive_news.png'
         })
       }
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
-        this.queueArchiveReload()
-      }
-
-      if (setting == 'useSystemWindowDecorations') {
-        this.$localData.root.saveLocalStorage()
-        this.$nextTick(() => {ipcRenderer.invoke('restart')})
-      }
 
       // Unforce if theme just changed to auto
       if (setting == 'themeOverride' && this.$localData.settings.themeOverride == "default")
         this.$localData.settings.forceThemeOverride = false
 
+      // Call this before queueing archive reload
       this.$localData.root.saveLocalStorage()
+
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
+        this.queueArchiveReload()
+      }
+
+      if (setting == 'useSystemWindowDecorations') {
+        // this.$localData.root.saveLocalStorage()
+        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+      }
     },
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: true})
@@ -819,6 +821,7 @@ export default {
       this.$nextTick(function () {
         // Don't show loading screen, "soft" reload
         // this.$root.loadState = "LOADING"
+        this.$localData.root.applySaveIfPending()
         ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       })
     },
