@@ -26,7 +26,8 @@
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
 
-  const Notifications = () => '@/components/UIElements/Notifications.vue'
+  import Notifications from '@/components/UIElements/Notifications.vue'
+
   const ContextMenu = () => import('@/components/UIElements/ContextMenu.vue')
   const UrlTooltip = () => import('@/components/UIElements/UrlTooltip.vue')
   const Updater = () => import('@/components/UIElements/Updater.vue')

@@ -342,7 +342,7 @@ Vue.mixin({
       if (notifications) {
         notifications.queueFromPageId(pageId)
       } else {
-        this.$logger.warn("Missing notifications ref!")
+        this.$logger.error("Missing notifications ref!")
       }
     },
     $pushNotif(notif) {
@@ -351,7 +351,7 @@ Vue.mixin({
       if (notifications) {
         notifications.queueNotif(notif)
       } else {
-        this.$logger.warn("Missing notifications ref!")
+        this.$logger.error("Missing notifications ref!")
       }
     },
     $timestampIsSpoiler(timestamp){
