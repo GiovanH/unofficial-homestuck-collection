@@ -300,7 +300,7 @@ export default {
     span:not(:first-child) {
       padding-top: 1em;
       display: inline-block;
-      white-space: pre-wrap;
+      word-break: break-all; // Override inline-block defaults
     }
     span + span,
     br + br + span {
