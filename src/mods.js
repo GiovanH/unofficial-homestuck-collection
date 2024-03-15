@@ -205,6 +205,8 @@ function onModLoadFail(responsible_mods, e) {
   if (!expectWorkingState())
     return // Pre-setup, we're probably fine ignoring this.
 
+  debugger
+
   store.set("needsRecovery", true)
 
   logger.warn("RENDER: Mod load failure with modlist", responsible_mods)
@@ -764,7 +766,7 @@ async function editArchiveAsync(archive) {
       onModLoadFail([js._id], e)
       throw e
     }
-    setLoadStage("READ_MODS")
+    // setLoadStage("READ_MODS")
   }
   setLoadStage("BAKE_ROUTES")
   await bakeRoutesPromise
@@ -1056,12 +1058,32 @@ async function getMixinsAsync(){
 
         for (const dname in (hook.data || {})) {
           const value = hook.data[dname]
+          if (this._computedWatchers[dname]) {
+            console.warn(
+              "Vue hook: component",
+              this.$options.name,
+              "hook is assigning", dname,
+              "as data, but it is a computed value!"
+            )
+          }
           this[dname] = (typeof value == "function" ? value.bind(this)(this[dname]) : value)
         }
         // Computed
         for (const cname in (hook.computed || {})) {
           // Precomputed super value
-          const sup = this._computedWatchers[cname].getter.call(this)
+          var sup;
+          try {
+            sup = this._computedWatchers[cname].getter.call(this)
+          } catch (e) {
+            console.warn(
+              "Vue hook: component",
+              this.$options.name,
+              "does not have existing computed property", cname,
+              "in", this._computedWatchers,
+              "super function will return undefined"
+            )
+            sup = () => undefined
+          }
           Object.defineProperty(this, cname, {
             get: hook.computed[cname].bind(vueComponent, sup),
             configurable: true
