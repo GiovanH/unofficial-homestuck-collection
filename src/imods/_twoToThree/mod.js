@@ -48,6 +48,8 @@ module.exports = {
           "art": []
         })
 
+        archive.comics.pxs.comics['you-have-a-feeling-its-going-to-be-a-long-day'].credit = "Zach Morrison and Andrew Hussie"
+
         archive.social.blogspot[8].html = archive.social.blogspot[8].html.replace('archive/tso/blurbs', 'archive/comics/tso/blurbs')
 
         editFormspring('andrewhussie', 'andrewhussie550488999', '"/archive/formspring/00958_1.gif"', '"assets://archive/social/formspring/00958_1.gif"')
