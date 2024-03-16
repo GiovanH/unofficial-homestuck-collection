@@ -400,7 +400,7 @@ if (assetDir && fs.existsSync(assetDir)) {
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
-    want_imods_extracted = true
+    want_imods_extracted = true // Takes effect when client requests archive
   } else {
     logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
@@ -434,6 +434,13 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
       archive = await loadArchiveData()
     }
     // search.giveArchive(archive)
+
+    // Communicate version state to imod
+    if (want_imods_extracted) {
+      logger.info("mods: before loading, please extract imods")
+      win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+    }
+
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
@@ -770,11 +777,6 @@ async function createWindow () {
   ipcMain.on('set-title', (event, new_title) => {
     win.setTitle(new_title)
   })
-
-  // Communicate version state to imods
-  if (want_imods_extracted) {
-    win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
-  }
 
   if (openedWithUrl)
     win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))

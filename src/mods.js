@@ -85,7 +85,7 @@ var setLoadStage
 
 if (ipcRenderer) {
   ipcRenderer.on('MODS_EXTRACT_IMODS_PLEASE', (event, payload) => {
-    logger.info("mods will extract imods")
+    logger.info("mods will extract imods on next update")
     want_imods_extracted = true
   })
   setLoadStage = function(stage) {
