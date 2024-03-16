@@ -518,7 +518,10 @@ export default {
                 !e.altKey && 
                 document.activeElement.tagName != 'INPUT') {
                 const frameEl = this.$el
-                if (frameEl.scrollLeft + frameEl.clientWidth == frameEl.scrollWidth) {
+                // Really weird workaround here for what I think is a subpixel math bug:
+                // Depending on zoom/dpi, frameEl.scrollWidth can be (frameEl.clientWidth - 1)
+                // even when fully scrolled
+                if (frameEl.scrollLeft + frameEl.clientWidth >= (frameEl.scrollWidth - 1)) {
                     // Only send event if scrolling doesn't happen
                     this.$refs.page.keyNavEvent('right', e)
                 }
