@@ -171,7 +171,7 @@ Vue.mixin({
         // TODO: Not sure resolveURL is needed here? This should always be external?
         _openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        this.$logger.error("UNCAUGHT ASSET?", to)
+        this.$logger.error("UNCAUGHT ASSET? Tried to externally open internal(?) asset", to)
         this.$openModal(to)
       } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
