@@ -693,7 +693,8 @@ async function createWindow () {
         throw Error(err)
       } else {
         // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
-        callback({redirectURL})
+        const redirect_callback = {redirectURL}
+        callback(redirect_callback)
       }
     } else {
       const destination_url = Resources.resolveURL(details.url)
@@ -703,12 +704,14 @@ async function createWindow () {
         throw Error(err)
       } else {
         // Okay
+        const redirect_callback = {
+          redirectURL: destination_url
+        }
         // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
         if (details.resourceType == "subFrame")
           win.webContents.send('TABS_PUSH_URL', destination_url)
-        else callback({
-          redirectURL: destination_url
-        })
+        else
+          callback(redirect_callback)
       }
     }
   })
