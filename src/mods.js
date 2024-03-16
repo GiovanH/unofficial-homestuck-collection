@@ -156,7 +156,7 @@ async function extractimods() {
     logger.info("Not yet in working state, not extracting imods.")
     return
   }
-  // TODO: Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
+  // Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   const Tar = await import('tar')
   let tardata
