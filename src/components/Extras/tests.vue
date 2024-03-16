@@ -18,12 +18,12 @@
 
         <div class="testSection" v-if="otherComponents.length">
           <h2>Overview</h2>
-          <div v-for="ikey in intersectionKeys" class="flexbox">
+          <div v-for="ikey in intersectionKeys" :key="ikey" class="flexbox">
             <h3 v-text="ikey" /><br />
-            <div v-for="COMP in otherComponents" class="column">
+            <div v-for="COMP in otherComponents" :key="COMP" class="column">
               <h4 v-text="COMP.name" />
               <ul class="intersectionOverview">
-                <li v-for='(__, k) in COMP[ikey]'>
+                <li v-for='(__, k) in COMP[ikey]' :key="__">
                   <span class="match" v-if="COMP[ikey][k] == otherComponents['PAGE'][ikey][k]" v-text="k" :data-value="COMP[ikey][k]"/>
                   <span class="notmatch" v-else-if="k in otherComponents['PAGE'][ikey]" v-text="k" />
                   <span class="new" v-else v-text="k" />
@@ -143,10 +143,11 @@
             <li><a href="/mspa/009165">Dialoglog</a></li>
             <li><a href="/mspa/009304">8ack</a></li>
             <li><a href="/mspa/009535">The Echidna page</a></li>
+            <li><a href="/mspa/009549">Sprite²</a></li>
+            <li><a href="/mspa/009823">Inline images</a></li>
             <li><a href="/mspa/009987">Collide</a></li></li>
             <li><a href="/mspa/010019">Panel path routing</a>
             <li><a href="/mspa/010027">Act 7</a></li>
-            <li><a href="/mspa/009823">Inline images</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
             <li><a href="/mspa/pony">pony</a></li>
             <!-- <li><a href="http://mspaintadventures.com/?s=3">Blood Spade</a></li> -->

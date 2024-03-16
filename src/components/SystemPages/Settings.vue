@@ -568,7 +568,7 @@ export default {
             minor: [], severe: ["holocaust"]
           },
           label: "Skaianet Systems - CURSED_HISTORY",
-          desc: `At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.`
+          desc: `At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the notes to be in extremely poor taste, and they were swiftly removed.`
         }
       ],
       themes: [

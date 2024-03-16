@@ -4,7 +4,7 @@
       <div v-for="(page, index) in nextPages" :key="index">
         <p v-if="('pageId' in page && 'title' in page)">
           &gt; <a v-if="isLeftPage" :href="nextUrl(page)" @click.prevent="resetScroll" class="tiltedArrow" >
-            <div class="notTiltedArrowLink">==&gt;⠀</div>
+            <div class="notTiltedArrowLink">==&gt; </div>
             <div class="tiltedArrowLink">==&gt;</div>
           </a>
           <a v-else :href="nextUrl(page)" class="nextArrowLink" v-text="page.title" />
