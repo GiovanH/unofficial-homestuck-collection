@@ -147,10 +147,17 @@
                 <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
                 <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
               </div>
-              <br><br>
-              <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
-              <br><br>
-              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight"></label>
+              <!-- <br><br> -->
+              <label class="fontslider" v-if="$localData.settings.textOverride.fontFamily != 'courierAliased'">
+              <!-- <label> -->
+                Font size:
+                <input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize">
+              </label>
+              <!-- <br><br> -->
+              <label class="fontslider">
+                Line height:
+                <input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight">
+              </label>
             </div>
             <div class="textpreviews">
               <!-- PageText usually require a tab change to recalculate theme. -->
@@ -1030,6 +1037,11 @@ export default {
           
       .textOptions label {
         display: block;
+      }
+
+      label.fontslider {
+        display: block;
+        margin-top: 1em;
       }
 
       .textpreviews {
