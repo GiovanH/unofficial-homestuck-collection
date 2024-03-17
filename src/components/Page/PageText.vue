@@ -55,9 +55,16 @@ export default {
   computed: {
     fontFamily() {
       const result = []
-      if (this.$localData.settings.textOverride.bold || !this.$localData.settings.textOverride.fontFamily) result.push('bold')
-      if (this.$localData.settings.textOverride.fontFamily) result.push(this.$localData.settings.textOverride.fontFamily)
-      if (this.$localData.settings.textOverride.paragraphSpacing) result.push("paragraphSpacing")
+      if (this.$localData.settings.textOverride.fontFamily) {
+        result.push(this.$localData.settings.textOverride.fontFamily)
+        if (this.$localData.settings.textOverride.bold)
+          result.push('bold')
+      } else {
+        // Default is always bold
+        result.push('bold')
+      }
+      if (this.$localData.settings.textOverride.paragraphSpacing)
+        result.push("paragraphSpacing")
       return result
     },
     buttonContent() {
@@ -268,10 +275,17 @@ export default {
     }
 
     &.courierPrime {
-      font-family: 'Courier Prime';
+      font-family: 'Courier Prime', monospace;
     }
     &.verdana {
       font-family: Verdana, Arial, Helvetica, sans-serif;
+    }
+    &.courierAliased {
+        font-family: 'courierstuck', 'Homestuck-Regular', 'Courier Prime', monospace;
+        font-size: 12pt !important;
+    }
+    &.garamond {
+      font-family: EB-Garamond, serif;
     }
     &.times {
       font-family: 'Times New Roman', Times, serif;

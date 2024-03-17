@@ -591,6 +591,8 @@ export default {
         {text: "Verdana / Arial", value: "verdana"},
         {text: "Times New Roman", value: "times"},
         {text: "Comic Sans", value: "comicSans"},
+        {text: "EB Garamond", value: "garamond"},
+        {text: "Courier Aliased", value: "courierAliased"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
       allControversial: [

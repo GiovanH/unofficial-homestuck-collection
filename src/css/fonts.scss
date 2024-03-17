@@ -1,2 +1,23 @@
 @import "@/css/fonts/courier-prime/courier-prime.scss";
 @import "@/css/fonts/open-dyslexic/open-dyslexic.scss";
+
+@font-face {
+  font-family: 'Homestuck-Regular';
+  src: url(assets://archive/epilogues/resources/Homestuck-Regular.woff2);
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: 'EB-garamond';
+  src: url('css/fonts/EBGaramond-VariableFont_wght.ttf');
+  font-weight: normal;
+  font-style: normal
+}
+
+@font-face {
+  font-family: 'courierstuck';
+  src: url('css/fonts/courierstuck.ttf');
+  font-weight: normal;
+  font-style: normal
+}

@@ -143,37 +143,6 @@ export default {
 
 <style lang="scss" scoped>
 
-@font-face {
-  font-family: 'Homestuck-Regular';
-  src: url(assets://archive/epilogues/resources/Homestuck-Regular.woff2);
-  font-weight: normal;
-  font-style: normal
-}
-
-@font-face {
-font-family:"adobe-garamond-pro";
-src:url("https://use.typekit.net/af/af619f/00000000000000003b9b00c5/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"),url("https://use.typekit.net/af/af619f/00000000000000003b9b00c5/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"),url("https://use.typekit.net/af/af619f/00000000000000003b9b00c5/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
-font-display:auto;font-style:normal;font-weight:700;font-stretch:normal;
-}
-
-@font-face {
-font-family:"adobe-garamond-pro";
-src:url("https://use.typekit.net/af/6c275f/00000000000000003b9b00c6/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("woff2"),url("https://use.typekit.net/af/6c275f/00000000000000003b9b00c6/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("woff"),url("https://use.typekit.net/af/6c275f/00000000000000003b9b00c6/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i7&v=3") format("opentype");
-font-display:auto;font-style:italic;font-weight:700;font-stretch:normal;
-}
-
-@font-face {
-font-family:"adobe-garamond-pro";
-src:url("https://use.typekit.net/af/5cace6/00000000000000003b9b00c2/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("woff2"),url("https://use.typekit.net/af/5cace6/00000000000000003b9b00c2/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("woff"),url("https://use.typekit.net/af/5cace6/00000000000000003b9b00c2/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3") format("opentype");
-font-display:auto;font-style:italic;font-weight:400;font-stretch:normal;
-}
-
-@font-face {
-font-family:"adobe-garamond-pro";
-src:url("https://use.typekit.net/af/2011b6/00000000000000003b9b00c1/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/2011b6/00000000000000003b9b00c1/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/2011b6/00000000000000003b9b00c1/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
-font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
-}
-
 .pageBody {
   color: var(--font-default);
   background: var(--page-pageBody);
@@ -235,7 +204,7 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
       font-weight: normal;
     }
     &.type-ao3-hsep-header {
-      font-family: adobe-garamond-pro, serif;
+      font-family: EB-garamond, serif;
       font-weight: bold;
     }
   }
@@ -279,7 +248,7 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
 
   // Body text
 
-  font-family: adobe-garamond-pro, serif;
+  font-family: EB-garamond, serif;
   font-weight: normal;
 
   div.o_epilogue p {
@@ -308,7 +277,7 @@ font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
 
   .calliope-dead { color: #ff0000 }
   .calliope-dead-story {
-      font-family: adobe-garamond-pro, serif;
+      font-family: EB-garamond, serif;
       font-weight: normal;
       color: #000000
   }

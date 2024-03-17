@@ -165,6 +165,11 @@ export default {
           desc: `For making the original offline Homestuck archive that sent me off down this rabbit hole to begin with!`
         },
         {
+          name: "ducdat0507",
+          link: "https://fontstruct.com/fontstructors/1639437/ducdat0507",
+          desc: `For the prerendered aliased Courier bitmap font.`
+        },
+        {
           name: "Each of our GitHub contributors",
           link: "https://github.com/Bambosh/unofficial-homestuck-collection/graphs/contributors",
           desc: "Every single change you guys make leaves a lasting impact on this project. We wouldn't be here without you!"
