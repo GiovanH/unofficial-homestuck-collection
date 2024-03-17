@@ -95,7 +95,7 @@ export default {
     },
     fontStyle() {
       const fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
-      const lineHeights = [1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
+      const lineHeights = [1, 1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
       return {
         fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
         lineHeight: lineHeights[this.$localData.settings.textOverride.lineHeight]

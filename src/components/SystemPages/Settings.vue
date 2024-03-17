@@ -150,7 +150,7 @@
               <br><br>
               <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
               <br><br>
-              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight"></label>
             </div>
             <div class="textpreviews">
               <!-- PageText usually require a tab change to recalculate theme. -->

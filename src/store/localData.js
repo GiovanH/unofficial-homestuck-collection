@@ -11,6 +11,14 @@ if (!window.isWebApp) {
         const local_data_prev = store.get('localData', {})
         store.delete('localData')
         store.set(local_data_prev)
+      },
+      '2.4.4': store => {
+        // Migrate storage
+        console.log("Migrating line height")
+        const settings_prev = store.get('settings', {})
+        const incremented_height = Number(settings_prev.textOverride.lineHeight) + 1
+        settings_prev.textOverride.lineHeight = incremented_height
+        store.set(settings_prev)
       }
     }
   })
@@ -74,7 +82,7 @@ const DEFAULT_SETTINGS = {
     fontFamily: "",
     bold: false,
     fontSize: 0,
-    lineHeight: 0,
+    lineHeight: 1,
     paragraphSpacing: false,
     highContrast: false,
   },
