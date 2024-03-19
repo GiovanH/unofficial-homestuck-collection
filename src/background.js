@@ -5,10 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
-import yaml from 'js-yaml'
-
 import Resources from "./resources.js"
-import Mods from "./mods.js"
 
 const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
