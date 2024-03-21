@@ -11,49 +11,50 @@ on:
     branches: [ ] # "develop"
 
 jobs:
-  prep-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create_release.outputs.id }}
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - id: package_json
-      run: |
-        content=`cat ./package.json`
-        # the following lines are only required for multi line json
-        content="${content//'%'/'%25'}"
-        content="${content//$'\n'/'%0A'}"
-        content="${content//$'\r'/'%0D'}"
-        # end of optional handling for multi line json
-        echo "::set-output name=json::$content"
-    - name: Create tag string
-      id: create_tag_str
-      run: |
-        tag=$(basename "${{ github.ref }}")-$(date +%Y%m%d)
-        echo "tag=$tag" >> $GITHUB_OUTPUT
-    - name: Update package.json snapshot version
-      uses: jossef/action-set-json-field@v2.1
-      with:
-        file: package.json
-        field: version
-        value: "${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: "v${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
-        release_name: "v${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
-        draft: true
-        prerelease: true
+  # prep-release:
+  #   name: Create GitHub Release
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     release_id: ${{ steps.create_release.outputs.id }}
+  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       fetch-depth: 0
+  #   - id: package_json
+  #     run: |
+  #       content=`cat ./package.json`
+  #       # the following lines are only required for multi line json
+  #       content="${content//'%'/'%25'}"
+  #       content="${content//$'\n'/'%0A'}"
+  #       content="${content//$'\r'/'%0D'}"
+  #       # end of optional handling for multi line json
+  #       echo "::set-output name=json::$content"
+  #   - name: Create tag string
+  #     id: create_tag_str
+  #     run: |
+  #       tag=$(basename "${{ github.ref }}")-$(date +%Y%m%d)
+  #       echo "tag=$tag" >> $GITHUB_OUTPUT
+  #   - name: Update package.json snapshot version
+  #     uses: jossef/action-set-json-field@v2.1
+  #     with:
+  #       file: package.json
+  #       field: version
+  #       value: "${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
+  #   - name: Create Release
+  #     id: create_release
+  #     uses: actions/create-release@v1
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       tag_name: "v${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
+  #       release_name: "v${{ fromJson(steps.package_json.outputs.json).version }}-${{ steps.create_tag_str.outputs.tag }}"
+  #       draft: true
+  #       prerelease: true
 
   build-matrix:
-    needs: [ prep-release ]
+    # needs: [ prep-release ]
+    needs: []
     strategy:
       fail-fast: false
       matrix:
