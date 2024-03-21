@@ -326,6 +326,14 @@ const routes = [
         path: ':page',
       },
     ]
+  },
+  {
+    path: '/mspfa/:story/:p',
+    props: true
+  },
+  {
+    path: '/mspfa/:story',
+    redirect: '/mspfa/:story/1'
   }
 ]
 

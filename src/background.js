@@ -5,10 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
-import yaml from 'js-yaml'
-
 import Resources from "./resources.js"
-import Mods from "./mods.js"
 
 const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
@@ -231,7 +228,8 @@ async function loadArchiveData(){
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
       audioData: {},
-      flags: {}
+      flags: {},
+      mspfa: {}
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
