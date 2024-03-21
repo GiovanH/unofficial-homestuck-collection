@@ -392,6 +392,9 @@ def downloadStory(STORY_NUM, offline=True):
     while len(css_stack) > 0:
         css_filepath = css_stack.pop()
 
+        if not os.path.isfile(css_filepath):
+            continue
+
         with open(css_filepath, "r") as fp:
             css_body = fp.read()
         if css_filepath == f"{story_name}/adventure.css":

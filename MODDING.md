@@ -40,6 +40,14 @@ Some changes don't require any sort of reload at all. Some require a soft reload
 
 Basically, anything that requires the main process to reload requires an application restart. This is usually if you change an actual file in the mods directory. Anything that modifies vue or adds CSS requires a soft reload, and stuff that just modifies the archive or adds footnotes can reload within vue. 
 
+### MSPFA
+
+The archive has first-class support for MSPFA-styled fan adventures.
+
+Make mods that are ready for zipping distribution using the tools/mspfa.py script, provided. 
+
+There is currently no way to make a "live-updating" MSPFA; fan adventures are snapshotted, so this is best used for complete fan adventures.
+
 ## API specification
 
 As per [Installing mods](#installing-mods) above, there are two forms of mods: single-file scripts and mod folders. 
@@ -343,6 +351,26 @@ Aside: Internally, there is no such thing as a `FootnoteScope`. Instead the pars
 
 ### `computed`
 
+<aside>
+**New with 2.4**: You can also define an async `asyncComputed` which has access to the more efficient readFileAsync variant functions.
+
+For example, as seen in mods:
+```js
+  async asyncComputed(api) {
+    const story = await api.readYamlAsync("./story.yaml")
+    return {
+      styles: [
+        {body: await api.readFileAsync("./adventure.scss")}
+      ],
+      edit(archive){
+        archive.mspfa[story_id] = story
+      }
+    }
+  }
+```
+
+</aside>
+
 There are some resources your mod might want to request from TUHC at runtime, like a namespaced logger object or access to a settings store. For this, use the `computed` function.
 
 (There is no relation between the `module.exports.computed` field and the vue conception of computed values, except for the general idea of computation.)
@@ -353,8 +381,15 @@ The `computed` function is passed the `api` object as an argument, which current
 
 ```js
 api = {
+    store,
     logger,
-    store
+    readFile(asset_path),
+    readJson(asset_path),
+    readYaml(asset_path),
+    async readFileAsync(asset_path, callback),
+    async readJsonAsync(asset_path, callback),
+    async readYamlAsync(asset_path, callback),
+    Resources
 }
 ```
 
@@ -366,6 +401,7 @@ The `store` object is a special namespaced store you can use for reading setting
 - `get(k, default_)`: Get the value of key `k`, or `default_` if `k` is not yet set.
 - `has(k)`
 - `delete(k)`
+- `onDidChange(key, callback)`
 - `clear()`
 
 The store provided is namespaced. This means it is safe to use commonly used keys in your mod without any risk of conflicting with the main program or other mods.
@@ -668,4 +704,3 @@ and Mod B can check
 `archive.flags['MOD_A_LOADED']`
 
 Note that there is no special namespacing done on these flags; any mod can theoretically read and write to any flag at any time. Also note that in the above example, Mod A must be loaded before Mod B in order to recognize its presence. This is intentional behavior.
-

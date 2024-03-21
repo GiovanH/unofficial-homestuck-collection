@@ -151,7 +151,7 @@ export default {
     return {
       DateTime: require('luxon').DateTime,
       time_zone: "America/New_York",
-      show_ad: true,
+      show_ad: false,
     }
   },
   computed: {
