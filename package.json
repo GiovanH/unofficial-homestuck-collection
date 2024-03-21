@@ -42,6 +42,7 @@
     "babel-loader": "^8.1.2",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
+    "electron-window-state": "^5.0.3",
     "encoding": "^0.1.12",
     "flexsearch": "^0.6.32",
     "gif-frames": "^1.0.1",

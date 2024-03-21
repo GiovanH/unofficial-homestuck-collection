@@ -21,6 +21,8 @@ const http = require('http')
 const Store = require('electron-store')
 const store = new Store()
 
+const windowStateKeeper = require('electron-window-state')
+
 const log = require('electron-log')
 const logger = log.scope('ElectronMain')
 
@@ -624,9 +626,17 @@ const OPENWITH_PROTOCOL = 'mspa'
 
 async function createWindow () {
   // Create the browser window.
+
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: 1280,
+    defaultHeight: 780
+  })
+
   win = new BrowserWindow({
-    width: 1280,
-    height: 780,
+    'x': mainWindowState.x,
+    'y': mainWindowState.y,
+    'width': mainWindowState.width,
+    'height': mainWindowState.height,
     'minWidth': 650,
     'minHeight': 600,
     backgroundColor: '#535353',
@@ -641,6 +651,8 @@ async function createWindow () {
       webviewTag: true
     }
   })
+
+  mainWindowState.manage(win)
 
   win.webContents.on('zoom-changed', (e, zoomDirection) => {
     if (zoomDirection === 'in') {
