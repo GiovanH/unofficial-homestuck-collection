@@ -1,10 +1,10 @@
 <script>
 
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import FlashCredit from '@/components/UIElements/FlashCredit.vue'
-import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
-import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
-import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+const NavBanner = () => import('@/components/UIElements/NavBanner.vue')
+const FlashCredit = () => import('@/components/UIElements/FlashCredit.vue')
+const MediaEmbed = () => import('@/components/UIElements/MediaEmbed.vue')
+const SpoilerBox = () => import('@/components/UIElements/SpoilerBox.vue')
+const StoryPageLink = () => import('@/components/UIElements/StoryPageLink.vue')
 
 const Sass = require('sass')
 

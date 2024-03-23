@@ -388,12 +388,13 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
 
-const draggable = () => import("vuedraggable")
-
 import Mods from "@/mods.js"
+
+const SubSettingsModal = () => import('@/components/UIElements/SubSettingsModal.vue')
+
+const draggable = () => import("vuedraggable")
 
 const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
 const ipcRenderer = require('electron').ipcRenderer

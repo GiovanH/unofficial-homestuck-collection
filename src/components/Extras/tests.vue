@@ -142,6 +142,7 @@
             <li><a href="/mspa/009058">Passwords</a></li>
             <li><a href="/mspa/009165">Dialoglog</a></li>
             <li><a href="/mspa/009304">8ack</a></li>
+            <li><a href="/mspa/009432">Rose/Roxy double label</a></li>
             <li><a href="/mspa/009535">The Echidna page</a></li>
             <li><a href="/mspa/009549">Sprite²</a></li>
             <li><a href="/mspa/009823">Inline images</a></li>

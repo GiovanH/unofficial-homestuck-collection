@@ -59,7 +59,6 @@
 <script>
 import Tab from '@/components/AppMenu/Tab.vue'
 import AddressBar from '@/components/AppMenu/AddressBar.vue'
-import Settings from '@/components/SystemPages/Settings.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
@@ -291,8 +290,25 @@ export default {
 
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
     },
-    forceReload: Settings.methods.forceReload,
-    archiveReload: Settings.methods.archiveReload,
+    forceReload: function() {
+      // Should match settings.forceReload
+      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
+      this.$root.loadState = "LOADING"
+      ipcRenderer.invoke('reload')
+    },
+    archiveReload(){
+      // Should match settings.archiveReload
+      this.memoizedClearAll()
+
+      this.$root.loadState = "LOADING"
+      this.$nextTick(function () {
+        // Don't show loading screen, "soft" reload
+        // this.$root.loadState = "LOADING"
+        this.$localData.root.applySaveIfPending()
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      })
+    }
   }
 }
 </script>
