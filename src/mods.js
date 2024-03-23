@@ -901,6 +901,17 @@ function getMainMixin(){
                 addScssStyle(style_id, sass_body)
               }
             })
+
+            const modToolbars = js.browserToolbars || {}
+            Object.entries(modToolbars).forEach((t, i) => {
+              const [componentTag, {component}] = t
+              // N.B. Unlike pages (which have URLs) toolbars are js-id namespaced.
+              if (component.scss) {
+                const style_id = `browsertoolbar-style-${js._id}-${componentTag}`
+                const sass_body = `#tabBar [data-component='${js._id}-${componentTag}'] {\n${component.scss}\n}`
+                addScssStyle(style_id, sass_body)
+              }
+            })
           } catch (e) {
             onModLoadFail([js._id], e)
           }

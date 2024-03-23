@@ -16,7 +16,7 @@
       <AddressBar/>
       <!-- Toolbars go here -->
       <component v-for="(__, componentkey) in browserToolbars" 
-        :is="componentkey" :key="componentkey" class="toolbar"/>
+        :is="componentkey" :key="componentkey" :data-component="componentkey" class="toolbar"/>
       <div class="lineBreak"/>
     </template>
 
@@ -50,7 +50,7 @@
     <template v-if="!$localData.settings.showAddressBar">
       <!-- Toolbars go here too (compact layout) -->
       <component v-for="(__, componentkey) in browserToolbars" 
-        :is="componentkey" :key="componentkey" class="toolbar"/>
+        :is="componentkey" :key="componentkey" :data-component="componentkey" class="toolbar"/>
     </template>
     <div />
   </div>
