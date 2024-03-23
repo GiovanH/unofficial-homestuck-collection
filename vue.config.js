@@ -90,8 +90,8 @@ module.exports = {
       nodeIntegration: true,
       // TEMPORARY: builds failing due to faulty minimization!
       chainWebpackMainProcess: config => {
-        config.plugins.delete("uglify");
-        config.optimization.minimize(false);
+        config.plugins.delete("uglify")
+        config.optimization.minimize(false)
       },
       // chainWebpackRendererProcess: config => {
       //     config.plugins.delete("uglify");
