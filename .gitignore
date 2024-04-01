@@ -33,7 +33,7 @@ pnpm-debug.log*
 install
 
 # generated file
-src/imods.tar
+src/imods.tar.gz
 
 /tools/mspfa/*/
 /tools/mspfa/*.log

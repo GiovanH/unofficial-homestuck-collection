@@ -8,7 +8,7 @@ install: package.json yarn.lock
 	touch install
 
 clean:
-	-rm ./install src/imods.tar
+	-rm ./install src/imods.tar.gz
 	-rm -r node_modules/.cache/
 	-rm -r dist/ dist_electron/*/
 
@@ -16,23 +16,24 @@ lint: install
 	yarn run vue-cli-service lint
 	# yarn lint
 
-# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar test' to make imods and pass --reset-last-version through
-test: install src/imods.tar
+# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
+test: install src/imods.tar.gz
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
 
-build: install src/imods.tar
+build: install src/imods.tar.gz
 	yarn run vue-cli-service electron:build
 	# yarn electron:build
 
-publish_release: install src/imods.tar
+publish_release: install src/imods.tar.gz
 	yarn run vue-cli-service electron:build -p always
 	
-vuebuild: install src/imods.tar
+vuebuild: install src/imods.tar.gz
 	yarn run vue-cli-service build
 
-src/imods.tar: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
-	cd src && tar -czf imods.tar imods/
+src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
+	# cd src && tar -czf imods.tar.gz imods/
+	cd src && tar -cf - imods/ | gzip -9 - > imods.tar.gz
 # 	-jq '.appVersion = "2.0.0"' ${CONFIG_JSON_PATH} > ${CONFIG_JSON_PATH}.tmp
 # 	-mv ${CONFIG_JSON_PATH}.tmp ${CONFIG_JSON_PATH}
 

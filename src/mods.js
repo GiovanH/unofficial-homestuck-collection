@@ -162,7 +162,7 @@ async function extractimods() {
   let tardata
   try {
     // eslint-disable-next-line import/no-webpack-loader-syntax
-    tardata = (await import("!url-loader!./imods.tar")).default // Require *must* have a literal string here
+    tardata = (await import("!url-loader!./imods.tar.gz")).default // Require *must* have a literal string here
   } catch (e) {
     logger.error(`Couldn't read bundled tar data: webpack issue?`)
     throw e
@@ -171,7 +171,7 @@ async function extractimods() {
   const tar_buffer = Buffer.from(base64, 'base64')
 
   const outpath = path.join(assetDir, "archive")
-  const temp_tar_path = path.join(outpath, '_imods.tar')
+  const temp_tar_path = path.join(outpath, '_imods.tar.gz')
   logger.info("Saving imods tar to ", temp_tar_path)
 
   await fs.promises.writeFile(temp_tar_path, tar_buffer)
