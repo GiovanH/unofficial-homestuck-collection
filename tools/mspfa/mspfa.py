@@ -1,6 +1,4 @@
 #!/bin/python3
-# Run mspfa.py <story_slug> <mspfa_id>
-# e.g. python3 mspfa.py "Felt" 21
 
 import re
 import json
@@ -12,40 +10,42 @@ import logging
 import difflib
 import itertools
 from urllib.parse import urlparse
-from lib import TriadLogger
+from lib import TriadLogger, saveStreamChunked
+import typing
 
 import ruamel.yaml
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-# requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions)
 
 yaml = ruamel.yaml.YAML()
 
+
 # Sensible multiline representer
 def _str_presenter(dumper, data):
-    TAG_STR = 'tag:yaml.org,2002:str'
+    tag_str = 'tag:yaml.org,2002:str'
     if '\n' in data:
-        return dumper.represent_scalar(TAG_STR, data, style='|')
-    return dumper.represent_scalar(TAG_STR, data, style='"')
+        return dumper.represent_scalar(tag_str, data, style='|')
+    return dumper.represent_scalar(tag_str, data, style='"')
 
 
 yaml.representer.add_representer(str, _str_presenter)
 
-
 try:
     from tqdm import tqdm
 except ImportError:
-    def tqdm(iterator, *args, **kwargs):
+    def tqdm(iterator, *args, **kwargs):  # type: ignore[no-redef]  # noqa: ARG001
         yield from iterator
+
+BBCode: typing.TypeAlias = str
+
 
 class Hacks():
     swflinks = True
     swflinks_vidreplace = True
 
-logger = None
 
-# net.OPTION_STRIPARGS = True
+logger: logging.Logger = None  # type: ignore[assignment]
 
 # https://mspfa.com/?s=42186&p=13
 
@@ -78,13 +78,14 @@ logger = None
 # x: The URL of the adventure's banner image
 # y: The adventure's CSS
 
-RAW_FILES = {
+RAW_FILES: dict[str, str] = {
     "y": "adventure.css",
     "j": "javascript.unverified.js",
     "v": "javascript.verified.js",
 }
 
-def bbToHTML(bbcode):
+
+def bbToHTML(bbcode: BBCode) -> str:
     bbcode_replacements = [
         [r'  ', "&nbsp;&nbsp;"],
         [r'\t', "&nbsp;&nbsp;&nbsp;&nbsp;"],
@@ -128,7 +129,9 @@ def bbToHTML(bbcode):
 #             backoff += 1
 #             time.sleep(2**backoff)
 
-def saveImageAs(story, src_url, target_name):
+
+def saveImageAs(story: str, src_url: str, target_name: str) -> str:
+    """Save image for story. Returns the output path."""
     directory = os.path.join(story, "img")
     os.makedirs(directory, exist_ok=True)
 
@@ -144,7 +147,7 @@ def saveImageAs(story, src_url, target_name):
 
     try:
         filestream = getStream(src_url, "https://mspfa.com/")
-        _saveChunked(outpath, filestream)
+        saveStreamChunked(outpath, filestream)
         return outpath.replace("\\", "/")
     except requests.exceptions.HTTPError:
         # print(f"""cp $(find L:/Archive/Homestuck/suptg.thisisnotatrueending.com/archive -iname '{os.path.split(src_url)[1]}') "{outpath}" """)
@@ -152,7 +155,8 @@ def saveImageAs(story, src_url, target_name):
         raise
         # return outpath.replace("\\", "/")
 
-def getStream(url, prev_url=None):
+
+def getStream(url, prev_url=None) -> requests.models.Response:
     """Extremely light, dumb helper to get a stream from a url
 
     Args:
@@ -169,8 +173,7 @@ def getStream(url, prev_url=None):
     if "photobucket" in url:
         headers['referer'] = "/".join(url.split("/")[:3])
 
-
-    stream = requests.get(url, stream=True, headers=headers, verify=False)
+    stream: requests.models.Response = requests.get(url, stream=True, headers=headers, verify=False)
     try:
         # print(url, stream.url, stream.headers)
         if "tinypic.com" in url:
@@ -179,7 +182,7 @@ def getStream(url, prev_url=None):
             raise requests.exceptions.HTTPError()
         if stream.url.endswith("/403.html"):
             raise requests.exceptions.HTTPError()
-        if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length')) == 0:
+        if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length', -1)) == 0:
             raise requests.exceptions.HTTPError()
         stream.raise_for_status()
     except requests.exceptions.HTTPError as e:
@@ -190,44 +193,29 @@ def getStream(url, prev_url=None):
                 raise requests.exceptions.HTTPError()
             if stream.url.endswith("/403.html"):
                 raise requests.exceptions.HTTPError()
-            if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length')) == 0:
+            if stream.headers.get('Content-Length') and int(stream.headers.get('Content-Length', -1)) == 0:
                 raise requests.exceptions.HTTPError()
             stream.raise_for_status()
             logging.warning(f"Got '{url}' from the wayback machine", exc_info=False)
         except requests.exceptions.HTTPError:
             logging.error(f"Could not download file '{wb_url}' either:", exc_info=False)
-            raise e
+            raise requests.exceptions.HTTPError from e
     return stream
 
-def _saveChunked(path, response):
-    """Save a binary stream to a path. Dumb.
 
-    Args:
-        path (str): 
-        response (response): 
-    """
-    try:
-        with open(path, 'wb') as file:
-            for chunk in response:
-                file.write(chunk)
-    except Exception:
-        # Clean up partial file
-        os.unlink(path)
-        raise
-
-def swfhack(pageno, bbcode, soup):
+def swfhack(pageno: int, bbcode: BBCode, soup: bs4.BeautifulSoup) -> BBCode:
     # Hack: Replace flash links with real flash embeds
 
     # Find dimensions of the video embed
     # Find links to swf files
     # Swaparooni
 
-    swf_width = 650
-    swf_height = 450
-    panel_video = soup.find("video", width=True, height=True)
+    swf_width: int = 650
+    swf_height: int = 450
+    panel_video: typing.Optional[bs4.element.Tag] = soup.find("video", width=True, height=True)  # type: ignore[assignment]
     if panel_video:
-        swf_width = panel_video['width']
-        swf_height = panel_video['height']
+        swf_width = int(panel_video['width'])  # type: ignore[arg-type]
+        swf_height = int(panel_video['height'])  # type: ignore[arg-type]
 
     for swflink in soup.find_all("a", href=re.compile(r"\.swf$")):
         logger.debug(f"swf link {swflink!r} on page {pageno}")
@@ -255,35 +243,42 @@ def swfhack(pageno, bbcode, soup):
             bbcode = swf_bbcode + "\n" + bbcode
 
         logger.debug("Swf replacement:\n" + "\n".join(difflib.Differ().compare(
-            bbcode_pre.split("\n"), 
+            bbcode_pre.split("\n"),
             bbcode.split("\n")
         )) + "\n")
     return bbcode
 
-def downloadStory(STORY_NUM, offline=True):
+
+def downloadStory(
+    story_id: int,
+    offline: bool = True,
+    story_name: typing.Optional[str] = None
+) -> None:
     global logger
     # parser.add_simple_formatter('img', '<img src=%(value)s" />')
 
     # curl 'https://mspfa.com/' --data-raw 'do=action&k=v'
 
-    r = requests.request("POST", 'https://mspfa.com/', data={
+    req_resp: requests.models.Response = requests.request("POST", 'https://mspfa.com/', data={
         "do": "story",
-        "s": str(STORY_NUM)
+        "s": str(story_id)
     })
 
-    try:
-        r.raise_for_status()
-        story_resp = r.json()
-    except requests.exceptions.HTTPError:
-        r = requests.get(f"https://mspfa.com/?s={STORY_NUM}")
-        soup = bs4.BeautifulSoup(r.text)
-        story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])
+    if story_name is None:
+        try:
+            req_resp.raise_for_status()
+            story_resp: dict = req_resp.json()
+        except requests.exceptions.HTTPError:
+            # Hack: parse story from MSPFA maintenance mode
+            req_resp = requests.get(f"https://mspfa.com/?s={story_id}")
+            soup = bs4.BeautifulSoup(req_resp.text)
+            story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])  # type: ignore[arg-type]
 
-    story_name = story_resp.get('n').replace(':', '-')
-    if (not offline):
-        story_name += "_online"
+        story_name = story_resp['n'].replace(':', '-')
+        if (not offline):
+            story_name += "_online"
 
-    logger = TriadLogger(f"{STORY_NUM}-{story_name}")
+    logger = TriadLogger(f"{story_id}-{story_name}")
 
     os.makedirs(f"{story_name}", exist_ok=True)
     os.makedirs(f"{story_name}", exist_ok=True)
@@ -307,8 +302,8 @@ def downloadStory(STORY_NUM, offline=True):
     if story_resp['o']:
         story_resp['o'] = "assets://mspfa/" + saveImageAs(story_name, story_resp['o'], 'thumbnail')
 
-    adv_images = {}
-    page_list = story_resp['p']
+    adv_images: dict[str, str] = {}
+    page_list: list[dict] = story_resp['p']
 
     for (pageno, page) in tqdm(enumerate(page_list), desc=story_name):
         pageno += 1
@@ -335,7 +330,7 @@ def downloadStory(STORY_NUM, offline=True):
             if any(a['href'].endswith(e) for e in ["swf", "mp4", "mp3", "png", "jpg", "gif", "jpeg", "webm"])
         ]
 
-        weird_things = None 
+        weird_things = None
         # soup.find_all("object", data=False)
         if weird_things:
             logger.warning(weird_things)
@@ -395,7 +390,7 @@ def downloadStory(STORY_NUM, offline=True):
         if not os.path.isfile(css_filepath):
             continue
 
-        with open(css_filepath, "r") as fp:
+        with open(css_filepath, "r", encoding="utf-8") as fp:
             css_body = fp.read()
         if css_filepath == f"{story_name}/adventure.css":
             root_body = css_body
@@ -407,18 +402,18 @@ def downloadStory(STORY_NUM, offline=True):
             if not dependency_path.endswith(".css"):
                 dependency_path += ".css"
 
-            _saveChunked(dependency_path, getStream(src_url, "https://mspfa.com/"))
+            saveStreamChunked(dependency_path, getStream(src_url, "https://mspfa.com/"))
             css_stack.append(dependency_path)
 
             # Flatten imports for root css
-            with open(dependency_path, 'r') as fp:
+            with open(dependency_path, 'r', encoding="utf-8") as fp:
                 root_body = root_body.replace(
                     match.group(0),
                     f"/* {css_filepath} */\n{fp.read()}\n\n",
                     1
                 )
 
-    with open(f"{story_name}/adventure.scss", 'w') as fp:
+    with open(f"{story_name}/adventure.scss", 'w', encoding="utf-8") as fp:
         fp.write(f'div.s{story_resp["i"]}[role="styleWrap"] {{\n')
         fp.write(root_body)
         fp.write("\n}\n")
@@ -434,7 +429,7 @@ def downloadStory(STORY_NUM, offline=True):
         fp.write(f"""module.exports = {{
   title: "{story_name.replace('_online', ' (online)')}",
   summary: "MSPFA",
-  
+
   edit: true,
 
   trees: {{
@@ -458,15 +453,17 @@ def downloadStory(STORY_NUM, offline=True):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(
-        description="Render j2 templates",
+        description="Download an adventure and its prereqs from mspfa, formatted as a UHC mod",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('story_ids', help="Story IDs", nargs='+')
-    parser.add_argument('--no-swfhack', action='store_true')
+    parser.add_argument('--dirname', help="Manual value for the folder path instead of using the adventure name")
+
+    parser.add_argument('--no-swfhack', action='store_true', help='Disable SWF conversion hack')
     parser.add_argument('--online', action='store_true', help="Don't download resources or replace links within story", default=False)
     args = parser.parse_args()
 
     Hacks.swflinks = (not args.no_swfhack)
 
     for id_ in args.story_ids:
-        downloadStory(id_, offline=(not args.online))
+        downloadStory(id_, offline=(not args.online), story_name=args.dirname)
