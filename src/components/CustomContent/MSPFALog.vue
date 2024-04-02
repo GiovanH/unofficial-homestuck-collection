@@ -133,6 +133,8 @@ export default {
     // font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 12px;
     font-family: Verdana, Arial, Helvetica, sans-serif;
+
+    word-break: break-word;
     // font-size: 10px;
   }
 

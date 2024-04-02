@@ -75,6 +75,7 @@ import MspaPageSelector from '@/components/UIElements/MspaPageSelector.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import Settings from '@/components/SystemPages/Settings.vue'
 
+// FIXME: Vue update broke this
 const LivePage = {
   ...VanillaPage,
   name: 'LivePage',
