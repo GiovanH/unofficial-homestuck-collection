@@ -248,6 +248,65 @@ def swfhack(pageno: int, bbcode: BBCode, soup: bs4.BeautifulSoup) -> BBCode:
         )) + "\n")
     return bbcode
 
+def getFullCss(story_name: str) -> str:
+    css_stack: list[str] = [f"{story_name}/adventure.css"]
+    root_body: str = ""
+    # css_body_total = ""
+    while len(css_stack) > 0:
+        css_filepath = css_stack.pop()
+
+        if not os.path.isfile(css_filepath):
+            continue
+
+        with open(css_filepath, "r", encoding="utf-8") as fp:
+            css_body = fp.read()
+        if css_filepath == f"{story_name}/adventure.css":
+            root_body = css_body
+
+        for match in [*re.finditer(r'@import url\((\"?)(?P<src>.+?)\1\);', css_body)]:
+            src_url = match.groupdict()['src']
+
+            dependency_path = f"{story_name}/{re.sub(r'[^A-Za-z0-9_-]', '', src_url)}"
+            if not dependency_path.endswith(".css"):
+                dependency_path += ".css"
+
+            saveStreamChunked(dependency_path, getStream(src_url, "https://mspfa.com/"))
+            css_stack.append(dependency_path)
+
+            # Flatten imports for root css
+            with open(dependency_path, 'r', encoding="utf-8") as fp:
+                root_body = root_body.replace(
+                    match.group(0),
+                    f"/* {css_filepath} */\n{fp.read()}\n\n",
+                    1
+                )
+
+    return root_body
+
+def writeModBoilerplate(story_name):
+    with open(f"{story_name}/mod.js", "w", encoding="utf-8") as fp:
+        fp.write(f"""module.exports = {{
+  title: "{story_name.replace('_online', ' (online)')}",
+  summary: "MSPFA",
+
+  edit: true,
+
+  trees: {{
+    './': 'assets://mspfa/{story_name}/',
+  }},
+  async asyncComputed(api) {{
+    const story = await api.readYamlAsync("./story.yaml")
+    return {{
+      styles: [
+        {{body: await api.readFileAsync("./adventure.scss")}}
+      ],
+      edit(archive){{
+        archive.mspfa['{story_name}'] = story
+      }}
+    }}
+  }}
+}}
+""")
 
 def downloadStory(
     story_id: int,
@@ -264,19 +323,21 @@ def downloadStory(
         "s": str(story_id)
     })
 
-    if story_name is None:
-        try:
-            req_resp.raise_for_status()
-            story_resp: dict = req_resp.json()
-        except requests.exceptions.HTTPError:
-            # Hack: parse story from MSPFA maintenance mode
-            req_resp = requests.get(f"https://mspfa.com/?s={story_id}")
-            soup = bs4.BeautifulSoup(req_resp.text)
-            story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])  # type: ignore[arg-type]
+    try:
+        req_resp.raise_for_status()
+        story_resp: dict = req_resp.json()
+    except requests.exceptions.HTTPError:
+        # Hack: parse story from MSPFA maintenance mode
+        req_resp = requests.get(f"https://mspfa.com/?s={story_id}")
+        soup = bs4.BeautifulSoup(req_resp.text)
+        story_resp = json.loads(soup.select("#maintenance-data")[0].contents[0])  # type: ignore[arg-type]
 
+    if story_name is None:
         story_name = story_resp['n'].replace(':', '-')
         if (not offline):
             story_name += "_online"
+
+    assert isinstance(story_name, str)
 
     logger = TriadLogger(f"{story_id}-{story_name}")
 
@@ -294,9 +355,6 @@ def downloadStory(
     open(f"{story_name}/links.txt", "w").close()
     if os.path.isfile(f"{story_name}/missing_urls.txt"):
         os.unlink(f"{story_name}/missing_urls.txt")
-
-    # imagespool = loom.Spool(2, "Images")
-    # linkspool = loom.Spool(2, "Links")
 
     # Thumbnail
     if story_resp['o']:
@@ -370,7 +428,11 @@ def downloadStory(
             }).json()
             for editor in story_resp['e']
         ]
-        for junk in ["f", "g", "e"]:
+        for junk in [
+            "f",  # ???
+            "g",  # i forgor
+            "e"  # probably not important
+        ]:
             story_resp.pop(junk)
     except Exception as e:
         logger.warn(e)
@@ -381,42 +443,13 @@ def downloadStory(
             with open(f"{story_name}/{filename}", "w") as fp:
                 fp.write(val)
 
-    css_stack = [f"{story_name}/adventure.css"]
-    root_body = ""
-    # css_body_total = ""
-    while len(css_stack) > 0:
-        css_filepath = css_stack.pop()
-
-        if not os.path.isfile(css_filepath):
-            continue
-
-        with open(css_filepath, "r", encoding="utf-8") as fp:
-            css_body = fp.read()
-        if css_filepath == f"{story_name}/adventure.css":
-            root_body = css_body
-
-        for match in [*re.finditer(r'@import url\((\"?)(?P<src>.+?)\1\);', css_body)]:
-            src_url = match.groupdict()['src']
-
-            dependency_path = f"{story_name}/{re.sub(r'[^A-Za-z0-9_-]', '', src_url)}"
-            if not dependency_path.endswith(".css"):
-                dependency_path += ".css"
-
-            saveStreamChunked(dependency_path, getStream(src_url, "https://mspfa.com/"))
-            css_stack.append(dependency_path)
-
-            # Flatten imports for root css
-            with open(dependency_path, 'r', encoding="utf-8") as fp:
-                root_body = root_body.replace(
-                    match.group(0),
-                    f"/* {css_filepath} */\n{fp.read()}\n\n",
-                    1
-                )
-
+    css_body: str = getFullCss(story_name)
     with open(f"{story_name}/adventure.scss", 'w', encoding="utf-8") as fp:
         fp.write(f'div.s{story_resp["i"]}[role="styleWrap"] {{\n')
-        fp.write(root_body)
+        fp.write(css_body)
         fp.write("\n}\n")
+
+    story_resp['whole_css'] = css_body
 
     yaml.dump(story_resp, open(f"{story_name}/story.yaml", "w", encoding="utf-8"))
 
@@ -425,29 +458,7 @@ def downloadStory(
 
     logger.info(f"{story_resp['n']}: {len(page_list)} pages")
 
-    with open(f"{story_name}/mod.js", "w", encoding="utf-8") as fp:
-        fp.write(f"""module.exports = {{
-  title: "{story_name.replace('_online', ' (online)')}",
-  summary: "MSPFA",
-
-  edit: true,
-
-  trees: {{
-    './': 'assets://mspfa/{story_name}/',
-  }},
-  async asyncComputed(api) {{
-    const story = await api.readYamlAsync("./story.yaml")
-    return {{
-      styles: [
-        {{body: await api.readFileAsync("./adventure.scss")}}
-      ],
-      edit(archive){{
-        archive.mspfa['{story_name}'] = story
-      }}
-    }}
-  }}
-}}
-""")
+    writeModBoilerplate(story_name)
 
 
 if __name__ == "__main__":
