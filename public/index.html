@@ -13,15 +13,26 @@
     </noscript>
     <div id="prepreloader">
       <div class="loadcard">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520" class="spiro"><g><g id="halfSpiro" class="left"><path id="thePath" d="M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g><g id="halfSpiro" class="right"><path id="thePath" d="M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g></g></svg>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520" class="spiro"><g><g id="halfSpiro" class="left"><path id="thePath" d="M-0.0  -71.3 Q-10.85 -10.45 -74.5 -1.35 -138.15 7.8 -181.15 -45.15 -224.1  -98.05 -221.0 -156.1 -217.9 -214.1 -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g><g id="halfSpiro" class="right"><path id="thePath" d="M-0.0 -71.3 Q-10.85 -10.45 -74.5 -1.35 -138.15 7.8 -181.15 -45.15 -224.1 -98.05 -221.0 -156.1 -217.9 -214.1 -184.95 -258.3"></path><use href="#thePath" style="transform: rotate(36deg);"></use><use href="#thePath" style="transform: rotate(72deg);"></use><use href="#thePath" style="transform: rotate(108deg);"></use><use href="#thePath" style="transform: rotate(144deg);"></use><use href="#thePath" style="transform: rotate(180deg);"></use><use href="#thePath" style="transform: rotate(216deg);"></use><use href="#thePath" style="transform: rotate(252deg);"></use><use href="#thePath" style="transform: rotate(288deg);"></use><use href="#thePath" style="transform: rotate(324deg);"></use></g></g></svg>
+      <p>Loading...</p>
       </div>
     <style>
       body {
         background-color: #35bfff;
       }
       div.loadcard {
-        text-align: center;
         filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+        text-align: center;
+      }
+
+      .loadcard p {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 16px;
+        color: white;
+
+        text-align: center;
+        font-weight: bold;
+        text-shadow: 1px 1px 0px black;
       }
       svg.spiro {
         max-width: 100%;
@@ -43,12 +54,12 @@
         }
       }
       @keyframes spin {
-      from {
+        from {
           transform: rotate(0deg);
-      }
-      to {
+        }
+        to {
           transform: rotate(360deg);
-      }
+        }
       }
       .loadcard svg.spiro > g {
         transform: translate(0, 145px);
