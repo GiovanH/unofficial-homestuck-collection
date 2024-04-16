@@ -256,7 +256,7 @@
         this.$root.loadStage = "MODS"
         try {
           await Mods.editArchiveAsync(archive)
-          this.$root.archive = archive
+          this.$root.archive = Object.freeze(archive)
           this.$root.loadStage = "LOADED_ARCHIVE"
           this.$root.loadState = "DONE"
         } catch (e) {
