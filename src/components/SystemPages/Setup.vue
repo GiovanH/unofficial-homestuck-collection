@@ -6,7 +6,7 @@
   <div class="tabFrame">
     <div class="pageBody">
       <div class="card" v-if="isNewUser">
-        <!-- First-run app setup, no error -->
+        <!-- First-run app setup wizard -->
         <div class="cardContent newUserSetup wizard">
           <div class="wizardSidebar">
             <img class="logo" src="@/assets/collection_logo.png" v-if="!$isWebApp">
@@ -129,15 +129,15 @@
               :disabled="wizardForwardButtonDisabled">Next &gt;</button>
             <!--<button v-if="newReaderCardIndex == lastNewReaderCard" @click="">Finish</button>-->
           </div>
-          
         </div>
       </div>
 
-      <div v-else-if="isLoading || !loadingTooLongTimeout">
-        <div class="loadcard" >
+      <div v-else-if="isLoading">
+        <!-- Spirograph spinner and load text -->
+        <div class="loadcard">
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
-    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c">
+    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c" :key="c">
       <path id="thePath" :d="spiroPos[spiroTestindex]">
         <animate v-if="spiroTestAnimate"
           attributeName="d"
@@ -153,59 +153,32 @@
 </svg>
           <p v-text="loadText"></p>
         </div>
-        <!-- <input type="checkbox" v-model="spiroTestAnimate" />
-        <button @click="copiedPath = spiroPos[spiroTestindex]">Copy</button>
-        <select v-model="spiroTestindex"><option v-for="v, i in spiroPos" :key="i" :value="i" v-text="i" /></select>
-        <textarea v-model="spiroPos[spiroTestindex]" style="width: 100%; height: 80px" /> -->
-      </div>
-
-      <div class="card" v-else>
-        <!-- Something went wrong. -->
-        <div class="cardContent">
-          <div class="errorWithMods" v-if="modsEnabled.length">
-            <br>
-            <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>Sorry! Something went critically wrong loading the program.</p><br>
-            <p>You currently have mods enabled:</p><br>
-            <ol class="modlist">
-              <li
-                v-for="option in modsEnabled"
-                :key="option.key"
-                :data-value="option.key"
-              >
-                <b v-text='option.label' />
-                <span class='summary' v-if='option.summary' v-text='option.summary' />
-              </li>
-            </ol>
-            <br>
-            <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
-            <p>Please disable all mods and then restart.</p><br>
-            <div class="center">
-              <button @click="clearEnabledMods()">Disable all and reload</button><br>
-            </div>
-            <span class="hint">If this issue persists when you re-enable a specific mod, please contact the mod's author!</span>
-          </div>
-
-          <div class="errorWithoutMods" v-else>
-            <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>It looks like something went wrong with your asset pack since the last time you were here.<br />I'm looking for <strong>v{{$data.$expectedAssetVersion}}</strong> in:</p><br>
-            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
-            <p>If you just updated the app, you might have asset pack <strong>v1</strong> installed already. This version requires <strong>v{{$data.$expectedAssetVersion}}</strong>; if you don't have it already, go to our <a href='https://bambosh.github.io/unofficial-homestuck-collection/'>website</a> for information on downloading it.</p><br>
-            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
-            <p>If you were using v2 already but made a change and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
-            <div class="center">
-              <button @click="locateAssets()">Locate Asset Pack v{{$data.$expectedAssetVersion}}</button>
-              <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
-              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
-            </div>
-            
-            <div class="center">
-              <button class="letsroll" :disabled="!validatePage || !isExpectedAssetVersion" @click="errorModeRestart()">All done. Let's roll!</button>
-            </div>
+        <div class="card" v-if="loadingTooLongTimeout">
+          <div class="cardContent">
+            <br />
+            <p>Loading is taking longer than normal. If you think it's stuck, you can try to recover.</p>
+            <SetupErrorRecovery />
           </div>
         </div>
       </div>
-      
+
+      <div class="card" v-else>
+        <!-- No loading status or archive: Something went wrong. -->
+        <div class="cardContent">
+          <br>
+          <img class="logo" src="@/assets/collection_logo.png"><br>
+          <p>Sorry! Something went critically wrong loading the program.</p><br>
+          <pre v-text="{
+            isLoading,
+            isNewUser,
+            loadState: $root.loadState,
+            archive: Boolean($archive),
+            assetDir: $localData.assetDir
+          }" />
+          <SetupErrorRecovery />
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -214,6 +187,7 @@
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import SetupErrorRecovery from '@/components/SystemPages/SetupErrorRecovery.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 // import Logo from '@/components/UIElements/Logo.vue'
 
@@ -223,7 +197,7 @@ const { ipcRenderer } = require('electron')
 export default {
   name: 'setup',
   components: {
-    TitleBar, NewReaderControls, SpoilerBox //, Logo
+    TitleBar, NewReaderControls, SpoilerBox, SetupErrorRecovery //, Logo
   },
   data: function() {
     return {
@@ -242,7 +216,6 @@ export default {
       newReaderToggle: true,
       loadingTooLongTimeout: false,
       assetDir: undefined,
-      isExpectedAssetVersion: undefined,
       selectedAssetVersion: undefined,
       contentWarnings: [
         'Slurs',
@@ -348,15 +321,14 @@ export default {
     isNewUser() {
       return !this.$localData.assetDir
     },
-    modsEnabled() {
-      return this.$localData.settings.modListEnabled.map((key) => 
-        this.$root.$modChoices[key]).filter(val => !!val)
+    isExpectedAssetVersion() {
+      return (this.selectedAssetVersion == this.$data.$expectedAssetVersion)
     }
   },
   mounted() {
     setTimeout(function() {
       this.loadingTooLongTimeout = true
-    }.bind(this), 16000)
+    }.bind(this), 8000)
   },
   methods: {
     wizardNextPage(direction){
@@ -381,32 +353,13 @@ export default {
     checkAssetVersion(assetDir){
       ipcRenderer.invoke('check-archive-version', {assetDir}).then(result => {
         this.selectedAssetVersion = result
-        this.isExpectedAssetVersion = (result == this.$data.$expectedAssetVersion)
         this.$logger.info("Version check: got", result, "eq?", this.$data.$expectedAssetVersion, this.isExpectedAssetVersion)
       })
-    },
-    clearEnabledMods(){
-      this.$localData.settings["modListEnabled"] = []
-      this.$localData.VM._saveLocalStorage()
-
-      this.loadingTooLongTimeout = false
-
-      this.modSoftRestart()
     },
     validateAndRestart(){
       this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
       ipcRenderer.invoke('restart')
-    },
-    errorModeRestart() {
-      if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
-
-      // SET_ASSET_DIR flushes persistent store for us
-      ipcRenderer.invoke('restart')
-    },
-    modSoftRestart() {
-      this.$localData.root.applySaveIfPending()
-      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
     }
   },
   watch: {
@@ -414,7 +367,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .setup {
   display: flex;
   flex-flow: column;
@@ -649,7 +602,11 @@ div.loadcard {
 }
 .loadcard {
 
+  text-align: center;
   margin: auto;
+
+  padding-bottom: 1em;
+
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 16px;
