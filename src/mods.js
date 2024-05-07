@@ -713,7 +713,13 @@ async function editArchiveAsync(archive) {
   const bakeRoutesPromise = bakeRoutes(enabledModsJs) // run in background
 
   // Footnotes
-  archive.footnotes = {}
+  try {
+    // doesn't exist
+    archive.footnotes = {}
+  } catch {
+    // frozen
+    for (var member in archive.footnotes) delete archive.footnotes[member]
+  }
 
   footnote_categories.forEach(category => {
     archive.footnotes[category] = []

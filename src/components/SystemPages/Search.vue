@@ -38,7 +38,7 @@ import PageText from '@/components/Page/PageText.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 // import FlexSearch from 'flexsearch'
-const { ipcRenderer } = require('electron')
+// const { ipcRenderer } = require('electron')
 const Mark = require('mark.js')
 
 const search = require('@/search.js').default

@@ -6,7 +6,7 @@
         <tr>
           <td colspan="3" class="grey">
             <center>
-              <div class="title"><a href="http://skaianetsystems.com/">Skaianet Systems Incorporated</a></div>
+              <div class="title"><a href="https://web.archive.org/web/0/http://www.skaianetsystems.com/">Skaianet Systems Incorporated</a></div>
             </center>
           </td>
         </tr>
@@ -170,7 +170,7 @@ export default {
       marqueeInterval: undefined,
       apophis: undefined,
       countDownDate: undefined,
-      impactTable : [
+      impactTable: Object.freeze([
         [
           [7.54044, 19.34320], [59.59924, 142.56831], [32.69014, 75.69641], [53.33706, 111.77075], [61.40545, 80.60927], [-23.56785, 114.93736], [31.29668, 12.54051], [52.41077, 87.31729], [-28.33136, 138.58945], [1.40001, -61.52241], [34.54162, -119.63153], [44.78893, 81.14044], [55.82463, 127.22151], [74.88070, 90.63174], [65.21932, -173.74283], [21.10738, 74.57002], [73.10748, -48.45428], [60.74755, 142.01706], [-5.37813, 31.42891], [-9.20952, -66.87065], [33.43228, 97.88285], [-26.08581, 24.69693], [11.24559, 12.08721], [-16.36835, -50.59490], [68.74373, -144.17275], [17.04005, 97.68261], [38.24650, 106.49642], [21.85192, -3.09684], [62.88434, -124.20298], [38.60233, 80.15358], [54.19481, 72.48143], [-27.50667, 133.93761], [-9.04663, -36.10689], [-27.26953, -57.91870], [58.40644, -68.97977], [-2.48229, -51.64199], [-12.05939, 25.55648], [30.67068, 118.61092], [26.90603, 85.96731],
         ], [
@@ -198,7 +198,7 @@ export default {
         ], [
           [7.54044, 19.34320], [59.59924, 142.56831],
         ]
-      ],
+      ]),
       cursedId: [
         "01-1863-Calamity.txt",
         "02-1864-Centralia.txt",
@@ -242,9 +242,9 @@ export default {
           icon: "archive/skaianet/hs.gif",
           title: `
             <a href="https://store.steampowered.com/app/623940/HIVESWAP_Act_1/" target="_blank">HIVESWAP.EXE</a>
-            <img src="assets://archive/skaianet/exe.gif" align="middle" />
+            <img src="${this.$getResourceURL('archive/skaianet/exe.gif')}" align="middle" />
             <a href="http://www.hiveswap.com" target="_blank">WWW</a>
-            <img src="assets://archive/skaianet/www.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />`,
           content: `
             <p>Monsters in the yard. Monsters in the house. Monsters in the hall, beating on your door. Your brother's trapped in his treehouse, so he’s not gonna be much help. You're going to have to get yourself out of this. But where did they come from? How are you supposed to deal with this? Well, certainly not by cowering in your room. That's for, uh, cowards.</p>
 
@@ -273,7 +273,7 @@ export default {
           icon: "archive/skaianet/viz.gif",
           title: `
             <a href="https://www.homestuck.com/" target="_blank">HOMESTUCK.COM</a>
-            <img src="assets://archive/skaianet/www.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />`,
           content: `
              <p>The current version of the MSPA website. More mobile-friendly, but with a number of issues. Hence this archive. Also has links to get official Homestuck merch.</p>
              <p><a href='/news/4-03-18'>Site Announcement</a></p>
@@ -283,7 +283,7 @@ export default {
           icon: "archive/skaianet/spoon.gif",
           title: `
             <a href="https://topatoco.com/products/mspa-sb-spoon" target="_blank">SPOON.PDF</a>
-            <img src="assets://archive/skaianet/book.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/book.gif')}" align="middle" />`,
           content: `
              <p>Journey with Sweet Bro as he joroneys to recover his spoon over a long jounrey. </p>
              <p><a href='https://www.kickstarter.com/projects/1724736026/sweet-bro-and-hella-jeff-by-hussie-dril-and-kc-gre/'>Kickstarter</a></p>
@@ -292,9 +292,9 @@ export default {
         {
           icon: "archive/skaianet/fs.gif",
           title: `<a href="https://store.steampowered.com/app/833040/Hiveswap_Friendsim/" target="_blank">FRIENDSIM.EXE</a>
-          <img src="assets://archive/skaianet/exe.gif" align="middle" />
+          <img src="${this.$getResourceURL('archive/skaianet/exe.gif')}" align="middle" />
           <a href="http://hs.hiveswap.com/friendsim/" target="_blank">WWW</a>
-          <img src="assets://archive/skaianet/www.gif" align="middle" />`,
+          <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />`,
           content: `
             <p>You just crash-landed on Alternia, and you’re <strong>DESPERATE</strong> for friendship! Anyone will do...wait, who are those two trolls approaching you?.</p>
             <p>The Hiveswap Friendsim is a quick, loosely-canonical visual novel adventure following the efforts of the unnamed protagonist (that’s you!) to survive and maybe even thrive on the harsh surface of ALTERNIA. Set in the time of Hiveswap: Act 1, this episodic visual novel’s opening volume, written by Homestuck creator Andrew Hussie, is sure to satisfy Homestuck and Hiveswap fans who are eager for a darker stroll across the Alternian landscape.</p>
@@ -306,11 +306,11 @@ export default {
           icon: "archive/skaianet/epi.gif",
           title: `
             <a href="/epilogues">EPILOGUES.TXT</a>
-            <img src="assets://archive/skaianet/txt.gif" align="middle" />
+            <img src="${this.$getResourceURL('archive/skaianet/txt.gif')}" align="middle" />
             <a href="https://www.homestuck.com/epilogues" target="_blank">WWW</a>
-            <img src="assets://archive/skaianet/www.gif" align="middle" />
+            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />
             <a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154" target="_blank">VIZ</a>
-            <img src="assets://archive/skaianet/book.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/book.gif')}" align="middle" />`,
           content: `<p>Tales of dubious authenticity.</p>
 
             <p>Ten years ago, a young man stood in his bedroom. The events set in motion that day would change his and his friends' lives forever, for the better and the worse (and the ridiculous). Now, in the aftermath, he has to make a choice: Meat or Candy?</p>
@@ -322,9 +322,9 @@ export default {
           icon: "archive/skaianet/pq.gif",
           title: `
             <a href="https://store.steampowered.com/app/1144030/Pesterquest/" target="_blank">PESTERQUEST.EXE</a>
-            <img src="assets://archive/skaianet/exe.gif" align="middle" />
+            <img src="${this.$getResourceURL('archive/skaianet/exe.gif')}" align="middle" />
             <a href="http://whatpumpkin.com/" target="_blank">WWW</a>
-            <img src="assets://archive/skaianet/www.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />`,
           content: `
             <p>Who are you again? And what the hell are you doing here? Wait… is this Earth, and who exactly is that kid over there? He looks nice! </p>
 
@@ -339,7 +339,7 @@ export default {
           icon: "archive/skaianet/hs2.gif",
           title: `
             <a href="https://www.homestuck2.com" target="_blank">HOMESTUCK^2.TXT</a>
-            <img src="assets://archive/skaianet/txt.gif" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/txt.gif')}" align="middle" />`,
           content: `
             <p>This is not Homestuck. But it is not <em>not</em> Homestuck. This is...</p>
 
@@ -347,10 +347,10 @@ export default {
 
             <p>Homestuck^2: Beyond Canon is an official continuation of the cult-classic webcomic Homestuck and a follow-up to The Homestuck Epilogues, dropped as a major event in April of 2019.</p>
             <p>Homestuck 2: Beyond Canon takes a combination of Andrew Hussie's original writing and plot outlines and concepts and joins him with a team of new, diverse voices to expand the compelling narratives of Homestuck's most (and least) beloved characters.</p>
-            <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p>
             <p><em><a href="https://www.patreon.com/homestuck">Description from the Homestuck Patreon.</a></em></p>
-            <p><em>25 October 2019 - (HIATUS)</em></p>`
+            <p><em>25 October 2019 -</em></p>`
         }
+        // <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p>
       ],
       cursedText: { }
     }
