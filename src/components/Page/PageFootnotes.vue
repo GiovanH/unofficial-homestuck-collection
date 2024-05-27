@@ -60,6 +60,7 @@ export default {
       text-align: center;
       margin: 0 auto;
       width: 600px;
+      white-space: break-spaces;
     }
   }
   .preface {
@@ -76,6 +77,7 @@ export default {
       text-align: center;
       margin: 0 auto;
       width: calc(100% - 50px);
+      white-space: break-spaces;
     }
   }
 
