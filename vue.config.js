@@ -1,10 +1,5 @@
 // const { VueLoaderPlugin } = require('vue-loader')
 
-// Workaround ERR_OSSL_EVP_UNSUPPORTED
-const crypto = require("crypto");
-const crypto_orig_createHash = crypto.createHash;
-crypto.createHash = algorithm => crypto_orig_createHash(algorithm == "md4" ? "sha256" : algorithm);
-
 // require('ofe').call()
 module.exports = {
   configureWebpack: {

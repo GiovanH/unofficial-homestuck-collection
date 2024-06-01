@@ -12,6 +12,9 @@ yarn.lock: package.json
 	touch yarn.lock
 
 # We do actually use a dummy install file to track this
+yarn.lock: package.json
+	yarn install # --ignore-optional
+
 install: package.json yarn.lock
 	yarn install
 	touch install
