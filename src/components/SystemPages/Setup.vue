@@ -123,9 +123,9 @@
 
           </div>
           <div class="wizardNavigation">
-            <button v-if="newReaderCardIndex > 0" @click="wizardNextPage(-1)" style="right: 94px;">&lt; Previous</button>
+            <button v-if="newReaderCardIndex > 0" @click="wizardNextPage(-1)" class="prev">&lt; Previous</button>
             <button v-if="newReaderCardIndex < lastNewReaderCard" 
-              @click="wizardNextPage(1)" style="right: 20px;"
+              @click="wizardNextPage(1)" class="next"
               :disabled="wizardForwardButtonDisabled">Next &gt;</button>
             <!--<button v-if="newReaderCardIndex == lastNewReaderCard" @click="">Finish</button>-->
           </div>
@@ -287,13 +287,14 @@ export default {
       loadStages: {
         "": "Awaiting reactivity",
         "MOUNTED": "Entangling connections",
+        "WAITING_ON_DATA": "Demanding firehose",
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
         "PATCHES": "Applying spackle",
         "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
-        "EXTRACT_IMODS": "Applying day 1 patch",
+        "EXTRACT_IMODS": "Applying day-one patch",
         "READ_MODS": "Indexing paraphernalia",
-        "BAKE_ROUTES": "Convoluting Routing Table",
+        "BAKE_ROUTES": "Convoluting routing table",
         "MODS_DONE": "Disparaging EMCAScript",
       },
       spiroPos: [
@@ -599,6 +600,12 @@ export default {
         font-size: 16px;
         position: absolute;
         margin: 0 2px;
+        &.next {
+          right: 20px;
+        }
+        &.prev {
+          right: 94px;
+        }
       }
     }
   }

@@ -1,35 +1,38 @@
 CONFIG_JSON_PATH = "${APPDATA}/unofficial-homestuck-collection/config.json"
 
+.SECONDEXPANSION:
+.SUFFIXES:
+
 default: test
+
+## Setup
+
+yarn.lock: package.json
+	yarn install # --ignore-optional
+	touch yarn.lock
 
 # We do actually use a dummy install file to track this
 install: package.json yarn.lock
-	yarn install --ignore-optional
+	yarn install
 	touch install
 
+## Prep actions
+
+.PHONY: clean
 clean:
+	yarn cache clean
+	-rm yarn-error.log
 	-rm ./install src/imods.tar.gz
 	-rm -r node_modules/.cache/
 	-rm -r dist/ dist_electron/*/
 
-lint: install 
+.PHONY: lint
+lint: install
 	yarn run vue-cli-service lint
 	# yarn lint
 
-# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
-test: install src/imods.tar.gz
-	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
-	# yarn dev
 
-build: install src/imods.tar.gz
-	yarn run vue-cli-service electron:build
-	# yarn electron:build
-
-publish_release: install src/imods.tar.gz
-	yarn run vue-cli-service electron:build -p always
-	
-vuebuild: install src/imods.tar.gz
-	yarn run vue-cli-service build
+## Intermediate files
 
 src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 	# cd src && tar -czf imods.tar.gz imods/
@@ -37,12 +40,28 @@ src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 # 	-jq '.appVersion = "2.0.0"' ${CONFIG_JSON_PATH} > ${CONFIG_JSON_PATH}.tmp
 # 	-mv ${CONFIG_JSON_PATH}.tmp ${CONFIG_JSON_PATH}
 
+## Running live
+
+# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
+.PHONY: test
+test: install src/imods.tar.gz
+	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
+	# yarn dev
+
+
+## Building output
+
+.PHONY: build
+build: install src/imods.tar.gz
+	yarn run vue-cli-service electron:build
+	# yarn electron:build
+
+
+.PHONY: publish-release
+publish-release: install src/imods.tar.gz
+	yarn run vue-cli-service electron:build -p always
+
+.PHONY: help
 help:
-	@echo 'Usage:'
-	@echo '  make clean      try to clean old build artifacts'
-	@echo '  make test       start a development version now'
-	@echo '  make build      create a production version'
-	@echo '  make lint       lints and fixes files'
-	
-	
-.PHONY: clean test build publish help lint test
+	grep -E '(^[^.#[:space:]].*:)|(##)' Makefile
+

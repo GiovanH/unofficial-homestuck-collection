@@ -18,7 +18,7 @@ module.exports = {
     optimization: {
       splitChunks: {
         minSize: 10000,
-        maxSize: 250000,
+        maxSize: 250000
       }
     },
     devtool: "source-map",

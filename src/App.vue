@@ -271,7 +271,7 @@
       // Ask for a fresh copy of the archive
       // Root must exist to receive it, so this calls from inside the app
       // and the app must have registered the receipt listener first to accept it!
-      this.$root.loadState = "LOADING"
+      this.$root.loadState = "WAITING_ON_DATA"
       ipcRenderer.send("RELOAD_ARCHIVE_DATA")
 
       document.addEventListener('dragover', event => event.preventDefault())

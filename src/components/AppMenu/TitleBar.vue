@@ -44,7 +44,7 @@ export default {
       // Give the OS 2500 ms, then force close
       setTimeout(function() {
         ipcRenderer.sendSync('win-close-sync')
-      }, 2500)
+      }, 500)
     }
   },
   mounted() {

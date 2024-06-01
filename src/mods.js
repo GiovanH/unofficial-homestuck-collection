@@ -1,8 +1,8 @@
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 
-const importSassJs = import('sass.js')
-const importYaml = import('js-yaml')
+const importSassJs = () => import('sass.js')
+const importYaml = () => import('js-yaml')
 const importResources = import("@/resources.js")
 
 var Resources // lazy
@@ -442,7 +442,7 @@ async function crawlFileTree(root, recursive = false) {
 
 async function buildApi(mod) {
   Resources = Resources || await importResources
-  yaml = yaml || await importYaml
+  yaml = yaml || await importYaml()
 
   function safetyChecks(local_path) {
     if (mod._singlefile) throw new Error(`Singlefile mods cannot use this method`)
@@ -816,7 +816,7 @@ function getMainMixin(){
   return {
     mounted() {
       const addScssStyle = (style_id, body) => {
-        importSassJs.then(SassJs => {
+        importSassJs().then(SassJs => {
           SassJs.compile(body, (result) => {
             if (result.status !== 0) throw Error(JSON.stringify(result))
             this.stylesheets.push({
