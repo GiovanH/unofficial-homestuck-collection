@@ -1,7 +1,7 @@
 <template>
   <div class="bannerDiv" v-if="!!banner"  @mouseover="mouseEnter" @mousemove="positionTooltip" @mouseleave="mouseLeave" >
     <Media :url="banner.url" :title="banner.title" class="bannerImage" noncritical />
-    <img v-if="imgTooltip" :src="imgTooltip" class="imgTooltip" />
+    <img v-if="imgTooltip" :src="$getResourceURL(imgTooltip)" class="imgTooltip" />
   </div>
 </template>
 

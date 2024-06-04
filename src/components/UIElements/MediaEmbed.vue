@@ -349,9 +349,15 @@ export default {
               })
             }
           }
+          window.open = function(url, name, features, replace) {
+              console.log("Flash invoked window.open")
+              vm.invokeFromFlash("link?" + url)
+          }
           if (typeof navigation !== 'undefined') {
             navigation.addEventListener("navigate", (e) => {
-              console.log("srcdoc navigating: ", e, e.destination)
+              console.log("srcdoc navigating: ", e, e.destination,
+                e.destination.url
+              )
               if (!e.destination.sameDocument) {
                 console.log(e.destination.url)
                 vm.invokeFromFlash("link?" + e.destination.url)

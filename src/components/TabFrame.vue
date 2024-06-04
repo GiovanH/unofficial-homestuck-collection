@@ -5,7 +5,10 @@
             theme,
             {
                 hidden: !tabIsActive,
-                forceScrollBar: $localData.settings.forceScrollBar,
+                forceScrollBar: (
+                    $localData.settings.forceScrollBar
+                    && resolveComponent != 'FULLSCREENFLASH'
+                ),
                 forceLoad
             }
         ]"

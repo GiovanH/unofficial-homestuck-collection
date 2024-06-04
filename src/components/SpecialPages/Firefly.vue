@@ -216,6 +216,7 @@ export default {
     position: absolute;
     height: 150px;
     width: 200px;
+    pointer-events: none;
   }  
 }
 

@@ -21,7 +21,15 @@ module.exports = {
         maxSize: 250000
       }
     },
-    devtool: "source-map",
+    devServer: {
+      stats: {
+        chunks: false,
+        chunkModules: false,
+        modules: false
+      }
+    },
+    // devtool: "source-map",
+    devtool: "eval-source-map",
     resolve: {
       alias: {
         // Include the vue compiler so mods can use templates
