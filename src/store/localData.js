@@ -209,7 +209,6 @@ class LocalData {
           this.saveData = back.saveData
           this.settings = back.settings
           if (this.settings.useTabbedBrowsing) {
-
             this.temp.isPoppingState = true
             this.tabData = back.tabData
             this.$nextTick(_ => {
@@ -269,7 +268,8 @@ class LocalData {
           this.tabData.tabs[key].future = []
           while (this.tabData.tabs[key].history.length > HISTORY_LIMIT) this.tabData.tabs[key].history.shift()
           this.$set(this.tabData.tabs[key], 'url', url)
-          
+
+          this.push_new_history()
           this.saveLocalStorage()
         },
 
@@ -373,6 +373,7 @@ class LocalData {
             this.tabData.activeTabKey = key
           }
 
+          this.push_new_history()
           this.saveLocalStorage()
         },
 
@@ -509,7 +510,6 @@ class LocalData {
             document.getElementById(tab.key).scrollLeft = 0
 
             tab.history.push(tab.url)
-            this.temp.isPoppingState = true
             tab.url = tab.future.pop()
           }
           
@@ -523,7 +523,6 @@ class LocalData {
             document.getElementById(tab.key).scrollLeft = 0
 
             tab.future.push(tab.url)
-            this.temp.isPoppingState = true
             tab.url = tab.history.pop()
           }
 
@@ -588,23 +587,27 @@ class LocalData {
         SET_ASSET_DIR(path) {
           this.assetDir = path
           this._saveLocalStorage()
+        },
+        push_new_history(to) {
+          const history_state = {
+            tabData: this.tabData
+          }
+          // console.log("Saving", history_state)
+          window.history.pushState(history_state, "", this.activeTabObject.url);
         }
       },
       watch: {
-        'activeTabObject.url'(to, from) {
-          if (to != from) {
-            if (this.temp.isPoppingState) {
-              // Consume URL change from popped history state (navigation backwards)
-              this.temp.isPoppingState = false;
-              return
-            }
-            const history_state = {
-              tabData: this.tabData
-            }
-            // console.log("Saving", history_state)
-            window.history.pushState(history_state, "", this.activeTabObject.url);
-          }
-        }
+        // 'activeTabObject.url'(to, from) {
+        //   if (to != from) {
+        //     if (this.temp.isPoppingState) {
+        //       // Consume URL change from popped history state (navigation backwards)
+        //       console.warn("Not double-counting history navigation", to, from)
+        //       this.temp.isPoppingState = false;
+        //       return
+        //     }
+
+        //   }
+        // }
       },
       created() {
         window.addEventListener("popstate", (event) => {
