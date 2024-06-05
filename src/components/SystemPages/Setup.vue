@@ -338,6 +338,8 @@ export default {
       return this.assetDir
     },
     isLoading() {
+
+      // If not in a finished load state, it's still loading
       return (this.$root.loadState != "ERROR") && (this.$root.loadState != "DONE")
     },
     loadText() {

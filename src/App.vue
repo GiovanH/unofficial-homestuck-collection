@@ -5,8 +5,7 @@
         $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
         $localData.settings.reducedMotion ? 'reducedMotion' : '',
         $root.platform // webapp or electron
-      ]"
-      v-if="$localData.assetDir && $archive && $root.loadState !== 'ERROR'">
+      ]" v-if="canLoadApp">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />
@@ -59,6 +58,19 @@
       }
     },
     computed: {
+      canLoadApp() {
+        if (this.$archive == undefined) {
+          // Cannot load components without archive
+          return false
+        } else {
+          if (this.$localData.assetDir && this.$root.loadState !== 'ERROR') {
+            // Asset dir is defined (setup finished) and loadState is not known error
+            return true
+          }
+        }
+        // Setup not completed, or loadState is error
+        return false
+      },
       tabList() {
         return this.$localData.tabData.tabList
       },
@@ -183,6 +195,8 @@
       this.$localData.root.TABS_SWITCH_TO()
       // Switch to the last tab (good) but replaces history (so we use the previously captured value)
 
+      this.$root.loadStage = "MOUNTED"
+
       if (isWebApp) {
         if (user_path_target != this.$localData.root.activeTabObject.url) {
           this.$logger.warn("Navigating user to", user_path_target)
@@ -247,7 +261,6 @@
         this.$root.loadState = state
       })
 
-      this.$root.loadStage = "MOUNTED"
       ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
         this.$root.loadStage = stage
       })

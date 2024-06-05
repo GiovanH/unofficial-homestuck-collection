@@ -111,6 +111,7 @@ const preload_components = [
 ]
 
 const COMPONENT_LOADING = undefined // "GenericPage"
+const COMPONENT_FIRSTLOAD = 'GenericPage'
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 import MSPFADISAMBIG from '@/components/CustomContent/MSPFADisambig.vue'
@@ -186,7 +187,7 @@ export default {
             gameOverThemeOverride: false, // Set by fullscreenFlash.vue
             modBrowserPages: {},
             lastContentTheme: undefined, // Cache the previous contentTheme for smoother transitions,
-            loadedResolvedComponent: undefined, // Don't change component until it's loaded so the page "hangs" a second before changing, instead of blanking out.
+            loadedResolvedComponent: COMPONENT_FIRSTLOAD, // Don't change component until it's loaded so the page "hangs" a second before changing, instead of blanking out.
             passedRouteParams: undefined // Keep routeParams tied to the resolved component so templates don't get unexpected input (e.g. unexpected params from the next, as-of-yet unloaded page component)
         }
     },

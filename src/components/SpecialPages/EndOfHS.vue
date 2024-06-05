@@ -164,6 +164,13 @@ export default {
   &.credits {
     background: black;
 
+    ::v-deep {
+      // Style baseline for mods, transcripts
+      --page-pageBorder: #000;
+      --page-pageContent: #000;
+      --font-default: #fff
+    }
+
     ::v-deep nav {
       .navOptions a {
         font-size: 0 !important;

@@ -2,9 +2,9 @@
   <div class="metadata">
     <div :title="$getChapter(thisPage.pageId)">
       <p v-text="`${thisPage.storyId}/${thisPage.pageId}`"/>
-      <p v-html="vizLink"/>
+      <p v-if="vizLink" v-html="vizLink"/>
     </div>
-    <time
+    <time v-if="datetime"
       :datetime="datetime.toFormat('yyyy-MM-dd ttt')"
       :data-timestamp="thisPage.timestamp">
       <span v-text="datetime.toFormat('LLL dd yyyy')"/>
@@ -40,7 +40,7 @@ export default {
     },
     vizLink() {
       const viz = this.$mspaToViz(this.thisPage.pageId)
-      return `${viz.s}/&ZeroWidthSpace;${viz.p}` 
+      if (viz) return `${viz.s}/&ZeroWidthSpace;${viz.p}`
     }
   },
   methods: {

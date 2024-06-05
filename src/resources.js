@@ -56,8 +56,8 @@ function fileIsAsset(url) {
 
 // NOT PURE
 function resolveURL(url) {
-  // The main logic. Takes an input url (that may be from old data) and
-  // resolves it to... whatever url is appropriate. Resolves the assets protocol.
+  // The main logic. Takes an unsanitized input url (that may be from old data) and
+  // resolves it to... whatever real http* url is appropriate. Resolves the assets protocol.
   let resource_url = getResourceURL(url)
   // logger.debug("Got resource URL", resource_url)
 
@@ -73,7 +73,7 @@ function resolveURL(url) {
 
 // Pure(?)
 function toFilePath(url, root_dir) {
-  // Like resolveURL, but returns an os-path and not a file URL
+  // Takes an unsanitized like resolveURL, but returns an os-path and not a file URL
   let resource_path = getResourceURL(url)
 
   if (resource_path.startsWith("assets://")) {
@@ -91,7 +91,7 @@ function toFilePath(url, root_dir) {
 
 // Pure
 function getResourceURL(request_url){
-  // Transforms URLS into logical resource paths, usually assets://
+  // Transforms external URLS into logical resource paths, usually assets://
   //
   // Things this might get:
   // *.mspaintadventures
@@ -170,7 +170,7 @@ function getResourceURL(request_url){
 
 // NOT PURE
 function resolveAssetsProtocol(asset_url, loopcheck=[]) {
-  // Resolves assets:// urls to real urls on the localhost:{port} server
+  // Resolves assets:// urls to real urls on the asset server, usually localhost:{random}
 
   // Examples
   // assets://images/candycorn.gif to http://127.0.0.1:21780/images/candycorn.gif

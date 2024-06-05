@@ -100,7 +100,7 @@ Vue.mixin({
   computed: {
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return this.$newReaderCurrent && this.$localData.settings.newReader.limit
+      return Boolean(this.$newReaderCurrent && this.$localData.settings.newReader.limit)
     },
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current
