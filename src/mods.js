@@ -838,7 +838,7 @@ function getMainMixin(){
 
             // Render stylesheets from mod css
             modstyles.forEach((customstyle, i) => {
-              const style_id = `style-${js._id}-${String(js.modVersion).replace(/\./g, '_')}-${i}`
+              const style_id = `style-${js._id}-${String(js.version).replace(/\./g, '_')}-${i}`
 
               if (customstyle.source && customstyle.body) {
                 throw Error("Styles cannot set both source and body. Use multiple style objects.")
