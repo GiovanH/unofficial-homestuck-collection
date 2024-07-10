@@ -1,58 +1,57 @@
 name: Build electron releases
 
 env:
-  NODE_VERSION: "14.18"
+  NODE_VERSION: "18.20"
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  prep-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create_release.outputs.id }}
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - id: package_json
-      run: |
-        content=`cat ./package.json`
-        # the following lines are only required for multi line json
-        content="${content//'%'/'%25'}"
-        content="${content//$'\n'/'%0A'}"
-        content="${content//$'\r'/'%0D'}"
-        # end of optional handling for multi line json
-        echo "::set-output name=json::$content"
-    - name: Create tag
-      id: create_tag
-      run: |
-        if [[ "$(basename "${{ github.ref }}")" == "main" ]]; then
-          tag=v${{ fromJson(steps.package_json.outputs.json).version }}
-        else
-          tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
-        fi
-        echo "tag=$tag" >> $GITHUB_OUTPUT
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.create_tag.outputs.tag }}
-        release_name: ${{ steps.create_tag.outputs.tag }}
-        draft: true
-        prerelease: false
+  # prep-release:
+  #   name: Create GitHub Release
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     release_id: ${{ steps.create_release.outputs.id }}
+  #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       fetch-depth: 0
+  #   - id: package_json
+  #     run: |
+  #       content=`cat ./package.json`
+  #       # the following lines are only required for multi line json
+  #       content="${content//'%'/'%25'}"
+  #       content="${content//$'\n'/'%0A'}"
+  #       content="${content//$'\r'/'%0D'}"
+  #       # end of optional handling for multi line json
+  #       echo "::set-output name=json::$content"
+  #   - name: Create tag
+  #     id: create_tag
+  #     run: |
+  #       if [[ "$(basename "${{ github.ref }}")" == "main" ]]; then
+  #         tag=v${{ fromJson(steps.package_json.outputs.json).version }}
+  #       else
+  #         tag=$(basename "${{ github.ref }}")-${{ fromJson(steps.package_json.outputs.json).version }}-$(date +%Y%m%d.%H%M%S)
+  #       fi
+  #       echo "tag=$tag" >> $GITHUB_OUTPUT
+  #   - name: Create Release
+  #     id: create_release
+  #     uses: actions/create-release@v1
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       tag_name: ${{ steps.create_tag.outputs.tag }}
+  #       release_name: ${{ steps.create_tag.outputs.tag }}
+  #       draft: true
+  #       prerelease: false
 
   build-matrix:
-    needs: [ prep-release ]
+    # needs: [ prep-release ]
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14.18]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     runs-on: ${{ matrix.os }}
@@ -64,6 +63,6 @@ jobs:
       with:
         node-version: "${{ env.NODE_VERSION }}"
     - run: make install
-    - run: make publish_release
+    - run: make publish-release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -7,13 +7,10 @@ default: test
 
 ## Setup
 
-yarn.lock: package.json
-	yarn install # --ignore-optional
-	touch yarn.lock
-
 # We do actually use a dummy install file to track this
 yarn.lock: package.json
 	yarn install # --ignore-optional
+	touch yarn.lock
 
 install: package.json yarn.lock
 	yarn install
@@ -34,7 +31,6 @@ lint: install
 	yarn run vue-cli-service lint
 	# yarn lint
 
-
 ## Intermediate files
 
 src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
@@ -51,14 +47,12 @@ test: install src/imods.tar.gz
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
 
-
 ## Building output
 
 .PHONY: build
 build: install src/imods.tar.gz
 	yarn run vue-cli-service electron:build
 	# yarn electron:build
-
 
 .PHONY: publish-release
 publish-release: install src/imods.tar.gz
@@ -67,4 +61,3 @@ publish-release: install src/imods.tar.gz
 .PHONY: help
 help:
 	grep -E '(^[^.#[:space:]].*:)|(##)' Makefile
-
