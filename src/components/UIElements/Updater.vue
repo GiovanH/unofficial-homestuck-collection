@@ -17,7 +17,7 @@ export default {
   props: [],
   data: function() {
     return {
-      ghOwner: 'bambosh',
+      ghOwner: 'giovanh',
       ghRepo: 'unofficial-homestuck-collection',
       ghReleasesRaw: undefined,
       dismissed: false

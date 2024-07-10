@@ -273,9 +273,9 @@
         <section class="modPrattle" v-if="!$isWebApp">
           <p class="settingDesc">
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
-            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
 
-            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
+            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
             <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
         <div class='hint'>
           <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>

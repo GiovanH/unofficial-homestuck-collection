@@ -21,16 +21,19 @@ Building a development version of TUHC requires NPM (Node 14.18), Yarn, `make`, 
 - `tar` and `make` are basic GNU utilities used extremely commonly in software development. `tar` is used to pack files (like zip) and `make` is used to build projects with dependencies. If you don't already have them on your system (you can maintain robust CLI environments using tools like [cygwin](https://www.cygwin.com) or [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)), you can download [`tar`](http://gnuwin32.sourceforge.net/packages/gtar.htm) and [`make`](https://www.gnu.org/software/make/) individually directly from GNU.
           
 ### Compiles and hot-reloads for development
+
 ```
 make test
 ```
 
 ### Compiles and minifies for production
+
 ```
 make publish
 ```
 
 ### Lints and fixes files
+
 ```
 make lint
 ```
@@ -42,7 +45,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 <div class="legal">
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH
+Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH, (C) 2024- GiovanH
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by

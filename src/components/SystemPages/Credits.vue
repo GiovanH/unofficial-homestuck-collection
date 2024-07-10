@@ -55,7 +55,7 @@
           <div class="legal">
             Legal:
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH
+Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH, (C) 2024- GiovanH
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
@@ -103,7 +103,7 @@ export default {
         {
           name: "Bambosh",
           link: "https://twitter.com/Bamboshu",
-          desc: `Howdy! I'm the original developer of this collection, which initially took form as a personal lockdown project during the depths of 2020. If you're curious about how everything fits together, check out its <a href="https://github.com/Bambosh/unofficial-homestuck-collection">GitHub page.</a> It's open source, so feel free to fork it off or suggest improvements!`
+          desc: `Howdy! I'm the original developer of this collection, which initially took form as a personal lockdown project during the depths of 2020. If you're curious about how everything fits together, check out its <a href="https://github.com/GiovanH/unofficial-homestuck-collection">GitHub page.</a> It's open source, so feel free to fork it off or suggest improvements!`
         },
         {
           name: "GiovanH",
@@ -171,7 +171,7 @@ export default {
         },
         {
           name: "Each of our GitHub contributors",
-          link: "https://github.com/Bambosh/unofficial-homestuck-collection/graphs/contributors",
+          link: "https://github.com/GiovanH/unofficial-homestuck-collection/graphs/contributors",
           desc: "Every single change you guys make leaves a lasting impact on this project. We wouldn't be here without you!"
         }
       ],

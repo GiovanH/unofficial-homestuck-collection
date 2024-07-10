@@ -14,7 +14,7 @@
           </div>
           <div class="textContent" :style="{marginTop: bboxes.textContent.top + 'px', height: bboxes.textContent.height + 'px'}">
             <textarea v-model="editContent" />
-            <p class="hint">MSPA text content. See <a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/MSPA-Story-Format">Reference</a></p>
+            <p class="hint">MSPA text content. See <a href="https://github.com/GiovanH/unofficial-homestuck-collection/wiki/MSPA-Story-Format">Reference</a></p>
           </div>
         </div>
         <span class="opt">Next Page(s): <input v-model="editNext" /></span>

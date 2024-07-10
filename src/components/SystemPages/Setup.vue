@@ -33,7 +33,7 @@
             <div class="hint wizardFooter">
               <!-- <p>WARNING: This program is protected by copyright law and international treaties.</p> -->
               <!-- I want to. I really want to. -->
-              <p>This application is open source (<a href="https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/LICENSE">GPL-3.0</a>). Check out the <a href="https://github.com/Bambosh/unofficial-homestuck-collection/">GitHub page</a> for resources like information on how you can contribute and the issue tracker so you can send us any bug reports. 
+              <p>This application is open source (<a href="https://github.com/GiovanH/unofficial-homestuck-collection/blob/main/LICENSE">GPL-3.0</a>). Check out the <a href="https://github.com/GiovanH/unofficial-homestuck-collection/">GitHub page</a> for resources like information on how you can contribute and the issue tracker so you can send us any bug reports.
             </p>
             </div>
           </div>
@@ -92,7 +92,7 @@
           <div v-if="$root.platform == 'webapp'" class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
             <h2>Getting Started</h2>
 
-            <p>You are currently using the <b>webapp</b> version of The Unofficial Homestuck Collection. Some features are unavailable (like Flash support and user mods) and others may work incorrectly or with degraded performance. The full program can be downloaded at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/releases'>GitHub repository</a>.</p>
+            <p>You are currently using the <b>webapp</b> version of The Unofficial Homestuck Collection. Some features are unavailable (like Flash support and user mods) and others may work incorrectly or with degraded performance. The full program can be downloaded at the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/releases'>GitHub repository</a>.</p>
 
             <p>Consider this a "trial version" if you're wondering if Homestuck is something you're interested in downloading, or as a way to easily share specific pages or moments with friends by link.</p>
 
