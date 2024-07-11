@@ -1,37 +1,31 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame" v-if="log">
-      <div class="pageContent">
-        <h2 class="pageTitle">Adventure Logs</h2>
-        <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
-        <div class="logItems" v-if="log.length > 0">
-          <template v-for="page in log">
-            {{page.date}} - <a :href="page.href">{{page.title}}</a><br/>
-          </template>
-        </div>
-        <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
+  <GenericPage>
+    <div class="pageContent" v-if="log">
+      <h2 class="pageTitle">Adventure Logs</h2>
+      <a  v-if="log.length > 0" :href="reverseLink" class="switchOrder">{{ reverseText }}</a>
+      <div class="logItems" v-if="log.length > 0">
+        <span class="line" v-for="page in log">
+          {{page.date}} - <a :href="page.href">{{page.title}}</a>
+          <!-- <br/> -->
+        </span>
       </div>
+      <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
     </div>
-    <div class="pageFrame noLog" v-else >
-      <div class="pageContent">
-        <h2 class="pageTitle">Adventure Logs</h2>
-        <div class="adventureLinks">
-          <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
-            <a :href="advlink.href"><Media :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
-          </div>
+    <div class="pageContent" v-else>
+      <h2 class="pageTitle">Adventure Logs</h2>
+      <div class="adventureLinks">
+        <div class="adventure" v-for="advlink in adventureLinks" :key="advlink.href">
+          <a :href="advlink.href"><Media :url="advlink.img" /><br /><span v-text="advlink.label" /></a>
         </div>
       </div>
     </div>
-    <PageFooter />
-  </div>
+  </GenericPage>
 </template>
 
 <script>
 
-import NavBanner from '@/components/UIElements/NavBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 const { DateTime } = require('luxon');
@@ -49,7 +43,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, PageFooter, MediaEmbed
+    Media, GenericPage, MediaEmbed
   },
   title(ctx){
     const adventure = ctx.routeParams.mode ? ctx.routeParams.mode[0] - 1 : undefined
@@ -72,7 +66,14 @@ export default {
           // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
           {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
           // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
-      ]
+      ],
+      storyLogRaw: this.memoized(story_id => {
+        // console.log("Recalculating raw story log (BAD)")
+
+        return this.$getAllPagesInStory(story_id).map(page_num =>
+          this.getLogEntry(story_id, page_num)
+        )
+      }, "storyLogRaw", 10),
     }
   },
   computed: {
@@ -126,20 +127,6 @@ export default {
       let default_="asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
     },
-    storyLogRaw() {
-      // The unsorted story log
-      this.$archive;
-
-      // Vue should really be able to keep track of this, but it just can't. 
-      
-      return this.memoized(story_id => {
-        // console.log("Recalculating raw story log (BAD)")
-
-        return this.$getAllPagesInStory(story_id).map(page_num => 
-          this.getLogEntry(story_id, page_num)
-        )
-      }, "storyLogRaw", 10)
-    }
   },
   methods: {
     getLogEntry(story_id, page_num) {
@@ -163,78 +150,38 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  ::v-deep a{
-    color: var(--page-links);
+
+.pageContent {
+  align-items: unset !important;
+}
+
+.adventureLinks {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  margin: 0 auto;
+  width: 600px;
+
+  .adventure {
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.1;
+    font-size: 18px;
   }
-  .pageBody {
-    color: var(--font-default);
-    background: var(--page-pageBody);
+}
+.switchOrder {
+  padding-left: 30px;
+}
+.logItems {
+  // width: calc(100% - 60px);
+  padding: 30px;
 
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
-
-    .pageFrame {
-      background: var(--page-pageFrame);
-
-      width: 950px;
-      padding-top: 7px;
-      padding-bottom: 23px;
-      margin: 0 auto;
-
-      flex: 0 1 auto;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      align-content: center;
-      .pageContent{
-        background: var(--page-pageContent);
-
-        .pageContent img {
-            max-width: 100%;
-        }
-        
-        width: 650px;     
-        h2.pageTitle {
-          max-width: 590px;
-          text-align: center;
-          line-height: 1.1;
-          font-size: 32px;
-          padding: 15px 0;
-          margin: 0 auto;
-        }
-        .adventureLinks {
-          display: flex;
-          flex-flow: row wrap;
-          justify-content: space-around;
-          margin: 0 auto;
-          width: 600px;
-
-          .adventure {
-            margin-bottom: 20px;
-            text-align: center;
-            line-height: 1.1;
-            font-size: 18px;
-          }
-        }
-        .switchOrder {
-          padding-left: 30px;
-        }
-        .logItems {
-          padding: 30px;
-
-          font-family: Verdana, Geneva, Tahoma, sans-serif;
-          font-size: 12px;
-        }
-      }
-    }
-
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 12px;
+  span.line {
+    display: block;
   }
-  
+}
 
 </style>
 

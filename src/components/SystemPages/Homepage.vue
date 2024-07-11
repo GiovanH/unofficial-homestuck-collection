@@ -31,7 +31,7 @@
           <p>One-upping Problem Sleuth's action-packed GIFs, Homestuck spiced up pivotal moments with Flash animations scored by a lively team of composers. Over time, the music team produced dozens of albums across a variety of genres.</p>
           <div class="links">
             <div class="left bigLink">
-              &gt; <a href="/mspa/6" >Begin Adventure</a>
+              &gt; <a href="/mspa/6" >Begin Homestuck</a>
             </div>
             <div class="center">
               &gt; <a href="/log/6" >Adventure Log</a><br>
@@ -115,7 +115,7 @@
           afterpage="010030"
           date="Oct 2016 - Aug 2017">
           <template v-slot:title>Snapchat</template>
-          <p>Snapshots of life on Earth C. No longer canon as of The Epilogues.</p>
+          <p>Extra snapshots of life on Earth C, continuing from the credits. No longer canon as of The Epilogues.</p>
         </HomeRowItem>
         <HomeRowItem
           class="rowItem"
@@ -126,9 +126,39 @@
           <template v-slot:title>Skaianet Systems</template>
           <p>Tomorrow's canon, today! Homestuck still has plenty in store for you.</p>
         </HomeRowItem>
+        <HomeRowItem
+          v-if="$archive.extras.epilogues"
+          class="rowItem"
+          href="/epilogues"
+          thumbsrc="assets://archive/epilogues/resources/archive_ep.gif"
+          afterpage="010030"
+          date="Apr 2019">
+          <template v-slot:title>The Homestuck Epilogues</template>
+          <p>Ten years after their adventure began, the heroes are enjoying a well-earned retirement on Earth C. But John still has one last choice to make.</p>
+        </HomeRowItem>
       </div>
     </div>
     
+    <div class="card tight" v-if="Object.keys($archive.mspfa).length > 0">
+      <div class="cardContent cardEntry">
+        <div class="icon">
+          <a href="/mspfa/" ><Media url="/images/archive_mspfa.gif" /></a>
+          <p class="date">Jan 2010 -</p>
+        </div>
+        <div class="description">
+          <h2><a href="/mspfa/" >MS Paint Fan Adventures</a></h2>
+          <p>Fans began running their own adventures on the MSPA Forums, but with the forum format panels and suggestions were mixed together, and navigation was an issue. In early 2010, lolzorine and nixshadow set up <a href="https://mspfa.com/">MS Paint Fan Adventures</a> as an open adventure reader. You can read a brief history <a href="https://mspfa.com/history/">on the site</a>.</p>
+          <br />
+          <p>With the collapse of the MSPA Forums, MSPFA became the de facto source for hosting small adventures. nixshadow retired, and the site is currently run by Grant.</p>
+          <div class="links autocol">
+            <span v-for="advlink in mspfaLinks" :key="advlink.href">
+              &gt; <a :href="advlink.href"><span v-text="advlink.label" /></a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card mspaCard">
       <Media url="/archive/collection/mspa_logo_dark.png" class="logo mspaLogo cardContent" />
       <div class="cardContent mainSection">
@@ -374,6 +404,8 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import Logo from '@/components/UIElements/Logo.vue'
 import HomeRowItem from '@/components/UIElements/HomeRowItem.vue'
 
+import MSPFAIndex from '@/components/CustomContent/MSPFAIndex.vue'
+
 export default {
   name: 'homepage',
   props: [
@@ -389,14 +421,22 @@ export default {
     return "The Unofficial Homestuck Collection"
   },
   computed: {
-    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []}
+    modHomeRowItems() {return this.$archive.tweaks.modHomeRowItems || []},
+    mspfaLinks: MSPFAIndex.computed.mspfaLinks
   },
   methods: {
   }
 }
 </script>
 
+
 <style scoped lang="scss">
+  @mixin tablet-size {
+    @media (max-width: 950px) {
+      @content;
+    }
+  }
+
   .pageBody {
     margin: 0;
     padding: 0;
@@ -414,6 +454,7 @@ export default {
   .navBanner {
     margin-bottom: 25px;
   }
+
   .card {
     position: relative;
     margin-top: 75px;
@@ -427,6 +468,7 @@ export default {
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: var(--page-pageContent);
 
     flex: 0 1 auto;
@@ -447,7 +489,7 @@ export default {
     }
     .logo {
       position: relative;
-      max-width: 920px;
+      max-width: min(920px, 100vw);
       // position: absolute;
       &.hsLogo {
         // padding: 10px 0;
@@ -512,6 +554,11 @@ export default {
           }
           img {
             display: block;
+
+            @include tablet-size {
+              max-width: 65px;
+              max-height: 65px;
+            }
           }
         }
         .description  {
@@ -525,6 +572,9 @@ export default {
           .links {
             margin-top: 10px;
             display: flex;
+            @include tablet-size {
+              display: block;
+            }
             align-items: center;
             font-family: Verdana,Arial,Helvetica,sans-serif;
 
@@ -573,6 +623,12 @@ export default {
       border-top: none;
     }
   }
+  .autocol {
+    display: block !important;
+    column-count: 2;
+    & > * {
+      display: block;
+    }
+  }
 
 </style>
-

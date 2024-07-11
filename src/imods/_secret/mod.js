@@ -13,7 +13,7 @@ module.exports = {
         codemachine.contentEditable = true // focus hack
         codemachine.addEventListener('keydown', (event) => {
           if (event.code == "KeyT" && event.ctrlKey) {
-            this.$openLink("http://localhost:8080/page/c=%3F%3F%3F/m=assets%3A%2F%2Fp8%2Fwalkabout.html/")
+            this.$openLink(window.location.host + "/page/c=%3F%3F%3F/m=assets%3A%2F%2Fp8%2Fwalkabout.html/")
           }
           event.stopPropagation()
           event.preventDefault()
@@ -32,9 +32,11 @@ module.exports = {
     },
     computed: {
       frameType($super) {
-        if (this.url == 'p8/walkabout.html' || this.url == 'p8/repl.html') return "webview"
-          else return $super()
-        }
+        if (this.url == 'p8/walkabout.html' || this.url == 'p8/repl.html')
+          return "webview"
+        else
+          return $super
+      }
     },
     methods: {
       initHtmlFrame(event, $super){
@@ -43,7 +45,7 @@ module.exports = {
         if (this.url == 'p8/walkabout.html' || this.url == 'p8/repl.html') {
           event.srcElement.addEventListener("console-message", (event) => {
             if (event.message.startsWith('GPIO:')) {
-              data = JSON.parse(event.message.slice(5))
+              const data = JSON.parse(event.message.slice(5))
               console.log(data)
               if (data['0'] == 1) {
                 this.$pushNotif({

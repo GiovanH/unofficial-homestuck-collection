@@ -6,31 +6,31 @@
     <div class="header">
       <NavBanner />
     </div>
-		<div class="content">
-			<div class="main_visual">
-				<h2 class="text_lead"><Media alt="FROM HOMESTUCK CREATOR ANDREW HUSSIE" url="/archive/namcohigh/text_lead.png" width="748" height="24" /></h2>
-				<div class="namco_high"><Media alt="NAMCO HIGH" url="/archive/namcohigh/logo_namcohigh_tm.png" width="259" height="156" /></div>
-			</div>
-			<div class="png_bg reservation_area">
-				<div>
-					<h3><Media alt="PLAY NAMCO HIGH NOW" url="/archive/namcohigh/text_namcohigh_01.png" width="288" height="19" /></h3>
-					<p>Namco High now available to play! All you need is a modern HTML5-capable web browser and a lot of free time. This is the browser-based video game character high school dating sim you have always been waiting for!</p>
-				</div>
-				<a href="/namcohigh/play"><Media alt="play now" class="btn btn_reservation" url="/archive/namcohigh/btn_play.png" width="291" /></a>
-			</div>
-			<a class="overview_area_anchor"></a>
-			<div class="png_bg overview_area">
-				<div>
-					<h3><Media alt="Overview" url="/archive/namcohigh/text_overview_01.png" width="320" height="55" /></h3>
-					<p>From Homestuck creator Andrew Hussie and universally-acclaimed video game developer NAMCO BANDAI Games comes an all new gaming experience: NAMCO HIGH! As a cousin to the Prince from Katamari Damacy, you will meet total strangers with whom you have nothing in common, but before the school year is over you'll break rules, bare your soul, and touch each other in ways you never dreamed.</p>
-				</div>
-			</div>
-			<a class="recommend_area_anchor"></a>
-			<div class="png_bg recommend_area">
-				<h3>
+    <div class="content">
+      <div class="main_visual">
+        <h2 class="text_lead"><Media alt="FROM HOMESTUCK CREATOR ANDREW HUSSIE" url="/archive/namcohigh/text_lead.png" width="748" height="24" /></h2>
+        <div class="namco_high"><Media alt="NAMCO HIGH" url="/archive/namcohigh/logo_namcohigh_tm.png" width="259" height="156" /></div>
+      </div>
+      <div class="png_bg reservation_area">
+        <div>
+          <h3><Media alt="PLAY NAMCO HIGH NOW" url="/archive/namcohigh/text_namcohigh_01.png" width="288" height="19" /></h3>
+          <p>Namco High now available to play! All you need is a modern HTML5-capable web browser and a lot of free time. This is the browser-based video game character high school dating sim you have always been waiting for!</p>
+        </div>
+        <a href="/namcohigh/play"><Media alt="play now" class="btn btn_reservation" url="/archive/namcohigh/btn_play.png" width="291" /></a>
+      </div>
+      <a class="overview_area_anchor"></a>
+      <div class="png_bg overview_area">
+        <div>
+          <h3><Media alt="Overview" url="/archive/namcohigh/text_overview_01.png" width="320" height="55" /></h3>
+          <p>From Homestuck creator Andrew Hussie and universally-acclaimed video game developer NAMCO BANDAI Games comes an all new gaming experience: NAMCO HIGH! As a cousin to the Prince from Katamari Damacy, you will meet total strangers with whom you have nothing in common, but before the school year is over you'll break rules, bare your soul, and touch each other in ways you never dreamed.</p>
+        </div>
+      </div>
+      <a class="recommend_area_anchor"></a>
+      <div class="png_bg recommend_area">
+        <h3>
           <Media alt="Students" url="/archive/namcohigh/text_students_01.png" width="296" height="57" />
         </h3>
-				<div class="bx-wrapper" style="width:1000px; position:relative;">
+        <div class="bx-wrapper" style="width:1000px; position:relative;">
           <div class="bx-window" style="position:relative; overflow:hidden; width:1000px;">
             <ul class="multiple clearfix slides" :style="`width: 999999px; position: relative; left: ${studentIndex * -1000}px;`" ref="students">
               <li class="slide" style="width: 1000px; float: left; list-style: outside none none;">
@@ -250,9 +250,9 @@
           <div @click="slidesRight(true)" class="bx-next"><Media class="btn" url="/archive/namcohigh/recommend_right_btn.png" alt="" width="52" height="51" /></div>
         </div>
       </div>
-			<a class="artist_area_anchor"></a>
-			<div class="png_bg artist_area_slide">
-				<h3><Media alt="The Team" url="/archive/namcohigh/text_artist_01.png" width="314" height="57" /></h3>
+      <a class="artist_area_anchor"></a>
+      <div class="png_bg artist_area_slide">
+        <h3><Media alt="The Team" url="/archive/namcohigh/text_artist_01.png" width="314" height="57" /></h3>
         <div class="bx-wrapper" style="width:1000px; position:relative;">
           <div class="bx-window" style="position:relative; overflow:hidden; width:1000px;">
             <ul class="multiple clearfix slides_03" :style="`width: 999999px; position: relative; left: ${artistIndex * -1000}px;`" ref="artists">
@@ -515,15 +515,15 @@
           <div @click="slidesRight(false)" class="bx-next"><Media class="btn" url="/archive/namcohigh/recommend_right_btn.png" alt="" width="52" height="51" /></div>
         </div>
       </div>
-		</div><!--==== /.content ====-->
-		<div class="footer">
-			<div class="footer_inner_attention">
-				<Media class="bng-logo hide-for-mobile png_bg" url="/archive/namcohigh/bng-logo.png" width="58" height="58" />
-				<p>NAMCO BANDAI Games Inc. Presents In Association With What Pumpkin Studios</p>
-				<p>A ShiftyLook Game Developed by Date Nighto LLC “NAMCO HIGH”</p>
-				<p>©NAMCO BANDAI Games Inc.</p>
-			</div>
-		</div>
+    </div><!--==== /.content ====-->
+    <div class="footer">
+      <div class="footer_inner_attention">
+        <Media class="bng-logo hide-for-mobile png_bg" url="/archive/namcohigh/bng-logo.png" width="58" height="58" />
+        <p>NAMCO BANDAI Games Inc. Presents In Association With What Pumpkin Studios</p>
+        <p>A ShiftyLook Game Developed by Date Nighto LLC “NAMCO HIGH”</p>
+        <p>©NAMCO BANDAI Games Inc.</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -627,14 +627,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pageBody {  
+.pageBody {
   background: #ccdbed url(assets://archive/namcohigh/bg.jpg) no-repeat fixed center / cover;
   text-align: center;
 
-	font-size: 11.2px;
-	color: #575757;
+  font-size: 11.2px;
+  color: #575757;
   font-family: Meiryo, Verdana, sans-serif;
-	letter-spacing: 1;
+  letter-spacing: 1;
   text-align: center;
   font-weight: normal;
 
@@ -646,7 +646,7 @@ export default {
     padding: 0;
     text-align: left;
   }
-  
+
   h1, h2, h3, h4, h5, h6,
   p, pre, ul, ol, dl, th, td, caption,
   address, blockquote {
@@ -660,7 +660,7 @@ export default {
   ul, ol, dl {
     list-style-type: none;
   }
-  
+
   img {
     vertical-align: bottom;
     border: none;
@@ -669,8 +669,8 @@ export default {
   .clearfix {
     zoom: 1;
     &::after {
-      content: ""; 
-      display: block; 
+      content: "";
+      display: block;
       clear: both;
     }
   }
@@ -688,11 +688,11 @@ export default {
 
       .text_lead {
         width: 748px;
-	      margin: 50px auto 0;
+        margin: 50px auto 0;
       }
       .namco_high {
         width: 241px;
-	      margin: 75px auto 0;
+        margin: 75px auto 0;
       }
     }
 
@@ -702,7 +702,7 @@ export default {
       position: relative;
       width: 1072px;
       height: 267px;
-      
+
       div {
         width: 400px;
         position: absolute;
@@ -761,11 +761,11 @@ export default {
         z-index: 1;
       }
       .bx-wrapper {
-	      margin: 0 0 0 34px;
+        margin: 0 0 0 34px;
       }
       .slides {
         transition: left 0.4s;
-        
+
         .slide {
           float: left;
           width: 1000px;
@@ -1001,7 +1001,7 @@ export default {
         z-index: 1;
       }
       .bx-wrapper {
-	      margin: 0 0 0 34px;
+        margin: 0 0 0 34px;
       }
       .slides_03 {
         transition: left 0.4s;

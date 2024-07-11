@@ -1,12 +1,12 @@
 <template>
-    <div id="titleBar">
-      <div id="titleBarText" v-text="activeTabTitle" />
-      <div id="titleBarButtons" tabindex="-1" v-if="showButtons">
-        <div class="systemButton" id="minButton" @click="minimize()" >‒</div>
-        <div class="systemButton" id="maxButton" @click="maximize()" >☐</div>
-        <div class="systemButton" id="closeButton" @click="close()" >✕</div>
-    </div>
-    </div>
+  <div id="titleBar">
+    <div id="titleBarText" v-text="activeTabTitle" />
+    <div id="titleBarButtons" tabindex="-1" v-if="showButtons">
+    <div class="systemButton" id="minButton" @click="minimize()" >‒</div>
+    <div class="systemButton" id="maxButton" @click="maximize()" >☐</div>
+    <div class="systemButton" id="closeButton" @click="close()" >✕</div>
+  </div>
+  </div>
 </template>
 
 <script>
@@ -26,7 +26,7 @@ export default {
       return navigator.appVersion.indexOf('Macintosh') == -1
     },
     activeTabTitle() {
-      return this.$archive ? this.$localData.tabData.tabs[this.activeTabKey].title : 'The Unofficial Homestuck Collection'
+      return this.$archive ? this.$localData.root.activeTabObject.title : 'The Unofficial Homestuck Collection'
     },
     activeTabKey() {
       return this.$localData.tabData.activeTabKey
@@ -44,7 +44,7 @@ export default {
       // Give the OS 2500 ms, then force close
       setTimeout(function() {
         ipcRenderer.sendSync('win-close-sync')
-      }, 2500)
+      }, 500)
     }
   },
   mounted() {
@@ -105,7 +105,7 @@ export default {
     }
     #closeButton:hover {
       color: white;
-			background: rgb(255, 73, 73);
-		}
+      background: rgb(255, 73, 73);
+    }
   }
 </style>

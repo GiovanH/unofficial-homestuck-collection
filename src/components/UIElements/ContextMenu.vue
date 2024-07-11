@@ -32,6 +32,7 @@
     <ul v-if="tags.includes('Selection')">
       <li @mouseup="copy()">Copy</li>
       <li @mouseup="selectAll()">Select All</li>  
+      <li @mouseup="collectionSearch()">Search Collection</li>
       <li @mouseup="googleSearch()">Search with Google</li>  
       <li v-if="selectionToUrl" @mouseup="$openLink(selectionToUrl, true)">Goto {{selectionToUrl}}</li>
       <li v-for="(action, index) in actionsText" :key="index" @mouseup="bind(action.cb, $event)" v-text="action.title"></li>
@@ -194,6 +195,10 @@ export default {
     },
     inspectElement() {
       ipcRenderer.invoke('inspect-element', {x: this.clickPos.x, y: this.clickPos.y})
+    },
+    collectionSearch() {
+      const query = window.getSelection().toString()
+      this.$openLink(`app://./search/${encodeURIComponent(query)}`, true)
     },
     googleSearch() {
       const query = window.getSelection().toString()

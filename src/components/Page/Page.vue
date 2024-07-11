@@ -8,21 +8,22 @@
       <div class="pageContent">
         <Footnotes :pageId="thisPage.pageId" preface class="footnotesContainer"/>
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" />
-              <div class="media" ref="media">
-                  <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
-              </div>
+            <h2 class="pageTitle" v-text="thisPage.title" v-if="!supercartridge" ref="pageTitle"/>
+            <div class="media" ref="media">
+              <Media v-for="url in pageMedia" :key="url" :url="url" class="panel"/>
+            </div>
           </div>
           <div class="textContent">
-              <FlashCredit  :pageId="thisPage.pageId"/>
-              <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content"/>
-              <PageNav :thisPage="thisPage" 
-                :nextPages="nextPagesArray" ref="pageNav"
-                :class="{'hidden': hideNav}" />
-          </div>
+          <FlashCredit :pageId="thisPage.pageId"/>
+          <TextContent :key="thisPage.pageId" :pageId="thisPage.pageId"  :content="thisPage.content" ref="textContent"/>
+          <PageNav :thisPage="thisPage"
+            :nextPages="hideNav ? [] : nextPagesArray" ref="pageNav" />
+            <!-- :class="{'hidden': hideNav}" /> -->
+        </div>
         <Footnotes :pageId="thisPage.pageId" class="footnotesContainer"/>
       </div>
       <div class="hidden">
+        <!-- Preload images -->
         <Media v-for="url in nextPagesMedia" :key="url" :url="url" class="panel"/>
       </div>
     </div>
@@ -41,7 +42,8 @@ import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 import Metadata from '@/components/Page/PageMetadata.vue'
 
-import Firefly from '@/components/SpecialPages/Firefly.vue'
+const Firefly = () => import('@/components/SpecialPages/Firefly.vue')
+
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 
 export default {
@@ -67,7 +69,7 @@ export default {
   title: function(ctx) {
     var title
     
-    const exceptions = {
+    const title_exceptions = {
       '006715': 'DOTA',
       '008801': 'GAME OVER',
       '009305': 'shes8ack',
@@ -81,12 +83,12 @@ export default {
     else if (ctx.routeParams.base === 'ryanquest' && p in ctx.$archive.mspa.ryanquest) {
       title = `${ctx.$archive.mspa.ryanquest[p].title} - Ryanquest`
     } else {
-      if (p in exceptions) {
-        title = exceptions[p]
+      if (p in title_exceptions) {
+        title = title_exceptions[p]
       } else {
         title = ctx.$archive.mspa.story[p].title + [
           " - Jailbreak", " - Bard Quest", "", " - Problem Sleuth", " - Homestuck Beta", " - Homestuck"
-        ][ctx.$getStory(p) - 1]
+        ][ctx.$getStoryNum(p) - 1]
       }
     }
     return title
@@ -103,7 +105,7 @@ export default {
       }
     },
     storyId() {
-      return this.isRyanquest ? 'ryanquest' : this.$getStory(this.pageNum)
+      return this.isRyanquest ? 'ryanquest' : this.$getStoryNum(this.pageNum)
     },
     pageCollection() {
       const storyDataKey = this.isRyanquest ? 'ryanquest' : 'story'
@@ -111,6 +113,8 @@ export default {
     },
     thisPage() {
       // Add useful information to archive object
+      if (!this.pageNum) return undefined
+
       return {
         ...this.pageCollection[this.pageNum],
         storyId: this.storyId,
@@ -127,18 +131,20 @@ export default {
       this.deretcon(media)
       var mediakey = media[0]
 
-      if (this.audioData) {
-        const flashPath = mediakey.substring(0, mediakey.length - 4)
-        this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
-        media[0] = `${flashPath}_hq.swf`
-      } else if (mediakey.includes(".swf")) {
-        this.$logger.info("Found no audio for", mediakey, this.audioData)
+      if (mediakey) {
+        if (this.audioData) {
+          const flashPath = mediakey.substring(0, mediakey.length - 4)
+          this.$logger.info("Found audio for", mediakey, this.audioData, "changing to", `${flashPath}_hq.swf`)
+          media[0] = `${flashPath}_hq.swf`
+        } else if (mediakey.includes(".swf")) {
+          this.$logger.info("Found no audio for", mediakey, this.audioData)
+        }
       }
 
       return media
     },
     nextPagesArray() {
-      this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
+      // this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
       let nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
@@ -148,9 +154,9 @@ export default {
       return nextPages
     },
     nextPagesMedia(){
-      return this.nextPagesArray.reduce((acc, page) => {
+      return new Set(this.nextPagesArray.reduce((acc, page) => {
         return [...acc, ...page.media.filter(x => /(gif|png)$/i.test(x))]
-      }, []).map(this.$getResourceURL)
+      }, []).map(this.$getResourceURL))
     },
     pixelated() {
       return this.$localData.settings.pixelScaling
@@ -216,6 +222,15 @@ export default {
         if (this.thisPage.flag.includes("R6") && this.nextPagesArray.length == 2) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[1]))
         else if (this.nextPagesArray.length == 1) this.$pushURL(this.$refs.pageNav.nextUrl(this.nextPagesArray[0]))
       }
+    },
+    spaceBarEvent(e) {
+      // If navigation is hidden, abort now (unless force is on)
+      if (this.hideNav && !this.forceKeyboardEnable)
+        return
+
+      if (this.$refs.textContent) {
+        this.$refs.textContent.open()
+      }
     }
   },
   updated() {
@@ -225,10 +240,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .pixelated::v-deep img{
-    image-rendering: pixelated;
-  }
-
   .pageBody {
     color: var(--font-default);
     background: var(--page-pageBody);
@@ -282,6 +293,23 @@ export default {
       }
     }
 
+    //Small screen check
+    @media (max-width: 950px) {
+      &{
+        overflow-x: hidden;
+        height: max-content;
+        .navBanner {
+          max-width: 100%;
+        }
+        .pageFrame {
+          max-width: 100%;
+        }
+        ::v-deep div.footer {
+          max-width: 100%;
+        }
+      }
+    }
+
     .pageFrame {
       background: var(--page-pageFrame);
 
@@ -320,16 +348,19 @@ export default {
             line-height: 1.1;
             font-size: 32px;
             padding: 15px 0;
+            @media (max-width: 650px) {
+              font-size: 2em;
+            }
           }
 
-          .media{
+          .media {
             display: flex;
             align-items: center;
             flex-flow: column;
 
             .panel {
               &:not(:last-child) {
-                margin-bottom: 17px;
+                margin-bottom: 20px;
               }
             }            
           }

@@ -1,10 +1,10 @@
 <template>
   <nav class="pageNavigation">
     <div class="nextArrow" v-if="nextPages.length > 0">
-      <div v-for="page in nextPages" :key="page.pageId">
+      <div v-for="(page, index) in nextPages" :key="index">
         <p v-if="('pageId' in page && 'title' in page)">
           &gt; <a v-if="isLeftPage" :href="nextUrl(page)" @click.prevent="resetScroll" class="tiltedArrow" >
-            <div class="notTiltedArrowLink">==&gt;⠀</div>
+            <div class="notTiltedArrowLink">==&gt; </div>
             <div class="tiltedArrowLink">==&gt;</div>
           </a>
           <a v-else :href="nextUrl(page)" class="nextArrowLink" v-text="page.title" />
@@ -36,44 +36,28 @@
 import PAGENAV from '@/components/Page/PageNav.vue'
 
 export default {
-    name: "x2ComboNav",
-    props: [
-    'thisPage', 'nextPages'
-    ],
-    components: {
+  extends: PAGENAV,
+  name: "x2ComboNav",
+  computed: {
+    isLeftPage(){
+      return (parseInt(this.thisPage.pageId) % 2 == 0)
     },
-    data() {
-      return {
-        DateTime: require('luxon').DateTime
-      }
-    },
-    computed: {
-      mspaBase: PAGENAV.computed.mspaBase,
-      startOverUrl: PAGENAV.computed.startOverUrl,
-      pageIdText: PAGENAV.computed.pageIdText,
-      pageNumber: PAGENAV.computed.pageNumber,
-      vizLink: PAGENAV.computed.vizLink,
-      isLeftPage(){
-        return (parseInt(this.thisPage.pageId) % 2 == 0)
-      },
-      backUrl() {
-        const thisLeftPage = this.isLeftPage ? this.thisPage : this.$archive.mspa.story[this.thisPage.previous]
+    backUrl() {
+      const thisLeftPage = this.isLeftPage ? this.thisPage : this.$archive.mspa.story[this.thisPage.previous]
 
-        const prevRightPage = this.$archive.mspa.story[thisLeftPage.previous]
+      const prevRightPage = this.$archive.mspa.story[thisLeftPage.previous]
 
-        return this.$resolvePath(`${this.mspaBase}/${prevRightPage.previous}`)
-      }
-    },
-    methods: {
-      getTimestamp: PAGENAV.methods.getTimestamp,
-      nextUrl: PAGENAV.methods.nextUrl,
-      resetScroll() {
-        let key = this.$localData.tabData.activeTabKey
-        document.getElementById(key).scrollTop = 0
-        document.getElementById(key).scrollLeft = document.getElementById(key).scrollWidth
-      }
+      return this.$resolvePath(`${this.mspaBase}/${prevRightPage.previous}`)
+    }
+  },
+  methods: {
+    resetScroll() {
+      let key = this.$localData.tabData.activeTabKey
+      document.getElementById(key).scrollTop = 0
+      document.getElementById(key).scrollLeft = document.getElementById(key).scrollWidth
     }
   }
+}
 </script>
 
 <style scoped lang="scss">

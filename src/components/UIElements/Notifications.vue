@@ -77,20 +77,26 @@ export default {
       Object.values(this.$archive.news).reduce(function(acc, y){
         return acc.concat(y)
       }, []).forEach(newspost => {
-        // Calculate truncated description
-        const d = document.createElement("div")
-        const desc_length = 140
-        d.innerHTML = newspost.html
-        const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
 
         if (!notifs_by_timestamp[newspost.timestamp])
           notifs_by_timestamp[newspost.timestamp] = []
+
         notifs_by_timestamp[newspost.timestamp].push({
           title: 'News posted',
-          desc: desc,
           notif_level: 'minor',
           url: `/news/${newspost.id}`,
-          thumb: '/archive/collection/archive_news.png'
+          thumb: '/archive/collection/archive_news.png',
+          postprocess() {
+            // Calculate truncated description
+            const d = document.createElement("div")
+            const desc_length = 140
+            d.innerHTML = newspost.html
+            const desc = d.innerText.slice(0, desc_length).replace('\n', '') + (d.innerText[desc_length + 1] ? "..." : "")
+
+            return {
+              desc
+            }
+          },
         })
       })
       return notifs_by_timestamp
@@ -219,7 +225,11 @@ export default {
     queueNotif(notif) {
       // Add notification to the queue and fire it if there's room to display it.
       const key = Math.random().toString(36).substring(2, 5) + Date.now()
-      const notifEntry = {...notif, key} // Add key to notif object
+      var notifEntry = {...notif, key} // Add key to notif object
+
+      if (notifEntry.postprocess) {
+        notifEntry = {...notifEntry, ...notifEntry.postprocess()}
+      }
 
       if (this.activeNotifs.length < this.maxActiveNotifs) this.fireNotif(notifEntry)
       else this.queue.push(notifEntry)
@@ -249,7 +259,7 @@ export default {
 <style scoped lang="scss">
 
 .notifWrapper {
-  position: fixed;
+  position: absolute;
   width: 400px;
   height: 100%;
   pointer-events: none;
@@ -269,7 +279,7 @@ export default {
   list-style: none;
   width: 100%;
   opacity: 1;
-  z-index: 1;
+  z-index: 5;
   margin-bottom: 10px;
 
   transition: all .2s;

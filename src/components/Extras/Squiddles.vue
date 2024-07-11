@@ -102,11 +102,11 @@ export default {
           ]
         },
         {
-          name: "Jessica Allison",
-          link: "https://jessicaallison.carbonmade.com",
+          name: "Kara Roas",
+          link: "https://kararoasart.carrd.co",
 
           socials: [
-            "https://twitter.com/PurgatoryRose"
+            "https://bsky.app/profile/kararoas.bsky.social"
           ]
         },
         {
@@ -229,6 +229,10 @@ export default {
         &:hover {text-decoration: underline;}
         &[href*="//twitter.com"] {
           &::before { content: "twitter"; }
+          &::after { content: "" !important; }
+        }
+        &[href*="//bsky.app"] {
+          &::before { content: "bluesky"; }
           &::after { content: "" !important; }
         }
         &[href*="deviantart.com/"] {

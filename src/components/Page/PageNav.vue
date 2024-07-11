@@ -1,7 +1,7 @@
 <template>
   <nav class="pageNavigation">
     <div class="nextArrow" v-if="nextPages.length > 0">
-      <div v-for="page in nextPages" :key="page.pageId">
+      <div v-for="(page, index) in nextPages" :key="index">
         <p v-if="('pageId' in page && 'title' in page)">
           &gt; <a :href="$resolvePath(`${mspaBase}/${page.pageId}`)" class="nextArrowLink" v-html="commandText(page)" @click="$updateNewReader(page.pageId)" />
         </p>
@@ -49,7 +49,7 @@ export default {
       return this.$resolvePath(`${this.mspaBase}/${this.thisPage.previous}`)
     },
     startOverUrl() {
-      return this.$resolvePath(`${this.mspaBase}/${this.$getStory(this.thisPage.pageId)}`)
+      return this.$resolvePath(`${this.mspaBase}/${this.$getStoryNum(this.thisPage.pageId)}`)
     },
     pageNumber() {
       if (this.mspaBase == 'ryanquest') return {s: 'ryanquest', p: parseInt(this.thisPage.pageId)}
@@ -111,6 +111,9 @@ export default {
 
     ::v-deep a {
       color: var(--page-links);
+    }
+    @media (max-width: 650px) {
+      font-size: 1.8em;
     }
   }
   .footerNav{

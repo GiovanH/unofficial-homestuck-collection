@@ -1,14 +1,14 @@
 name: Build electron releases - development
 
 env:
-  NODE_VERSION: "14.18"
+  NODE_VERSION: "18.20"
 
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ ] # "develop"
+  # pull_request:
+  #   # The branches below must be a subset of the branches above
+  #   branches: [ ] # "develop"
 
 jobs:
   # prep-release:
@@ -54,12 +54,10 @@ jobs:
 
   build-matrix:
     # needs: [ prep-release ]
-    needs: []
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14.18]
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-13 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -70,7 +68,7 @@ jobs:
       with:
         node-version: "${{ env.NODE_VERSION }}"
     - run: make install
-    - run: make publish_release
+    - run: make publish-release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # PUBLISH_FOR_PULL_REQUEST: true

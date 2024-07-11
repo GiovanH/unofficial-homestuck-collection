@@ -129,6 +129,9 @@ export default {
     content: none !important;
   }
 }
+a.frame {
+  color: white !important; // Don't colorize links
+}
 .icon {
   font-size: 14px;
   background: black;

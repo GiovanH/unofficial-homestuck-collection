@@ -2,6 +2,8 @@
 node_modules
 /dist
 
+__pycache__
+
 # local env files
 .env.local
 .env.*.local
@@ -23,9 +25,15 @@ pnpm-debug.log*
 
 # Electron-builder output
 /dist_electron
+/dist
+
+/tools/mspfa/
 
 # install pseudofile
 install
 
 # generated file
-src/imods.tar
+src/imods.tar.gz
+
+/tools/mspfa/*/
+/tools/mspfa/*.log

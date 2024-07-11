@@ -35,8 +35,8 @@
 
 	--system-skycolor: #35bfff;
 	--system-background: 
-		url(assets://archive/collection/homebg_right.png) left top repeat-y fixed,
-      	url(assets://archive/collection/homebg_left.png) right top repeat-y fixed;
+		url('../src/assets/homebg_right.png') left top repeat-y fixed,
+      	url('../src/assets/homebg_left.png') right top repeat-y fixed;
 
 	--ctx-bg: #EEEEEE;
 	--ctx-frame: #535353;
@@ -81,8 +81,10 @@
 		--page-links: #5599ff;
 		--page-log-bg: #000000;
 
-		--system-background: none;
-		--system-skycolor: #222;
+		--system-background:
+			url('../src/assets/themes/night_homebg_right.png') left top repeat-y fixed,
+			url('../src/assets/themes/night_homebg_left.png') right top repeat-y fixed;
+		--system-skycolor: #1e1e1e;
 		
 		--ctx-bg: #262626;
 		--ctx-frame: #000000;
@@ -110,6 +112,10 @@
 		--page-log-bg: #FFFFFF;
 
 		--nav-candyCornContent: "";
+
+		--system-background:
+			url('../src/assets/themes/retrobg.png') left top repeat fixed;
+		--system-skycolor: #DDDDDD;
 
 		--ctx-bg: #FFFFFF;
 		--ctx-divider: #DDDDDD;
@@ -152,8 +158,8 @@
 		--page-links: #2cff4b;
 		--page-links-visited: #2cff4b;
 
-		--system-background: none;
-		--system-skycolor: #000000;
+		--system-background: url("../src/assets/themes/scratchbg.png") repeat fixed;
+		--system-skycolor: #0E4603;
 
 		--ctx-bg: #0e4603;
 		--ctx-frame: #082a00;
@@ -186,6 +192,23 @@
 		--page-pageBorder: #f400ec;
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
+
+		--system-background:
+			url('../src/assets/themes/sbahjbigman.png') 82% -10px no-repeat fixed,
+			url('../src/assets/themes/sbahjbottomleft.png') left bottom no-repeat fixed,
+			url('../src/assets/themes/sbahjbottomright.png') right bottom no-repeat fixed,
+			url('../src/assets/themes/sbahjtopleft.png') left top no-repeat fixed,
+			url('../src/assets/themes/sbahjtopright.png') right top no-repeat fixed,
+			url('../src/assets/themes/sbahjbottom.png') center bottom repeat-x fixed,
+			url('../src/assets/themes/sbahjright.png') right center repeat-y fixed,
+			url('../src/assets/themes/sbahjleft.png') left center repeat-y fixed,
+			url('../src/assets/themes/sbahjsideleft.png') left center repeat-y fixed,
+			url('../src/assets/themes/sbahjsideright.png') right center repeat-y fixed,
+			url('../src/assets/themes/sbahjseamleft.png') left top no-repeat fixed,
+			url('../src/assets/themes/sbahjseamright.png') right top no-repeat fixed,
+			url('../src/assets/themes/sbahjtop.png') center top repeat-x fixed,
+			url('../src/assets/themes/sbahjbg.png') left top repeat fixed;
+		--system-skycolor: #fff;
 
 		--ctx-bg: #f400ec;
 		--ctx-frame: #0707ec;
@@ -276,8 +299,9 @@
 		--ctx-select: red;
 		--ctx-divider: #ffffff;
 
-		--system-background: none;
-		--system-skycolor: #000000;
+		--system-background:
+        	linear-gradient(360deg, rgba(25,31,83,1) 0%, rgba(23,34,80,1) 3%, rgba(20,38,73,1) 5%, rgba(19,43,66,1) 8%, rgba(22,49,61,1) 11%, rgba(33,57,51,1) 13%, rgba(33,57,51,1) 15%, rgba(39,58,45,1) 17%, rgba(54,57,38,1) 20%, rgba(64,57,39,1) 22%, rgba(74,58,38,1) 24%, rgba(85,58,38,1) 26%, rgba(91,57,37,1) 28%, rgba(91,57,37,1) 30%, rgba(87,56,39,1) 31%, rgba(74,45,27,1) 32%, rgba(132,101,21,1) 33%, rgba(192,148,10,1) 34%, rgba(188,151,6,1) 36%, rgba(186,148,8,1) 37%, rgba(179,125,5,1) 38%, rgba(167,105,2,1) 39%, rgba(165,94,3,1) 40%, rgba(152,66,2,1) 42%, rgba(145,40,1,1) 44%, rgba(137,5,6,1) 47%, rgba(140,4,18,1) 51%, rgba(116,0,0,1) 53%, rgba(115,0,0,1) 55%, rgba(86,0,0,1) 58%, rgba(102,0,0,1) 62%, rgba(45,0,0,1) 68%, rgba(38,0,0,1) 71%, rgba(29,0,0,1) 73%, rgba(11,0,0,1) 80%, rgba(17,0,0,1) 90%, rgba(24,0,0,1) 100%) fixed;
+		--system-skycolor: #000;
 
 		--saves-bg: #454545;
 		--saves-tab: #262626;
@@ -319,8 +343,10 @@
 		--ctx-select: #111111;
 		--ctx-divider: #ffffff;
 
-		--system-background: none;
-		--system-skycolor: #111111;
+		--system-background:
+			url('../src/assets/themes/tsobg.png') left top repeat-y fixed,
+			url('../src/assets/themes/tsobg.png') right 500px repeat-y fixed;
+		--system-skycolor: #111;
 
 		--saves-bg: #2f2f2f;
 		--saves-tab: #111111;
@@ -347,8 +373,8 @@
 
 		--nav-bg: #000000;
 
-		--page-pageBody: url(assets://images/trickster_sitegraphics/Z2.gif);
-		--page-pageFrame: url(assets://images/trickster_sitegraphics/bluetile.gif);
+		--page-pageBody: #ffd800 url(assets://images/trickster_sitegraphics/Z2.gif);
+		--page-pageFrame: #0019b8 url(assets://images/trickster_sitegraphics/bluetile.gif);
 		--page-pageBorder: #00117e;
 		--page-pageContent: #ff73fd;
 		--page-log-bg: #ff73fd;
@@ -356,6 +382,12 @@
 		--page-nav-meta: #f9fd6b;
 		--page-links: #fb060b;
 		--page-links-visited: #f9fd6b;
+
+		--system-background:
+			url(assets://images/trickster_sitegraphics/Z2.gif) top left repeat-y fixed,
+			url('../src/assets/themes/Z2right.gif') top right repeat-y fixed,
+			url(assets://images/trickster_sitegraphics/bluetile.gif) fixed;
+		--system-skycolor: #FFD800;
 
 		--ctx-bg: #ff73fd;
 		--ctx-frame: #00117e;
@@ -379,6 +411,22 @@
 				visibility: visible;
 				margin-left: 10px;
 				content: url(assets://images/trickster_sitegraphics/sucker.gif);
+			}
+		}
+		.reducedMotion & {
+    		--page-pageFrame: repeating-linear-gradient(
+    			to bottom,
+    			#00117e,
+    			#00117e 40px,
+    			#0019b8 40px,
+    			#0019b8 80px
+    		);
+			.nextArrowLink{
+			    visibility: initial;
+			    font-size: inherit;
+			}
+			.nextArrowLink:after{
+				display: none;
 			}
 		}
 	}
@@ -413,6 +461,11 @@
 		--page-nav-divider: #000000;
 		--page-nav-meta: #2ed73a;
 		--page-links: #2ed73a;
+
+		--system-background:
+			url('../src/assets/themes/homosuckbg_left.png') left top no-repeat fixed,
+			url('../src/assets/themes/homosuckbg_right.png') right top no-repeat fixed;
+		--system-skycolor: #042300;
 
 		--ctx-bg: #073c00;
 		--ctx-frame: #042300;
@@ -463,6 +516,10 @@
 		--page-links: #72abd2;
 		--page-links-visited: #ffffff;
 
+		--system-background:
+			url('../src/assets/themes/pxsbg.png') center top repeat fixed;
+		--system-skycolor: #095486;
+
 		--ctx-bg: #003b64;
 		--ctx-frame: #095486;
 		--ctx-shadow: #000000;
@@ -485,5 +542,10 @@
 				font-weight: bold;
 			}
 		}
+	}
+
+	&.mspfa {
+		--nav-bg: #000;
+		--nav-candyCornContent: url(assets://images/candycorn_mspfa.png);
 	}
 }

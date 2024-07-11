@@ -1,56 +1,52 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="pageFrame">
-      <div class="pageContent">
-          <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPage.title" />
-              <div class="media">
-                  <Media v-for="url in thisPage.media" :key="url" :url="url" class="panel"/>
-              </div>
-          </div>    
-          <div class="passwordField">
-            <p>3NT3R P4SSWORD:</p>
-            <div class="passwordForm">
-              <input class="jumpBoxInput" type="text" spellcheck="false" v-model="inputText" v-on:keydown.enter="submitPassword"/>
-              <button @click="submitPassword()">Submit</button>
-            </div>
-            <br>
-            <p id="passwordFailure">&lt;- OR GO B4CK!!!</p>
-          </div>  
-          <div class="textContent">              
-              <TextContent :key="thisPage.pageId" :content="passwordHint"/>
-              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
-          </div>
+  <GenericPage>
+    <div class="mediaContent">
+      <h2 class="pageTitle" v-text="thisPage.title" />
+      <div class="media">
+        <Media v-for="url in thisPage.media" :key="url" :url="url" class="panel"/>
       </div>
-    </div>    
-    <PageFooter />
-  </div>
+    </div>
+    <div class="passwordField">
+      <p>3NT3R P4SSWORD:</p>
+      <div class="passwordForm">
+        <input class="jumpBoxInput" type="text" spellcheck="false" v-model="inputText" v-on:keydown.enter="submitPassword"/>
+        <button @click="submitPassword()">Submit</button>
+      </div>
+      <br>
+      <p id="passwordFailure">&lt;- OR GO B4CK!!!</p>
+    </div>
+    <div class="textContent">
+      <TextContent :key="thisPage.pageId" :content="passwordHint"/>
+      <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" ref="pageNav" />
+    </div>
+  </GenericPage>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import Media from '@/components/UIElements/MediaEmbed.vue'
-import TextContent from '@/components/Page/PageText.vue'
-import PageNav from '@/components/Page/PageNav.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+// import NavBanner from '@/components/UIElements/NavBanner.vue'
+// import Media from '@/components/UIElements/MediaEmbed.vue'
+// import TextContent from '@/components/Page/PageText.vue'
+// import PageNav from '@/components/Page/PageNav.vue'
+// import PageFooter from '@/components/Page/PageFooter.vue'
 
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 import PAGE from '@/components/Page/Page.vue'
 
 export default {
+  extends: PAGE,
   name: 'tzPassword',
   props: [
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, TextContent, PageNav, PageFooter
+    GenericPage
   },
-  theme: PAGE.theme,
-  title: PAGE.title,
+  title: function(ctx) {
+    return "???????"
+  },
   data: function() {
     return {
-      ...PAGE.data(),
       inputText: '',
       passwordHint: `|P4SSWORD H1NT| <br /><span style="color: #008282">1F YOU DON'T KNOW TH3 P4SSWORD Y3T, 1T M34NS YOU'R3 NOT SUPPOS3D TO, DUMMY! GO B4CK!!!</span>`,
       failText: "&lt;- <b>WRONG!</b> GO B4CK!!!",
@@ -68,11 +64,6 @@ export default {
     }
   },
   computed: {
-    pageNum: PAGE.computed.pageNum,
-    thisPage: PAGE.computed.thisPage,
-    pageCollection: PAGE.computed.pageCollection,
-    storyId: PAGE.computed.storyId,
-    isRyanquest: PAGE.computed.isRyanquest,
     nextPagesArray() {
       return []
     }
@@ -93,104 +84,65 @@ export default {
       } else {
         document.getElementById('passwordFailure').innerHTML = this.failText
       }
-    },
-    keyNavEvent: PAGE.methods.keyNavEvent
+    }
   }
 }
 </script>
 
 <style scoped lang="scss">
-  .pixelated::v-deep img{
-    image-rendering: pixelated;
+
+.pageContent {
+  align-items: unset !important;
+}
+
+.mediaContent {
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+
+  h2.pageTitle {
+    max-width: 590px;
+    text-align: center;
+    line-height: 1.1;
+    font-size: 32px;
+    padding: 15px 0;
   }
 
-  .pageBody {
-    color: var(--font-default);
-    background: var(--page-pageBody);
-
-    margin: 0;
-    padding: 0;
+  .media {
     display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
     align-items: center;
+    flex-flow: column;
 
-    > img {
-      align-self: center;
+    .panel {
+      &:not(:last-child) {
+        margin-bottom: 20px;
+      }
     }
-
-    .pageFrame {
-    background: var(--page-pageFrame);
-
-    width: 950px;
-    padding-top: 7px;
-    padding-bottom: 23px;
-    margin: 0 auto;
-
-    flex: 0 1 auto;
-    display: flex;
-    justify-content: center;
-
-      .pageContent {
-        background: var(--page-pageContent);
-        
-        max-width: 950px;
-        display: flex;
-        flex: 0 1 auto;
-        align-items: center;
-        flex-flow: column;
-
-        .mediaContent {
-          display: flex;
-          align-items: center;
-          flex-flow: column;
-
-          h2.pageTitle {
-            max-width: 590px;
-            text-align: center;
-            line-height: 1.1;
-            font-size: 32px;
-            padding: 15px 0;
-          }
-
-          .media{
-            display: flex;
-            align-items: center;
-            flex-flow: column;
-
-            .panel {
-              &:not(:last-child) {
-                margin-bottom: 17px;
-              }
-            }            
-          }
-        }
-
-        .passwordField {
-          font-family: Verdana, Arial, Helvetica, sans-serif;
-          font-weight: normal;
-          display: flex;
-          flex-flow: column;
-          align-items: center;
-        }
-        .textContent{
-          margin-top: 30px;
-          width: 600px;
-
-          ::v-deep .pageNavigation {
-            .nextArrow {
-              display: none;
-            }
-            .meta {
-              visibility: hidden;
-            }
-          }
-        }
-      }	
-    }
-
   }
-  
+}
+
+.passwordField {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+}
+.textContent{
+  margin-top: 30px !important;
+  margin-bottom: 0 !important;
+  align-items: unset !important;
+  width: 600px;
+
+  ::v-deep .pageNavigation {
+    .nextArrow {
+      display: none;
+    }
+    .meta {
+      visibility: hidden;
+    }
+  }
+}
 
 </style>
 

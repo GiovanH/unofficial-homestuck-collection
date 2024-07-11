@@ -1,54 +1,53 @@
 import Vue from 'vue'
+
 import App from './App'
 import router from './router'
 import localData from './store/localData'
-// import path from 'path'
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {
-  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
-  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import Memoization from '@/memoization.js'
 
-const Store = require('electron-store')
-const store = new Store()
+import Mods from "./mods.js"
+import Resources from "./resources.js"
 
-const log = require('electron-log');
-log.transports.console.format = '[{level}] {text}';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft,
+  faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock,
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+} from '@fortawesome/free-solid-svg-icons'
+
+const importAsyncComputed = import('vue-async-computed')
+const importFontAwesomeIconObj = import('@fortawesome/vue-fontawesome')
 
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, 
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
 ])
 
-Vue.component('fa-icon', FontAwesomeIcon)
+// Global prereqs
 
-Vue.config.productionTip = false
+window.isWebApp = (window.isWebApp || false)
 
-Vue.use(localData, {
-  store: new localData.Store(store.get('localData'))
-})
-
-const {shell, ipcRenderer} = require('electron')
-const {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
-
-const Resources = require("@/resources.js")
-Resources.init({
-  assets_root: `http://127.0.0.1:${port}/`
-})
+const ipcRenderer = require('electron').ipcRenderer
 
 // Must init resources first.
-import Mods from "./mods.js"
+var shell, store, log, port, appVersion
+if (!window.isWebApp) {
+  var {shell} = require('electron')
 
-window.doFullRouteCheck = Mods.doFullRouteCheck
+  const Store = require('electron-store')
+  store = new Store()
 
-// Mixin mod mixins
-Mods.getMixins().forEach((m) => Vue.mixin(m))
+  log = require('electron-log');
+  log.transports.console.format = '[{level}] {text}';
+
+  var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
+
+  Resources.init({
+    assets_root: `http://127.0.0.1:${port}/`
+  })
+}
 
 // eslint-disable-next-line no-extend-native
 Number.prototype.pad = function(size) {
@@ -56,6 +55,38 @@ Number.prototype.pad = function(size) {
     return undefined
   return this.toString().padStart(size || 2, '0')
 }
+
+
+const app_domain = window.location.host // (window.isWebApp ? window.webAppDomain : 'localhost:8080')
+
+// Loading checks
+
+// Vue
+//
+// Promises that all need to complete before we launch the Vue VM
+var promises_loading = []
+
+Vue.config.productionTip = false
+
+Vue.use(localData) // Initializes and loads when Vue installs it
+
+// FontAwesomeIconComponent
+promises_loading.push((async function() {
+  const { FontAwesomeIcon } = await importFontAwesomeIconObj
+  Vue.component('fa-icon', FontAwesomeIcon)
+})());
+
+// Mixin asynccomputed
+promises_loading.push((async function() {
+  const AsyncComputed = await importAsyncComputed
+  Vue.use(AsyncComputed)
+})());
+
+// Mixin mod mixins
+promises_loading.push((async function() {
+  const mixins = await Mods.getMixinsAsync()
+  mixins.forEach((m) => Vue.mixin(m))
+})());
 
 Vue.mixin(Memoization.mixin)
 
@@ -67,16 +98,15 @@ Vue.mixin({
     }
   },
   computed: {
-    $localhost: () => `http://127.0.0.1:${port}/`,
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return this.$newReaderCurrent && this.$localData.settings.newReader.limit
+      return Boolean(this.$newReaderCurrent && this.$localData.settings.newReader.limit)
     },
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current
     },
-    $modChoices: Mods.getModChoices,
-    $logger() {return log.scope(this.$options.name || this.$options._componentTag || "undefc!")}
+    $logger() { return log.scope(this.$options.name || this.$options._componentTag || "undefc!")},
+    $isWebApp() { return window.isWebApp || false }
   },
   methods: {
     $resolvePath(to){
@@ -107,7 +137,12 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
-      const urlObject = new URL(url.replace(/(localhost:8080|app:\/\/\.\/)index\.html\??/, '$1'))
+      const re_local = new RegExp(`(${app_domain}|app:\/\/\\.(index)?)`)
+      const re_local_index = new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\\??`)
+      // const re_local_asset = new RegExp(`(http:\/\/127.0.0.1:${port}\/|assets:\/\/)`)
+
+      const url_str = url.replace(re_local_index, '$1')
+      const urlObject = new URL(url_str)
 
       if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
         this.$openModal(Resources.resolveAssetsProtocol(url))
@@ -119,16 +154,24 @@ Vue.mixin({
       to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
              .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
-      if (!/(app:\/\/\.(index)?|\/\/localhost:8080)/.test(urlObject.origin)) {
+      function _openExternal(to_) {
+        if (!isWebApp) {
+          shell.openExternal(to_)
+        } else {
+          window.open(Resources.resolveURL(to_), '_blank').focus();
+        }
+      }
+
+      if (!re_local.test(urlObject.origin)) {
         // Link is external
         if (urlObject.href.includes('steampowered.com/app')) {
           ipcRenderer.invoke('steam-open', urlObject.href)
-        } else shell.openExternal(Resources.resolveURL(urlObject.href))
+        } else _openExternal(urlObject.href)
       } else if (/\.(html|pdf)$/i.test(to)){
         // TODO: Not sure resolveURL is needed here? This should always be external?
-        shell.openExternal(Resources.resolveURL(to))
+        _openExternal(Resources.resolveURL(to))
       } else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(to)){
-        this.$logger.error("UNCAUGHT ASSET?", to)
+        this.$logger.error("UNCAUGHT ASSET? Tried to externally open internal(?) asset", to)
         this.$openModal(to)
       } else if (auxClick) {
         this.$localData.root.TABS_NEW(this.$resolvePath(to), true)
@@ -136,7 +179,15 @@ Vue.mixin({
         this.$pushURL(to)
       }
     },
-    $getResourceURL: Resources.getResourceURL,
+    $getResourceURL(url) {
+      const resource_url = Resources.getResourceURL(url)
+      if (isWebApp) {
+        // simulate webRequest redirection here
+        return Resources.resolveURL(url)
+      } else {
+        return resource_url
+      }
+    },
     $getChapter: Resources.getChapter,
     $filterURL(u) {return this.$getResourceURL(u)},
     $pushURL(to, key = this.$localData.tabData.activeTabKey){
@@ -144,157 +195,47 @@ Vue.mixin({
       this.$localData.root.TABS_PUSH_URL(url, key)
     },
     $mspaFileStream(url) {
-      return Resources.toFilePath(url, this.$localData.assetDir)
+      return Resources.toFilePath(Resources.resolveURL(url), this.$localData.assetDir)
     },
-    $getStory(pageNumber){
-      pageNumber = parseInt(pageNumber) || pageNumber
-
-      // JAILBREAK
-      if (pageNumber <= 135 || pageNumber == "jb2_000000"){
-        return 1
-      }      
-      // BARD QUEST
-      else if (pageNumber >= 136 && pageNumber <= 216) {
-        return 2
+    $getStoryNum: Resources.getStoryNum,
+    $getAllPagesInStory: Resources.getAllPagesInStory,
+    $isVizBase: Resources.isVizBase,
+    $parseMspaOrViz(userInput, story = 'homestuck') {
+      // Takes a user-formatted string and returns a MSPA page number.
+      // The output page number may not be real!
+      if (Number.isInteger(userInput)) {
+        this.$logger.warn("parseMspaOrViz got int, not string: ", userInput)
+        userInput = String(userInput)
       }
-      // BLOOD SPADE
-      else if (pageNumber == "mc0001") {
-        return 3
-      }      
-      // PROBLEM SLEUTH
-      else if (pageNumber >= 219 && pageNumber <= 1892){
-        return 4
-      }      
-      // HOMESTUCK BETA
-      else if (pageNumber >= 1893 && pageNumber <= 1900){
-        return 5
-      }      
-      // HOMESTUCK
-      else if (pageNumber >= 1901 && pageNumber <= 10030 || (pageNumber == "pony" || pageNumber == "pony2" || pageNumber == "darkcage" || pageNumber == "darkcage2")){
-        return 6
+      if (this.$localData.settings.mspaMode) {
+        return userInput.replace(/^0+/, '').padStart(6, '0')
+      } else {
+        return this.$vizToMspa(story, userInput).p
       }
-
-      return undefined
-    },
-    $getAllPagesInStory(story_id, incl_secret=false) {
-      const page_nums = []
-      if (story_id == '1'){
-        for (let i = 2; i <= 6; i++) page_nums.push(i.pad(6))
-        for (let i = 8; i <= 135; i++) page_nums.push(i.pad(6))
-        page_nums.push("jb2_000000")
-      } else if (story_id == '2'){
-        page_nums.push(Number(136).pad(6))
-        for (let i = 171; i <= 216; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '3'){
-        page_nums.push("mc0001")
-      } else if (story_id == '4'){
-        for (let i = 219; i <= 991; i++) page_nums.push(i.pad(6))
-        for (let i = 993; i <= 1892; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '5'){
-        for (let i = 1893; i <= 1900; i++) page_nums.push(i.pad(6))
-      } else if (story_id == '6'){
-        for (let i = 1901; i <= 4298; i++) page_nums.push(i.pad(6))
-        for (let i = 4300; i <= 4937; i++) page_nums.push(i.pad(6))
-        for (let i = 4939; i <= 4987; i++) page_nums.push(i.pad(6))
-        for (let i = 4989; i <= 9801; i++) page_nums.push(i.pad(6))
-        for (let i = 9805; i <= 10030; i++) page_nums.push(i.pad(6))
-        if (incl_secret) {
-          page_nums.push("darkcage")
-          page_nums.push("darkcage2")
-          page_nums.push("pony")
-          page_nums.push("pony2")
-        }
-      } else if (story_id == 'ryanquest'){
-        for (let i = 1; i <= 15; i++) page_nums.push(i.pad(6))
-      }
-
-      if (story_id == 'snaps') {
-        for (let i = 1; i <= 64; i++) page_nums.push(String(i))
-      }
-      return page_nums
     },
     $vizToMspa(vizStory, vizPage) {
-      let mspaPage
-      const vizNum = !isNaN(vizPage) ? parseInt(vizPage) : undefined
-      const pageNotInStory = (mspaPage) => this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
-
-      switch (vizStory) {
-        case 'jailbreak':
-          mspaPage = (vizNum == 135) ? 'jb2_000000' : (vizNum + 1).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 135 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'bard-quest':
-          mspaPage = (vizNum == 1) ? "000136" : (vizNum + 169).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 47 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'blood-spade':
-          if (vizNum == 1) mspaPage = "mc0001"
-          else return {s: undefined, p: undefined}
-          break
-        case 'problem-sleuth':
-          mspaPage = (vizNum + 218).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 1674 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'beta':
-          mspaPage = (vizNum + 1892).toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 8 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'homestuck':
-          mspaPage = vizNum ? (vizNum + 1900).toString().padStart(6, '0') : vizPage
-          if (1 > vizNum || vizNum > 8130 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
-        case 'ryanquest':
-          mspaPage = vizNum.toString().padStart(6, '0')
-          if (1 > vizNum || vizNum > 15 || pageNotInStory(mspaPage)) return {s: undefined, p: undefined}
-          break
+      // Resources.vizToMspa, but also checks the archive.
+      const undef_page = {s: undefined, p: undefined}
+      const {s, p} = Resources.vizToMspa(vizStory, vizPage)
+      if (this.$archive) {
+        const pageInStory = (p in this.$archive.mspa.story || p in this.$archive.mspa.ryanquest)
+        if (!pageInStory) {
+          this.$logger.info("$vizToMspa: p", p, "not in story!", vizStory, vizPage)
+          return undef_page
+        }
       }
-      return {s: vizStory == 'ryanquest' ? 'ryanquest' : this.$getStory(mspaPage), p: mspaPage}
+      return {s, p}
     },
     $mspaToViz(mspaInput, isRyanquest = false){
-      const mspaPage = (this.$archive && mspaInput.padStart(6, '0') in this.$archive.mspa.story) ? mspaInput.padStart(6, '0') : mspaInput
-      const mspaStory = this.$getStory(mspaPage)
-      const pageNotInStory = this.$archive ? !(mspaPage in this.$archive.mspa.story || mspaPage in this.$archive.mspa.ryanquest) : false
-
-      let vizStory, vizPage
-
-      if (isRyanquest) {
-        if (pageNotInStory) return undefined
-        return {s: 'ryanquest', p: parseInt(mspaPage).toString() }
-      } else if (pageNotInStory) {
-        return undefined
-      } else {
-        switch (mspaStory) {
-          case 1:
-            vizStory = "jailbreak"
-            vizPage = (mspaPage == 'jb2_000000') ? '135' : (parseInt(mspaPage) - 1).toString()
-            break
-          case 2:
-            vizStory = "bard-quest"
-            if (parseInt(mspaPage) == 136) vizPage = "1"
-            else vizPage = (parseInt(mspaPage) - 169).toString()
-            break
-          case 3:
-            vizStory = "blood-spade"
-            vizPage = "1"
-            break
-          case 4:
-            vizStory = "problem-sleuth"
-            vizPage = (parseInt(mspaPage) - 218).toString()
-            break
-          case 5:
-            vizStory = "beta"
-            vizPage = (parseInt(mspaPage) - 1892).toString()
-            break
-          case 6:
-            vizStory = "homestuck"
-            vizPage = isNaN(mspaPage) ? mspaPage : (parseInt(mspaPage) - 1900).toString()
-            break
+      // Resources.mspaToViz, but also checks the archive.
+      if (this.$archive) {
+        const mspaPage = isNaN(mspaInput) ? mspaInput : mspaInput.padStart(6, '0')
+        const pageInStory = (mspaPage in (isRyanquest ? this.$archive.mspa.ryanquest : this.$archive.mspa.story))
+        if (!pageInStory) {
+          return undefined
         }
-        return {s: vizStory, p: vizPage}
       }
-    },
-    $isVizBase(base){
-      return ['jailbreak', 'bard-quest', 'blood-spade', 'problem-sleuth', 'beta', 'homestuck'].includes(base)
+      return Resources.mspaToViz(mspaInput, isRyanquest)
     },
     $mspaOrVizNumber(mspaId){
       // Formates a mspaId as either an mspaId or viz number, depending on user settings.
@@ -305,29 +246,16 @@ Vue.mixin({
         ? mspaId 
         : this.$mspaToViz(mspaId).p
     },
-    $parseMspaOrViz(userInput, story = 'homestuck') {
-      // Takes a user-formatted string and returns a MSPA page number.
-      // The output page number may not be real!
-      if (Number.isInteger(userInput)) {
-        this.$logger.waring("parseMspaOrViz got int, not string: ", userInput)
-        userInput = String(userInput)
-      }
-      if (this.$localData.settings.mspaMode) {
-        return userInput.replace(/^0+/, '').padStart(6, '0')
-      } else {
-        return this.$vizToMspa(story, userInput).p
-      }
-    },
     $updateNewReader(thisPageId, forceOverride = false) {
       if (!this.$isNewReader && !forceOverride)
         return // don't reset non-new reader back to new-reader mode unless explicitly forced
 
       const isSetupMode = !this.$archive
-      const isNumericalPage = /\D/.test(thisPageId)
+      const isNumericalPage = /\d/.test(thisPageId)
       const endOfHSPage = (this.$archive ? this.$archive.tweaks.endOfHSPage : "010030")
       const isInRange = '000219' <= thisPageId && thisPageId <= endOfHSPage // in the "keep track of spoilers" range
 
-      if (!isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
+      if (isNumericalPage && isInRange && (isSetupMode || thisPageId in this.$archive.mspa.story)) {
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
@@ -409,10 +337,22 @@ Vue.mixin({
       return this.$localData.settings[retcon_id]
     },
     $popNotifFromPageId(pageId) {
-      this.$root.$children[0].$refs.notifications.queueFromPageId(pageId)
+      // Don't error even if triggered from setup page
+      const notifications = this.$root.$children[0].$refs.notifications
+      if (notifications) {
+        notifications.queueFromPageId(pageId)
+      } else {
+        this.$logger.error("Missing notifications ref!")
+      }
     },
     $pushNotif(notif) {
-      this.$root.$children[0].$refs.notifications.queueNotif(notif)
+      // Don't error even if triggered from setup page
+      const notifications = this.$root.$children[0].$refs.notifications
+      if (notifications) {
+        notifications.queueNotif(notif)
+      } else {
+        this.$logger.error("Missing notifications ref!")
+      }
     },
     $timestampIsSpoiler(timestamp){
       if (!this.$isNewReader) return false
@@ -497,30 +437,51 @@ Vue.mixin({
   } 
 })
 
-window.vm = new Vue({
-  data(){
-    return {
-      archive: undefined,
-      loadState: undefined
+window.Vue = Vue;
+
+// Resolve all promises, then make app
+Promise.all(promises_loading).then(_ => {
+  // Once JS loads from network, replace barebones preloader with vue preloader.
+  const preloader_div = document.getElementById("prepreloader")
+  if (preloader_div) preloader_div.remove()
+
+  // Mount vue
+  window.vm = new Vue({
+    data(){
+      return {
+        archive: undefined,
+        loadState: undefined,
+        loadStage: undefined,
+        platform: (window.isWebApp ? "webapp" : "electron"),
+        tabTheme: {} // Modified by App (avoid reacting to refs)
+      }
+    },
+    computed: {
+      // Easy access
+      app(){ return this.$refs.App },
+    },
+    asyncComputed: {
+      $modChoices: {
+        default: {},
+        get: Mods.getModChoicesAsync
+      },
+    },
+    router,
+    render: function (h) { return h(App, {ref: 'App'}) },
+    watch: {
+      '$localData.settings.devMode'(to, from){
+        if (log.transports) {
+          const is_dev = to
+          log.transports.console.level = (is_dev ? "silly" : "info");
+          this.$logger.silly("Verbose log message for devs")
+          this.$logger.info("Log message for everybody")
+        }
+        this.$localData.VM.saveLocalStorage()
+      }
     }
-  },
-  computed: {
-    // Easy access
-    app(){ return this.$refs.App },
-    tabTheme(){ return this.app.tabTheme }
-  },
-  router,
-  render: function (h) { return h(App, {ref: 'App'}) },
-  watch: {
-    '$localData.settings.devMode'(to, from){
-      const is_dev = to
-      log.transports.console.level = (is_dev ? "silly" : "info");
-      this.$logger.silly("Verbose log message for devs")
-      this.$logger.info("Log message for everybody")
-      this.$localData.VM.saveLocalStorage()
-    }
-  }
-}).$mount('#app')
+  }).$mount('#app')
+})
+
 
 // Even though we cancel the auxclick, reallly *really* cancel mouse navigation.
 window.addEventListener("mouseup", (e) => {
@@ -533,3 +494,6 @@ window.addEventListener("mouseup", (e) => {
 // Expose for debugging
 window.Resources = Resources
 window.Mods = Mods
+window.doFullRouteCheck = Mods.doFullRouteCheck
+
+// window.onbeforeunload = () => "please.... stay";

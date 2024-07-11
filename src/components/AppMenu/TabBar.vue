@@ -1,5 +1,5 @@
 <template>
-  <div id="tabBar">
+  <div id="tabBar" v-if="hasTabBarContainer">
     <div class="navigationButtons">
       <button class="systemButton historyButton historyBack" @click="historyBack" 
         @click.middle="historyBackNewTab" :disabled="!activeTabHasHistory">
@@ -9,32 +9,34 @@
         <fa-icon icon="chevron-right"></fa-icon></button>
 
       <button class="systemButton historyButton refresh" 
-        @click="reloadTab" @click.middle="forceReload">
+        @click="reloadTab" @click.middle="forceReload" @click.shift="archiveReload">
         <fa-icon icon="redo"></fa-icon></button>
     </div>
     <template v-if="$localData.settings.showAddressBar">
       <AddressBar/>
       <!-- Toolbars go here -->
       <component v-for="(__, componentkey) in browserToolbars" 
-        :is="componentkey" :key="componentkey" class="toolbar"/>
+        :is="componentkey" :key="componentkey" :data-component="componentkey" class="toolbar"/>
       <div class="lineBreak"/>
     </template>
 
     <div id="tabSection">
-      <div id="dragTab" class="tab activeTab" 
-        tabindex="-1" v-show="showDragTab">
-        <div class="tabTitle" :class="{dragTitleFade}"></div>
-        <button class="systemButton closeTabButton">✕</button>
-      </div>
-      <transition-group name="tab-list" tag="ul" id="tabs">
-        <Tab v-for="key in sortedTabList" 
-          :key="key" :tab="tabs[key]" 
-          :ref="'tab_' + key" 
-          @mousedown.left.native="initDrag()" />
-      </transition-group>
-      <!-- TODO: Replace this with an svg so it's consistent across systems -->
-      <button class="systemButton newTabButton" @click="newTab()" title="New tab">
-        <span>＋</span></button>
+      <template v-if="$localData.settings.useTabbedBrowsing">
+        <div id="dragTab" class="tab activeTab"
+          tabindex="-1" v-show="showDragTab">
+          <div class="tabTitle" :class="{dragTitleFade}"></div>
+          <button class="systemButton closeTabButton">✕</button>
+        </div>
+        <transition-group name="tab-list" tag="ul" id="tabs">
+          <Tab v-for="key in sortedTabList"
+            :key="key" :tab="tabs[key]"
+            :ref="'tab_' + key"
+            @mousedown.left.native="initDrag()" />
+        </transition-group>
+        <!-- TODO: Replace this with an svg so it's consistent across systems -->
+        <button class="systemButton newTabButton" @click="newTab()" title="New tab">
+          <span>＋</span></button>
+      </template>
       <div class="sysActionButtons">
         <button class="systemButton sysActionButton jumpBoxButton" 
          v-if="!$localData.settings.showAddressBar" 
@@ -48,7 +50,7 @@
     <template v-if="!$localData.settings.showAddressBar">
       <!-- Toolbars go here too (compact layout) -->
       <component v-for="(__, componentkey) in browserToolbars" 
-        :is="componentkey" :key="componentkey" class="toolbar"/>
+        :is="componentkey" :key="componentkey" :data-component="componentkey" class="toolbar"/>
     </template>
     <div />
   </div>
@@ -60,7 +62,7 @@ import AddressBar from '@/components/AppMenu/AddressBar.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
-const { ipcRenderer } = require('electron')
+const ipcRenderer = require('electron').ipcRenderer
 
 export default {
   name: 'tabBar',
@@ -76,7 +78,8 @@ export default {
       dragTarget: undefined,
       showDragTab: false,
       dragTitleFade: false,
-      browserToolbars: {}
+      browserToolbars: {},
+      ipcRenderer
     }
   },  
   created(){
@@ -92,6 +95,13 @@ export default {
   computed: {
     sortedTabList() {
       return this.$localData.tabData.sortedTabList
+    },
+    hasTabBarContainer() {
+      if (!this.$isWebApp) return true
+      else return (this.$localData.settings.useTabbedBrowsing)
+      //            Tabbed  Untabbed
+      // Webapp      Nav     None
+      // Electron    Nav     Nav
     },
     tabs() {
       return this.$localData.tabData.tabs
@@ -164,10 +174,6 @@ export default {
         this.$logger.warn("Couldn't reload tab (no page?)", e)
       }
     },
-    forceReload(e) {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      ipcRenderer.invoke('reload')
-    },
     newTab() {
       this.$localData.root.TABS_NEW()
     },
@@ -196,6 +202,7 @@ export default {
     },
 
     initDrag(e) {
+      // TODO: Improve performance
       e = e || window.event
       e.preventDefault()
 
@@ -282,6 +289,25 @@ export default {
       if (!document.getElementById('appHeader').classList.contains('headerHoverEnabled')) document.getElementById('appHeader').classList.add('headerHoverEnabled')
 
       this.clickAnchor = this.thresholdDirection = this.dragTarget = undefined
+    },
+    forceReload: function() {
+      // Should match settings.forceReload
+      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
+      this.$root.loadState = "LOADING"
+      ipcRenderer.invoke('reload')
+    },
+    archiveReload(){
+      // Should match settings.archiveReload
+      this.memoizedClearAll()
+
+      this.$root.loadState = "LOADING"
+      this.$nextTick(function () {
+        // Don't show loading screen, "soft" reload
+        // this.$root.loadState = "LOADING"
+        this.$localData.root.applySaveIfPending()
+        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+      })
     }
   }
 }
@@ -333,7 +359,10 @@ export default {
   }
   .historyBack > svg { padding-right: 0.1em; }
   .refresh, .jumpBoxButton { 
-    > svg { font-size: calc(var(--symbol-font-size) * 0.9) } 
+    > svg {
+      height: 22px;
+      font-size: calc(var(--symbol-font-size) * 0.9)
+    }
   }
 
   .sysActionButton {

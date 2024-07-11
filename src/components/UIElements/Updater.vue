@@ -17,7 +17,7 @@ export default {
   props: [],
   data: function() {
     return {
-      ghOwner: 'bambosh',
+      ghOwner: 'giovanh',
       ghRepo: 'unofficial-homestuck-collection',
       ghReleasesRaw: undefined,
       dismissed: false
@@ -28,6 +28,10 @@ export default {
       // Visible gh releases.
       // Excludes prereleases unless app is in dev mode.
       if (!this.ghReleasesRaw) return undefined
+      if (this.ghReleasesRaw.message) {
+        this.$logger.warn(this.ghReleasesRaw)
+        return undefined
+      }
 
       let releases = this.ghReleasesRaw
       if (!this.$localData.settings.devMode) 

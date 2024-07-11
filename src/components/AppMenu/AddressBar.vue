@@ -100,7 +100,7 @@ export default {
       if (match = /^\/mspa\/(\d+)$/.exec(activeTabUrl))
         return match[1]
       // eslint-disable-next-line no-cond-assign
-      if (match = /^\/(\w+?)\/(\d+)$/.exec(activeTabUrl)) {
+      if (match = /^\/(jailbreak|bard-quest|blood-spade|problem-sleuth|beta|homestuck|ryanquest)\/(\d+)$/.exec(activeTabUrl)) {
         const viz = this.$vizToMspa(match[1], match[2])
         if (viz) return viz.p
       }

@@ -47,16 +47,18 @@
         <h2>Application Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
       </div>
@@ -74,7 +76,7 @@
                 {{ theme.text }}
               </option>
             </select>
-            <template v-if="$localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default'">
+            <template v-if="!$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
               <dt><label><input type="checkbox" 
                 name="forceThemeOverride" 
                 v-model="$localData.settings['forceThemeOverride']" 
@@ -117,6 +119,13 @@
               :indeterminate.prop="darkModeChecked === undefined"
               @click="toggleDarkMode()"> Dark Mode
             </label>
+            <label v-if="$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
+              <input type="checkbox"
+                name="forceThemeOverride"
+                v-model="$localData.settings['forceThemeOverride']"
+                @click="toggleSetting('forceThemeOverride')">
+              Override page-specific themes
+            </label>
           </dt>
 
           <dt>Text Override</dt>
@@ -138,10 +147,17 @@
                 <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
                 <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
               </div>
-              <br><br>
-              <label>Font size:<input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize"></label>
-              <br><br>
-              <label>Line height:<input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="6" step="1" list="lineHeight"></label>
+              <!-- <br><br> -->
+              <label class="fontslider" v-if="$localData.settings.textOverride.fontFamily != 'courierAliased'">
+              <!-- <label> -->
+                Font size:
+                <input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize">
+              </label>
+              <!-- <br><br> -->
+              <label class="fontslider">
+                Line height:
+                <input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight">
+              </label>
             </div>
             <div class="textpreviews">
               <!-- PageText usually require a tab change to recalculate theme. -->
@@ -157,14 +173,18 @@
           </div>
           
           <template v-for="boolSetting in enhancementListBoolean">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass still -->
-            <dd class="settingDesc" v-html="boolSetting.desc"></dd>
+              <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
 
         </dl>
@@ -250,22 +270,21 @@
       <div class="settings mod">
         <h2>Mod Settings</h2>
 
-        <section class="modPrattle">
+        <section class="modPrattle" v-if="!$isWebApp">
           <p class="settingDesc">
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
-<!--           </p>
-          <p> -->
-            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
-<!--           </p>
-          <p> -->
-            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/Bambosh/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
+            You can get mods from anywhere, but a good place to start is the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
+
+            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
             <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
-        </section>
-          
         <div class='hint'>
           <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
-          
         </div>
+        </section>
+        <section class="modPrattle" v-else>
+          <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
+        </section>
+
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
@@ -315,6 +334,7 @@
           <!-- v-if="$localData.settings.devMode || needReload"  -->
           <button @click="forceReload" class="reload">Reload Application</button>
         </div>
+        <button v-if="$localData.settings.devMode" @click="reloadModList(); archiveReload();" class="reload">Soft reload archive (refresh mods and re-run edits)</button>
       </div>
     </div>
     <div class="card">
@@ -322,16 +342,18 @@
         <h2>System Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListSystem">
-            <dt :key="boolSetting.model"><label>
-              <input type="checkbox" 
-                :name="boolSetting.model" 
-                v-model="$localData.settings[boolSetting.model]" 
-                @click="toggleSetting(boolSetting.model)"
-              >{{boolSetting.label}}</label></dt> 
-              <!-- the spacing here is made of glass -->
-            <label :for="boolSetting.model">
-              <dd class="settingDesc" v-html="boolSetting.desc" />
-            </label>
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :for="boolSetting.model" >
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
           </template>
         </dl>
         <div class="system">
@@ -343,14 +365,16 @@
             <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
           </span>
           <br><br>
-          <span class="hint">Asset pack directory:</span>
-          <br>
-          <strong>{{$localData.assetDir || 'None selected'}}</strong>
-          <br><br>
-          <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
-          <br><br>
-          <button @click="locateAssets()">Relocate assets</button>
-          <br><br>
+          <div v-if="!$isWebApp">
+            <span class="hint">Asset pack directory:</span>
+            <br>
+            <strong>{{$localData.assetDir || 'None selected'}}</strong>
+            <br><br>
+            <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
+            <br><br>
+            <button @click="locateAssets()">Relocate assets</button>
+            <br><br>
+          </div>
           <button @click="factoryReset()">Factory reset</button>
         </div>
       </div>
@@ -364,13 +388,16 @@ import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageText from '@/components/Page/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import SubSettingsModal from '@/components/UIElements/SubSettingsModal.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
-import draggable from "vuedraggable"
+
 import Mods from "@/mods.js"
 
-const log = require('electron-log')
-const { ipcRenderer } = require('electron')
+const SubSettingsModal = () => import('@/components/UIElements/SubSettingsModal.vue')
+
+const draggable = () => import("vuedraggable")
+
+const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
+const ipcRenderer = require('electron').ipcRenderer
 
 export default {
   name: 'settings',
@@ -406,12 +433,13 @@ export default {
           desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
         }, {
           model: 'hideFullscreenHeader', 
-          label: "Hide fullscreen header", 
-          desc: "Hide header content (such as the jump bar, title and tab bars) in fullscreen mode (F11)."
+          label: "Hide header in fullscreen",
+          desc: "Hide the application header (title bar, address bar, and tabs) in fullscreen mode (F11)."
         }, {
           model: "smoothScrolling",
           label: "Enable smooth scrolling",
-          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>"
+          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "pixelScaling",
           label: "Pixelated image scaling",
@@ -419,14 +447,15 @@ export default {
         }, {
           model: "urlTooltip",
           label: "Show URL Tooltip",
-          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>"
+          desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>",
+          platform_whitelist: ['electron']
         }
       ],
       enhancementListBoolean: [
         {
           model: "arrowNav",
           label: "Enable arrow key navigation",
-          desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys."
+          desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys, and open textboxes with space."
         }, {
           model: "openLogs",
           label: "Automatically open logs",
@@ -442,7 +471,8 @@ export default {
         }, {
           model: "bandcampEmbed",
           label: "Enable online bandcamp player",
-          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet."
+          desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.",
+          platform_whitelist: ['electron']
         }
       ],
       settingListSystem: [
@@ -451,21 +481,37 @@ export default {
           label: "Enable Developer Mode",
           desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
         }, {
+          model: "reducedMotion",
+          label: "Reduce Motion",
+          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
+        }, {
           model: "jsFlashes",
           label: "Enable enhanced Flash effects",
           desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
         }, {
+          model: "ruffleFallback",
+          label: "Enable Ruffle flash emulation fallback",
+          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
+        }, {
           model: "enableHardwareAcceleration",
           label: "Enable hardware acceleration",
-          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>"
+          desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "useSystemWindowDecorations",
           label: "Use system window decorations",
-          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>"
+          desc: "Use OS-native window decorations instead of the electron title bar. <strong>Will restart the application.</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
-          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is."
+          desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
+          platform_whitelist: ['electron'],
+        }, {
+          model: "useTabbedBrowsing",
+          label: "Use Tabbed Browsing",
+          desc: "By default, the web app only shows one page at a time, like a standard website. This setting re-enables the in-app tab bar, and the app will store your tabs in settings.",
+          platform_whitelist: ['webapp']
         }
       ],
       retconList: [
@@ -530,7 +576,7 @@ export default {
             minor: [], severe: ["holocaust"]
           },
           label: "Skaianet Systems - CURSED_HISTORY",
-          desc: `At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the the notes to be in extremely poor taste, and they were swiftly removed.`
+          desc: `At the beginning of 2019, <a href="/skaianet" target="_blank">the Skaianet Systems website launched</a>, with some of Hussie's old worldbuilding notes peppered through the source code. Many people found the notes to be in extremely poor taste, and they were swiftly removed.`
         }
       ],
       themes: [
@@ -545,7 +591,8 @@ export default {
         {text: "Homosuck", value: "A6A6"},
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
-        {text: "Paradox Space", value: "pxs"}
+        {text: "Paradox Space", value: "pxs"},
+        {text: "MSPFA", value: "mspfa"},
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -553,6 +600,8 @@ export default {
         {text: "Verdana / Arial", value: "verdana"},
         {text: "Times New Roman", value: "times"},
         {text: "Comic Sans", value: "comicSans"},
+        {text: "EB Garamond", value: "garamond"},
+        {text: "Courier Aliased", value: "courierAliased"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
       allControversial: [
@@ -579,10 +628,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$modChoices[key]).filter(val => !!val)
+        this.$root.$modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$modChoices).filter((choice) => 
+      return Object.values(this.$root.$modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -704,20 +753,22 @@ export default {
           thumb: '/archive/collection/archive_news.png'
         })
       }
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
-        this.queueArchiveReload()
-      }
-
-      if (setting == 'useSystemWindowDecorations') {
-        this.$localData.root.saveLocalStorage()
-        this.$nextTick(() => {ipcRenderer.invoke('restart')})
-      }
 
       // Unforce if theme just changed to auto
       if (setting == 'themeOverride' && this.$localData.settings.themeOverride == "default")
         this.$localData.settings.forceThemeOverride = false
 
+      // Call this before queueing archive reload
       this.$localData.root.saveLocalStorage()
+
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
+        this.queueArchiveReload()
+      }
+
+      if (setting == 'useSystemWindowDecorations') {
+        // this.$localData.root.saveLocalStorage()
+        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+      }
     },
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: true})
@@ -730,13 +781,16 @@ export default {
       }
       ipcRenderer.invoke('prompt-okay-cancel', args).then(answer => {
         if (answer === true) {
-          ipcRenderer.invoke('factory-reset', answer)
+          this.$localData.root.clearLocalStorage()
+          Mods.store_mods.clear()
+          // ipcRenderer.invoke('restart')
         }
       })
     },
     onUpdateSortable: function(event){
       const el_active = event.target
       const setting_key = el_active.attributes['data-setting'].value
+      const reordered_item = event.item.attributes['data-value'].value
 
       // Get lists of values
       const old_list = this.$localData.settings[setting_key]
@@ -746,14 +800,23 @@ export default {
       this.$localData.settings[setting_key] = list_active
 
       // Calculte needReload
-      let diff = list_active.filter(x => !old_list.includes(x))
+      let diff = [reordered_item]
+      diff = diff.concat(list_active.filter(x => !old_list.includes(x)))
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
-      if (diff.some(key => this.$modChoices[key].needsHardReload)) {
-        this.$logger.info("List change requires hard reload", diff)
+
+      try {
+        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
+          this.$logger.info("List change requires hard reload", diff)
+          this.needReload = true
+        }
+        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
+          this.$logger.info("List change requires archive reload", diff)
+          this.queueArchiveReload()
+        }
+      } catch (e) {
+        // Sometimes keys aren't in modChoices yet
+        this.$logger.error(e)
         this.needReload = true
-      }
-      if (diff.some(key => this.$modChoices[key].needsArchiveReload)) {
-        this.$logger.info("List change requires archive reload", diff)
         this.queueArchiveReload()
       }
     },
@@ -767,6 +830,9 @@ export default {
 
       this.$root.loadState = "LOADING"
       this.$nextTick(function () {
+        // Don't show loading screen, "soft" reload
+        // this.$root.loadState = "LOADING"
+        this.$localData.root.applySaveIfPending()
         ipcRenderer.send('RELOAD_ARCHIVE_DATA')
       })
     },
@@ -774,31 +840,34 @@ export default {
       this.$refs.modal.openMod(mod, info_only)
     },
     forceReload: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
+      this.$localData.VM.saveLocalStorage()
+      this.$localData.VM._saveLocalStorage()
+      this.$root.loadState = "LOADING"
       ipcRenderer.invoke('reload')
-      // this.$root.loadState = "LOADING"
-      // this.$nextTick(function () {
-      //   ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      //   ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      // })
-      // ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      ipcRenderer.sendSync('MODS_FORCE_RELOAD')
-      this._computedWatchers.$modChoices.run()
-      this._computedWatchers.modsEnabled.run()
-      this._computedWatchers.modsDisabled.run()
-      this.$forceUpdate()
-      this.queueArchiveReload()
+      Mods.loadModChoicesAsync().then(_ => {
+        this.$root.$asyncComputed.$modChoices.update()
+        // this._computedWatchers.modsEnabled.run()
+        // this._computedWatchers.modsDisabled.run()
+        this.$forceUpdate()
+      })
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
+    },
+    trackSettings() {
+      // Log settings, for debugging
+      this.$logger.info(this.$localData.settings)
     }
   },
   mounted(){
     if (this.routeParams.sec) {
       this.$nextTick(() => this.scrollToSec(this.routeParams.sec))
     }
+  },
+  destroyed() {
+    this.trackSettings()
   },
   watch: {
     'tab.history': function (to, from) {
@@ -808,8 +877,7 @@ export default {
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (to == this.tab.key || from == this.tab.key) {
-        // Log settings, for debugging
-        this.$logger.info(this.$localData.settings)
+
         if (this.needReload) {
           this.forceReload()
           // forceReload includes archiveReload
@@ -857,6 +925,7 @@ export default {
     border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
     box-sizing: border-box;
     width: 950px;
+    max-width: 100vw;
     background: var(--page-pageContent);
 
     flex: 0 1 auto;
@@ -900,6 +969,11 @@ export default {
       margin-top: 20px;
       text-align: center;
       font-weight: normal;
+    }
+
+    .needreload {
+      color: red;
+      font-weight: bold;
     }
 
     .newReaderInput {
@@ -967,6 +1041,11 @@ export default {
         display: block;
       }
 
+      label.fontslider {
+        display: block;
+        margin-top: 1em;
+      }
+
       .textpreviews {
         border: 6px solid var(--page-pageFrame);
         padding: 6px;
@@ -1026,13 +1105,19 @@ export default {
     font-weight: normal;
     margin: 1em 0;
     
+    // Ignore card margins for sortable on tiny screens
+    @media (max-width: 650px) {
+      margin: 1em -50px;
+    }
+
+
     ul, ol {  
       text-align: left;        
       border: solid var(--page-pageBorder, var(--page-pageFrame));
       border-width: 5px 5px 0 0;
       padding-bottom: 6em;
       height: 100%;
-      max-height: 70vh;
+      max-height: 60vh;
       overflow: auto;
     }
 

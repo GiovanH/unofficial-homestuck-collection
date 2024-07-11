@@ -11,28 +11,28 @@
       <div class="pageContent leftPage">
         <Footnotes :pageId="thisPages[0].pageId" preface />
           <div class="mediaContent">
-              <h2 class="pageTitle" v-text="thisPages[0].title" />
-              <div class="media">
-                  <Media v-for="url in pageMedia[0]" :key="url" :url="url" class="panel"/>
-              </div>
+            <h2 class="pageTitle" v-text="thisPages[0].title" />
+            <div class="media">
+              <Media v-for="url in pageMedia[0]" :key="url" :url="url" class="panel"/>
+            </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPages[0].pageId" :content="thisPages[0].content"/>
-              <PageNav :thisPage="thisPages[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
+            <TextContent :key="thisPages[0].pageId" :content="thisPages[0].content" ref="textcontent1"/>
+            <PageNav :thisPage="thisPages[0]" :nextPages="nextPagesArray[0]" ref="pageNav1"/>
           </div>
         <Footnotes :pageId="thisPages[0].pageId" />
       </div>
       <div class="pageContent rightPage">
         <Footnotes :pageId="thisPages[1].pageId" preface />
           <div class="mediaContent">
-              <h2 class="pageTitle" v-html="thisPages[1].title" />
-              <div class="media">
-                  <Media v-for="url in pageMedia[1]" :key="url" :url="url" class="panel"/>
-              </div>
+            <h2 class="pageTitle" v-html="thisPages[1].title" />
+            <div class="media">
+              <Media v-for="url in pageMedia[1]" :key="url" :url="url" class="panel"/>
+            </div>
           </div>      
           <div class="textContent">
-              <TextContent :key="thisPages[1].pageId" :content="thisPages[1].content"/>
-              <PageNav :thisPage="thisPages[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
+            <TextContent :key="thisPages[1].pageId" :content="thisPages[1].content" ref="textcontent2"/>
+            <PageNav :thisPage="thisPages[1]" :nextPages="nextPagesArray[1]" ref="pageNav2"/>
           </div>
         <Footnotes :pageId="thisPages[1].pageId" />
       </div>
@@ -42,39 +42,19 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import Banner from '@/components/Page/PageBanner.vue'
-import Media from '@/components/UIElements/MediaEmbed.vue'
-import TextContent from '@/components/Page/PageText.vue'
 import PageNav from '@/components/SpecialPages/x2ComboNav.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
-import Footnotes from '@/components/Page/PageFootnotes.vue'
-import Metadata from '@/components/Page/PageMetadata.vue'
-
 import PAGE from '@/components/Page/Page.vue'
 
 export default {
+  extends: PAGE,
   name: 'x2Combo',
-  props: [
-    'tab', 'routeParams'
-  ],
   components: {
-    NavBanner, Banner, Media, TextContent, PageNav, PageFooter, Footnotes, Metadata
+    PageNav
   },
-  data: function() {
-    return {
-      ...PAGE.data()
-    }
-  },
-  theme: PAGE.theme,
   title: PAGE.title,
+  theme: PAGE.theme,
   computed: {
-    pageNum: PAGE.computed.pageNum,  // Page number of one of the two pages (usually the left one)
-    storyId: PAGE.computed.storyId,
-    isRyanquest: PAGE.computed.isRyanquest,
-    pageCollection: PAGE.computed.pageCollection,
-    thisPage: PAGE.computed.thisPage,
+    // pageNum: PAGE.computed.pageNum,  // Page number of one of the two pages (usually the left one)
     thisPages() {
       let thisPageId = this.pageNum
       let leftPageId, rightPageId
@@ -117,7 +97,12 @@ export default {
         })
       })
 
-      return [this.thisPages[0].media, this.thisPages[1].media]
+      var media1 = Array.from(this.thisPages[0].media)
+      var media2 = Array.from(this.thisPages[1].media)
+      this.deretcon(media1)
+      this.deretcon(media2)
+
+      return [media1, media2]
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPages[1].title}`)
@@ -137,16 +122,20 @@ export default {
         this.$pushURL(this.$refs.pageNav1.backUrl)
       else if (dir == 'right') 
         this.$pushURL(this.$refs.pageNav2.nextUrl(this.nextPagesArray[1][0]))
+    },
+    spaceBarEvent(e) {
+      if (this.$refs.textcontent1) {
+        this.$refs.textcontent1.open()
+      }
+      if (this.$refs.textcontent2) {
+        this.$refs.textcontent2.open()
+      }
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-.pixelated::v-deep img{
-  image-rendering: pixelated;
-}
-
 .pageBody {
   color: var(--font-default);
   background: var(--page-pageBody);
@@ -191,7 +180,7 @@ export default {
       align-items: center;
       flex-flow: column;
       &.leftPage {
-        margin-right: 30px;
+        margin-right: 33px;
       }
 
       .mediaContent {
@@ -207,14 +196,14 @@ export default {
           padding: 15px 0;
         }
 
-        .media{
+        .media {
           display: flex;
           align-items: center;
           flex-flow: column;
 
           .panel {
             &:not(:last-child) {
-              margin-bottom: 17px;
+              margin-bottom: 20px;
             }
           }            
         }
@@ -226,11 +215,9 @@ export default {
         display: flex;
         flex-direction: column;
       }
-    }	
+    }
   }
-
 }
-
 
 </style>
 

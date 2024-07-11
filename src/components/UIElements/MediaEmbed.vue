@@ -1,30 +1,82 @@
 <template>
-  <img    v-if="getMediaType(url) === 'img'" :src='$getResourceURL(url)' @dragstart="drag($event)" alt />
-  <video  v-else-if="getMediaType(url) ==='vid' && gifmode != undefined" :src='$getResourceURL(url)' :width="videoWidth" autoplay="true" muted="true" loop disablePictureInPicture />
-  <video  v-else-if="getMediaType(url) ==='vid' && gifmode == undefined" :src='$getResourceURL(url)' :width="videoWidth" controls controlsList="nodownload" disablePictureInPicture alt />
-  <iframe v-else-if="getMediaType(url) === 'swf'" :key="url" :srcdoc='flashSrc' :width='flashProps.width' :height='($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height' @load="initIframe()" seamless/>
+  <GifSeeker v-if="mediaType === 'gif' && reduceMotion"
+    :src='$getResourceURL(url)' :noanimate="$localData.settings.reducedMotion && (noncritical != undefined)"
+    class='mediaembed' />
+  <img v-else-if="mediaType === 'img' || mediaType === 'gif'"
+    :src='$getResourceURL(url)'
+    @dragstart="drag($event)" alt
+    class='mediaembed' />
+  <video v-else-if="mediaType ==='vid' && gifmode != undefined"
+    :src='$getResourceURL(url)'
+    :width="videoWidth"
+    disablePictureInPicture
+    autoplay="true" muted="true"
+    loop
+    class='mediaembed' />
+  <video v-else-if="mediaType ==='vid' && gifmode == undefined"
+    :src='$getResourceURL(url)'
+    :width="videoWidth"
+    disablePictureInPicture alt
+    :autoplay="autoplay" @loadeddata="onVideoLoaded"
+    class='mediaembed' />
+
+  <button v-else-if="mediaType === 'swf' && (reduceMotion && !reducedMotionFlashConfirmed)"
+    class="mediaembed confirm-button"
+    @click="reducedMotionFlashConfirmed = true" >
+    <div class="play-button">
+      <div></div>
+    </div>
+    <canvas
+      :width="width || flashProps.width"
+      :height="height || ($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height"
+      style="width: 100%; height: 100%;"></canvas>
+  </button>
+  <iframe v-else-if="mediaType === 'swf'"
+    :key="url" :srcdoc='flashSrc'
+    :width='width || flashProps.width'
+    :height='height || (($localData.settings.jsFlashes && flashProps.id in cropHeight) ? cropHeight[flashProps.id] : flashProps.height)'
+    @load="initIframe" seamless
+    class='mediaembed' />
   <!-- HTML iframes must not point to assets :c -->
 
-  <component v-else-if="getMediaType(url) === 'html'"
-  :is="frameType"
-  :src='resolveFrameUrl(url)' 
-  ref='frame'
-  :style="`width: ${flashProps.width}px; height: ${flashProps.height}px; max-width: 100%; max-height: 100%;`"
-  @did-finish-load="initHtmlFrame" seamless />
+  <component v-else-if="mediaType === 'html'"
+    :is="frameType"
+    :src='resolveFrameUrl(url)'
+    ref='frame'
+    :style="`width: ${width || flashProps.width}px; height: ${height || flashProps.height}px; max-width: 100%; max-height: 100%;`"
+    @did-finish-load="initHtmlFrame" seamless
+    class='mediaembed' />
   <!-- <button @click='$refs.frame.openDevTools()'>Webframe</button> -->
 
-  <div v-else-if="getMediaType(url) === 'txt'" v-html="getFile(url)"  class="textEmbed" />
-  <audio v-else-if="getMediaType(url) === 'audio'" class="audioEmbed" controls controlsList="nodownload" :src="this.$getResourceURL(url)" type="audio/mpeg" />
+  <div v-else-if="mediaType === 'txt'"
+    v-html="getFile(url)" class="textEmbed" />
+  <audio v-else-if="mediaType === 'audio'"
+    class="audioEmbed"
+    controls controlsList="nodownload"
+    :src="this.$getResourceURL(url)"
+    type="audio/mpeg" />
 </template>
 
 <script>
-import fs from 'fs'
-import path from 'path'
 import Resources from "@/resources.js"
+import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
+
+const GifSeeker = () => import('@/components/UIElements/GifSeeker.vue')
+
+const path = (window.isWebApp ? require('path-browserify') : require('path'))
+const ipcRenderer = require('electron').ipcRenderer
+
+var fs
+if (!window.isWebApp) {
+  fs = require('fs')
+} else {
+  fs = undefined
+}
 
 export default {
   name: "MediaEmbed",
-  props: ['url', 'gifmode', 'webarchive'],
+  props: ['url', 'gifmode', 'webarchive', 'width', 'height', 'autoplay', 'noncritical'],
+  components: {SpoilerBox, GifSeeker},
   emits: ['blockedevent'], 
   data() {
     return {
@@ -215,11 +267,14 @@ export default {
         'A6A6I1': -100,
         'darkcage': 350,
       },
+      pauseAt: {
+        "08080": 18
+      },
       audio: [],
       source: undefined,
       lastStartedAudio: undefined,
       shouldEnsaftenWebviews: true,
-
+      reducedMotionFlashConfirmed: false,
       timer: {
         interval: undefined,
         callback: undefined,
@@ -234,10 +289,16 @@ export default {
       if (this.webarchive) return 'webview'
       return 'iframe'
     },
+    mediaType() {
+      return this.getMediaType(this.url)
+    },
+    flashId() {
+      // ID, before any underscores
+      return path.parse(this.url).name.split("_")[0]
+    },
     videoWidth() {
-      const filename = path.parse(this.url).name
       let width = 950
-      switch (filename){
+      switch (this.flashId){
         case "08120": 
           width = 1280
           break
@@ -246,22 +307,20 @@ export default {
       return `${width}px`
     },
     flashProps() {
-      // ID, before any underscores
-      let filename = path.parse(this.url).name.split("_")[0]
-      this.$logger.info("Getting flash props for", filename, this.url)
+      this.$logger.info("Getting flash props for", this.flashId, this.url)
 
       const defaultProps = {
-        id: filename, 
-        width: 650, 
-        height: 450, 
+        id: this.flashId,
+        width: this.width || 650,
+        height: this.height || 450,
         bgcolor: '#fff',
         rawStyle: ''
       }
 
-      let customProps = this.indexedFlashProps[filename] || {}
+      let customProps = this.indexedFlashProps[this.flashId] || {}
 
       if (Object.keys(customProps).length)
-        this.$logger.info("Custom props for flash", filename, customProps)
+        this.$logger.info("Custom props for flash", this.flashId, customProps)
 
       return {...defaultProps, ...customProps}
     },
@@ -290,7 +349,25 @@ export default {
               })
             }
           }
+          window.open = function(url, name, features, replace) {
+              console.log("Flash invoked window.open")
+              vm.invokeFromFlash("link?" + url)
+          }
+          if (typeof navigation !== 'undefined') {
+            navigation.addEventListener("navigate", (e) => {
+              console.log("srcdoc navigating: ", e, e.destination,
+                e.destination.url
+              )
+              if (!e.destination.sameDocument) {
+                console.log(e.destination.url)
+                vm.invokeFromFlash("link?" + e.destination.url)
+              }
+            })
+          } else {
+            console.warn("Browser does not support 'navigation' listener")
+          }
         <\/script>
+        ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
         </head>
         <body>
         <object type="application/x-shockwave-flash" 
@@ -308,9 +385,31 @@ export default {
         </body>
         </html>
       `
+    },
+    reduceMotion() {
+      return this.$localData.settings.reducedMotion
     }
   },
   methods: {
+    onVideoLoaded(event) {
+      // Don't show controls until video is loaded and element is sized
+      event.srcElement.controls = true
+      event.srcElement.controlsList = "nodownload"
+
+      const pauseAt = this.pauseAt[this.flashProps.id]
+      if (pauseAt) {
+        const pause = function(){
+          if (this.currentTime > pauseAt) {
+            console.log("pausing video at", this.currentTime)
+            this.controls = true
+            this.pause()
+            this.removeEventListener("timeupdate", pause)
+          }
+        }
+        event.srcElement.controls = false
+        event.srcElement.addEventListener("timeupdate", pause)
+      }
+    },
     initHtmlFrame(event) {
       if (this.frameType == 'webview') {
         const webview = event.srcElement
@@ -349,11 +448,12 @@ document.addEventListener('click', function (e) {
         }
       }
     },
-    initIframe() {
-      this.$el.contentWindow.vm = this
+    initIframe(event) {
+      const target = event.target || event.path[0]
+      target.contentWindow.vm = this
     },
     resolveFrameUrl(url){
-      this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
+      // this.$logger.info('Resolving iframe url', url, Resources.resolveURL(url))
       return Resources.resolveURL(url)
     },
     invokeFromFlash(func) {
@@ -378,8 +478,9 @@ document.addEventListener('click', function (e) {
 
       // getURL "about:srcdoc#gameOver" "" <- Get ready for some bullshit
 
-      this.$logger.debug(func)
-      const [funcName, param] = func.split('?')
+      this.$logger.debug("flash invoked function", func)
+      const [funcName, ...params] = func.split('?')
+      const param = params.join('?') // reconstitute params with ? in them
       switch (funcName) {
         case 'audioInit':
           this.$logger.debug(`Creating audio`)
@@ -410,7 +511,11 @@ document.addEventListener('click', function (e) {
           this.audioVolume(param)
           break
         case 'link':
-          this.$pushURL(param, this.$parent.tab.key)
+          if (param != 'about:srcdoc') {
+            this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
+          } else {
+            this.$logger.warn("Tried to navigate page to srcdoc!")
+          }
           break
         case 'heightStart':
           if (this.$localData.settings.jsFlashes) {
@@ -440,6 +545,7 @@ document.addEventListener('click', function (e) {
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
             this.$logger.info("Initializing dynamic game over page")
+            this.$parent.gameOverPreload = false
             this.gameOver.count = 0
             this.startTimer(() => {
               const next_step = this.gameOver.steps[this.gameOver.count]
@@ -481,7 +587,8 @@ document.addEventListener('click', function (e) {
 
       return audioElement
     },
-    audioStart(n = 1) {
+    audioStart(n) {
+      n = (n === "" ? 1 : n)
       this.audioInit()
       let cascadeDelay = 0
       if (this.flashProps.id == '04106') {
@@ -615,12 +722,27 @@ document.addEventListener('click', function (e) {
     },
 
     getFile(url) {
-      return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      // Return the contents of the (text) file at url.
+      this.$logger.info("Retrieving file", url)
+      if (this.$isWebApp) {
+        const request = new XMLHttpRequest();
+        request.open("GET", url, false); // `false` makes the request synchronous
+        request.send(null);
+        if (request.status === 200) {
+          return request.responseText
+        } else {
+          console.error(request)
+        }
+      } else {
+        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+      }
     },
     getMediaType (url) {
       url = url.toLowerCase()
       const ext = path.extname(url)
       switch (ext) {
+        case ".gif":
+          return 'gif'
         case ".swf":
           return 'swf'
         case ".mp4":
@@ -638,9 +760,11 @@ document.addEventListener('click', function (e) {
       }
     },
     drag(e) {
-      e.preventDefault()
-      e.dataTransfer.effectAllowed = 'copy'
-      require('electron').ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+      if (!this.$isWebApp) {
+        e.dataTransfer.effectAllowed = 'copy'
+        ipcRenderer.send('ondragstart', this.$mspaFileStream(this.url))
+        e.preventDefault()
+      }
     }
   },
   updated() {
@@ -675,5 +799,36 @@ document.addEventListener('click', function (e) {
   audio {
     width: 100%;
     min-width: 650px;
+  }
+  .confirm-button {
+    position: relative;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 0;
+    background: var(--page-pageContent);
+
+    .play-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      background: rgba(0, 0, 0, 0.3);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -30px;
+
+      > div {
+        width: 0;
+        height:  0;
+        border-top: 14px solid transparent;
+        border-bottom: 14px solid transparent;
+        border-left: 14px solid rgba(0, 0, 0, 0.5);
+        position: absolute;
+        left: 26px;
+        top: 16px;
+      }
+    }
   }
 </style>

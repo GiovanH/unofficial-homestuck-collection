@@ -1,16 +1,17 @@
 <template>
   <div id="window" :class="theme">
-    <div id="app" :class="[
-      // $root.loadState != 'DONE' ? 'busy' : '',
-      $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
-        
-      ]" v-if="$archive && $root.loadState !== 'ERROR'">
+    <div id="app"
+      :class="[
+        $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
+        $localData.settings.reducedMotion ? 'reducedMotion' : '',
+        $root.platform // webapp or electron
+      ]" v-if="canLoadApp">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
       <Notifications :class="theme" ref="notifications" />
-      <ContextMenu :class="theme" ref="contextMenu" />
-      <Updater ref="Updater" />
-      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip"/>
+      <ContextMenu :class="theme" ref="contextMenu" v-if="!$isWebApp" />
+      <Updater ref="Updater" v-if="!$isWebApp" />
+      <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip && !$isWebApp"/>
       <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
     </div>
     <div id="app" class="mspa"  v-else>
@@ -23,20 +24,29 @@
 <script>
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
-  import TabFrame from '@/components/TabFrame.vue'
-  import Notifications from '@/components/UIElements/Notifications.vue'
-  import Updater from '@/components/UIElements/Updater.vue'
 
-  import ContextMenu from '@/components/UIElements/ContextMenu.vue'
-  import UrlTooltip from '@/components/UIElements/UrlTooltip.vue'
+  const Notifications = () => import('@/components/UIElements/Notifications.vue')
+
+  const ContextMenu = () => import('@/components/UIElements/ContextMenu.vue')
+  const UrlTooltip = () => import('@/components/UIElements/UrlTooltip.vue')
+  const Updater = () => import('@/components/UIElements/Updater.vue')
+  const TabFrame = () => import('@/components/TabFrame.vue')
 
   import Mods from "./mods.js"
 
-  const electron = require('electron')
+  const ipcRenderer = require('electron').ipcRenderer
+
+  var mixins = []
+  var webFrame = undefined;
+
+  if (!window.isWebApp) {
+    webFrame = require('electron').webFrame
+    mixins = [ Mods.getMainMixin() ];
+  }
 
   export default {
     name: 'HomestuckCollection',
-    mixins: [Mods.getMainMixin()],
+    mixins,
     components: {
       Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
     },
@@ -48,6 +58,19 @@
       }
     },
     computed: {
+      canLoadApp() {
+        if (this.$archive == undefined) {
+          // Cannot load components without archive
+          return false
+        } else {
+          if (this.$localData.assetDir && this.$root.loadState !== 'ERROR') {
+            // Asset dir is defined (setup finished) and loadState is not known error
+            return true
+          }
+        }
+        // Setup not completed, or loadState is error
+        return false
+      },
       tabList() {
         return this.$localData.tabData.tabList
       },
@@ -105,7 +128,7 @@
     methods: {
       resetZoom() {
         this.zoomLevel = 0
-        electron.webFrame.setZoomLevel(this.zoomLevel)
+        webFrame.setZoomLevel(this.zoomLevel)
       },
       checkTheme() {
         this.needCheckTheme = !this.needCheckTheme;
@@ -113,13 +136,13 @@
       zoomIn() {
         if (this.zoomLevel < 5) {
           this.zoomLevel += 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       zoomOut() {
         if (this.zoomLevel > -5) {
           this.zoomLevel -= 0.5
-          electron.webFrame.setZoomLevel(this.zoomLevel)
+          webFrame.setZoomLevel(this.zoomLevel)
         }
       },
       openJumpbox() {
@@ -149,83 +172,120 @@
             return
           }
           this.$logger.info("Requesting icon change to", app_icon_var)
-          electron.ipcRenderer.send('set-sys-icon', app_icon_var)
+          ipcRenderer.send('set-sys-icon', app_icon_var)
         })
       }
     },
     watch: {
       'theme'(to, from) {
         this.updateAppIcon()
-      } 
+      },
+      'tabTheme'(to, from) {
+        if (to != undefined)
+          this.$root.tabTheme = to
+      }
+    },
+    updated() {
+      if (this.$isWebApp) this.filterLinksAndImages(window.document.body)
     },
     mounted () {
       this.$nextTick(() => this.updateAppIcon())
+      const user_path_target = window.location.pathname
 
       this.$localData.root.TABS_SWITCH_TO()
+      // Switch to the last tab (good) but replaces history (so we use the previously captured value)
 
-      electron.webFrame.setZoomFactor(1)
+      this.$root.loadStage = "MOUNTED"
 
-      // Ask for a fresh copy of the archive
-      // Root must exist to receive it, so this calls from inside the app
-      electron.ipcRenderer.send("RELOAD_ARCHIVE_DATA") 
+      if (isWebApp) {
+        if (user_path_target != this.$localData.root.activeTabObject.url) {
+          this.$logger.warn("Navigating user to", user_path_target)
+          this.$nextTick(() => {
+            // this.$localData.root.TABS_PUSH_URL(user_path_target)
+            this.$localData.root.TABS_NEW(user_path_target)
+          })
+        } else {
+          // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
+
+        }
+      }
+
+      webFrame && webFrame.setZoomFactor(1)
 
       // Sets up listener for the main process
-      electron.ipcRenderer.on('TABS_NEW', (event, payload) => {
+      ipcRenderer.on('TABS_NEW', (event, payload) => {
         this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
       })
-      electron.ipcRenderer.on('TABS_CLOSE', (event, key) => {
+      ipcRenderer.on('TABS_CLOSE', (event, key) => {
         this.$localData.root.TABS_CLOSE(key)
       })
-      electron.ipcRenderer.on('TABS_DUPLICATE', (event) => {
+      ipcRenderer.on('TABS_DUPLICATE', (event) => {
         this.$localData.root.TABS_DUPLICATE()
       })
-      electron.ipcRenderer.on('TABS_RESTORE', (event) => {
+      ipcRenderer.on('TABS_RESTORE', (event) => {
         this.$localData.root.TABS_RESTORE()
       })
-      electron.ipcRenderer.on('TABS_CYCLE', (event, payload) => {
+      ipcRenderer.on('TABS_CYCLE', (event, payload) => {
         this.$localData.root.TABS_CYCLE(payload.amount)
       })
-      electron.ipcRenderer.on('TABS_PUSH_URL', (event, to) => {
+      ipcRenderer.on('TABS_PUSH_URL', (event, to) => {
         this.$pushURL(to)
       })
-      electron.ipcRenderer.on('TABS_HISTORY_BACK', (event) => {
+      ipcRenderer.on('TABS_HISTORY_BACK', (event) => {
         this.$localData.root.TABS_HISTORY_BACK()
       })
-      electron.ipcRenderer.on('TABS_HISTORY_FORWARD', (event) => {
+      ipcRenderer.on('TABS_HISTORY_FORWARD', (event) => {
         this.$localData.root.TABS_HISTORY_FORWARD()
       })
-      electron.ipcRenderer.on('ZOOM_IN', (event) => {
+      ipcRenderer.on('ZOOM_IN', (event) => {
         this.zoomIn()
       })
-      electron.ipcRenderer.on('ZOOM_OUT', (event) => {
+      ipcRenderer.on('ZOOM_OUT', (event) => {
         this.zoomOut()
       })
-      electron.ipcRenderer.on('ZOOM_RESET', (event) => {
+      ipcRenderer.on('ZOOM_RESET', (event) => {
         this.resetZoom()
       })
-      electron.ipcRenderer.on('OPEN_FINDBOX', (event) => {
+      ipcRenderer.on('OPEN_FINDBOX', (event) => {
         this.activeTabComponent.$refs.findbox.open()
-      })      
-      electron.ipcRenderer.on('OPEN_JUMPBOX', (event) => {
+      })
+      ipcRenderer.on('OPEN_JUMPBOX', (event) => {
         this.openJumpbox()
-      })      
+      })
 
-      electron.ipcRenderer.on('RELOAD_LOCALDATA', (event) => {
+      ipcRenderer.on('RELOAD_LOCALDATA', (event) => {
         this.$localData.VM.reloadLocalStorage()
       })
-      
-      electron.ipcRenderer.on('ARCHIVE_UPDATE', (event, archive) => {
-        this.$root.archive = archive
-      })
 
-      electron.ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
+      ipcRenderer.on('SET_LOAD_STATE', (event, state) => {
         this.$root.loadState = state
       })
 
-      this.$root.loadStage = "MOUNTED"
-      electron.ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
+      ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
         this.$root.loadStage = stage
       })
+
+      ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
+        this.$root.loadStage = "MODS"
+        try {
+          await Mods.editArchiveAsync(archive)
+          this.$root.archive = Object.freeze(archive)
+          this.$root.loadStage = "LOADED_ARCHIVE"
+          this.$nextTick(() => {
+            this.$root.loadState = "DONE"
+          })
+        } catch (e) {
+          this.$logger.error(e)
+          this.$root.archive = undefined
+          this.$root.loadState = "ERROR"
+        }
+      })
+
+      // Ask for a fresh copy of the archive
+      // Root must exist to receive it, so this calls from inside the app
+      // and the app must have registered the receipt listener first to accept it!
+      this.$root.loadState = "WAITING_ON_DATA"
+      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
 
       document.addEventListener('dragover', event => event.preventDefault())
       document.addEventListener('drop', event => event.preventDefault())
@@ -235,68 +295,57 @@
         if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })
 
-      // TODO: click and auxclick seem to share a lot of code here, consider rewrite
+      const app = this
 
-      window.addEventListener('click', event => {
-        // ensure we use the link, in case the click has been received by a subelement
-        let { target } = event
+      const parentLinkElement = (target) => {
         while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
-        // handle only links that do not reference external resources
-        if (target && target.href) { //
+        return target
+      }
+
+      const onLinkClick = (event, force_aux_click=false) => {
+        // ensure we use the link, in case the click has been received by a subelement
+        const resolvedTarget = parentLinkElement(event.target)
+        if (resolvedTarget && resolvedTarget.href) {
           // some sanity checks taken from vue-router:
           // https://github.com/vuejs/vue-router/blob/dev/src/components/link.js#L106
-          const { altKey, ctrlKey, metaKey, shiftKey, button, defaultPrevented } = event
-          // don't handle when preventDefault called
-          if (defaultPrevented) return
-          // don't handle right clicks
-          if (button !== undefined && button !== 0) return
-          // don't handle if `target="_blank"`
-          const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false // unused?
+          if (event.defaultPrevented) return // don't handle when preventDefault called
+          const targetBlank = (resolvedTarget.getAttribute) ? (/\b_blank\b/i.test(resolvedTarget.getAttribute('target'))) : false // don't handle if `target="_blank"`
 
           if (event.preventDefault) {
             event.preventDefault()
-            const auxClick = metaKey || altKey || ctrlKey || shiftKey || targetBlank
-            this.$openLink(target.href, auxClick)
+            const { altKey, ctrlKey, metaKey, shiftKey } = event
+            const auxClick = (metaKey || altKey || ctrlKey || shiftKey) || targetBlank
+
+            app.$openLink(resolvedTarget.href, auxClick || force_aux_click)
+            // const resolved_href = Resources.resolveURL(resolvedTarget.href)
+            // app.$openLink(resolved_href, auxClick || force_aux_click)
           }
         }
+      }
+
+      window.addEventListener('click', event => {
+        if (event.button !== undefined && event.button !== 0) return // only handle left clicks
+        onLinkClick(event)
       })
 
       window.addEventListener('auxclick', event => {
         // ensure we use the link, in case the click has been received by a subelement
-        let { target, button } = event
-        if (button == 2) {
+        if (event.button == 2 && this.$refs.contextMenu) {
           event.preventDefault()
-          // TODO: Sometimes contextMenu is undefined?
-          console.assert(this.$refs.contextMenu, this.$refs)
-          this.$refs.contextMenu.open(event, target)
-          return
-        } else if (button == 3) {
+          this.$refs.contextMenu.open(event, event.target)
+        } else {
+          if (event.button !== undefined && event.button !== 1) return // only handle middle clicks
+          onLinkClick(event, true)
+        }
+      })
+
+      window.addEventListener("mousedown", (event) => {
+        if (event.button == 3) {
           event.preventDefault()
           this.$localData.root.TABS_HISTORY_BACK()
-        } else if (button == 4) {
+        } else if (event.button == 4) {
           event.preventDefault()
           this.$localData.root.TABS_HISTORY_FORWARD()
-        }
-        while (target && (target.tagName !== 'A' && target.tagName !== 'AREA')) target = target.parentNode
-        // handle only links that do not reference external resources
-        if (target && target.href) {
-          // some sanity checks taken from vue-router:
-          // https://github.com/vuejs/vue-router/blob/dev/src/components/link.js#L106
-          // const { altKey, ctrlKey, metaKey, shiftKey, defaultPrevented } = event
-          // don't handle with control keys
-          // if (metaKey || altKey || ctrlKey || shiftKey) return
-          // don't handle when preventDefault called
-          if (event.defaultPrevented) return
-
-          // don't handle if `target="_blank"`
-          // const targetBlank = (target.getAttribute) ? (/\b_blank\b/i.test(target.getAttribute('target'))) : false; // unused?
-          // don't handle right clicks
-          if (button !== undefined && button !== 1) return
-
-          if (event.preventDefault) {    
-            event.preventDefault()
-            this.$openLink(target.href, true)
-          }
         }
       })
     }
@@ -331,7 +380,7 @@
   html, body {
     height: 100%;
   }
-  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, div{
+  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, div {
     margin: 0;
     padding: 0;
   }
@@ -340,6 +389,11 @@
     font-size: 14px;
     font-weight: bolder;
     overflow-wrap: break-word;
+  }
+  @media (max-width: 650px) {
+    body {
+      font-size: 14px;
+    }
   }
   .tabFrame {
     input, img {
@@ -356,6 +410,11 @@
     .invisible {
       visibility: hidden !important;
     }
+
+    .pixelated img {
+        image-rendering: pixelated;
+    }
+
     .hidden {
       &.forceLoad {
         height: 0;
@@ -370,33 +429,34 @@
     }
   }
 
-  a, .bookmarkUrlDisplay {
-    &.jumpboxLink::after{
-      @extend %fa-icon;
-      @extend .fas;
-      content: fa-content($fa-var-chevron-right);
-    }
-    &[href^="http://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href^="https://"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href^="mailto"]:not([href*="127.0.0.1"]):not([href*="localhost"]),
-    &[href$=".pdf"],
-    // &[href$=".html"]:not([href*="assets://"]) {
-    &[href$=".html"] {
-      &::after{
-        @extend %fa-icon;
-        @extend .fas;
-        content: fa-content($fa-var-external-link-alt);
-        margin: 0 1px 0 2px;
-        line-height: inherit;
+  a.jumpboxLink::after{
+    // By default, show > in the jump bar
+    @extend %fa-icon;
+    @extend .fas;
+    content: fa-content($fa-var-chevron-right);
+  }
+  .electron {
+    a, .urlDisplay {
+      // Link-like links...
+      &[href^="http://"], &[href^="https://"], &[href^="mailto"], &[href$=".pdf"], &[href$=".html"] {
+        // ...that aren't on localhost
+        &:not([href*="127.0.0.1"]):not([href*="localhost"]):not([href*="assets://"])::after{
+          @extend %fa-icon;
+          @extend .fas;
+          content: fa-content($fa-var-external-link-alt);
+          margin: 0 1px 0 2px;
+          line-height: inherit;
+        }
       }
-    }
-    &[href$=".jpg"],&[href$=".png"],&[href$=".gif"],&[href$=".swf"],&[href$=".txt"],&[href$=".mp3"],&[href$=".wav"],&[href$=".mp4"],&[href$=".webm"]{
-      &::after{
-        @extend %fa-icon;
-        @extend .fas;
-        content: fa-content($fa-var-file-image);
-        margin: 0 1px 0 2px;
-        line-height: inherit;
+      // Asset-like links
+      &[href$=".jpg"], &[href$=".png"], &[href$=".gif"], &[href$=".swf"], &[href$=".txt"], &[href$=".mp3"], &[href$=".wav"], &[href$=".mp4"], &[href$=".webm"]{
+        &::after{
+          @extend %fa-icon;
+          @extend .fas;
+          content: fa-content($fa-var-file-image);
+          margin: 0 1px 0 2px;
+          line-height: inherit;
+        }
       }
     }
   }

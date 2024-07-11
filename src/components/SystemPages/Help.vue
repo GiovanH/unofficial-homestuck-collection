@@ -50,8 +50,8 @@
       </div>
       <div class="cardContent" v-if="cardSelection == 'usage'">
         <section>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
+          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
         <section>
           <h2>GENERAL NAVIGATION</h2>
@@ -105,7 +105,7 @@
           <dd>Most of the colored text in Homestuck is optimized to be read against the default grey MSPA background, so dark text colors will become very hard to read against a dark background. If you're using dark mode, we recommend also turning on <b>High contrast text</b> in settings under Text Override.</dd>
 
           <dt>How can I share or find mods?</dt>
-          <dd><a href="https://github.com/Bambosh/unofficial-homestuck-collection/wiki/Third-Party-Mods">We have a wiki page dedicated to shining a light on various mods developed by the community.</a>. If you've created a mod and want to share it, please add a link to the list! <strong v-if="$isNewReader">Be careful - this list is likely to contain unmarked spoilers.</strong></dd>
+          <dd><a href="https://github.com/GiovanH/unofficial-homestuck-collection/wiki/Third-Party-Mods">We have a wiki page dedicated to shining a light on various mods developed by the community.</a>. If you've created a mod and want to share it, please add a link to the list! <strong v-if="$isNewReader">Be careful - this list is likely to contain unmarked spoilers.</strong></dd>
 
           <dt>How can I install mods?</dt>
           <dd>Installing mods is simple - once you've downloaded one, just drag it into the "mods" folder in your asset pack. It will appear <a href='/settings/mod' target='_blank'>in this list of "Inactive" mods</a> once you refresh the application. To enable a mod, drag it over to the "Active" column. If any active mods conflict with each other, whichever one is higher on the list will take priority.</dd>
@@ -144,8 +144,8 @@
           <p>Still having trouble? Reach out to us:</p>
         </section>
         <section>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
-          <a href="https://github.com/Bambosh/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
+          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
       </div>
     </div>

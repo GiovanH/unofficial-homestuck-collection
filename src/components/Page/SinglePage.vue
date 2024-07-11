@@ -10,11 +10,10 @@ function urlToArgObj(url) {
 }
 
 export default {
-  ...VanillaPage,
+  extends: VanillaPage,
   name: 'singlepage',
   data: function() {
     return {
-      ...VanillaPage.data(),
       shortVer: {
         "title": 'c',
         "pageId": 'id',
@@ -28,7 +27,7 @@ export default {
     }
   },
   props: [
-    'tab', 'routeParams'
+    'tab', 'routeParams', 'args'
   ],
   theme: function(ctx) {
     const args = urlToArgObj(ctx.tab.url)
@@ -39,7 +38,6 @@ export default {
     return args.c || 'SinglePage'
   },
   methods: {
-    ...VanillaPage.methods,
     argLookup(key, def) {
       const islist = Array.isArray(def)
       if (islist) {
@@ -59,7 +57,6 @@ export default {
     }
   },
   computed: {
-    ...VanillaPage.computed,
     isRyanquest(){
       return false
     },
@@ -70,7 +67,7 @@ export default {
       return this.$archive.mspa['story']
     },
     queryArgs() {
-      return urlToArgObj(this.tab.url)
+      return this.args || urlToArgObj(this.tab.url)
     },
     thisPage() {
       // Add useful information to archive object

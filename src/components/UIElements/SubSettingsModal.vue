@@ -94,7 +94,8 @@
 
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
-const { getModStoreKey } = require('@/mods.js').default
+const { getModStoreKey, store_mods } = require('@/mods.js').default
+
 const { ipcRenderer } = require('electron')
 
 const Store = require('electron-store')
@@ -136,7 +137,7 @@ export default {
       this.settingsModel = modopt.settingsmodel || {}
       this.modopt = modopt
       this.storeKey = getModStoreKey(modopt.key, null)
-      this.buffer = store.get(this.storeKey) || {}
+      this.buffer = store_mods.get(this.storeKey) || {}
       this.info_only = Boolean(info_only)
 
       this.isActive = true
@@ -153,8 +154,8 @@ export default {
       this.storeKey = undefined
       this.info_only = undefined
 
-      if (this.modopt.needsArchiveReload) {
-        this.queueArchiveReload()
+      if (this.modopt.needsArchiveReload && this.$parent.queueArchiveReload) {
+        this.$parent.queueArchiveReload()
       }
       // TODO: Track if options have been changed, and hardreload
       // if a reload is required & options have changed requiring it
@@ -166,12 +167,12 @@ export default {
       if (this.info_only) return
       if (!this.hasSettings) return
       this.$logger.debug("saving", this.buffer, this.storeKey)
-      store.set(this.storeKey, this.buffer)
+      store_mods.set(this.storeKey, this.buffer)
     },
     clearAll() {
       this.$logger.info("Clearing mod store key", this.storeKey)
-      store.set(this.storeKey, {})
-      this.buffer = store.get(this.storeKey) || {}
+      store_mods.set(this.storeKey, {})
+      this.buffer = store_mods.get(this.storeKey) || {}
     },
     forceReload() {
       this.close()

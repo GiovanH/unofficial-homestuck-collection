@@ -7,7 +7,7 @@ const electron = require('electron')
 
 export default {
   name: 'UrlTooltip',
-	props: [],
+  props: [],
   data() {
     return {
       url: "",
@@ -29,7 +29,7 @@ export default {
         .replace(/^http:\/\/localhost:8080\//, "/")
         .replace(/^app:\/\/\.\//, "/")
 
-      if (!new_url.startsWith('http')) {
+      if (!new_url.startsWith('http') && !new_url.startsWith('assets:')) {
         // Not an external link; resolve the path
         new_url = this.$resolvePath(new_url)
       }

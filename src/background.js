@@ -2,12 +2,10 @@
 
 import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
-import FlexSearch from 'flexsearch'
 
 import Resources from "./resources.js"
-import Mods from "./mods.js"
 
 const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
@@ -20,8 +18,12 @@ const http = require('http')
 const Store = require('electron-store')
 const store = new Store()
 
+const windowStateKeeper = require('electron-window-state')
+
 const log = require('electron-log')
 const logger = log.scope('ElectronMain')
+
+// const search = require('./search.js').default
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -31,15 +33,15 @@ const gotTheLock = app.requestSingleInstanceLock()
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
 
-if (!store.get('localData.settings.enableHardwareAcceleration')) {
-  console.log("Disabling hardware acceleration")
+if (!store.get('settings.enableHardwareAcceleration')) {
+  logger.info("Disabling hardware acceleration")
   app.disableHardwareAcceleration()
 } else {
-  console.log("Not disabling hardware acceleration")
+  logger.info("Not disabling hardware acceleration")
 }
 
 // Log settings, for debugging
-logger.info(store.get('localData.settings'))
+logger.info(store.get('settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -66,10 +68,9 @@ function zoomOut() {
   }
 }
 
-var assetDir = store.has('localData.assetDir') ? store.get('localData.assetDir') : undefined
+var assetDir = store.has('assetDir') ? store.get('assetDir') : undefined
 
 var port
-var chapterIndex;
 
 // Menu won't be visible to most users, but it helps set up default behaviour for most common key combos
 var menuTemplate = [
@@ -204,10 +205,10 @@ var menuTemplate = [
   }
 ]
 
-function loadArchiveData(){
+async function loadArchiveData(){
   // Attempt to set up with local files. If anything goes wrong, we'll invalidate the archive/port data. If the render process detects a failure it'll shunt over to setup mode
-  // This returns an `archive` object, and does not modify the global archive directly. 
-  win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
+  // This returns an `archive` object, and does not modify the global archive directly.
+  if (win) win.webContents.send('SET_LOAD_STAGE', "ARCHIVE")
   logger.info("Loading archive")
 
   if (!assetDir) throw Error("No reference to asset directory")
@@ -227,7 +228,8 @@ function loadArchiveData(){
       extras: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/extras.json'), 'utf8')),
       tweaks: JSON.parse(fs.readFileSync(path.join(assetDir, 'archive/data/tweaks.json'), 'utf8')),
       audioData: {},
-      flags: {}
+      flags: {},
+      mspfa: {}
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
@@ -241,40 +243,13 @@ function loadArchiveData(){
     .filter(v => v.flag.includes('TZPASSWORD'))
     .map(v => v.pageId)
 
-  // We pre-build this here so mods have access to it
-  // TODO: This is unused now, remove it
-  data.search = Object.values(data.mspa.story).map(storypage => {
-    return {
-      key: storypage.pageId,
-      chapter: Resources.getChapter(storypage.pageId),
-      content: `${storypage.title}###${storypage.content}`
-    }
-  })
-
-  win.webContents.send('SET_LOAD_STAGE', "MODS")
-  logger.info("Loading mods")
-
   try {
-    logger.debug("Applying mod archive edits")
-    Mods.editArchive(data)
-    // This isn't strictly part of loading the archive data,
-    // but we should do this only when we reload the archive
-    logger.debug("Baking mod routes")
-    Mods.bakeRoutes()
-
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
   } catch (e) {
-    // Errors should already log/handle themselves by now
-    // but we need to update the application state to react to it
-    // This is probably due to a poorly written mod, somehow.
-    // specifically $localdata can be in an invalid state
-    logger.error("Error applying mods to archive? DEBUG THIS!!!", e)
-    console.log("Error applying mods to archive? DEBUG THIS!!!", e)
-
     dialog.showMessageBoxSync({
       type: 'error',
       title: 'Archive load error',
@@ -284,23 +259,10 @@ function loadArchiveData(){
     throw e
   }
 
-  win.webContents.send('SET_LOAD_STAGE', "PATCHES")
+  if (win) win.webContents.send('SET_LOAD_STAGE', "PATCHES")
   logger.info("Loading patches")
-  // TEMPORARY OVERWRITES UNTIL ASSET PACK V2
-  if (data.version == "1") {
-    logger.info("Applying asset pack v1 patches")
-    const gankraSearchPage = data.search.find(x => x.key == '002745')
-    if (gankraSearchPage) gankraSearchPage.content = gankraSearchPage.content.replace('Gankro', 'Gankra')
-
-    data.mspa.story['002745'].content = data.mspa.story['002745'].content.replace('Gankro', 'Gankra')
-
-    data.mspa.faqs.new.content = data.mspa.faqs.new.content.replace(/bgcolor="#EEEEEE"/g, '')
-
-    data.music.tracks['ascend'].commentary = data.music.tracks['ascend'].commentary.replace('the-king-in-red>The', 'the-king-in-red">The')
-  }
-
-  chapterIndex = undefined
   
+  if (win) win.webContents.send('SET_LOAD_STAGE', "LOADED_ARCHIVE_VANILLA")
   return data
 }
 
@@ -336,11 +298,14 @@ try {
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.has('localData.settings.smoothScrolling') && !store.get('localData.settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
+    if (store.has('settings.smoothScrolling') && !store.get('settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   } else throw Error(`Flash plugin not located at ${flashPath}`)
   
   // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Max-Age', 2592000); // 30 days
     return handler(request, response, {
       public: assetDir
     })
@@ -356,8 +321,8 @@ try {
     })
   })
 } catch (error) {
-  logger.error(error)
-  logger.info("Loading check failed, loading setup mode")
+  logger.debug(error)
+  logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
   // Specifically, the render process bases its decision on whether archive is defined or not. If undefined, it loads setup mode.
@@ -422,40 +387,60 @@ ipcMain.handle('check-archive-version', async (event, payload) => {
   }
 })
 
+var want_imods_extracted = false
+
 if (assetDir && fs.existsSync(assetDir)) {
   // App version checks
-  const last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+  var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
+  if (app.commandLine.hasSwitch('reset-last-version')) {
+    logger.warn(`Run with --reset-last-version flag, resetting version from ${last_app_version} to 0.0.0.`)
+    last_app_version = '0.0.0';
+  }
 
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
   if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
-    console.log(`App updated from ${last_app_version} to ${APP_VERSION}`)
-    Mods.extractimods()
+    logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
+    want_imods_extracted = true // Takes effect when client requests archive
   } else {
-    console.log(`last version ${last_app_version} gte current version ${APP_VERSION}`)
+    logger.debug(`last version ${last_app_version} gte current version ${APP_VERSION}`)
   }
 
   store.set("appVersion", APP_VERSION)
 } else {
-  console.log("Deferring app version checks until initial configuration is complete.")
+  logger.warn("Deferring app version checks until initial configuration is complete.")
 }
 
 // Speed hack, try to preload the first copy of the archive
 var first_archive
 var archive // Also, keep a reference to the latest archive, for lazy eval
 try {
-  archive = first_archive = loadArchiveData()
+  loadArchiveData().then(result => {
+    archive = first_archive = result
+  })
 } catch (e) {
   // logger.warn(e)
   // don't even warn, honestly
 }
 
-ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
+ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   win.webContents.send('SET_LOAD_STATE', "LOADING")
   try {
     if (first_archive) {
+      // Use the preloaded "first archive"
       archive = first_archive
       first_archive = undefined;
-    } else archive = loadArchiveData()
+    } else {
+      // Reload the archive data
+      archive = await loadArchiveData()
+    }
+    // search.giveArchive(archive)
+
+    // Communicate version state to imod
+    if (want_imods_extracted) {
+      logger.info("mods: before loading, please extract imods")
+      win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+    }
+
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
@@ -463,6 +448,8 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', (event) => {
   }
   win.webContents.send('SET_LOAD_STATE', "DONE")
 })
+
+// search.registerIpc(ipcMain)
 
 ipcMain.handle('win-minimize', async (event) => {
   win.minimize()
@@ -485,16 +472,6 @@ ipcMain.on('win-close-sync', (e) => {
   logger.warn("Got synchronous close event!")
   win.destroy()
   e.returnValue = true;
-})
-
-ipcMain.handle('copy-image', async (event, payload) => {
-  logger.info(payload.url)
-  Sharp(payload.url).png().toBuffer().then(buffer => {
-    logger.info(buffer)
-    const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-    logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-    clipboard.writeImage(sharpNativeImage)
-  })
 })
 
 ipcMain.handle('save-file', async (event, payload) => {
@@ -521,8 +498,8 @@ ipcMain.handle('locate-assets', async (event, payload) => {
     try {
       // If there's an issue with the archive data, this should fail.
       assetDir = newPath[0]
-      logger.info(assetDir)
-      loadArchiveData()
+      logger.info("New asset directory", assetDir)
+      await loadArchiveData() // Run to check if this thows an error
 
       let flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
@@ -546,10 +523,12 @@ ipcMain.handle('locate-assets', async (event, payload) => {
           message: 'This will restart the application. Continue?'
         })
         if (confirmation == 0) {
-          store.set('localData.assetDir', newPath[0])
+          store.set('assetDir', newPath[0])
         
-          app.relaunch()
-          app.exit()
+          if (!isDevelopment) {
+            app.relaunch()
+            app.exit()
+          }
         }
       } else return newPath[0]
     } else {
@@ -564,22 +543,12 @@ ipcMain.handle('locate-assets', async (event, payload) => {
 })
 
 ipcMain.handle('restart', async (event) => {
-  app.relaunch()
+  (!isDevelopment) && app.relaunch() // Can't relaunch app and maintain debugger connection
   app.exit()
 })
 
 ipcMain.handle('reload', async (event) => {
   win.reload()
-})
-
-
-ipcMain.handle('factory-reset', async (event, confirmation) => {
-  if (confirmation === true) {
-    store.delete('localData')
-  
-    app.relaunch()
-    app.exit()
-  }
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {
@@ -600,119 +569,6 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
   return (answer === 0)
 })
 
-function buildChapterIndex(){
-  logger.info("Building new search index")
-  chapterIndex = new FlexSearch({
-    doc: {
-      id: 'key',
-      field: ['mspa_num', 'content'],
-      tag: 'chapter'
-    }
-  })
-
-  const storytextList = Object.keys(archive.mspa.story).map(page_num => {
-    const page = archive.mspa.story[page_num]
-    return {
-      key: page_num,
-      mspa_num: page_num,
-      chapter: Resources.getChapter(page_num),
-      content: `${page.title}<br />${page.content}`
-    }
-  })
-
-  logger.info("Populating search index with", storytextList.length, "page documents")
-  chapterIndex.add(storytextList)
-
-  const footnoteList = Object.keys(archive.footnotes.story).map(page_num => {
-    return {
-      key: `${page_num}-notes`, // Duplicate keys are not allowed.
-      mspa_num: page_num,
-      chapter: Resources.getChapter(page_num),
-      content: archive.footnotes.story[page_num].map(
-        note => note.content
-      ).join("###")
-    }
-  })
-
-  logger.info("Populating search index with", footnoteList.length, "footnote documents")
-  chapterIndex.add(footnoteList)
-}
-
-ipcMain.handle('search', async (event, payload) => {
-  if (chapterIndex == undefined)
-    buildChapterIndex()
-
-  if (payload == undefined)
-    return // Just wanted to ensure the index
-
-  const keyAlias = {
-    "mc0001": 1892.5,
-    "jb2_000000": 135.5,
-    "pony": 2838.5,
-    "pony2": 6517.5,
-    "darkcage": 6273.5,
-    "darkcage2": 6927.5
-  }
-  
-  let limit = 1000
-  const sort = (a, b) => {
-    const aKey = Number.isNaN(parseInt(a.key)) ? keyAlias[a.key] : parseInt(a.key)
-    const bKey = Number.isNaN(parseInt(b.key)) ? keyAlias[a.key] : parseInt(b.key)
-    return (payload.sort == 'desc') 
-      ? aKey > bKey ? -1 : aKey < bKey ? 1 : 0 
-      : aKey < bKey ? -1 : aKey > bKey ? 1 : 0
-  }
-
-  let filteredIndex
-  if (payload.filter[0]) {
-    const items = chapterIndex.where(function(item) {
-      return payload.filter.includes(item.chapter)
-    })
-    limit = items.length < 1000 ? items.length : 1000
-    filteredIndex = new FlexSearch({
-      doc: {
-        id: 'key', 
-        field: ['mspa_num', 'content']
-      }
-    }).add(items)
-  } else {
-    filteredIndex = chapterIndex
-  }
-
-  const results = (payload.sort == 'asc' || payload.sort == 'desc') 
-    ? filteredIndex.search(payload.input, {limit, sort})
-    : filteredIndex.search(payload.input, {limit})
-
-  const foundText = []
-  for (const page of results) {
-    const flex = new FlexSearch()
-    const page_lines = page.content.split('<br />')
-    for (let i = 0; i < page_lines.length; i++) {
-      flex.add(i, page_lines[i])
-    }
-    const indexes = flex.search(payload.input)
-    const spread_indexes = Array.from(
-      indexes.reduce((acc, i) => {
-        const spread = 2;
-        for (let j = i - spread; j < i + spread; j++) {
-          acc.add(j)
-        }
-        return acc
-      }, new Set())
-    ).sort()
-    const matching_lines = spread_indexes.filter(i => page_lines[i]).map(i => page_lines[i])
-
-    if (matching_lines.length > 0){
-      foundText.push({
-        key: page.key,
-        mspa_num: page.mspa_num,
-        lines: matching_lines
-      })
-    }
-  }
-  return foundText
-})
-
 ipcMain.handle('steam-open', async (event, browserUrl) => {
   const steamUrl = browserUrl.replace(/http(s){0,1}:\/\/[\w.]*steampowered.com\/app/i, 'steam://url/StoreAppPage')
   
@@ -724,44 +580,66 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
-const Sharp = require('sharp')
-ipcMain.on('ondragstart', (event, filePath) => {
-  // logger.info("Dragging file", filePath)
-  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
-  try {
-    // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
-    // const nativeIconFromPath = nativeImage.createFromPath(filePath)
-    // if (!nativeIconFromPath.isEmpty()) {
-    //   logger.info("Native icon from path", nativeIconFromPath)
-    //   cb(nativeIconFromPath)
-    // } else {
-      Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
-      .png().toBuffer().then(buffer => {
-        const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-        // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-        cb(sharpNativeImage)
-      })
-    // }
-  } catch (err) {
-    logger.error("Couldn't process image", err)
-    // eslint-disable-next-line no-undef
-    cb(`${__static}/img/dragSmall.png`)
-  }
-})
+try {
+  const Sharp = require('sharp')
+  ipcMain.on('ondragstart', (event, filePath) => {
+    // logger.info("Dragging file", filePath)
+    const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+    try {
+      // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
+      // const nativeIconFromPath = nativeImage.createFromPath(filePath)
+      // if (!nativeIconFromPath.isEmpty()) {
+      //   logger.info("Native icon from path", nativeIconFromPath)
+      //   cb(nativeIconFromPath)
+      // } else {
+        Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
+        .png().toBuffer().then(buffer => {
+          const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+          // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+          cb(sharpNativeImage)
+        }).catch(err => {throw err;})
+      // }
+    } catch (err) {
+      logger.error("Couldn't process image", err)
+      // eslint-disable-next-line no-undef
+      cb(`${__static}/img/dragSmall.png`)
+    }
+  })
+
+  ipcMain.handle('copy-image', async (event, payload) => {
+    // logger.info(payload.url)
+    Sharp(payload.url).png().toBuffer().then(buffer => {
+      // logger.info(buffer)
+      const sharpNativeImage = nativeImage.createFromBuffer(buffer)
+      // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
+      clipboard.writeImage(sharpNativeImage)
+    })
+  })
+} catch {
+  logger.error("Couldn't install sharp!")
+}
 
 let openedWithUrl
 const OPENWITH_PROTOCOL = 'mspa'
 
 async function createWindow () {
   // Create the browser window.
+
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: 1280,
+    defaultHeight: 780
+  })
+
   win = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    'minWidth': 1000,
+    'x': mainWindowState.x,
+    'y': mainWindowState.y,
+    'width': mainWindowState.width,
+    'height': mainWindowState.height,
+    'minWidth': 650,
     'minHeight': 600,
     backgroundColor: '#535353',
     useContentSize: true,
-    frame: store.get('localData.settings.useSystemWindowDecorations'),
+    frame: store.get('settings.useSystemWindowDecorations'),
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
     webPreferences: {
@@ -771,6 +649,8 @@ async function createWindow () {
       webviewTag: true
     }
   })
+
+  mainWindowState.manage(win)
 
   win.webContents.on('zoom-changed', (e, zoomDirection) => {
     if (zoomDirection === 'in') {
@@ -818,6 +698,7 @@ async function createWindow () {
       "http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3", 
       "http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3", 
       "http://www.timelesschaos.com/transferFiles/618heircut.mp3",
+      "*://asset.uhc/*",
       "*://*.sweetcred.com/*"
     ]
   }, (details, callback) => {
@@ -829,7 +710,8 @@ async function createWindow () {
         throw Error(err)
       } else {
         // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
-        callback({redirectURL})
+        const redirect_callback = {redirectURL}
+        callback(redirect_callback)
       }
     } else {
       const destination_url = Resources.resolveURL(details.url)
@@ -839,12 +721,14 @@ async function createWindow () {
         throw Error(err)
       } else {
         // Okay
+        const redirect_callback = {
+          redirectURL: destination_url
+        }
         // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
         if (details.resourceType == "subFrame")
           win.webContents.send('TABS_PUSH_URL', destination_url)
-        else callback({
-          redirectURL: destination_url
-        })
+        else
+          callback(redirect_callback)
       }
     }
   })
@@ -882,8 +766,9 @@ async function createWindow () {
   // win.setIcon(current_icon)
 
   ipcMain.on('set-sys-icon', (event, new_icon) => {
+    // eslint-disable-next-line no-undef
     new_icon = (new_icon || `@/icons/icon`).replace(/^@/, __static)
-    if (new_icon && new_icon != current_icon) {
+    if (new_icon && (new_icon != current_icon)) {
       try {
         if (process.platform == "win32") {
           new_icon += ".ico"
@@ -902,9 +787,6 @@ async function createWindow () {
   ipcMain.on('set-title', (event, new_title) => {
     win.setTitle(new_title)
   })
-
-  // Give mods a reference to the window object so it can reload 
-  Mods.giveWindow(win);
 
   if (openedWithUrl)
     win.webContents.send('TABS_PUSH_URL', openedWithUrl.replace(OPENWITH_PROTOCOL + '://', "/"))

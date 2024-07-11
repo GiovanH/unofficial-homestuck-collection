@@ -59,9 +59,8 @@ export default {
     }
   },
   methods: {
-
     shuffleBoxPositions() {
-      let prev = this.boxPosIndex
+      const prev = this.boxPosIndex
       do {
         this.boxPosIndex = Math.floor(5 * Math.random())
       } while (this.boxPosIndex == prev)
@@ -85,9 +84,10 @@ export default {
         this.firefly[i].delay = 1
         this.firefly[i].delaytick = 0 
       }
+
       this.firefly[i].tx = this.firefly[i].frame * this.firefly[i].imgw     //  moves animation block to next frame on sprite sheet
       this.cobj[i].drawImage(
-        !!this.firefly[i].dir ? this.beer[i] : this.beel[i],
+        this.firefly[i].dir ? this.beer[i] : this.beel[i],
         this.firefly[i].tx,
         0,
         this.firefly[i].imgw,
@@ -103,9 +103,10 @@ export default {
           this.firefly[i].delay = 0
           this.firefly[i].delaytick = 0
         }
-      } 
-      else {
-        this.firefly[i].frame++ //  move to next animation frame
+      }  else {
+        if (!this.$localData.settings.reducedMotion) {
+          this.firefly[i].frame++ //  move to next animation frame
+        }
       }
       this.cobj[i].restore()  //  done updating the canvas-  close task!
     },
@@ -115,9 +116,12 @@ export default {
       for (var i = 0; i < this.boxnum; i++) {   //  CYCLE through all canvas boxes you want - use BOXNUM variable
         this.clearCanvas(i)           //  Clear canvas screen before showing new animation content
         this.drawFirefly(i)
-        // Now, lets make the firefly move to a new position
-        this.firefly[i].y += this.firefly[i].yvel
-        this.firefly[i].x += this.firefly[i].xvel
+
+        if (!this.$localData.settings.reducedMotion) {
+          // Now, lets make the firefly move to a new position
+          this.firefly[i].y += this.firefly[i].yvel
+          this.firefly[i].x += this.firefly[i].xvel
+        }
 
         // EDGE collision check - TOP BOX COLLISION
         if (this.firefly[i].y - this.radius < -60) {
@@ -183,6 +187,9 @@ export default {
           delay: 0, //  delay flag to stop gif/sprite animation before repeating cycle
           delaytick: 0  // stores the delay counter
         }
+        if (this.$localData.settings.reducedMotion) {
+          this.firefly[x].frame = 5
+        }
       }
       this.fireflyInterval = setInterval(this.updateFirefly, 1000/this.fpsrate)
       this.shuffleBoxPositions()
@@ -199,9 +206,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.pixelated {
-  image-rendering: pixelated;
-}
 .fireflies {
   position: relative;
   width: 714px;
@@ -212,6 +216,7 @@ export default {
     position: absolute;
     height: 150px;
     width: 200px;
+    pointer-events: none;
   }  
 }
 

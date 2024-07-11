@@ -1,15 +1,31 @@
 <template>
-  <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
-    <div class="pageFrame">
+  <div>
+    <GenericPage v-if="gameOverPreload"
+      :tab="tab" >
       <div class="pageContent">
-        <Footnotes :pageId="thisPage.pageId" preface />
+        <div class="mediaContent">
+          <h2 class="pageTitle">[S] GAME OVER.</h2>
+          <div class="media" ref="media">
+            <div class="panel"
+              style="width: 650px; height: 450px; background: #001800; border: none;" />
+          </div>
+        </div>
+        <div class="textContent" style="height: 70px;"></div>
+      </div>
+    </GenericPage>
+    <!-- <GenericPage v-if="gameOverPreload" /> -->
+    <div :style="{visibility: gameOverPreload ? 'hidden' : 'visible', height: gameOverPreload ? '0' : undefined}" class="pageBody" :class="[bgClass, {hiddenGameOver: gameOverPreload}]" :data-pageid="`${storyId}/${thisPage.pageId}`">
+      <div class="pageFrame">
+        <div class="pageContent">
+          <Footnotes :pageId="thisPage.pageId" preface />
           <div class="mediaContent">
               <Media :url="flashUrl" ref="flash" />
-          </div>      
-          <div class="textContent">
-              <PageNav :thisPage="thisPage" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
           </div>
-        <Footnotes :pageId="thisPage.pageId" />
+          <div class="textContent">
+              <PageNav :thisPage="thisPage" ref="pageNav" :nextPages="nextPagesArray" :class="(needsNav ? '' : 'hidden')" />
+          </div>
+          <Footnotes :pageId="thisPage.pageId" />
+        </div>
       </div>
     </div>
   </div>
@@ -20,16 +36,15 @@
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import PageNav from '@/components/Page/PageNav.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
+import GenericPage from '@/components/UIElements/GenericPage.vue'
 
 import PAGE from '@/components/Page/Page.vue'
 
 export default {
+  extends: PAGE,
   name: 'fullscreenFlash',
-  props: [
-    'tab', 'routeParams'
-  ],
   components: {
-    Media, PageNav, Footnotes
+    Media, PageNav, Footnotes, GenericPage
   },
   theme: function(ctx) {
     ctx.$logger.info("Checked theme", ctx.gameOverThemeOverride)
@@ -38,17 +53,11 @@ export default {
   title: PAGE.title,
   data: function() {
     return {
-      ...PAGE.data(),
+      gameOverPreload: false,
       appThemeOverride: 'default'
     }
   },
   computed: {
-    pageNum: PAGE.computed.pageNum,
-    storyId: PAGE.computed.storyId,
-    thisPage: PAGE.computed.thisPage,
-    pageCollection: PAGE.computed.pageCollection,
-    nextPagesArray: PAGE.computed.nextPagesArray,
-    isRyanquest: PAGE.computed.isRyanquest,
     flashUrl() {
       // Mirrored from Page.vue:pageMedia()
       let media = Array.from(this.thisPage.media)
@@ -81,6 +90,9 @@ export default {
   mounted() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
       this.$parent.gameOverThemeOverride = 'A6A6'
+      if (!this.needsNav && !this.$localData.settings.reducedMotion) // only if we're using stock flash
+        this.gameOverPreload = true // unset by MediaEmbed after we get gameOver signal
+
       this.$watch(
         "$refs.flash.gameOver.count", (count) => {
           switch(count) {
@@ -161,6 +173,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .hiddenGameOver {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+  }
   .pageBody {
     margin: 0;
     padding: 0;
@@ -175,19 +192,21 @@ export default {
 
     &.dota {
       background: #000;
+      height: 100%;
     }
     &.shes8ack {
       background: #fff;
+      height: 100%;
     }
     // banging
     // &[data-pageid="6/007395"] {
     //   background: #5a5a5a;
     // }
-    &.gameover {
-      background: linear-gradient(to right, #042300 50%, #535353 50%);
-      background-size: 200% 100%;
-      background-position: left bottom;
-    }
+    // &.gameover {
+    //   background: linear-gradient(to right, #042300 50%, #535353 50%);
+    //   background-size: 200% 100%;
+    //   background-position: left bottom;
+    // }
 
     .pageFrame {
     flex: 0 1 auto;
@@ -205,7 +224,7 @@ export default {
           align-items: center;
           flex-flow: column;
         }
-      }	
+      }
     }
   }
 </style>
