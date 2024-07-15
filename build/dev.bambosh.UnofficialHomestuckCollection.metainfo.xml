@@ -9,10 +9,8 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0</project_license>
   <description>
-    <p>The Unofficial Homestuck Collection is a heavily customised browser built from the ground up
-      to support offline reading of Homestuck and its related works.</p>
-    <p>The Asset Pack V2 is required for the application to function. This is a separate
-      download that can be found on the homepage.</p>
+    <p>The Unofficial Homestuck Collection is a heavily customised browser built from the ground up to support offline reading of Homestuck and its related works.</p>
+    <p>The Asset Pack V2 is required for the application to function. This is a separate download that can be found on the homepage.</p>
   </description>
   <screenshots>
     <screenshot type="default">
@@ -27,6 +25,12 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.5.1" date="2024-07-10" type="stable">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.5.1</url>
+      <description>
+        <p>This update brings the main release of The Unofficial Homestuck Collection up-to-date with the prerelease and web beta.</p>
+      </description>
+    </release>
     <release version="2.0.7" date="2023-05-13" type="stable">
       <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/v2.0.7</url>
       <description>
