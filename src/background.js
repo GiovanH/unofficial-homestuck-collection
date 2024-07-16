@@ -439,6 +439,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     if (want_imods_extracted) {
       logger.info("mods: before loading, please extract imods")
       win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+      want_imods_extracted = false
     }
 
     win.webContents.send('ARCHIVE_UPDATE', archive)
