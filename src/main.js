@@ -137,22 +137,15 @@ Vue.mixin({
       this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
     },
     $openLink(url, auxClick = false) {
+      // Open a link. Could be intra-app, external, or an assets:// uri
+      //
       const re_local = new RegExp(`(${app_domain}|app:\/\/\\.(index)?)`)
       const re_local_index = new RegExp(`(${app_domain}|app:\/\/\\.\/)index\\.html\\??`)
       // const re_local_asset = new RegExp(`(http:\/\/127.0.0.1:${port}\/|assets:\/\/)`)
 
+      // Normalize implied proto://./index.html links back to proto://./
       const url_str = url.replace(re_local_index, '$1')
       const urlObject = new URL(url_str)
-
-      if (urlObject.protocol == "assets:" && !/\.(html|pdf)$/i.test(url)) {
-        this.$openModal(Resources.resolveAssetsProtocol(url))
-        return
-      }
-      
-      // Else, tests
-      let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
-      to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
-             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       function _openExternal(to_) {
         if (!isWebApp) {
@@ -161,6 +154,22 @@ Vue.mixin({
           window.open(Resources.resolveURL(to_), '_blank').focus();
         }
       }
+
+      // If asset, open in modal or externally as appropriate
+      if (urlObject.protocol == "assets:") {
+        const to_ = Resources.resolveAssetsProtocol(url)
+        if (!/\.(html|pdf)$/i.test(url)) {
+          this.$openModal(to_)
+        } else {
+          _openExternal(to_)
+        }
+        return
+      }
+      
+      // Else, tests on a real link
+      let to = (/mspaintadventures/.test(urlObject.href) && !!urlObject.search) ? urlObject.href : urlObject.pathname
+      to = to.replace(/.*mspaintadventures.com\/(\w*\.php)?\?s=(\w*)&p=(\w*)/, "/mspa/$3")
+             .replace(/.*mspaintadventures.com\/\?s=(\w*)/, "/mspa/$1")
 
       if (!re_local.test(urlObject.origin)) {
         // Link is external
