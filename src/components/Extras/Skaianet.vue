@@ -282,7 +282,7 @@ export default {
         {
           icon: "archive/skaianet/spoon.gif",
           title: `
-            <a href="https://topatoco.com/products/mspa-sb-spoon" target="_blank">SPOON.PDF</a>
+            <a href="https://archive.org/details/sbahj-and-the-quest-for-the-missing-spoon" target="_blank">SPOON.PDF</a>
             <img src="${this.$getResourceURL('archive/skaianet/book.gif')}" align="middle" />`,
           content: `
              <p>Journey with Sweet Bro as he joroneys to recover his spoon over a long jounrey. </p>
@@ -308,13 +308,11 @@ export default {
             <a href="/epilogues">EPILOGUES.TXT</a>
             <img src="${this.$getResourceURL('archive/skaianet/txt.gif')}" align="middle" />
             <a href="https://www.homestuck.com/epilogues" target="_blank">WWW</a>
-            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />
-            <a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154" target="_blank">VIZ</a>
-            <img src="${this.$getResourceURL('archive/skaianet/book.gif')}" align="middle" />`,
+            <img src="${this.$getResourceURL('archive/skaianet/www.gif')}" align="middle" />`,
           content: `<p>Tales of dubious authenticity.</p>
 
             <p>Ten years ago, a young man stood in his bedroom. The events set in motion that day would change his and his friends' lives forever, for the better and the worse (and the ridiculous). Now, in the aftermath, he has to make a choice: Meat or Candy?</p>
-            <p><em><a href="https://www.viz.com/read/graphic-novel/homestuck-epilogues/product/6154">Description from VIZ Media.</a></em></p>
+            <p><em><a href="https://www.amazon.com/Homestuck-Epilogues-Meat-Candy/dp/1974701085">Description from Amazon store page.</a></em></p>
             <p><em>Online release: 13 - 20 April 2019</em></p>
             <p><em>VIZ Media print release: 14 January 2020</em></p>`
         },
@@ -338,16 +336,15 @@ export default {
         {
           icon: "archive/skaianet/hs2.gif",
           title: `
-            <a href="https://www.homestuck2.com" target="_blank">HOMESTUCK^2.TXT</a>
+            <a href="https://www.beyondcanon.com" target="_blank">HS:BC.TXT</a>
             <img src="${this.$getResourceURL('archive/skaianet/txt.gif')}" align="middle" />`,
           content: `
-            <p>This is not Homestuck. But it is not <em>not</em> Homestuck. This is...</p>
+            <p>Homestuck: Beyond Canon (HS:BC) is a further continuation of the Homestuck story, after the events of The Homestuck Epilogues and Pesterquest.</p>
 
-            <h2>HOMESTUCK^2: BEYOND CANON</h2>
+            <p>It is a story about the consequences of the pursuit of relevancy and growing up. As this work is a direct followup to The Homestuck Epilogues it is highly recommended you be familiar with what happens in that story.</p>
 
-            <p>Homestuck^2: Beyond Canon is an official continuation of the cult-classic webcomic Homestuck and a follow-up to The Homestuck Epilogues, dropped as a major event in April of 2019.</p>
-            <p>Homestuck 2: Beyond Canon takes a combination of Andrew Hussie's original writing and plot outlines and concepts and joins him with a team of new, diverse voices to expand the compelling narratives of Homestuck's most (and least) beloved characters.</p>
-            <p><em><a href="https://www.patreon.com/homestuck">Description from the Homestuck Patreon.</a></em></p>
+            <p>Homestuck: Beyond Canon is made possible by a passionate team of writers and artists -- collectively known as the Homestuck Independent Creative Union -- but most importantly the continued support of fans like you.</p>
+            <p><em><a href="https://beyondcanon.com/about">Description from the website's About page.</a></em></p>
             <p><em>25 October 2019 -</em></p>`
         }
         // <p>On an indefinite hiatus as of Feb 2021. You can see the announcement post <a href='https://homestuck.net/official/patreon/posts/future-approach-47431875/'>here</a></p>
@@ -370,21 +367,21 @@ export default {
     setApophis() {
       // Get todays date and time
       let now = new Date().getTime()
-      
+
       // Find the distance between now and the count down date
       let distance = this.countDownDate - now
-      
+
       // Time calculations for days, hours, minutes and seconds
       let years = Math.floor(distance / (1000 * 60 * 60 * 24 * 365))
       let days = Math.floor(distance / (1000 * 60 * 60 * 24)) - (years * 365)
       let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
       let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
       let seconds = Math.floor((distance % (1000 * 60)) / 1000)
-      
+
       // Output the result in an element with class="Apophis"
       this.apophis = years + "y " + days + "d " + hours + "h " + minutes + "m " + seconds + "s "
-      
-      // If the count down is over, write some text 
+
+      // If the count down is over, write some text
       if (distance < 0) {
         clearInterval(this.marqueeInterval)
         this.apophis = "EXPIRED"
@@ -405,10 +402,9 @@ export default {
           console.error(request)
         }
       } else {
-        return fs.readFileSync(this.$mspaFileStream(url), 'utf8')
+        return require('fs').readFileSync(this.$mspaFileStream(url), 'utf8')
       }
-      // require('fs').readFileSync(this.$mspaFileStream(url), 'utf8')
-    },
+    }
   },
   updated() {
   },
