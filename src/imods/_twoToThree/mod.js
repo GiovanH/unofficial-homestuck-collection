@@ -4,17 +4,17 @@ module.exports = {
   modVersion: 0.1,
   trees: {
     "./pxs/": "assets://archive/comics/pxs/",
-    "./archive/": "assets://archive/",
+    "./archive/": "assets://archive/"
   },
   routes: {
-    //replace flashes that don't mute when HQ audio is enabled
+    // replace flashes that don't mute when HQ audio is enabled
     'assets://storyfiles/hs2/03085/03085_hq.swf': './swf/03085_hq.swf',
     'assets://storyfiles/hs2/04082/04082_hq.swf': './swf/04082_hq.swf',
 
-    //replace hq flash mp3 for At The Price Of Oblivion
+    // replace hq flash mp3 for At The Price Of Oblivion
     'assets://storyfiles/hs2/03693/03693.mp3': './mp3/03693.mp3',
 
-    //reroute improperly formatted links in 25-Nov-09 newspost
+    // reroute improperly formatted links in 25-Nov-09 newspost
     'assets://newspost_images/scarecrowking1.gif': 'assets://archive/social/news/scarecrowking1.gif',
     'assets://newspost_images/scarecrowking2.gif': 'assets://archive/social/news/scarecrowking2.gif',
   },
@@ -47,6 +47,18 @@ module.exports = {
           ],
           "art": []
         })
+
+        // Hotfix some formatting headaches
+
+        archive.mspa.story['004153'].content = archive.mspa.story['004153'].content.replace(
+          `L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
+          `<span style="color: #2ed73a; white-space: nowrap">L<img src="assets://storyfiles/hs2/scraps/o.gif" border="0">rd English</span>`)
+
+        console.log(archive.mspa.story['004153'].content)
+
+        archive.mspa.story['005530'].content = archive.mspa.story['005530'].content.replace(
+          `L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
+          `<span style="color: #2ed73a; white-space: nowrap">L<img src="assets://storyfiles/hs2/scraps/o.gif" border="0">rd English</span>`)
 
         archive.comics.pxs.comics['you-have-a-feeling-its-going-to-be-a-long-day'].credit = "Zach Morrison and Andrew Hussie"
 
