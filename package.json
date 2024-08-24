@@ -12,7 +12,7 @@
     }
   ],
   "engines": {
-    "node": ">=18.20"
+    "node": "18.20"
   },
   "version": "2.5.3",
   "license": "GPL-3.0",
