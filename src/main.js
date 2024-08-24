@@ -148,7 +148,7 @@ Vue.mixin({
       const urlObject = new URL(url_str)
 
       function _openExternal(to_) {
-        if (!isWebApp) {
+        if (!window.isWebApp) {
           shell.openExternal(to_)
         } else {
           window.open(Resources.resolveURL(to_), '_blank').focus();

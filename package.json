@@ -12,9 +12,9 @@
     }
   ],
   "engines": {
-    "node": ">= 18.20"
+    "node": "18.20"
   },
-  "version": "2.5.2",
+  "version": "2.5.3",
   "license": "GPL-3.0",
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,

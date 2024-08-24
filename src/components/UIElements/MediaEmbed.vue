@@ -512,7 +512,7 @@ document.addEventListener('click', function (e) {
           break
         case 'link':
           if (param != 'about:srcdoc') {
-            this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
+            this.$pushURL(this.$getResourceURL(param))
           } else {
             this.$logger.warn("Tried to navigate page to srcdoc!")
           }
