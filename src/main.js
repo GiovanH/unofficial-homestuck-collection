@@ -142,8 +142,8 @@ Vue.mixin({
     $openLink(url, auxClick = false) {
       // Open a link. Could be intra-app, external, or an assets:// uri
       //
-      const re_local = new RegExp(`^(${regExpEscape(app_domain)}|app:\/\/\\.(index)?)`)
-      const re_local_index = new RegExp(`^(${regExpEscape(app_domain)}|app:\/\/\\.\/)index\\.html\\??`)
+      const re_local = new RegExp(`^(http://|https://)?(${regExpEscape(app_domain)}|app:\/\/\\.(index)?)`)
+      const re_local_index = new RegExp(`^(http://|https://)?(${regExpEscape(app_domain)}|app:\/\/\\.\/)index\\.html\\??`)
       // const re_local_asset = new RegExp(`(http:\/\/127.0.0.1:${port}\/|assets:\/\/)`)
 
       // Normalize implied proto://./index.html links back to proto://./
