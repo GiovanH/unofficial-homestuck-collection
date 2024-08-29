@@ -826,15 +826,8 @@ export default {
     },
     archiveReload(){
       this.debounce = false 
-      this.memoizedClearAll()
 
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        // Don't show loading screen, "soft" reload
-        // this.$root.loadState = "LOADING"
-        this.$localData.root.applySaveIfPending()
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
+      this.$root.app.archiveReload()
     },
     openSubModel: function(mod, info_only=false) {
       this.$refs.modal.openMod(mod, info_only)
