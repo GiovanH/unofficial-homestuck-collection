@@ -51,11 +51,11 @@ module.exports = {
         // Hotfix some formatting headaches
 
         archive.mspa.story['004153'].content = archive.mspa.story['004153'].content.replace(
-          `L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
+          `<span style="color: #2ed73a">L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
           `<span style="color: #2ed73a; white-space: nowrap">L<img src="assets://storyfiles/hs2/scraps/o.gif" border="0">rd English</span>`)
 
         archive.mspa.story['005530'].content = archive.mspa.story['005530'].content.replace(
-          `L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
+          `<span style="color: #2ed73a">L</span><img src="http://www.mspaintadventures.com/storyfiles/hs2/scraps/o.gif" border="0" /><span style="color: #2ed73a">rd English</span>`,
           `<span style="color: #2ed73a; white-space: nowrap">L<img src="assets://storyfiles/hs2/scraps/o.gif" border="0">rd English</span>`)
 
         archive.comics.pxs.comics['you-have-a-feeling-its-going-to-be-a-long-day'].credit = "Zach Morrison and Andrew Hussie"

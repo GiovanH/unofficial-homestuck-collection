@@ -260,6 +260,7 @@ export default {
 
 .notifWrapper {
   position: absolute;
+  overflow: hidden;
   width: 400px;
   height: 100%;
   pointer-events: none;
