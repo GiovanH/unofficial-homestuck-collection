@@ -124,13 +124,13 @@ publish-webapp:
     rm build/webAppModTrees.json || :
     rsync -ri src/imods "../Asset Pack V2/archive/"
 
-    just litepack &
-    make webapp &
-    wait
+    just litepack;
+    make webapp;
 
     chmod -R 755 dist
-    rsync -ri --exclude "*.json" --delete-after dist/ "blog.giovanh.com:~/www-homestuck/"
-
+    rsync -ri --exclude "*.json" --exclude "unofficial-homestuck-collection" --delete-after dist/ "blog.giovanh.com:~/www-homestuck/"
+    chmod -R ../webpage/
+    rsync -ri --delete-after ../webpage/ "homestuck.giovanh.com:~/www-homestuck-static/unofficial-homestuck-collection/"
     # rsync -i /cygdrive/l/Archive/Homestuck/tagly/tagly.py blog.giovanh.com:~/tagly/ --exclude '.git' --exclude '__pycache__' --exclude '.pytest_cache'
     # ssh -t blog.giovanh.com "sudo service tagbooru restart"
     :

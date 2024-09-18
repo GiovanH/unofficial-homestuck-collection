@@ -57,8 +57,8 @@
           <!-- <dt>Why is the spirograph loading animation broken</dt>
           <dd>Your browser doesn't support (or incorrectly implements) <a href='https://www.w3.org/TR/SVG2/'>SVG2</a>.</dd> -->
 
-          <dt>Is that an advertisement at the bottom?</dt>
-          <dd>No. No products or sponsorships or any profitability here. I do invite anyone interested to help contribute to the operating costs of hosting this site itself, but the content is of course provided for free (just as it was originally published).</dd>
+          <!-- <dt>Is that an advertisement at the bottom?</dt>
+          <dd>No. No products or sponsorships or any profitability here. I do invite anyone interested to help contribute to the operating costs of hosting this site itself, but the content is of course provided for free (just as it was originally published).</dd> -->
 
           <dt>What version of the desktop program is this?</dt>
           <dd>The exact version does not map directly to one of the TUHC desktop versions. Generally this is based on a recent development version or prerelease, although it probably pulls in WIP features and beta experiments that haven't been merged in to the stable version yet. </dd>
