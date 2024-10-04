@@ -1,0 +1,46 @@
+app-id: dev.bambosh.UnofficialHomestuckCollection
+runtime: org.freedesktop.Platform
+runtime-version: "23.08"
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: "23.08"
+command: unofficial-homestuck-collection
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=pulseaudio
+  - --share=network
+  - --device=dri
+  - --filesystem=home
+build-options:
+  env:
+    pkgver: {{ pkgver }}
+modules:
+  - name: unofficial-homestuck-collection
+    buildsystem: simple
+    builddir: true
+    build-commands:
+      - tar -xf unofficial-homestuck-collection-*.tar.gz
+      - rm unofficial-homestuck-collection-*.tar.gz
+      - cp -ar unofficial-homestuck-collection-${pkgver} ${FLATPAK_DEST}/unofficial-homestuck-collection
+      - |
+        for i in 16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512; do
+          install -Dm644 build/icons/$i.png /app/share/icons/hicolor/$i/apps/dev.bambosh.UnofficialHomestuckCollection.png
+        done
+      - install -Dm644 build/dev.bambosh.UnofficialHomestuckCollection.metainfo.xml /app/share/metainfo/dev.bambosh.UnofficialHomestuckCollection.metainfo.xml
+      - install -Dm644 build/dev.bambosh.UnofficialHomestuckCollection.desktop /app/share/applications/dev.bambosh.UnofficialHomestuckCollection.desktop
+      - install -Dm755 unofficial-homestuck-collection ${FLATPAK_DEST}/bin
+    sources:
+      - type: file
+        url: "{{ asset_url }}"
+        sha256: "{{ asset_sha }}"
+      # Required for icons, desktop file and appstream file
+      - type: git
+        url: https://github.com/GiovanH/unofficial-homestuck-collection.git
+        commit: "{{ commit_hash }}"
+      # Wrapper to launch the app
+      - type: script
+        dest-filename: unofficial-homestuck-collection
+        commands:
+          - zypak-wrapper.sh /app/unofficial-homestuck-collection/unofficial-homestuck-collection --disable-gpu-sandbox "$@"

@@ -298,16 +298,7 @@ export default {
       ipcRenderer.invoke('reload')
     },
     archiveReload(){
-      // Should match settings.archiveReload
-      this.memoizedClearAll()
-
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        // Don't show loading screen, "soft" reload
-        // this.$root.loadState = "LOADING"
-        this.$localData.root.applySaveIfPending()
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
+      this.$root.app.archiveReload()
     }
   }
 }

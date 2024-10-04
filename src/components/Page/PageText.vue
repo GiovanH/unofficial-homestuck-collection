@@ -321,6 +321,9 @@ export default {
       padding: initial;
       display: inline !important;
     }
+    // Fix semantic trailing whitespace (i.e. called </span><span>The Tumor) from being
+    // cut off in inline-block display mode.
+    white-space: break-spaces;
   }
 
   .authorlog {

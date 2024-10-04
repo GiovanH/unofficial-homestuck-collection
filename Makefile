@@ -41,11 +41,16 @@ src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 
 ## Running live
 
-# Run 'SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
+# Run 'rm src/imods.tar.gz; SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
 .PHONY: test
 test: install src/imods.tar.gz
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
 	# yarn dev
+
+.PHONY: itest
+itest:
+	-rm src/imods.tar.gz
+	SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test
 
 ## Building output
 

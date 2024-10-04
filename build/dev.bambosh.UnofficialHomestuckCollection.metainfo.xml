@@ -2,7 +2,7 @@
 <component type="desktop">
   <id>dev.bambosh.UnofficialHomestuckCollection</id>
   <name>The Unofficial Homestuck Collection</name>
-  <summary>An offline collection of Homestuck and its related works</summary>
+  <summary>Offline collection of Homestuck and its related works</summary>
   <developer_name>Bambosh</developer_name>
   <developer_name>GiovanH</developer_name>
   <launchable type="desktop-id">dev.bambosh.UnofficialHomestuckCollection.desktop</launchable>
@@ -15,16 +15,18 @@
   <screenshots>
     <screenshot type="default">
       <caption>Collection interface</caption>
-      <image type="source" width="998" height="900">
-        https://bambosh.dev/unofficial-homestuck-collection/images/collection.gif</image>
+      <image type="source" width="998" height="900">https://homestuck.giovanh.com/unofficial-homestuck-collection/images/collection.gif</image>
     </screenshot>
     <screenshot>
-      <caption>Bandcamp interface</caption>
-      <image type="source" width="1015" height="708">
-        https://bambosh.dev/unofficial-homestuck-collection/images/bandcamp.gif</image>
+      <caption>Bandcamp support</caption>
+      <image type="source" width="1015" height="708">https://homestuck.giovanh.com/unofficial-homestuck-collection/images/bandcamp.gif</image>
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.5.2" type="stable" date="2024-07-29T00:13:49Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.5.2</url>
+      <description><p>Bugfix to fix https://github.com/GiovanH/unofficial-homestuck-collection/issues/601. Promoted to full release 2024-08-24</p></description>
+    </release>
     <release version="2.5.1" date="2024-07-10" type="stable">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.5.1</url>
       <description>
@@ -41,18 +43,18 @@
       <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/v2.0.5</url>
       <description>
         <p>Features</p>
+        <p>Fixes</p>
         <ul>
           <li>Option to use native window decorations - by @GiovanH in #267</li>
           <li>Genericise notification behavior for mods - by @GiovanH in #283</li>
           <li>Dragging images now displays a preview of the image, instead of the placeholder
             captcha card - by @GiovanH in #316</li>
-          <li>Several new context menu options, including "Copy Image" - by @GiovanH in #317</li>
+          <li>Several new context menu options, including &#34;Copy Image&#34; - by @GiovanH in #317</li>
         </ul>
-        <p>Fixes</p>
         <ul>
           <li>Crash that occurred when upgrading from a previous version of the collection - by
             @GiovanH in #285</li>
-          <li>Some cases where new reader progress wouldn't update correctly - by @GiovanH in #282</li>
+          <li>Some cases where new reader progress wouldn&#39;t update correctly - by @GiovanH in #282</li>
           <li>A local IP address being displayed with the path of certain images - by @Bambosh in
             #326</li>
           <li>Some HQ flashes with double &amp; incorrectly linked scarecrowking images in the news
@@ -64,7 +66,7 @@
       <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/2.0.4</url>
       <description>
         <p>Known Issue: If you delete the old Asset Pack V1 before launching version 2.0 of the
-          program for the first time, you'll get a javascript error. This can be avoided by deleting
+          program for the first time, you&#39;ll get a javascript error. This can be avoided by deleting
           Asset Pack V1 after setting up version 2.0, or you can recover from the problem by
           deleting your %appdata%/unofficial-homestuck-collection folder.</p>
       </description>
@@ -85,7 +87,7 @@
           <li>Steam links now open in the client if you have it installed (thanks @leo60228).</li>
           <li>Added context menu option to search highlighted text in Google.</li>
           <li>Altered a credit that was deadnaming Gankra.</li>
-          <li>Fixed Ascend's track commentary being cut off.</li>
+          <li>Fixed Ascend&#39;s track commentary being cut off.</li>
           <li>A whole lot of UI fixes and polish.</li>
         </ul>
       </description>
@@ -94,15 +96,15 @@
       <url>https://github.com/Bambosh/unofficial-homestuck-collection/releases/tag/V1.0.0</url>
       <description>
         <p>This is the initial release of The Unofficial Homestuck Collection!</p>
-        <p>Requires V1 of the Asset Pack to function. You'll have to find it elsewhere, sorry! Once
-          you've got it downloaded, you'll have to tell the application where to find it during the
-          initial startup process. After that, you're set!</p>
+        <p>Requires V1 of the Asset Pack to function. You&#39;ll have to find it elsewhere, sorry! Once
+          you&#39;ve got it downloaded, you&#39;ll have to tell the application where to find it during the
+          initial startup process. After that, you&#39;re set!</p>
       </description>
     </release>
   </releases>
-  <url type="homepage">https://bambosh.dev/unofficial-homestuck-collection/</url>
+  <url type="homepage">https://homestuck.giovanh.com/unofficial-homestuck-collection/</url>
   <url type="bugtracker">https://github.com/Bambosh/unofficial-homestuck-collection/issues</url>
-  <url type="faq">https://bambosh.dev/unofficial-homestuck-collection/faq.html</url>
+  <url type="faq">https://homestuck.giovanh.com/unofficial-homestuck-collection/faq.html</url>
   <url type="vcs-browser">https://github.com/Bambosh/unofficial-homestuck-collection</url>
   <categories>
     <category>Game</category>
@@ -125,9 +127,9 @@
   </content_rating>
   <keywords>
     <keyword>homestuck</keyword>
-    <keyword>andrew hussie</keyword>
     <keyword>mspa</keyword>
     <keyword>ms paint adventures</keyword>
+    <keyword>andrew hussie</keyword>
     <keyword>flash</keyword>
   </keywords>
 </component>
