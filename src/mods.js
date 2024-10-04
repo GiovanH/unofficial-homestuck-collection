@@ -474,10 +474,10 @@ async function buildApi(mod) {
         } else {
           const v = store_mods.get(getModStoreKey(mod._id, k), default_)
           this_store_cache[k] = (v == undefined ? cached_undefined : v)
-          return v || default_
+          return v
         }
       },
-      has: (k) => this_store_cache[k] || store_mods.has(getModStoreKey(mod._id, k)),
+      has: (k) => this_store_cache[k] != undefined || store_mods.has(getModStoreKey(mod._id, k)),
       delete: (k) => {
         delete this_store_cache[k]
         store_mods.delete(getModStoreKey(mod._id, k))
