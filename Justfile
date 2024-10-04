@@ -16,15 +16,18 @@ git-future:
     done
 
 xml_release:
-    #!/bin/bash
-    gh release view --json tagName,publishedAt,url,body \
-      | yq -p json -o xml '
-        {"release": {
+    #!/bin/bash -x
+    release="$(gh release view --json tagName,publishedAt,url,body)"
+    export body="$(echo "$release" | yq -p json '.body' | /usr/bin/env python3 -m markdown)"
+
+    echo "$release" | yq -p json -o xml '. | {
+        "release": {
           "+@version": (.tagName | sub("v", "")),
           "+@type": "stable",
           "+@date": (.publishedAt),
           "url": .url,
-          "description": "<p>" + .body + "</p>"}
+          "description": strenv(body)
+        }
       }'
 
 flatpak:
