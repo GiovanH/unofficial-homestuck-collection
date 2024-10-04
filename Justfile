@@ -48,8 +48,11 @@ flatpak:
           '
     )
 
-    commit_hash="$(git rev-list -n 1 $release_tag)"
-    logparam "Release tag" "$release_tag" "has commit hash" "$commit_hash"
+    # commit_hash="$(git rev-list -n 1 $release_tag)"
+    # logparam "Release tag" "$release_tag" "has commit hash" "$commit_hash"
+
+    commit_hash="$(git rev-parse origin-gio/develop)"
+    logparam "Develop head (w/ metadata) has commit hash" "$commit_hash"
 
     tarurl="$(echo $json_release | jq -r .url)"
 
