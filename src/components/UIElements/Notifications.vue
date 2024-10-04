@@ -197,13 +197,13 @@ export default {
           latestTimestamp, nextTimestamp, 
           this.notifCollectionTimestampsIndex
         )
-        this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
+        // this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
 
         const notifications_between = notif_timestamps_between
             .map(t => this.notifCollectionTimestamps[t])
             .flat() // would be a List<List<notif>> otherwise b/c multi timestamps
             .filter(this.filterNotifBySetting)
-        this.$logger.debug("notifications_between", notifications_between)
+        // this.$logger.debug("notifications_between", notifications_between)
 
         // Group newsposts if too many
         if (notif_timestamps_between.length <= this.maxActiveNotifs) {
