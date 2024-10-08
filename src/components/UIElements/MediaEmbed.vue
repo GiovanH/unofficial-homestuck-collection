@@ -340,7 +340,11 @@ export default {
         <script>
           // JS Enhancements: ${this.$localData.settings.jsFlashes}
           // HQ Audio: ${this.$localData.settings.hqAudio}
+
+          // Frag IPC
           window.onhashchange = (e) => {
+            console.debug("srcdoc hash change: ", e, window.location.hash)
+
             if (window.location.hash != '#unset') {
               let hash = window.location.hash.substr(1).split('&')
               window.location.hash = '#unset';
@@ -349,18 +353,31 @@ export default {
               })
             }
           }
+
+          // Intercept navigation events
           window.open = function(url, name, features, replace) {
-              console.log("Flash invoked window.open")
-              vm.invokeFromFlash("link?" + url)
+            console.log("Flash invoked window.open")
+            vm.invokeFromFlash("link?" + url)
           }
+
           if (typeof navigation !== 'undefined') {
             navigation.addEventListener("navigate", (e) => {
               console.log("srcdoc navigating: ", e, e.destination,
                 e.destination.url
               )
-              if (!e.destination.sameDocument) {
+              if (!e.destination.sameDocument && !e.destination.url.startsWith('about:srcdoc')) {
                 console.log(e.destination.url)
                 vm.invokeFromFlash("link?" + e.destination.url)
+              } else {
+                // Workaround for ruffle bug https://github.com/ruffle-rs/ruffle/issues/2092
+                console.log("Internal frame navigation", e.destination, e.destination.url)
+                e.preventDefault()
+
+                const target = new URL(e.destination.url)
+                const hash = target.hash.substr(1).split('&')
+                hash.forEach((func)=>{
+                  vm.invokeFromFlash(func)
+                })
               }
             })
           } else {
