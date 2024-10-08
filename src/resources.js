@@ -1,16 +1,18 @@
 // Rules for transforming intercepted URLS
 
-const Mods = require('@/mods.js').default
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 const path = (isWebApp ? require('path-browserify') : require('path'))
 
-const ipcRenderer = require('electron').ipcRenderer
-
 var logger
 if (!isWebApp) {
-  const log = require('electron-log')
-  logger = log.scope('Resources')
+  try {
+    const log = require('electron-log')
+    logger = log.scope('Resources')
+  } catch (err) {
+    // console.warn(err)
+    logger = console
+  }
 } else {
   logger = console
 }
@@ -177,6 +179,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 
   console.assert(asset_url.startsWith("assets://"), "resources", asset_url + " is not on the assets protocol!")
 
+  const Mods = require('@/mods.js').default
   if (Mods) {
     const mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
@@ -209,6 +212,8 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 const UrlFilterMixin = {
   methods: {
     filterLinksAndImages(el){
+      const ipcRenderer = require('electron').ipcRenderer
+
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
       if (!el) {
@@ -280,6 +285,17 @@ const UrlFilterMixin = {
 
 // ====================================
 // Story logic
+
+const all_stories = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  'ryanquest',
+  'snaps',
+]
 
 function getStoryNum(pageNumber) {
   // Given a MSPA page number, determine the numerical story ID it is associated with.
@@ -543,6 +559,8 @@ module.exports = {
   isReady(){
     return assets_root !== undefined
   },
+  all_stories,
+
   UrlFilterMixin,
   resolveURL,
   toFilePath,
