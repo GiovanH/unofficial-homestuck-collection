@@ -213,7 +213,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 const UrlFilterMixin = {
   methods: {
     filterLinksAndImages(el){
-      const ipcRenderer = require('electron').ipcRenderer
+      const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
