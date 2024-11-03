@@ -42,5 +42,7 @@ If applicable, add screenshots to help explain your problem.
  - Asset Pack Version
  - OS: [Windows/Mac/Linux version X.XX]
 
+**Logs (attach your log files from `%appdata%/unofficial-homestuck-collection/logs`:**
+
 **Additional context**
 Add any other context about the problem here.
