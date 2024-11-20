@@ -127,10 +127,15 @@ publish-webapp:
     just litepack;
     make webapp;
 
+    just upload-webapp
+
+upload-webapp:
+    #!/bin/bash
     chmod -R 755 dist
-    rsync -ri --exclude "*.json" --exclude "unofficial-homestuck-collection" --delete-after dist/ "blog.giovanh.com:~/www-homestuck/"
-    chmod -R ../webpage/
-    rsync -ri --delete-after ../webpage/ "homestuck.giovanh.com:~/www-homestuck-static/unofficial-homestuck-collection/"
+    rsync -ri --exclude "*.json" --exclude "unofficial-homestuck-collection" --delete-after dist/ "homestuck.giovanh.com:~/www-homestuck/"
+    # (cd ../webpage/ && make all)
+    chmod -R 755 ../webpage/
+    rsync -ri --delete-after ../webpage/build/ "homestuck.giovanh.com:~/www-homestuck-static/unofficial-homestuck-collection/"
     # rsync -i /cygdrive/l/Archive/Homestuck/tagly/tagly.py blog.giovanh.com:~/tagly/ --exclude '.git' --exclude '__pycache__' --exclude '.pytest_cache'
     # ssh -t blog.giovanh.com "sudo service tagbooru restart"
     :
