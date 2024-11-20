@@ -281,6 +281,11 @@ function getFlashPath(){
     default:
       throw Error("Unknown platform", process.platform)
   }
+
+  if (assetDir === undefined) {
+    throw Error("Asset directory not yet defined")
+  }
+
   let flashPath = path.join(assetDir, flashPlugin)
 
   if (process.platform == "win32" && !fs.existsSync(flashPath)) {
@@ -292,6 +297,9 @@ function getFlashPath(){
 }
 
 try {
+  if (assetDir === undefined) {
+    throw Error("Asset directory not yet defined, triggering first run")
+  }
   // Pick the appropriate flash plugin for the user's platform
   const flashPath = getFlashPath()
 
@@ -301,7 +309,8 @@ try {
     if (store.has('settings.smoothScrolling') && !store.get('settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   } else throw Error(`Flash plugin not located at ${flashPath}`)
   
-  // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
+  // Spin up a static file server to grab assets from.
+  // Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
     response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
@@ -314,11 +323,16 @@ try {
   server.listen(0, '127.0.0.1', (error) => {
     if (error) throw error
     port = server.address().port
-  
-    // Initialize Resources
-    Resources.init({
-      assets_root: `http://127.0.0.1:${port}/`
-    })
+
+    if (port === undefined) {
+      throw Error("Could not initialize internal asset server", server, server.address())
+    } else {
+      logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
+      // Initialize Resources
+      Resources.init({
+        assets_root: `http://127.0.0.1:${port}/`
+      })
+    }
   })
 } catch (error) {
   logger.debug(error)
@@ -413,13 +427,18 @@ if (assetDir && fs.existsSync(assetDir)) {
 // Speed hack, try to preload the first copy of the archive
 var first_archive
 var archive // Also, keep a reference to the latest archive, for lazy eval
-try {
-  loadArchiveData().then(result => {
-    archive = first_archive = result
-  })
-} catch (e) {
-  // logger.warn(e)
-  // don't even warn, honestly
+
+if (assetDir != undefined) {
+  try {
+    loadArchiveData().then(result => {
+      archive = first_archive = result
+    }).catch(error => {
+      logger.debug(error, "(first load or missing asset pack?)")
+    })
+  } catch (e) {
+    // logger.warn(e)
+    // don't even warn, honestly
+  }
 }
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
@@ -505,7 +524,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       // logger.info(assetDir, flashPlugin, flashPath)
       if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
-      logger.error(error)
+      logger.debug(error)
       validated = false
     }
 

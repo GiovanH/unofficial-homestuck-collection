@@ -117,7 +117,7 @@ function getAssetRoute(url) {
 
   // Lazily bake routes as needed instead of a init hook
   if (routes == undefined) {
-    logger.warn("Routes not loaded yet", (ipcMain ? 'main' : 'render'))
+    logger.warn("Routes not loaded yet", (ipcMain ? 'main' : 'render'), url)
     return undefined
   //   logger.info("Baking routes lazily, triggered by", url)
   //   bakeRoutes()
@@ -1197,39 +1197,45 @@ async function tryExtractZipsForFilesystemIlliteratesAsync(tree) {
 async function loadModChoicesAsync(){
   // Get the list of mods players can choose to enable/disable
   var mod_folders
-  try {
-    if ((await fsExistsAsync(assetDir)) && !(await fsExistsAsync(modsDir))){
-      logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
-      fs.mkdirSync(modsDir)
-    }
-    const tree = await crawlFileTree(modsDir, false)
-
-    try {
-      await tryExtractZipsForFilesystemIlliteratesAsync(tree)
-    } catch (e) {
-      logger.info(e, "(who cares?)")
-    }
-
-    async function isRootValidMod(file_name) {
-      if (/\.js$/.test(file_name))
-        return true;
-      if (tree[file_name] === undefined) {
-        if (await fsExistsAsync(path.join(modsDir, file_name, "mod.js")))
-          return true
-      }
-      logger.warn("Not a mod:", file_name, path.join(file_name, "mod.js"))
-      return false
-    }
-
-    // .js file or folder of some sort
-
-    const roots = Object.keys(tree)
-    const filter = await Promise.all(roots.map(isRootValidMod))
-    mod_folders = roots.filter((_, i) => filter[i])
-  } catch (e) {
+  if (assetDir == undefined) {
     // No mod folder at all. That's okay.
-    logger.error(e)
+    logger.info("Asset dir not yet defined. (First run)")
     return []
+  } else {
+    try {
+      if ((await fsExistsAsync(assetDir)) && !(await fsExistsAsync(modsDir))){
+        logger.warn("Asset pack exists but mods dir doesn't, making empty folder")
+        fs.mkdirSync(modsDir)
+      }
+      const tree = await crawlFileTree(modsDir, false)
+
+      try {
+        await tryExtractZipsForFilesystemIlliteratesAsync(tree)
+      } catch (e) {
+        logger.info(e, "(who cares?)")
+      }
+
+      async function isRootValidMod(file_name) {
+        if (/\.js$/.test(file_name))
+          return true;
+        if (tree[file_name] === undefined) {
+          if (await fsExistsAsync(path.join(modsDir, file_name, "mod.js")))
+            return true
+        }
+        logger.warn("Not a mod:", file_name, path.join(file_name, "mod.js"))
+        return false
+      }
+
+      // .js file or folder of some sort
+
+      const roots = Object.keys(tree)
+      const filter = await Promise.all(roots.map(isRootValidMod))
+      mod_folders = roots.filter((_, i) => filter[i])
+    } catch (e) {
+      // No mod folder at all. That's okay.
+      logger.error(e)
+      return []
+    }
   }
 
   const choice_promises = mod_folders.map(async (dir) => {
