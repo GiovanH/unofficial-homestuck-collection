@@ -5,21 +5,36 @@
     <!-- <img v-else :src="$getResourceURL(src)" :style="{'padding-bottom': '20px'}" /> -->
     <div v-else :style="{width: '650px', height: '450px', 'padding-bottom': '20px'}" />
     <div class='controls' v-if="frames.length > 1">
-      <span>GIF</span>
-      <input
-        type="checkbox"
-        v-model="autoplay"
-        title="Autoplay">
-      <input
+      <button
+        style="width: 5em;"
+        v-text="autoplay ? 'Pause' : 'Play'"
+        @click="autoplay = !autoplay"
+      />
+      <div class="filmstrip" ref="filmstrip">
+        <img v-for="frame, i in frames" :key="`frame${i}`"
+          :src="frame.dataURL"
+          class="clickable"
+          :class="{active: (i == selected_index)}"
+          @click="selected_index = i"
+        />
+      </div>
+      <!-- <label>Loop
+        <input
+          type="checkbox"
+          v-model="autoplay"
+          title="Autoplay">
+      </label> -->
+      <!-- <input
         type="range"
         min="0" :max="frames.length-1"
         v-model.number="selected_index"
         @input="autoplay = false"
         class="slider"
-        :style="{width: `${12 * frames.length}px`}"
-        :title="`${1 + selected_index}/${frames.length}`">
+        style="width: 100%;"
+        :title="`${1 + selected_index}/${frames.length}`"> -->
       <!-- <span v-if="autoplay">Delay x
         <input type="number" style="width: 2em;" v-model="autoplay_delay_multiplier">
+        :style="{width: `${12 * frames.length}px`}"
       </span> -->
     </div>
   </div>
@@ -95,6 +110,16 @@ export default {
       if (to == true) {
         this.queueNextTimeout()
       }
+    },
+    'selected_index'(to) {
+      if (!this.$refs.filmstrip) return
+
+      this.$refs.filmstrip.children[to].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center"
+      })
+
     }
   }
 }
@@ -103,6 +128,7 @@ export default {
 <style scoped lang="scss">
 .controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 div.wrapper {
@@ -110,6 +136,28 @@ div.wrapper {
   img {
     max-width: inherit;
     max-height: inherit;
+  }
+  .filmstrip {
+    display: flex;
+    max-width: 650px;
+    overflow-x: scroll;
+
+    > img {
+      flex: 1 1;
+      flex-basis: 0;
+      // width: 0;
+      max-height: 64px;
+      image-rendering: auto !important;
+      margin: 4px;
+
+      &.clickable {
+        cursor: pointer;
+      }
+
+      &.active {
+        filter: drop-shadow(2px 4px 6px black);
+      }
+    }
   }
 }
 </style>
