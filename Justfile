@@ -2,7 +2,7 @@ default:
     just --list
 
 # construct 'future' git branch from stack
-git-future:
+git-future *args:
     #!/bin/bash
     set -eu -o pipefail
 
@@ -10,9 +10,9 @@ git-future:
 
     git reset --hard develop
 
-    for branch in $@; do
-        git merge $branch
-        git commit || :
+    for branch in {{args}}; do
+      git merge $branch
+      git commit || :
     done
 
 xml_release:
