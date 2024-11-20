@@ -5,8 +5,6 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
-import Resources from "./resources.js"
-
 const { nativeImage } = require('electron');
 const APP_VERSION = app.getVersion()
 const path = require('path')
@@ -328,10 +326,6 @@ try {
       throw Error("Could not initialize internal asset server", server, server.address())
     } else {
       logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
-      // Initialize Resources
-      Resources.init({
-        assets_root: `http://127.0.0.1:${port}/`
-      })
     }
   })
 } catch (error) {
@@ -722,33 +716,43 @@ async function createWindow () {
     ]
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
-      const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      if (details.url == redirectURL) {
-        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
-        logger.error(err)
-        throw Error(err)
-      } else {
-        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
-        const redirect_callback = {redirectURL}
-        callback(redirect_callback)
-      }
-    } else {
-      const destination_url = Resources.resolveURL(details.url)
-      if (details.url == destination_url) {
-        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
-        logger.error(err)
-        throw Error(err)
-      } else {
-        // Okay
-        const redirect_callback = {
-          redirectURL: destination_url
-        }
-        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
-        if (details.resourceType == "subFrame")
-          win.webContents.send('TABS_PUSH_URL', destination_url)
-        else
+      // const redirectURL = Resources.resolveAssetsProtocol(details.url)
+      const reply_channel = 'RESOURCES_RESOLVE_ASSETS_PROTOCOL' + details.url
+      win.webContents.send('RESOURCES_RESOLVE_ASSETS_PROTOCOL', reply_channel, details.url)
+      ipcMain.once(reply_channel, (event, redirectURL) => {
+        if (details.url == redirectURL) {
+          const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+          logger.error(err)
+          throw Error(err)
+        } else {
+          // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+          const redirect_callback = {redirectURL}
           callback(redirect_callback)
-      }
+        }
+      })
+    } else {
+      // const destination_url = Resources.resolveURL(details.url)
+
+      const reply_channel = 'RESOURCES_RESOLVE_URL' + details.url
+      win.webContents.send('RESOURCES_RESOLVE_URL', reply_channel, details.url)
+      ipcMain.once(reply_channel, (event, destination_url) => {
+        if (details.url == destination_url) {
+          const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+          logger.error(err)
+          throw Error(err)
+        } else {
+          // Okay
+          const redirect_callback = {
+            redirectURL: destination_url
+          }
+          // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+          if (details.resourceType == "subFrame")
+            win.webContents.send('TABS_PUSH_URL', destination_url)
+          else
+            callback(redirect_callback)
+        }
+      })
+
     }
   })
 
@@ -758,14 +762,18 @@ async function createWindow () {
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
 
-    const parsedURL = Resources.resolveURL(url)
-    logger.info(`new-window: ${url} ===> ${parsedURL}`)
+    // const parsedURL = Resources.resolveURL(url)
+    const reply_channel = 'RESOURCES_RESOLVE_URL_REPLY' + url
+    win.webContents.send('RESOURCES_RESOLVE_URL', url)
+    ipcMain.once(reply_channel, (event, parsedURL) => {
+      logger.info(`new-window: ${url} ===> ${parsedURL}`)
 
-    // If the given URL is still external, open a browser window.
-    if (/http/.test(parsedURL))
-      shell.openExternal(url) 
-    else
-      win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+      // If the given URL is still external, open a browser window.
+      if (/http/.test(parsedURL))
+        shell.openExternal(url)
+      else
+        win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+    })
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {

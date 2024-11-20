@@ -186,6 +186,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
       // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
       if (loopcheck.includes(mod_route)) {
         loopcheck.push(mod_route)
+        console.error("Circular asset path!", loopcheck)
         throw Error("Circular asset path!" + loopcheck)
       } else {
         loopcheck.push(mod_route)
@@ -555,6 +556,15 @@ module.exports = {
   init(settings){
     assets_root = settings.assets_root || assets_root
     logger.info("Resources initialized to", assets_root)
+
+    const ipcRenderer = require('electron').ipcRenderer
+    ipcRenderer.on('RESOURCES_RESOLVE_ASSETS_PROTOCOL', (event, reply_channel, url) => {
+      event.sender.send(reply_channel, resolveAssetsProtocol(url))
+    })
+    ipcRenderer.on('RESOURCES_RESOLVE_URL', (event, reply_channel, url) => {
+      event.sender.send(reply_channel, resolveURL(url))
+    })
+
   },
   isReady(){
     return assets_root !== undefined

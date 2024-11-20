@@ -58,6 +58,11 @@ var routes = undefined
 const store_modlist_key = 'settings.modListEnabled'
 // const store_devmode_key = 'settings.devMode'
 
+if (ipcMain) {
+  logger.error("Main background process loading modsjs")
+  console.trace()
+}
+
 let validatedState = false
 function expectWorkingState(){
   if (validatedState || isWebApp) return true
@@ -301,18 +306,6 @@ async function bakeRoutes(enabled_mods_js) {
   routes = all_mod_routes
 
   // logger.debug(all_mod_routes)
-  if (ipcRenderer) {
-    // logger.debug('Render sending routes to main')
-    ipcRenderer.invoke('MODS_UPDATE_ROUTES', routes)
-  }
-}
-if (ipcMain) {
-  // Update `routes` in the background process scope, for when
-  // Resources needs to fetch route info statically.
-  ipcMain.handle('MODS_UPDATE_ROUTES', (event, all_mod_routes) => {
-    // logger.debug('Main updating routes from render msg')
-    routes = all_mod_routes
-  })
 }
 
 async function doFullRouteCheck(){
