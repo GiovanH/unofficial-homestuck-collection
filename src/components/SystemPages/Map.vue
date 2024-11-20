@@ -2,31 +2,31 @@
   <GenericPage noPageContent>
     <div class="pageContent psMap" v-if="isPSMap">
       <h2 class="pageTitle">Problem Sleuth Map</h2>
-      <Media url="/maps/map_04.gif" useMap="#problemSleuth"/>
+      <Media :url="psMap" useMap="#problemSleuth"/>
       <map name="problemSleuth">
         <area shape="rect" href="/unlock/PS_titlescreen" coords="18,17,190,140">
-        <area shape="rect" href="/mspa/000219" coords="223,2,413,167">
-        <area shape="rect" href="/mspa/000302" coords="440,-9,630,185">
-        <area shape="rect" href="/mspa/000402" coords="382,226,627,399">
-        <area shape="rect" href="/mspa/000448" coords="83,180,336,304">
-        <area shape="rect" href="/mspa/000546" coords="-4,327,294,466">
-        <area shape="rect" href="/mspa/000604" coords="51,489,351,629">
-        <area shape="rect" href="/mspa/000666" coords="389,415,612,596">
-        <area shape="rect" href="/mspa/000742" coords="365,608,654,801">
-        <area shape="rect" href="/mspa/000816" coords="-10,628,334,809">
-        <area shape="rect" href="/mspa/000873" coords="-10,820,183,1026">
-        <area shape="rect" href="/mspa/000953" coords="221,813,363,987">
-        <area shape="rect" href="/mspa/001030" coords="394,808,627,1014">
-        <area shape="rect" href="/mspa/001069" coords="394,1023,601,1230">
-        <area shape="rect" href="/mspa/001149" coords="204,1029,379,1211">
-        <area shape="rect" href="/mspa/001257" coords="-10,1030,169,1213">
-        <area shape="rect" href="/mspa/001299" coords="52,1245,307,1429">
-        <area shape="rect" href="/mspa/001406" coords="351,1252,620,1511">
-        <area shape="rect" href="/mspa/001466" coords="227,1575,402,1687">
-        <area shape="rect" href="/mspa/001507" coords="56,1759,238,1945">
-        <area shape="rect" href="/mspa/001589" coords="345,1728,602,1934">
-        <area shape="rect" href="/mspa/001655" coords="189,1977,435,2168">
-        <area shape="rect" href="/mspa/001708" coords="53,2202,563,2443">
+        <area shape="rect" href="/mspa/000219" v-if="!$pageIsSpoiler('000219')" coords="223,2,413,167">
+        <area shape="rect" href="/mspa/000302" v-if="!$pageIsSpoiler('000302')" coords="440,-9,630,185">
+        <area shape="rect" href="/mspa/000402" v-if="!$pageIsSpoiler('000402')" coords="382,226,627,399">
+        <area shape="rect" href="/mspa/000448" v-if="!$pageIsSpoiler('000448')" coords="83,180,336,304">
+        <area shape="rect" href="/mspa/000546" v-if="!$pageIsSpoiler('000546')" coords="-4,327,294,466">
+        <area shape="rect" href="/mspa/000604" v-if="!$pageIsSpoiler('000604')" coords="51,489,351,629">
+        <area shape="rect" href="/mspa/000666" v-if="!$pageIsSpoiler('000666')" coords="389,415,612,596">
+        <area shape="rect" href="/mspa/000742" v-if="!$pageIsSpoiler('000742')" coords="365,608,654,801">
+        <area shape="rect" href="/mspa/000816" v-if="!$pageIsSpoiler('000816')" coords="-10,628,334,809">
+        <area shape="rect" href="/mspa/000873" v-if="!$pageIsSpoiler('000873')" coords="-10,820,183,1026">
+        <area shape="rect" href="/mspa/000953" v-if="!$pageIsSpoiler('000953')" coords="221,813,363,987">
+        <area shape="rect" href="/mspa/001030" v-if="!$pageIsSpoiler('001030')" coords="394,808,627,1014">
+        <area shape="rect" href="/mspa/001069" v-if="!$pageIsSpoiler('001069')" coords="394,1023,601,1230">
+        <area shape="rect" href="/mspa/001149" v-if="!$pageIsSpoiler('001149')" coords="204,1029,379,1211">
+        <area shape="rect" href="/mspa/001257" v-if="!$pageIsSpoiler('001257')" coords="-10,1030,169,1213">
+        <area shape="rect" href="/mspa/001299" v-if="!$pageIsSpoiler('001299')" coords="52,1245,307,1429">
+        <area shape="rect" href="/mspa/001406" v-if="!$pageIsSpoiler('001406')" coords="351,1252,620,1511">
+        <area shape="rect" href="/mspa/001466" v-if="!$pageIsSpoiler('001466')" coords="227,1575,402,1687">
+        <area shape="rect" href="/mspa/001507" v-if="!$pageIsSpoiler('001507')" coords="56,1759,238,1945">
+        <area shape="rect" href="/mspa/001589" v-if="!$pageIsSpoiler('001589')" coords="345,1728,602,1934">
+        <area shape="rect" href="/mspa/001655" v-if="!$pageIsSpoiler('001655')" coords="189,1977,435,2168">
+        <area shape="rect" href="/mspa/001708" v-if="!$pageIsSpoiler('001708')" coords="53,2202,563,2443">
       </map>
     </div>
     <div class="pageContent hsMap" v-else-if="isHSMap">
@@ -668,6 +668,40 @@ export default {
   computed: {
     isPSMap() {
       return this.routeParams.mode == '4'
+    },
+    psMap() {
+      if (this.$isNewReader) {
+        // if A is a spoiler, only show map B
+        const map_map = [
+          ['000302', '_01'],
+          ['000402', '_02'],
+          ['000448', '_03'],
+          ['000546', '_04'],
+          ['000604', '_05'],
+          ['000666', '_06'],
+          ['000742', '_07'],
+          ['000816', '_08'],
+          ['000873', '_09'],
+          ['000953', '_10'],
+          ['001030', '_11'],
+          ['001069', '_12'],
+          ['001149', '_13'],
+          ['001257', '_14'],
+          ['001299', '_15'],
+          ['001406', '_16'],
+          ['001466', '_17'],
+          ['001507', '_18'],
+          ['001589', '_19'],
+          ['001655', '_20']
+        ]
+        for (const pair of map_map) {
+          const [page, map_suffix] = pair
+          if (this.$pageIsSpoiler(page)) {
+            return `/maps/map_04${map_suffix}.gif`
+          }
+        }
+      }
+      return `/maps/map_04.gif`
     },
     isHSMap() {
       return this.routeParams.mode == '6'
