@@ -555,7 +555,7 @@ module.exports = {
     assets_root = settings.assets_root || assets_root
     logger.info("Resources initialized to", assets_root)
 
-    const ipcRenderer = require('electron').ipcRenderer
+    const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
     ipcRenderer.on('RESOURCES_RESOLVE_ASSETS_PROTOCOL', (event, reply_channel, url) => {
       event.sender.send(reply_channel, resolveAssetsProtocol(url))
     })

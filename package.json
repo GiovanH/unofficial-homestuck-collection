@@ -19,8 +19,8 @@
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve webapp/browser.js",
+    "build": "vue-cli-service build webapp/browser.js",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
@@ -36,6 +36,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^2.0.10",
+    "@sentry/vue": "^7.60.1",
     "array.prototype.toreversed": "^1.1.1",
     "caniuse-lite": "^1.0.30001621",
     "electron-log": "^4",
@@ -69,12 +70,13 @@
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.24",
     "@babel/plugin-transform-optional-chaining": "^7.24",
     "@babel/preset-env": "^7.21.4",
+    "@sentry/webpack-plugin": "^2.5.0",
     "@vue/cli-plugin-e2e-webdriverio": "^5.0.8",
     "@vue/cli-plugin-router": "^4.5",
     "@vue/cli-service": "^4.5",
     "@vue/devtools": "^6.5.0",
     "@vue/eslint-config-standard": "^5.1.2",
-    "acorn": "^8",
+    "array.prototype.toreversed": "^1.1.1",
     "babel-loader": "^8.1.2",
     "css-loader": "^3.5",
     "electron": "^9.0.0",
@@ -91,6 +93,7 @@
     "eslint-plugin-vue": "^7.8.0",
     "node-loader": "^1.0.3",
     "node-sass": "^8",
+    "raw-loader": "^4.0.2",
     "sass": "^1.62.1",
     "sass-loader": "^10.2.1",
     "string-replace-loader": "^3.1.0",
@@ -101,12 +104,12 @@
     "webpack": "^4.18.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.1",
-    "yaml-loader": "^0.8.0"
+    "yaml-loader": "^0.8.0",
+    "acorn": "^8"
   },
   "resolutions": {
     "@achrinza/node-ipc": "^10",
     "acorn-jsx": "^5.3.2",
-    "terser-webpack-plugin": "^3.0.3",
     "vue-cli-plugin-electron-builder/electron-builder": "^24",
     "vue-loader": "~15.9"
   }

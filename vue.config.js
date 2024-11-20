@@ -37,18 +37,25 @@ module.exports = {
         "@/*": "./src/*"
       }
     },
+    plugins: [],
     module: {
       rules: [{
           test: /\.(?:js|mjs|cjs)$/,
           exclude: {
             and: [/node_modules/], // Exclude libraries in node_modules ...
-            not: []
+            not: [
+              // Except for a few of them that needs to be transpiled because they use modern syntax
+              /vue-reader/,
+              /typescript-etw/,
+            ]
           },
           use: {
             loader: 'babel-loader',
             options: {
               presets: [
-                ['@babel/preset-env', { targets: "defaults" }]
+                ['@babel/preset-env', {
+                  targets: "defaults"
+                }]
               ],
               plugins: [
                 '@babel/plugin-transform-nullish-coalescing-operator',
@@ -74,6 +81,16 @@ module.exports = {
           flags: 'g'
         }
       }
+      // config.module.rule('js')
+      //     .use('string-replace-loader')
+      //     .loader('string-replace-loader')
+      //     .before('js-loader') // After css-loader processes imports (before means after)
+      //     .tap(options => {
+      //         return {
+      //             search: /\/\/ ?!START_NO_WEBAPP.+?!END_NO_WEBAPP/m,
+      //             replace: '/* section removed */'
+      //         }
+      //     })
       // config.module.rule('vue')
       //     .use('string-replace-loader')
       //     .loader('string-replace-loader')
@@ -146,4 +163,18 @@ module.exports = {
       }
     }
   }
+}
+
+if (process.env.ASSET_PACK_HREF && !process.env.ASSET_PACK_HREF.includes('localhost')) {
+  // Production web app builds only
+
+  const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
+
+  module.exports.configureWebpack.plugins.push(
+    sentryWebpackPlugin({
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  )
 }

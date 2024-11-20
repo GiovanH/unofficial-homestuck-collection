@@ -90,3 +90,47 @@ flatpak:
     git commit -m "Automatic version update"
     git push --set-upstream origin "$flat_branch"
     gh pr create --title "Automatic version update to $release_tag" --body ""
+
+# start live server in another window if it's not running already
+ensure-server:
+    #!/bin/bash
+    curl http://localhost:8080 >/dev/null \
+      || xterm -e bash -c "make serve" \
+      || mintty -e bash -c "make serve"
+
+# Build and publish
+
+
+litepack:
+    #!/bin/bash
+    (cd .. && ./litepack.sh)
+
+litepack-mods:
+    #!/bin/bash
+    (
+        set -eu -o pipefail
+        cd ..
+        source ./litepack.sh
+
+        copyImods &
+        fixOB &
+        copyMods &
+        wait
+    )
+
+# build and upload webapp to prod
+publish-webapp:
+    #!/bin/bash
+    rm build/webAppModTrees.json || :
+    rsync -ri src/imods "../Asset Pack V2/archive/"
+
+    just litepack &
+    make webapp &
+    wait
+
+    chmod -R 755 dist
+    rsync -ri --exclude "*.json" --delete-after dist/ "blog.giovanh.com:~/www-homestuck/"
+
+    # rsync -i /cygdrive/l/Archive/Homestuck/tagly/tagly.py blog.giovanh.com:~/tagly/ --exclude '.git' --exclude '__pycache__' --exclude '.pytest_cache'
+    # ssh -t blog.giovanh.com "sudo service tagbooru restart"
+    :

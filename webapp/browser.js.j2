@@ -1,0 +1,396 @@
+{%- set ASSET_PACK_HREF = ASSET_PACK_HREF|default(environ('ASSET_PACK_HREF')) -%}
+{%- set ASSET_DIR = ASSET_DIR|default(environ('ASSET_DIR')) -%}
+{%- set APP_VERSION = APP_VERSION|default(environ('APP_VERSION')) -%}
+
+const store = require('@/../webapp/localstore.js')
+
+window.webAppAppVersion = "{{ APP_VERSION.strip() }}"
+window.webAppAssetPackHref = "{{ ASSET_PACK_HREF }}"
+window.webAppModsDir = "{{ ASSET_DIR }}mods/"
+window.webAppIModsDir = "{{ ASSET_DIR }}archive/imods/"
+
+// Old-reader-only settings in the webhook for setup validateAndRestart
+
+window.webAppOpinionatedDefaults = {
+  showAddressBar: false,
+  mspaMode: true,
+  ruffleFallback: true,
+  useTabbedBrowsing: false,
+  // extraMetadata: true,
+  modListEnabled: [
+    "tuhc-readmspa",
+    // "tuhc-commentary",
+    "oddities",
+    "Ruby Quest",
+    "Nan Quest",
+    // "Nightfall_online",
+    // "Psycholonials_online",
+    // "HomestuckSlurReplacement",
+  ]
+}
+
+window.webAppOpinionatedModDefaults = {
+  "oddities": {
+    "readmeta": true,
+    "no2009": true,
+    "calliope": true
+  },
+  "tuhc-commentary": {"show_author": true},
+  "tuhc-readmspa": {"transcripts": true, "nominor": true, "alttext": true}
+}
+
+// All mods to include as options
+  // "semantic", // requires node process :(
+  // "Nightfall_online",
+{% set mods = [
+  "404Quest_online",
+  "eraserhead.js",
+  "HomestuckSlurReplacement",
+  "oddities",
+  "Plaintext-Images",
+  "Psycholonials_online",
+  "Ruby Quest_online",
+  "Nan Quest_online",
+  "Ruby Quest",
+  "Nan Quest",
+
+  "socialLinks",
+  "tuhc-commentary",
+  "tuhc-damara",
+  "tuhc-puzzlestuck",
+  "tuhc-readmspa",
+  "zombocom.js",
+  "dequirk.js",
+] %}
+
+
+var kofi_goal_progress = "Unknown";
+
+const show_ad = (_) => {
+  return false;
+
+  // if ((new Date()).toISOString().startsWith(store.get("last_goal_met"))) {
+  //   return false
+  // } else {
+  //   return true
+  // }
+}
+
+fetch("/goals.json")
+  .then(result => result.json())
+  .then(data => {
+    if (data.percent != undefined) {
+      kofi_goal_progress = data.percent
+      if (kofi_goal_progress > 1) {
+        const year_month = (new Date()).toISOString().slice(0, 7)
+        store.set("last_goal_met", year_month)
+      }
+    } else {
+      console.error("Bad goals:", data)
+    }
+
+    // kofi_goal_progress = /percentage: '(.+?)',/.exec(text)[1]
+    // // const sandbox_doc = document.implementation.createHTMLDocument("Sandbox")
+    // // const sandbox_body = sandbox_doc.createElement("body");
+    // // sandbox_body.innerHTML = text
+    // // kofi_goal_progress = sandbox_body.querySelector('[name="Goal Widget"] span.kfds-font-bold').innerText.trim()
+
+  })
+
+// if (show_ad()) {
+//   store.set("last_goal_met", "2023-07")
+//   // Check if the goal is met yet so we can stop showing promo
+//   // fetch("https://corsproxy.io/?" + encodeURIComponent("https://ko-fi.com/giovanh39142/goal"))
+//   fetch("https://corsproxy.io/?" + encodeURIComponent("https://ko-fi.com/streamalerts/goaloverlay/sa_c698783d-8928-496d-8907-7d9f716c9906#iframe.html"))
+//     .then(result => result.text())
+//     .then(text => {
+//       kofi_goal_progress = /percentage: '(.+?)',/.exec(text)[1]
+//       // const sandbox_doc = document.implementation.createHTMLDocument("Sandbox")
+//       // const sandbox_body = sandbox_doc.createElement("body");
+//       // sandbox_body.innerHTML = text
+//       // kofi_goal_progress = sandbox_body.querySelector('[name="Goal Widget"] span.kfds-font-bold').innerText.trim()
+
+//       if ((Number(kofi_goal_progress.replace("%", "")) || 0) > 100) {
+//         const year_month = (new Date()).toISOString().slice(0, 7)
+//         store.set("last_goal_met", year_month)
+//       }
+//     })
+// }
+
+window.webAppModJs = {
+  'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
+
+  _bolin: import('{{ ASSET_DIR }}archive/imods/_bolin.js'),
+  _hqAudio: import('{{ ASSET_DIR }}archive/imods/_hqAudio.js'),
+  _pxsTavros: import('{{ ASSET_DIR }}archive/imods/_pxsTavros.js'),
+  _replaybound: import('{{ ASSET_DIR }}archive/imods/_replaybound/mod.js'),
+  _secret: import('{{ ASSET_DIR }}archive/imods/_secret/mod.js'),
+  _soluslunes: import('{{ ASSET_DIR }}archive/imods/_soluslunes.js'),
+  _twoToThree: import('{{ ASSET_DIR }}archive/imods/_twoToThree/mod.js'),
+  _unpeachy: import('{{ ASSET_DIR }}archive/imods/_unpeachy.js'),
+  serveropts: lockmod({
+    title: "Server customization layer",
+    author: "GiovanH",
+    modVersion:.1,
+    browserPages: {
+      'GIO': {
+        component: require('./gio.vue').default
+      }
+    },
+    vueHooks: [
+      {
+        matchName: "navBanner",
+        data: {
+          urls($super) {
+            $super[1] = ["/gio", ...$super[1]]
+            return $super
+          },
+          labels($super) {
+            $super.mspa['/gio'] = "GIO"
+            $super.A6A6['/gio'] = "STALKER."
+            return $super
+          }
+        },
+      },
+      {
+        matchName: "credits",
+        data: {
+          archiveCredits($super) {
+            // Requested removal on the web version
+            return $super.filter((obj) => (obj.name !== 'MrCheeze'));
+          }
+        }
+      },
+      {
+        matchName: "skaianet",
+        mounted() {
+          (async () => {
+            this.cursedText = {
+            {%- for txtpath in [
+              "01-1863-Calamity.txt",
+              "02-1864-Centralia.txt",
+              "03-1873-TrainRobbery.txt",
+              "04-1876-RIPJamesBros.txt",
+              "05-1881-Crocker.txt",
+              "06-1889-Skaianet.txt",
+              "07-1895-Einstein.txt",
+              "08-1896-FredKarnosArmy.txt",
+              "09-1903-PatentOffice.txt",
+              "10-1910-JaneAndJake.txt",
+              "11-1923-JakeLeaves.txt",
+              "12-1926-RIPHoudini.txt",
+              "13-1927-PuttingPantsOnPhilip.txt",
+              "14-1931-JakeReturns.txt",
+              "15-1933-HitlersPromotion.txt",
+              "16-1942-AnnDunham.txt",
+              "17-1945-WWII.txt",
+              "18-1955-RIPEinstein.txt",
+              "19-1957-RIPHardy.txt",
+              "20-1961-NextPhase.txt",
+              "21-1964-TheFieriClones.txt",
+              "22-1965-LaurelsLastStand.txt",
+              "23-1965-2009-SkipToTheEnd.txt",
+              "24-1863-1965-PostScratchTimeline.txt",
+              "25-1965-HarryAdoptsFieriAgain.txt",
+              "26-1977-ChaplinsLastStand.txt",
+              "27-1989-ICP.txt",
+              "28-1996-JaneAndJake.txt",
+              "29-2008-Obama.txt",
+              "30-2011-Rebranding.txt",
+              "31-2016-Trump.txt",
+              "32-2024-TheDoubleJuggaloPresidency.txt",
+              "33-2029-Apophis.txt",
+              "34-2050-Flooding.txt",
+              "35-2040-2424-PreparingAlterniaC.txt",
+              "36-RIPHIC.txt"
+            ] %}
+              "/archive/skaianet/FORBIDDEN_ENTRIES/{{txtpath}}": (await import("!raw-loader!{{ASSET_DIR}}archive/skaianet/FORBIDDEN_ENTRIES/{{txtpath}}")).default,
+            {%- endfor %}
+            }
+          })();
+        }
+      },
+      {
+        matchName: "setup",
+        methods: {
+          validateAndRestart($super) {
+            if (!this.$isNewReader) {
+              this.$localData.settings.modListEnabled.push("tuhc-commentary")
+              this.$localData.settings.modListEnabled.push("Psycholonials_online")
+
+              // this.$localData.settings.extraMetadata = true
+            }
+            $super()
+          }
+        }
+      },
+      // {
+      //   matchName: "settings",
+      //   methods: {
+      //     trackSettings($super) {
+      //       $super()
+      //       try {
+      //         import("@sentry/vue").then(Sentry => {
+      //           ;[
+      //             ...this.settingListBoolean,
+      //             ...this.settingListSystem,
+      //             ...this.enhancementListBoolean,
+      //             ...this.controversialList
+      //           ].forEach(modelSetting => {
+      //             Sentry.setContext(modelSetting.model, this.$localData.settings[modelSetting.model]);
+      //             Sentry.captureMessage(`${modelSetting.model} = ${this.$localData.settings[modelSetting.model]}`);
+      //           })
+      //         })
+      //       } catch (e) {
+      //         this.$logger.error(e)
+      //       }
+      //     }
+      //   }
+      // },
+      {
+        match(ctx) {return show_ad() && ctx.$options.name == "pageFooter"},
+        data: { show_ad: show_ad }
+      },
+      {
+        match(ctx) {return show_ad() && ctx.$options.name == "MSPFAPage"},
+        data: { show_ad: show_ad }
+      },
+      {
+        match(ctx) {return show_ad() && ctx.$options.name == "ad"},
+        data: {
+          href: "https://ko-fi.com/giovanh39142",
+          src: "https://ko-fi.com/streamalerts/goaloverlay/sa_c698783d-8928-496d-8907-7d9f716c9906#iframe.html"
+        },
+        computed:{
+          projectWonderfulText: ($super) => "This goal is to cover the costs of writing and hosting software, NOT the content, which is free."
+        }
+      }
+    ]
+  }),
+  {% for mod in mods -%}
+  '{{ mod }}': import('{{ ASSET_DIR }}mods/{{ mod if mod.endswith(".js") else mod + "/mod.js" }}'),
+  {% endfor %}
+}
+
+window.webAppModTrees = require('../build/webAppModTrees.json')
+
+async function getArchiveData() {
+
+  // NB webpack require mandates full literal strings here, no paramterization.
+  const imports = {
+    version: import('{{ ASSET_DIR }}archive/data/version.json'),
+    mspa: import('{{ ASSET_DIR }}archive/data/mspa.json'),
+    social: import('{{ ASSET_DIR }}archive/data/social.json'),
+    news: import('{{ ASSET_DIR }}archive/data/news.json'),
+    music: import('{{ ASSET_DIR }}archive/data/music.json'),
+    comics: import('{{ ASSET_DIR }}archive/data/comics.json'),
+    extras: import('{{ ASSET_DIR }}archive/data/extras.json'),
+    tweaks: import('{{ ASSET_DIR }}archive/data/tweaks.json'),
+  }
+
+  const modules = Object.fromEntries(
+    (await Promise.all(
+      Object.entries(imports)
+      .map(async ([name, promise]) => [name, (await promise).default])
+    ))
+    // .filter(([k, v]) => (k != 'default')) // Remove merged-in 'default' for version.json
+    // .map(([k, v]) => [k, v.default || v]) // Use .default if exists, otherwise value
+  )
+
+  const {version, ...otherModules} = modules;
+  return {
+    tweaks: {},
+    ...version,
+    ...otherModules,
+    audioData: {},
+    flags: {},
+    mspfa: {}
+  }
+}
+
+// End configuration
+window.isWebApp = true
+
+window.localstore = store
+
+if (!Array.prototype.toReversed) {
+  const toReversed = require('array.prototype.toreversed');
+  var shimmed = toReversed.shim();
+}
+
+function lockmod(modjs) { // hoisted
+  modjs.hidden = true
+  return modjs
+}
+
+if (!store.has("mods")) {
+  store.set("mods", window.webAppOpinionatedModDefaults)
+}
+
+const Mods = require("../src/mods.js").default
+
+const logger = console
+
+async function loadArchiveData() {
+  // We have to de-module the data into raw json so it's not mutable, otherwise the content doesn't reset on reload.
+  console.time("getArchiveData")
+  const archive_data_modules = await getArchiveData()
+  console.timeEnd("getArchiveData")
+
+  // console.time("datamanip")
+  // let data = archive_data_modules
+  // let data = Object.fromEntries(
+  //   Object.entries(archive_data_modules)
+  //     .filter(([k, v]) => (k != 'default')) // Remove merged-in 'default' for version.json
+  //     .map(([k, v]) => [k, v.default || v] // Use .default if exists, otherwise value
+  // ))
+  // console.timeEnd("datamanip")
+
+  console.time("data copy")
+  data = JSON.parse(JSON.stringify(archive_data_modules))
+  console.timeEnd("data copy")
+
+  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
+    .filter(v => v.flag.includes('TZPASSWORD'))
+    .map(v => v.pageId)
+
+  // Sanity checks
+  const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
+  required_keys.forEach(key => {
+    if (!data[key]) throw new Error("Archive object missing required key", key)
+  })
+
+  return data
+}
+
+const fakeIpc = require('./fakeIpc.js')
+
+fakeIpc.on('RELOAD_ARCHIVE_DATA', (event) => {
+  fakeIpc.send('SET_LOAD_STATE', "LOADING")
+  try {
+    loadArchiveData().then(data => {
+      fakeIpc.send('ARCHIVE_UPDATE', data)
+    })
+  } catch (e) {
+    fakeIpc.send('SET_LOAD_STATE', "ERROR")
+  }
+})
+
+// Anti-malware warnings
+// window.addEventListener('DOMContentLoaded', (e) => {
+//   if (navigator.getEnvironmentIntegrity !== undefined) {
+//     const container = (document.querySelector('#content') || document.querySelector('#main') || document.querySelector('body'))
+//     container.innerHTML =
+//     `<section><h1>⚠Your browser has been compromised</h1>
+//     Your browser is flagged as supporting
+//     "<a href='https://vivaldi.com/blog/googles-new-dangerous-web-environment-integrity-spec/'>Web Environment Integrity</a>",
+//     a Google euphemism for malware designed to give the websites you visit control over your personal environment,
+//     lock your web browser with DRM, and of course prevent ad-blocking.
+//     This website -- and all websites -- should not be used with malware-infected browsers.
+//     Please install a legitimate web browser such as
+//     <a href="https://vivaldi.com/">Vivaldi</a> or
+//     <a href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>, and stay safe out there.</section>`;
+//   }
+// })
+
+require('../src/main')

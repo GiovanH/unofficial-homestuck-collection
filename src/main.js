@@ -29,7 +29,7 @@ library.add([
 
 window.isWebApp = (window.isWebApp || false)
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 // Must init resources first.
 /* eslint-disable no-redeclare */
@@ -47,6 +47,15 @@ if (!window.isWebApp) {
 
   Resources.init({
     assets_root: `http://127.0.0.1:${port}/`
+  })
+} else {
+  store = require('@/../webapp/localstore.js')
+  log = { scope() { return console; } }
+
+  var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
+
+  Resources.init({
+    assets_root: window.webAppAssetPackHref
   })
 }
 
@@ -104,7 +113,7 @@ Vue.mixin({
   computed: {
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return Boolean(this.$newReaderCurrent && this.$localData.settings.newReader.limit)
+      return Boolean(!this.$root.guestMode && (this.$newReaderCurrent && this.$localData.settings.newReader.limit))
     },
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current
@@ -397,6 +406,7 @@ Vue.mixin({
       // "Hiveswap Friendsim" and "Pesterquest" are pseudopages used by the bandcamp viewer
       // to reference tracks and volumes, i.e. "Pesterquest: Volume 14"
 
+      if (this.$root.guestMode) return false
       if (!this.$archive) return true // Setup mode
 
       const parsedLimit = parseInt(this.$localData.settings.newReader[useLimit ? 'limit' : 'current'])
@@ -466,6 +476,7 @@ Promise.all(promises_loading).then(_ => {
         archive: undefined,
         loadState: undefined,
         loadStage: undefined,
+        guestMode: false,
         platform: (window.isWebApp ? "webapp" : "electron"),
         tabTheme: {} // Modified by App (avoid reacting to refs)
       }
@@ -494,6 +505,28 @@ Promise.all(promises_loading).then(_ => {
       }
     }
   }).$mount('#app')
+
+  if (window.webAppAssetPackHref && !window.webAppAssetPackHref.includes('localhost')) {
+    import("@sentry/vue").then(Sentry => {
+      Sentry.init({
+        app: Vue,
+        dsn: "https://7e23b32f11076af727a96b6e2961689e@o4505609395306496.ingest.sentry.io/4505609400090624",
+        integrations: [
+          new Sentry.BrowserTracing({
+            // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
+            // tracePropagationTargets: ["localhost", "https:yourserver.io/api/"],
+            routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+          }),
+          new Sentry.Replay(),
+        ],
+        // Performance Monitoring
+        tracesSampleRate: 0.5, // Capture 100% of the transactions, reduce in production!
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+      });
+    })
+  }
 })
 
 // Even though we cancel the auxclick, reallly *really* cancel mouse navigation.

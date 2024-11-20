@@ -11,6 +11,7 @@
       <Notifications :class="theme" ref="notifications" />
       <ContextMenu :class="theme" ref="contextMenu" v-if="!$isWebApp" />
       <Updater ref="Updater" v-if="!$isWebApp" />
+      <GuestBanner ref="GuestBanner" v-if="$root.guestMode" />
       <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip && !$isWebApp"/>
       <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
     </div>
@@ -34,7 +35,9 @@
   const Updater = () => import('@/components/UIElements/Updater.vue')
   const TabFrame = () => import('@/components/TabFrame.vue')
 
-  const ipcRenderer = require('electron').ipcRenderer
+  const GuestBanner = () => import('@/components/UIElements/GuestBanner.vue')
+
+  const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
   var mixins = []
   var webFrame = undefined;
@@ -42,13 +45,20 @@
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
     mixins = [Mods.getMainMixin()]
+  } else {
+    const Resources = require('./resources.js')
+    mixins = [
+      Mods.getMainMixin(),
+      Resources.UrlFilterMixin
+    ]
+    webFrame = undefined
   }
 
   export default {
     name: 'HomestuckCollection',
     mixins,
     components: {
-      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
+      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater, GuestBanner
     },
     data() {
       return {
@@ -65,6 +75,9 @@
         } else {
           if (this.$localData.assetDir && this.$root.loadState !== 'ERROR') {
             // Asset dir is defined (setup finished) and loadState is not known error
+            return true
+          } else if (this.$root.guestMode) {
+            // Preview page directly
             return true
           }
         }
@@ -211,6 +224,9 @@
       this.$root.loadStage = "MOUNTED"
 
       if (window.isWebApp) {
+        if (user_path_target != "/" && !this.$localData.assetDir) {
+          this.$root.guestMode = true
+        }
         if (user_path_target != this.$localData.root.activeTabObject.url) {
           this.$logger.warn("Navigating user to", user_path_target)
           this.$nextTick(() => {
@@ -218,7 +234,7 @@
             this.$localData.root.TABS_NEW(user_path_target)
           })
         } else {
-          // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
+          this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
 
         }
       }
@@ -304,6 +320,10 @@
       document.addEventListener('drop', event => event.preventDefault())
 
       window.addEventListener('keydown', event => {
+        if (event.key === "l" && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault()
+          this.openJumpbox()
+        }
         const activeFrame = document.getElementById(this.$localData.tabData.activeTabKey)
         if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })

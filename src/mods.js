@@ -36,6 +36,13 @@ if (!isWebApp) {
   })
 
   fs = require('fs')
+
+} else {
+  store = require('@/../webapp/localstore.js')
+  store_mods = store.scopedStore('mods')
+  log = {
+    scope() { return console; }
+  }
 }
 
 if (ipcMain) {
@@ -44,7 +51,7 @@ if (ipcMain) {
 }
 
 const path = (isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 
 // const sass = require('sass')
 // const SassJs = require('sass.js')
@@ -365,6 +372,19 @@ function getEnabledMods() {
   if (!store.get('settings.newReader.limit'))
     list.push("_secret")
 
+  if (isWebApp) {
+    Object.keys(window.webAppModJs).forEach(key => {
+      const modjs = window.webAppModJs[key]
+      if (typeof modjs != "function") {
+        // Not a promise, preloaded object
+        if (!list.includes(key) && modjs.hidden && !modjs._internal) {
+          // logger.debug("Webapp: force-enabling loaded, hidden, non-internal mod", key)
+          list.push(key)
+        }
+      }
+    })
+  }
+
   return list
 }
 
@@ -389,26 +409,45 @@ async function getEnabledModsJsAsync(opts) {
 }
 
 async function searchWebAppModTrees(path) {
-  function * search(data, values) {
-    for (const value of values)
-      yield * search1(data, value)
-  }
+  // function * search(data, values) {
+  //   for (const value of values)
+  //     yield * search1(data, value)
+  // }
 
-  function * search1(data, value) {
-    if (Object(data) === data) {
-      for (const key of Object.keys(data)) {
-        if (key === value)
-          yield data[key]
-        else
-          yield * search1(data[key], value)
-      }
-    }
-  }
+  // function * search1(data, value) {
+  //   if (Object(data) === data) {
+  //     for (const key of Object.keys(data)) {
+  //       if (key === value)
+  //         yield data[key]
+  //       else
+  //         yield * search1(data[key], value)
+  //     }
+  //   }
+  // }
 
   let result
   const tree_root = await Promise.resolve(window.webAppModTrees)
-  for (result of search(tree_root, path.split('/'))) {
-    // result = result
+  // for (result of search(tree_root, path.split('/'))) {
+  //   // result = result
+  //   logger.info("Found match for", path, "in", window.webAppModTrees, result)
+  // }
+  // First result is most shallow
+  // result = search(tree_root, path.split('/')).next().value
+  //
+  for (const rootkey of Object.keys(window.webAppModTrees)) {
+    // imods or mods
+    result = window.webAppModTrees[rootkey]
+    for (const subpath of path.split('/')) {
+      if (subpath) {
+        try {
+          result = result[subpath]
+        } catch {
+          result = undefined
+          break
+        }
+      }
+    }
+    if (result) break
   }
 
   if (Object.values(tree_root).includes(result)) {
@@ -420,6 +459,17 @@ async function searchWebAppModTrees(path) {
 async function crawlFileTree(root, recursive = false) {
   // Gives a object that represents the file tree, starting at root
   // Values are objects for directories or true for files that exist
+  if (isWebApp) {
+    const try_roots = [root.replace(window.webAppIModsDir, ''), root.replace(window.webAppModsDir, '')]
+    for (const try_root of try_roots) {
+      const result = await searchWebAppModTrees(try_root)
+      if (result) {
+        return result
+      }
+    }
+    logger.error("Root", root, "not found in any", try_roots)
+  }
+
   const dir = fs.opendirSync(root)
   const ret = {}
   let dirent
@@ -542,30 +592,32 @@ async function getModJsAsync(mod_dir, options = {}) {
 
     // Set mod name, path, and is_directory:
 
-    if (mod_dir.endsWith(".js")) {
-      // logger.debug(mod_dir, "is explicit singlefile.")
-      is_singlefile = true
-      modjs_name = mod_dir
-      modjs_path = path.join(thisModsDir, mod_dir)
-    } else {
-      // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
-      try {
-        const is_directory = !(fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile()) // allow for junctions, symlinks
-        if (is_directory) {
-          is_singlefile = false
-          modjs_name = path.join(mod_dir, "mod.js")
-          modjs_path = path.join(thisModsDir, modjs_name)
-        } else {
+    if (!isWebApp) {
+      if (mod_dir.endsWith(".js")) {
+        // logger.debug(mod_dir, "is explicit singlefile.")
+        is_singlefile = true
+        modjs_name = mod_dir
+        modjs_path = path.join(thisModsDir, mod_dir)
+      } else {
+        // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
+        try {
+          const is_directory = !(fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile()) // allow for junctions, symlinks
+          if (is_directory) {
+            is_singlefile = false
+            modjs_name = path.join(mod_dir, "mod.js")
+            modjs_path = path.join(thisModsDir, modjs_name)
+          } else {
+            is_singlefile = true
+            modjs_name = mod_dir + ".js"
+            modjs_path = path.join(thisModsDir, modjs_name)
+          }
+        } catch (e) {
+          // lstatsync threw error; js-less path didn't exist at all, so singlefile.
+          // logger.error(mod_dir, "must be singlefile, errored", e)
           is_singlefile = true
           modjs_name = mod_dir + ".js"
           modjs_path = path.join(thisModsDir, modjs_name)
         }
-      } catch (e) {
-        // lstatsync threw error; js-less path didn't exist at all, so singlefile.
-        // logger.error(mod_dir, "must be singlefile, errored", e)
-        is_singlefile = true
-        modjs_name = mod_dir + ".js"
-        modjs_path = path.join(thisModsDir, modjs_name)
       }
     }
 
@@ -581,7 +633,13 @@ async function getModJsAsync(mod_dir, options = {}) {
     try {
       var mod_module
       if (isWebApp) {
-        throw Error("Webapp cannot use non-webpack require!")
+        mod_module = await Promise.resolve(window.webAppModJs[mod_dir])
+        if (!Boolean(mod_module)) {
+          removeModsFromEnabledList(mod_dir)
+          onModLoadFail([mod_dir], new Error("Mod missing from static webapp build"))
+          return
+        }
+        mod_module = mod_module.default || mod_module
       } else {
         if (options.reload) {
           /* eslint-disable no-undef */
@@ -814,15 +872,30 @@ function getMainMixin(){
   return {
     mounted() {
       const addScssStyle = (style_id, body) => {
-        importSassJs().then(SassJs => {
-          SassJs.compile(body, (result) => {
-            if (result.status !== 0) throw Error(JSON.stringify(result))
-            this.stylesheets.push({
-              id: style_id,
-              body: result.text
+        const cache_id = `stylecache.${style_id}`
+        if (store_mods.has(cache_id)) {
+          logger.info(`Using cached style ${style_id}`)
+          this.stylesheets.push({
+            id: style_id,
+            body: store_mods.get(cache_id)
+          })
+        } else {
+          importSassJs().then(SassJs => {
+            logger.info(`Compiling style ${style_id}`)
+            if (isWebApp) {
+              // TODO: This doesn't resolve routes; would be much better to grep and replace with resolutions here
+              body = body.replace(/(assets:\/\/.+)(?=\);)/g, Resources.resolveAssetsProtocol)
+            }
+            SassJs.compile(body, (result) => {
+              if (result.status !== 0) throw Error(JSON.stringify(result))
+              store_mods.set(cache_id, result.text)
+              this.stylesheets.push({
+                id: style_id,
+                body: result.text
+              })
             })
           })
-        })
+        }
       }
 
       enabledModsJsPromise.then(modules => {
@@ -1195,7 +1268,10 @@ async function tryExtractZipsForFilesystemIlliteratesAsync(tree) {
 async function loadModChoicesAsync(){
   // Get the list of mods players can choose to enable/disable
   var mod_folders
-  if (assetDir == undefined) {
+
+  if (isWebApp) {
+    mod_folders = Object.keys(window.webAppModJs)
+  } else if (assetDir == undefined) {
     // No mod folder at all. That's okay.
     logger.info("Asset dir not yet defined. (First run)")
     return []

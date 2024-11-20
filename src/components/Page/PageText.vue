@@ -21,7 +21,7 @@
 
 <script>
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
 const Color = require('ts-color-class')
 
 export default {

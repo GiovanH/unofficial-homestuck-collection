@@ -467,7 +467,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
   }
-  win.webContents.send('SET_LOAD_STATE', "DONE")
+  // win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 // search.registerIpc(ipcMain)
