@@ -167,7 +167,24 @@ export default {
     position: relative; // Allow things to align to the page
 
   }
+  //Small screen check
+  @media (max-width: 950px) {
+    &{
+      overflow-x: hidden;
+      height: max-content;
+      .navBanner {
+        max-width: 100%;
+      }
+      .pageFrame {
+        max-width: 100%;
+      }
+      ::v-deep div.footer {
+        max-width: 100%;
+      }
+    }
+  }
 }
+
 
 .mspa.epilogue ::v-deep {
   .bg-white { background-color: #FFFFFF; }
