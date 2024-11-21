@@ -84,7 +84,7 @@ const LivePage = {
     return {
       ...VanillaPage.data(),
       tab: {},
-      routeParams: {},
+      routeParams: {}
     }
   },
   props: ['thisPage'],

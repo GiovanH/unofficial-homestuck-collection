@@ -84,7 +84,7 @@ const DEFAULT_SETTINGS = {
     fontSize: 0,
     lineHeight: 1,
     paragraphSpacing: false,
-    highContrast: false,
+    highContrast: false
   },
   arrowNav: true,
   openLogs: false,
@@ -122,7 +122,7 @@ const DEFAULT_SAVEDATA = {
 
 class LocalData {
   constructor(init) {
-    let data = init || {
+    const data = init || {
       assetDir: '',
       tabData: DEFAULT_TABDATA,
       saveData: DEFAULT_SAVEDATA,
@@ -198,7 +198,7 @@ class LocalData {
         reloadLocalStorage() {
           this.applySaveIfPending()
           const all = store.get()
-          let back = {
+          const back = {
             assetDir: all['assetDir'],
             saveData: all['saveData'] || DEFAULT_SAVEDATA,
             settings: {...DEFAULT_SETTINGS, ...all['settings']},
@@ -295,10 +295,9 @@ class LocalData {
 
           // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
           if (adjacent) {
-            this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
+            this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex + 1 : this.activeTabIndex + 1
             this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
-          }
-          else {
+          } else {
             this.tabData.sortedTabList.push(key)
           }
 
@@ -306,8 +305,7 @@ class LocalData {
 
           if (!adjacent || this.tabData.tabList.length == 1 || this.settings.switchToNewTabs){
             this.TABS_SWITCH_TO(key)
-          }
-          else {
+          } else {
             // TABS_SWITCH_TO also saves localStorage, so we only need to run this here if we're not switching tabs
             this.saveLocalStorage()
           }
@@ -327,24 +325,22 @@ class LocalData {
             
             // If adjacent, chain new tabs along in sequence next to the current tab. Otherwise, place tab at end of array
             if (adjacent) {
-              this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex+1 : this.activeTabIndex+1
+              this.temp.tabChainIndex = this.temp.tabChainIndex ? this.temp.tabChainIndex + 1 : this.activeTabIndex + 1
               this.tabData.sortedTabList.splice(this.temp.tabChainIndex, 0, key)
-            }
-            else {
+            } else {
               this.tabData.sortedTabList.push(key)
             }
             
-            let targetTab = this.tabData.tabs[target]
+            const targetTab = this.tabData.tabs[target]
 
             let url = targetTab.url
-            let history = [...targetTab.history]
-            let future = [...targetTab.future]
+            const history = [...targetTab.history]
+            const future = [...targetTab.future]
 
             if (historyMode == 'back') {
               future.push(url)
               url = history.pop()
-            }
-            else if (historyMode == 'forward') {
+            } else if (historyMode == 'forward') {
               history.push(url)
               url = future.pop()
             }
@@ -362,8 +358,7 @@ class LocalData {
             if (this.tabData.tabList.length > this.tabData.sortedTabList.length) this.TABS_RESYNC()
 
             this.TABS_SWITCH_TO(key)
-          }
-          else console.warning(`Tried to duplicate nonexistent key '${target}'`)
+          } else console.warning(`Tried to duplicate nonexistent key '${target}'`)
         },
 
         TABS_SWITCH_TO(key = this.tabData.activeTabKey) {
@@ -402,11 +397,11 @@ class LocalData {
           if (!this.tabData.tabList.includes(key) || this.tabData.tabList.length <= 1) return
 
           if (key === this.tabData.activeTabKey){
-            let activeIndex = (this.activeTabIndex >= this.tabData.sortedTabList.length-1) ? this.tabData.sortedTabList.length-2 : this.activeTabIndex + 1
+            const activeIndex = (this.activeTabIndex >= this.tabData.sortedTabList.length - 1) ? this.tabData.sortedTabList.length - 2 : this.activeTabIndex + 1
             this.TABS_SWITCH_TO(this.tabData.sortedTabList[activeIndex])
           }
 
-          let sortedIndex = this.tabData.sortedTabList.indexOf(key)
+          const sortedIndex = this.tabData.sortedTabList.indexOf(key)
 
           this.tabData.tabList.splice(this.tabData.tabList.indexOf(key), 1)
           this.tabData.sortedTabList.splice(this.tabData.sortedTabList.indexOf(key), 1)
@@ -417,12 +412,12 @@ class LocalData {
             this.tabData.closedTabList.shift()
           }
 
-          let tabsToKeep = [...this.tabData.tabList]
+          const tabsToKeep = [...this.tabData.tabList]
           this.tabData.closedTabList.forEach(closedTab => {
             tabsToKeep.push(closedTab.key)
           })
 
-          let toClear =  Object.keys(this.tabData.tabs).filter(x => !tabsToKeep.includes(x))
+          const toClear =  Object.keys(this.tabData.tabs).filter(x => !tabsToKeep.includes(x))
 
           toClear.forEach(key => {
             if (key in this.tabData.tabs) {
@@ -441,19 +436,19 @@ class LocalData {
         },
 
         TABS_CLOSE_ON_RIGHT(key = this.tabData.activeTabKey) {
-          let hitlist = this.tabData.sortedTabList.slice(this.tabData.sortedTabList.indexOf(key)+1, this.tabData.sortedTabList.length)
+          const hitlist = this.tabData.sortedTabList.slice(this.tabData.sortedTabList.indexOf(key) + 1, this.tabData.sortedTabList.length)
           hitlist.reverse().forEach(key => this.TABS_CLOSE(key))
         },
 
         TABS_CLOSE_ALL_OTHERS(key = this.tabData.activeTabKey) {
-            let hitlist = [...this.tabData.sortedTabList]
+            const hitlist = [...this.tabData.sortedTabList]
             hitlist.splice(this.tabData.sortedTabList.indexOf(key), 1)
             hitlist.reverse().forEach(key => this.TABS_CLOSE(key))
         },
 
         TABS_RESTORE() {
           if (this.tabData.closedTabList.length > 0) {
-            let tab = this.tabData.closedTabList.pop()
+            const tab = this.tabData.closedTabList.pop()
             this.tabData.tabList.push(tab.key)
             this.tabData.sortedTabList.splice(tab.index, 0, tab.key)
             this.TABS_SWITCH_TO(tab.key)
@@ -463,7 +458,7 @@ class LocalData {
         },
 
         TABS_RESYNC() {
-          let lostTabs = this.tabData.tabList.filter(key => !this.tabData.sortedTabList.includes(key))
+          const lostTabs = this.tabData.tabList.filter(key => !this.tabData.sortedTabList.includes(key))
           lostTabs.forEach(key => {
             this.tabData.sortedTabList.push(key)
           })
@@ -492,8 +487,8 @@ class LocalData {
         TABS_SWAP(key1, key2) {
           this.temp.tabChainIndex = undefined
 
-          let index1 = this.tabData.sortedTabList.indexOf(key1)
-          let index2 = this.tabData.sortedTabList.indexOf(key2)
+          const index1 = this.tabData.sortedTabList.indexOf(key1)
+          const index2 = this.tabData.sortedTabList.indexOf(key2)
           if (index1 < 0 || index2 < 0) {
             console.warn(`One of the tabs you're trying to swap doesn't exist. Tab 1: ${key1}, Tab 2: ${key2}`)
             return
@@ -503,7 +498,7 @@ class LocalData {
         },
         
         TABS_HISTORY_FORWARD() {
-          let tab = this.activeTabObject
+          const tab = this.activeTabObject
           if (tab.future.length > 0) {
             window.getSelection().empty()
             document.getElementById(tab.key).scrollTop = 0
@@ -516,7 +511,7 @@ class LocalData {
           this.saveLocalStorage()
         },
         TABS_HISTORY_BACK() {
-          let tab = this.activeTabObject
+          const tab = this.activeTabObject
           if (tab.history.length > 0) {
             window.getSelection().empty()
             document.getElementById(tab.key).scrollTop = 0
@@ -548,8 +543,8 @@ class LocalData {
           this.saveLocalStorage()
         },
         SAVES_SWAP(key1, key2) {
-          let index1 = this.saveData.saveList.indexOf(key1)
-          let index2 = this.saveData.saveList.indexOf(key2)
+          const index1 = this.saveData.saveList.indexOf(key1)
+          const index2 = this.saveData.saveList.indexOf(key2)
           if (index1 < 0 || index2 < 0) {
             console.warn(`One of the tabs you're trying to swap doesn't exist. Tab 1: ${key1}, Tab 2: ${key2}`)
             return
@@ -593,7 +588,7 @@ class LocalData {
             tabData: this.tabData
           }
           // console.log("Saving", history_state)
-          window.history.pushState(history_state, "", this.activeTabObject.url);
+          window.history.pushState(history_state, "", this.activeTabObject.url)
         }
       },
       watch: {
@@ -657,7 +652,6 @@ class LocalData {
   }
 }
 
-
 export default {
   // Store: LocalData,
   install (Vue, options) {
@@ -672,5 +666,5 @@ export default {
         // this.reloadLocalStorage()
       }
     })
-  },
+  }
 }

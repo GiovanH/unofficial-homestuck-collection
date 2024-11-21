@@ -42,9 +42,9 @@ import PageFooter from '@/components/Page/PageFooter.vue'
 import Footnotes from '@/components/Page/PageFootnotes.vue'
 import Metadata from '@/components/Page/PageMetadata.vue'
 
-const Firefly = () => import('@/components/SpecialPages/Firefly.vue')
-
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
+
+const Firefly = () => import('@/components/SpecialPages/Firefly.vue')
 
 export default {
   name: 'page',
@@ -62,7 +62,7 @@ export default {
     }
   },
   theme: function(ctx) {
-    let p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
+    const p = ctx.$isVizBase(ctx.routeParams.base) ? ctx.$vizToMspa(ctx.routeParams.base, ctx.routeParams.p).p : ctx.routeParams.p
     if (ctx.routeParams.base !== 'ryanquest' && ctx.$archive.mspa.story[p].theme) 
       return ctx.$archive.mspa.story[p].theme
   },
@@ -122,7 +122,7 @@ export default {
       }
     },
     audioData(){
-      let media = Array.from(this.thisPage.media)
+      const media = Array.from(this.thisPage.media)
       this.deretcon(media)
       return this.$archive.audioData[media[0]]
     },
@@ -145,7 +145,7 @@ export default {
     },
     nextPagesArray() {
       // this.$logger.info(`${this.tab.url} - ${this.thisPage.title}`)
-      let nextPages = []
+      const nextPages = []
       this.thisPage.next.forEach(nextID => {
         // Removes [??????] password links if the retcon hasn't been triggered yet
         if (!this.$shouldRetcon('retcon6') && this.retcon6passwordPages.includes(nextID)) return
@@ -199,8 +199,8 @@ export default {
       (this.thisPage.flag.includes('R2') && !this.$shouldRetcon('retcon2')) ||
       (this.thisPage.flag.includes('R3') && !this.$shouldRetcon('retcon3')) ||
       (this.thisPage.flag.includes('R4') && !this.$shouldRetcon('retcon4')) ||
-      (this.thisPage.flag.includes('R5') && !this.$shouldRetcon('retcon5')) ){
-          for (let i in media) {
+      (this.thisPage.flag.includes('R5') && !this.$shouldRetcon('retcon5'))){
+          for (const i in media) {
             media[i] = media[i]
             .replace(/1([0-9]{4})\/1[0-9]{4}\.swf/g, "0$1/0$1.swf")
             .replace(/_?retcon(heir)?/, "")

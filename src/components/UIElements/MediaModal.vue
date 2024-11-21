@@ -3,7 +3,9 @@
     <div class="modalMask" v-if="isActive" tabindex="-1" @keydown.esc="close()" @click.self="close()">
       <div class="modalContainer" >
         <div class="modalContent" ref="modalContent">
-          <MediaEmbed :url="url" ref="media" webarchive="true" @blockedevent="onBlockedEvent"/>
+          <MediaEmbed :url="url" ref="media"
+            webarchive="true" @blockedevent="onBlockedEvent"
+          />
         </div>
         <div class="modalLinks">
           <span v-if="$isWebApp"><a :href="url" v-text="url" /></span>
@@ -18,11 +20,9 @@
   </transition>
 </template>
 
-
 <script>
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
-
 
 var shell;
 if (!window.isWebApp) {
@@ -36,7 +36,7 @@ export default {
     MediaEmbed, FlashCredit
   },
   data() {
-    return{
+    return {
       isActive: false,
       url: undefined
     }

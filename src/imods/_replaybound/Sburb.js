@@ -1,6 +1,3 @@
-DRAW_FPS = 60;
-
-
 /**
 $Id: Iuppiter.js 3026 2010-06-23 10:03:13Z Bear $
 
@@ -36,6 +33,10 @@ $Author: Bear $
 $Date: 2010-06-23 18:03:13 +0800 (星期三, 23 六月 2010) $
 $Revision: 3026 $
 */
+
+/* eslint-disable */
+
+DRAW_FPS = 60;
 
 if (typeof Iuppiter === 'undefined')
     Iuppiter = {

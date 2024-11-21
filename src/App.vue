@@ -22,6 +22,8 @@
 </template>
 
 <script>
+  import Mods from "./mods.js"
+
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
 
@@ -32,8 +34,6 @@
   const Updater = () => import('@/components/UIElements/Updater.vue')
   const TabFrame = () => import('@/components/TabFrame.vue')
 
-  import Mods from "./mods.js"
-
   const ipcRenderer = require('electron').ipcRenderer
 
   var mixins = []
@@ -41,7 +41,7 @@
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
-    mixins = [ Mods.getMainMixin() ];
+    mixins = [Mods.getMainMixin()]
   }
 
   export default {
@@ -75,7 +75,9 @@
         return this.$localData.tabData.tabList
       },
       activeTabComponent() {
+        // eslint-disable-next-line no-unused-expressions
         this.needCheckTheme; // what a truly awful hack. vue's fault
+
         // (it's because $refs isn't reactive)
         const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
         if (tab_components) {
@@ -131,7 +133,7 @@
         webFrame.setZoomLevel(this.zoomLevel)
       },
       checkTheme() {
-        this.needCheckTheme = !this.needCheckTheme;
+        this.needCheckTheme = !this.needCheckTheme
       },
       zoomIn() {
         if (this.zoomLevel < 5) {
@@ -208,7 +210,7 @@
 
       this.$root.loadStage = "MOUNTED"
 
-      if (isWebApp) {
+      if (window.isWebApp) {
         if (user_path_target != this.$localData.root.activeTabObject.url) {
           this.$logger.warn("Navigating user to", user_path_target)
           this.$nextTick(() => {

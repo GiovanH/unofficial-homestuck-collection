@@ -16,14 +16,14 @@
             <p class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</p>
             <dl>
               <template v-for="retcon in retconList">
-                <dt :key="retcon.model"><label>
+                <dt :key="retcon.model + '-dt'"><label>
                   <input type="checkbox" 
                     :name="retcon.model" 
                     v-model="$localData.settings[retcon.model]" 
                     :disabled="$localData.settings.fastForward"
                     @click="toggleSetting(retcon.model)"
                   >{{retcon.label}}</label></dt>
-                <dd class="settingDesc">
+                <dd :key="retcon.model + '-dd'" class="settingDesc">
                   Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
                 </dd>
               </template>
@@ -48,14 +48,14 @@
         <dl>
           <template v-for="boolSetting in settingListBoolean">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
+              <dt :key="boolSetting.model + '-dt'"><label>
                 <input type="checkbox"
                   :name="boolSetting.model"
                   v-model="$localData.settings[boolSetting.model]"
                   @click="toggleSetting(boolSetting.model)"
                 >{{boolSetting.label}}</label></dt>
                 <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <label :key="boolSetting.model + '-label'" :for="boolSetting.model">
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
@@ -137,7 +137,7 @@
             <div class="knobs">
               <label>Font family:<br>
                 <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
-                  <option v-for="font in fonts" :value="font.value">
+                  <option v-for="font in fonts" :value="font.value" :key="font.value">
                     {{ font.text }}
                   </option>
                 </select>
@@ -174,14 +174,14 @@
           
           <template v-for="boolSetting in enhancementListBoolean">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
+              <dt :key="boolSetting.model + '-dt'"><label>
                 <input type="checkbox"
                   :name="boolSetting.model"
                   v-model="$localData.settings[boolSetting.model]"
                   @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <label :key="boolSetting.model + '-dd'" :for="boolSetting.model" >
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
@@ -249,7 +249,7 @@
           <SpoilerBox kind="Controversial Content" :start-open="controversialAny">
 
             <template v-for="cc in controversialList">
-              <dt><label>
+              <dt :key="cc.model + '-dt'"><label>
                 <input type="checkbox" 
                   :name="cc.model" 
                   v-model="$localData.settings[cc.model]" 
@@ -259,7 +259,7 @@
                 <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
                 <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
               </dt>
-              <dd class="settingDesc" v-html="cc.desc" />
+              <dd :key="cc.model + '-dd'" class="settingDesc" v-html="cc.desc" />
             </template>
 
           </SpoilerBox>
@@ -284,7 +284,6 @@
         <section class="modPrattle" v-else>
           <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
         </section>
-
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
@@ -343,14 +342,14 @@
         <dl>
           <template v-for="boolSetting in settingListSystem">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
+              <dt :key="boolSetting.model + '-dt'"><label>
                 <input type="checkbox"
                   :name="boolSetting.model"
                   v-model="$localData.settings[boolSetting.model]"
                   @click="toggleSetting(boolSetting.model)"
                 >{{boolSetting.label}}</label></dt>
                 <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <label :key="boolSetting.model + '-dd'" :for="boolSetting.model" >
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
@@ -396,7 +395,7 @@ const SubSettingsModal = () => import('@/components/UIElements/SubSettingsModal.
 
 const draggable = () => import("vuedraggable")
 
-const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
+const log = (window.isWebApp ? { scope() { return console } } : require('electron-log'))
 const ipcRenderer = require('electron').ipcRenderer
 
 export default {
@@ -506,7 +505,7 @@ export default {
           model: "allowSysUpdateNotifs",
           label: "Enable update notifications",
           desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
-          platform_whitelist: ['electron'],
+          platform_whitelist: ['electron']
         }, {
           model: "useTabbedBrowsing",
           label: "Use Tabbed Browsing",
@@ -592,7 +591,7 @@ export default {
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
-        {text: "MSPFA", value: "mspfa"},
+        {text: "MSPFA", value: "mspfa"}
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -794,7 +793,7 @@ export default {
 
       // Get lists of values
       const old_list = this.$localData.settings[setting_key]
-      const list_active = Array(...el_active.children).map((child) =>
+      const list_active = [...el_active.children].map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
@@ -829,8 +828,8 @@ export default {
 
       this.$root.app.archiveReload()
     },
-    openSubModel: function(mod, info_only=false) {
-      this.$refs.modal.openMod(mod, info_only)
+    openSubModel: function(mod, info_only) {
+      this.$refs.modal.openMod(mod, (info_only || false))
     },
     forceReload: function() {
       this.$localData.VM.saveLocalStorage()
@@ -870,7 +869,6 @@ export default {
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (to == this.tab.key || from == this.tab.key) {
-
         if (this.needReload) {
           this.forceReload()
           // forceReload includes archiveReload
@@ -1102,7 +1100,6 @@ export default {
     @media (max-width: 650px) {
       margin: 1em -50px;
     }
-
 
     ul, ol {  
       text-align: left;        

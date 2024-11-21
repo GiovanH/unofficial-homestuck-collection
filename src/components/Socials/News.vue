@@ -4,9 +4,17 @@
     <a href="/news"><Media class="logo" :url="newsLogo" /></a>
 
     <div class="newsYear" v-for="newsYear in filteredSortedPosts" :key="newsYear.yearNo">
-      <h2 class="yearTitle" :class="[newsYear.yearNo]" v-text="'20'+newsYear.yearNo" @click="toggleYear(newsYear.yearNo)" />
+      <h2 class="yearTitle"
+        :class="[newsYear.yearNo]"
+        v-text="'20'+newsYear.yearNo"
+        @click="toggleYear(newsYear.yearNo)"
+      />
       <ul v-if="activeYear == newsYear.yearNo || showAllYears">
-        <li v-for="post in newsYear.posts" class="post" v-html="post.html" :key="post.id" />
+        <li class="post"
+          v-for="post in newsYear.posts"
+          v-html="post.html"
+          :key="post.id"
+        />
 
         <li v-if="newsYear.posts.length < newsposts[newsYear.yearNo].length" class="post notice">
           {{newsposts[newsYear.yearNo].length - newsYear.posts.length}} posts remain in 20{{newsYear.yearNo}}.
@@ -32,7 +40,7 @@ import Resources from '@/resources.js'
 
 export default {
   name: 'news',
-  mixins: [ Resources.UrlFilterMixin ],
+  mixins: [Resources.UrlFilterMixin],
   props: [
     'tab', 'routeParams'
   ],
@@ -47,7 +55,7 @@ export default {
   },
   computed: {
     showAllYears() {
-      return this.activeYear == "ALL";
+      return this.activeYear == "ALL"
     },
     newsLogo() {
       return this.$root.tabTheme.rendered == 'A6A6' ? '/images/a6a6_news.png' : '/images/news.png'
@@ -108,7 +116,7 @@ export default {
         const year = /(\d+)[a-z]?$/.exec(this.routeParams.id)[1]
         if (year in this.newsposts) {
           this.activeYear = year
-          this.$nextTick(()=>{
+          this.$nextTick(() => {
             this.jumpToClass(this.routeParams.id)
           })
         }

@@ -48,12 +48,12 @@ export default {
       return this.h - 60  // y adjust for placing firefly ycoord so it is not outside box
     },
     boxPos(){
-      let positions = [ 
-        { top: [ 200, 600,  50, 500 ], left: [ -300, -100, 400, 700 ] },
-        { top: [ 400,   0, 600,  50 ], left: [ -150,  -50, 300, 650 ] }, 
-        { top: [ 500, 200, 350,   0 ], left: [ -250, -150, 575, 750 ] },
-        { top: [  50, 400,  25, 250 ], left: [ -200,  -50, 300, 600 ] },
-        { top: [ 650,  50, 500, 300 ], left: [ -100, -100, 450, 750 ] }
+      const positions = [ 
+        { top: [200, 600,  50, 500], left: [-300, -100, 400, 700] },
+        { top: [400,   0, 600,  50], left: [-150,  -50, 300, 650] }, 
+        { top: [500, 200, 350,   0], left: [-250, -150, 575, 750] },
+        { top: [ 50, 400,  25, 250], left: [-200,  -50, 300, 600] },
+        { top: [650,  50, 500, 300], left: [-100, -100, 450, 750] }
       ]
       return positions[this.boxPosIndex]
     }
@@ -151,11 +151,11 @@ export default {
   mounted() {
       //  START BUILDING ALL NEEDED firefly objects
       for (let x = 0; x < this.boxnum; x++) {
-        let sname = document.getElementById(this.tab.key).getElementsByClassName('fbox_' + x)[0]  //  Get the ID or name of canvas object
+        const sname = document.getElementById(this.tab.key).getElementsByClassName('fbox_' + x)[0]  //  Get the ID or name of canvas object
         sname.width = this.w    //  FORCE canvas block to be a specific width size
         sname.height = this.h   //  FORCE canvas block to be a specific height sizthis.e
 
-        let tname = sname.getContext('2d')  //  Attach the full 'canvas' controls to make it work
+        const tname = sname.getContext('2d')  //  Attach the full 'canvas' controls to make it work
         this.cobj.push(tname) // The Object ID container for a specific <canvas> box
 
         //  Create needed images! - R and L facing types (BEER - right, BEEL - left)
@@ -191,7 +191,7 @@ export default {
           this.firefly[x].frame = 5
         }
       }
-      this.fireflyInterval = setInterval(this.updateFirefly, 1000/this.fpsrate)
+      this.fireflyInterval = setInterval(this.updateFirefly, 1000 / this.fpsrate)
       this.shuffleBoxPositions()
   },
   beforeDestroy() {
@@ -221,4 +221,3 @@ export default {
 }
 
 </style>
-

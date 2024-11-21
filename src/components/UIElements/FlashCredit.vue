@@ -42,23 +42,22 @@ export default {
     },
     musicText(ref){
       if (ref in this.$archive.music.tracks) {
-        let track = this.$archive.music.tracks[ref]
-        let names = []
+        const track = this.$archive.music.tracks[ref]
+        const names = []
         track.artists.forEach(artist => {names.push(this.$archive.music.artists[artist.who].name)})
         return track.name + ' - ' + names.join(', ')
-      }
-      else return ref
+      } else return ref
     },
     startScroll(i) {
-      let marquee = this.$refs.credit[i].querySelector('.marquee')
-      let overflow = marquee.clientWidth - this.$refs.credit[i].querySelector('.credit').clientWidth + 5
+      const marquee = this.$refs.credit[i].querySelector('.marquee')
+      const overflow = marquee.clientWidth - this.$refs.credit[i].querySelector('.credit').clientWidth + 5
       if (overflow > 0) {
-        let distance = marquee.clientWidth + 25
+        const distance = marquee.clientWidth + 25
 
         this.marqueeText = marquee.innerText
         marquee.innerText = `${this.marqueeText} • ${this.marqueeText}`
 
-        let time = distance/80
+        const time = distance / 80
 
         marquee.style.transition = `margin ${time}s linear`
         marquee.style.marginLeft = `-${distance}px`
@@ -74,7 +73,7 @@ export default {
       }
     },
     endScroll(i) {
-      let marquee = this.$refs.credit[i].querySelector('.marquee')
+      const marquee = this.$refs.credit[i].querySelector('.marquee')
       if (this.marqueeText) {
         marquee.style.transition = ''
         marquee.style.marginLeft = 0
@@ -168,4 +167,3 @@ a.frame {
 }
 
 </style>
-

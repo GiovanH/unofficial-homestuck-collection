@@ -5,21 +5,22 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
-const { nativeImage } = require('electron');
-const APP_VERSION = app.getVersion()
+const { nativeImage } = require('electron')
+
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
 const http = require('http')
 
+const log = require('electron-log')
 const Store = require('electron-store')
-const store = new Store()
 
 const windowStateKeeper = require('electron-window-state')
 
-const log = require('electron-log')
+const store = new Store()
 const logger = log.scope('ElectronMain')
+const APP_VERSION = app.getVersion()
 
 // const search = require('./search.js').default
 
@@ -44,7 +45,8 @@ logger.info(store.get('settings'))
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', 
+  {
+    scheme: 'assets',
     privileges: { 
       standard: true,
       secure: true,
@@ -57,12 +59,12 @@ protocol.registerSchemesAsPrivileged([
 // zoom functions
 function zoomIn() {
   if (win) {
-    win.webContents.send('ZOOM_IN');
+    win.webContents.send('ZOOM_IN')
   }
 }
 function zoomOut() {
   if (win) {
-    win.webContents.send('ZOOM_OUT');
+    win.webContents.send('ZOOM_OUT')
   }
 }
 
@@ -139,7 +141,12 @@ var menuTemplate = [
       {
         label: 'New Tab',
         accelerator: 'CmdOrCtrl+T',
-        click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+        click: () => {
+          if (win) win.webContents.send(
+            'TABS_NEW',
+            {parsedURL: '/', adjacent: false}
+          )
+        }
       },
       {
         label: 'Close Tab',
@@ -237,10 +244,6 @@ async function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
-  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
-    .filter(v => v.flag.includes('TZPASSWORD'))
-    .map(v => v.pageId)
-
   try {
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
@@ -310,9 +313,9 @@ try {
   // Spin up a static file server to grab assets from.
   // Mounts on a dynamically assigned port, which is returned here as a callback.
   const server = http.createServer((request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
-    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-    response.setHeader('Access-Control-Max-Age', 2592000); // 30 days
+    response.setHeader('Access-Control-Allow-Origin', '*')
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
+    response.setHeader('Access-Control-Max-Age', 2592000)
     return handler(request, response, {
       public: assetDir
     })
@@ -402,7 +405,7 @@ if (assetDir && fs.existsSync(assetDir)) {
   var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
   if (app.commandLine.hasSwitch('reset-last-version')) {
     logger.warn(`Run with --reset-last-version flag, resetting version from ${last_app_version} to 0.0.0.`)
-    last_app_version = '0.0.0';
+    last_app_version = '0.0.0'
   }
 
   const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
@@ -441,7 +444,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     if (first_archive) {
       // Use the preloaded "first archive"
       archive = first_archive
-      first_archive = undefined;
+      first_archive = undefined
     } else {
       // Reload the archive data
       archive = await loadArchiveData()
@@ -484,7 +487,8 @@ ipcMain.handle('win-close', async (event) => {
 ipcMain.on('win-close-sync', (e) => {
   logger.warn("Got synchronous close event!")
   win.destroy()
-  e.returnValue = true;
+  e.returnValue = true
+  process.exit()
 })
 
 ipcMain.handle('save-file', async (event, payload) => {
@@ -514,7 +518,7 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       logger.info("New asset directory", assetDir)
       await loadArchiveData() // Run to check if this thows an error
 
-      let flashPath = getFlashPath()
+      const flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
       if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
@@ -610,7 +614,7 @@ try {
           const sharpNativeImage = nativeImage.createFromBuffer(buffer)
           // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
           cb(sharpNativeImage)
-        }).catch(err => {throw err;})
+        }).catch(err => {throw err})
       // }
     } catch (err) {
       logger.error("Couldn't process image", err)
@@ -638,7 +642,7 @@ const OPENWITH_PROTOCOL = 'mspa'
 async function createWindow () {
   // Create the browser window.
 
-  let mainWindowState = windowStateKeeper({
+  const mainWindowState = windowStateKeeper({
     defaultWidth: 1280,
     defaultHeight: 780
   })
@@ -672,7 +676,7 @@ async function createWindow () {
     if (zoomDirection === 'out') {
       zoomOut()
     }
-  });
+  })
 
   // Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
@@ -752,7 +756,6 @@ async function createWindow () {
             callback(redirect_callback)
         }
       })
-
     }
   })
 

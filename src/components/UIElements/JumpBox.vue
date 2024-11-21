@@ -59,9 +59,9 @@ export default {
   methods: {
 		open() {
       this.isActive = true
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.jumpboxText = this.tab.url
-        setTimeout(()=>{
+        setTimeout(() => {
           this.$refs.input.focus()
           this.$refs.input.select()
         }, 10)
@@ -89,7 +89,7 @@ export default {
       this.$localData.root.TABS_PUSH_URL(event.url) // avoids some weird focus cases
       this.$refs.suggest.hideList()
       document.activeElement.blur()
-    },
+    }
   },
   mounted() {
   },

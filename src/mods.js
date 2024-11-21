@@ -9,8 +9,8 @@ var Resources // lazy
 var yaml
 
 if (!Array.prototype.toReversed) {
-  const toReversed = require('array.prototype.toreversed');
-  var shimmed = toReversed.shim();
+  const toReversed = require('array.prototype.toreversed')
+  var shimmed = toReversed.shim()
 }
 
 var ipcMain, fs
@@ -80,7 +80,7 @@ function fsExistsAsync(path) {
       } else {
         reject(err)
       }
-    });
+    })
   })
 }
 
@@ -1210,7 +1210,7 @@ async function loadModChoicesAsync(){
 
       async function isRootValidMod(file_name) {
         if (/\.js$/.test(file_name))
-          return true;
+          return true
         if (tree[file_name] === undefined) {
           if (await fsExistsAsync(path.join(modsDir, file_name, "mod.js")))
             return true

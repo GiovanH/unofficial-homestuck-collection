@@ -105,7 +105,9 @@ function doSearch(payload) {
   }
 
   // "Where" function to make sure any IN: tag matches the *start* of the chapter
-  const where = payload.chapter ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0) : undefined
+  const where = payload.chapter
+    ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0)
+    : undefined
 
   // Run search
   const searchOpts = {

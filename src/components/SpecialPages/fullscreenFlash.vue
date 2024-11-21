@@ -60,10 +60,10 @@ export default {
   computed: {
     flashUrl() {
       // Mirrored from Page.vue:pageMedia()
-      let media = Array.from(this.thisPage.media)
+      const media = Array.from(this.thisPage.media)
       
       if (this.$archive.audioData[media[0]]) {
-        let flashPath = media[0].substring(0, media[0].length-4)
+        const flashPath = media[0].substring(0, media[0].length - 4)
         this.$logger.info("Found audio for", media[0], this.$archive.audioData[media[0]], "changing to", `${flashPath}_hq.swf`)
         media[0] = `${flashPath}_hq.swf`
       }
@@ -228,4 +228,3 @@ export default {
     }
   }
 </style>
-

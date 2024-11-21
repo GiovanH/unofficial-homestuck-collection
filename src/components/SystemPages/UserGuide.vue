@@ -58,7 +58,7 @@ export default {
   computed: {
   },
   methods: {
-  },
+  }
 }
 </script>
 
@@ -139,4 +139,3 @@ export default {
   }
 
 </style>
-

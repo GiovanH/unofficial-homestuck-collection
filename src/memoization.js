@@ -1,4 +1,4 @@
-var LRUCache = require('mnemonist/lru-cache');
+var LRUCache = require('mnemonist/lru-cache')
 
 var all_caches = {}
 
@@ -6,7 +6,7 @@ function getCache(size, funkey) {
     if (funkey == undefined)
         throw `Function key is undefined!`
 
-    let exist_cache = all_caches[funkey]
+    const exist_cache = all_caches[funkey]
     if (exist_cache)
         return funkey
 
@@ -18,7 +18,7 @@ function cacheHas(cache_id, key) {return all_caches[cache_id].has(key)}
 function cacheGet(cache_id, key) {return all_caches[cache_id].get(key)}
 function cacheSet(cache_id, key, value) {all_caches[cache_id].set(key, value)}
 function memoizedClearAll() {
-    for (let c in all_caches)
+    for (const c in all_caches)
         all_caches[c].clear()
 }
 

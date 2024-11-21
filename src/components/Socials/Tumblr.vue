@@ -66,7 +66,9 @@ export default {
   },
   computed: {
     posts() {
-      let filteredPosts = this.$isNewReader ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$newReaderCurrent].timestamp) : [...this.$archive.social.tumblr]
+      const filteredPosts = this.$isNewReader
+        ? this.$archive.social.tumblr.filter(post => post.timestamp <= this.$archive.mspa.story[this.$newReaderCurrent].timestamp)
+        : [...this.$archive.social.tumblr]
       return this.reverse ? filteredPosts.reverse() : filteredPosts
     },
     filteredPostCount() {
@@ -78,12 +80,11 @@ export default {
       this.reverse = !this.reverse
     },
     jumpToClass(id){
-      let className = id || ""
-      let el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
+      const className = id || ""
+      const el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
       if (el) {
         el.scrollIntoView(true)
-      }
-      else {
+      } else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
     }

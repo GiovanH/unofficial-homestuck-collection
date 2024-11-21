@@ -43,7 +43,7 @@ export default {
   computed: {
     notifCollectionPages(){
       // Map<mspa_num: List<notif>>
-      let notifs_by_page = {}
+      const notifs_by_page = {}
       Object.keys(notifPages).forEach(page_num => {
         notifPages[page_num].forEach(notif_id => {
           notifData[notif_id].notif_level = 'major'
@@ -73,11 +73,10 @@ export default {
     // },
     notifCollectionTimestamps(){
       // Map<timestamp: List<notif>>
-      let notifs_by_timestamp = {}
+      const notifs_by_timestamp = {}
       Object.values(this.$archive.news).reduce(function(acc, y){
         return acc.concat(y)
       }, []).forEach(newspost => {
-
         if (!notifs_by_timestamp[newspost.timestamp])
           notifs_by_timestamp[newspost.timestamp] = []
 
@@ -96,7 +95,7 @@ export default {
             return {
               desc
             }
-          },
+          }
         })
       })
       return notifs_by_timestamp
@@ -146,7 +145,7 @@ export default {
 
       // this.$logger.info("Searching between", time1, this.formatTimestamp(time1), "&", time2, this.formatTimestamp(time2))
 
-      let ret = []
+      const ret = []
       let newst = -1
       for (let i = fuzzyBinarySearch(corpus, time1); newst <= time2; newst = corpus[i++]) {
         if (newst > time1) {

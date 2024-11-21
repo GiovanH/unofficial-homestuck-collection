@@ -18,7 +18,7 @@
 </template>
 
 <script>
-let Mark = require('mark.js')
+const Mark = require('mark.js')
 
 export default {
   name: 'findBox',
@@ -35,7 +35,7 @@ export default {
       marks: [],
       markLength: 0,
       step: 0,
-      recurseGuard: false,
+      recurseGuard: false
     }
   },
   computed: {
@@ -120,26 +120,24 @@ export default {
     },
     next(){
       if (this.marks.length > 0) {
-        let prev = this.step
+        const prev = this.step
         if (++this.step >= this.markLength) this.step = 0
         this.marks[prev].classList.remove('findBoxSelected')
         this.marks[this.step].classList.add('findBoxSelected')
         this.marks[this.step].scrollIntoView({block: "center"})
-      }
-      else {
+      } else {
         this.search()
       }
     },
     prev(){
       if (this.marks.length > 0) {
         this.recurseGuard = false
-        let prev = this.step
+        const prev = this.step
         if (--this.step < 0) this.step = this.markLength - 1
         this.marks[prev].classList.remove('findBoxSelected')
         this.marks[this.step].classList.add('findBoxSelected')
         this.marks[this.step].scrollIntoView({block: "center"})
-      }
-      else if (!this.recurseGuard) {
+      } else if (!this.recurseGuard) {
         this.recurseGuard = true
         this.search()
         this.prev()
@@ -154,7 +152,7 @@ export default {
       this.freshStart = true
       this.reset()
     }
-  },
+  }
 }
 </script>
 
@@ -210,7 +208,6 @@ export default {
         }
       }
     }
-
     
   }
   .findBox-enter-active, .findBox-leave-active {

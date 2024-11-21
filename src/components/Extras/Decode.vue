@@ -149,17 +149,15 @@ export default {
       else return false
     },
     morseOutput() {
-      let input = this.morseInput.concat(' ').replace(/[ \t]/g, ' =+=+=').replace(/\n/g, ' =+=+=\n=+=+=').split('=+=+=')
-      let output = []
-      for (let char of input) {
+      const input = this.morseInput.concat(' ').replace(/[ \t]/g, ' =+=+=').replace(/\n/g, ' =+=+=\n=+=+=').split('=+=+=')
+      const output = []
+      for (const char of input) {
         if (char in this.morseModel) output.push(this.morseModel[char])
         else output.push(char)
       }
       return output.join('')
     }
-  },
-  methods: {
-  },
+  }
 }
 </script>
 
@@ -209,4 +207,3 @@ export default {
   font-family: serif
 }
 </style>
-

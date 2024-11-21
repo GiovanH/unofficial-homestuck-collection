@@ -14,7 +14,7 @@ import Resources from '@/resources.js'
 
 export default {
   name: 'extras',
-  mixins: [ Resources.UrlFilterMixin ],
+  mixins: [Resources.UrlFilterMixin],
   props: [
     'tab', 'routeParams'
   ],
@@ -49,7 +49,7 @@ export default {
     },
     thisPage() {
       return typeof this.pageData == 'string' ? this.pageData : this.pageData[this.routeParams.p].content
-    },
+    }
   },
   updated() {
     this.filterLinksAndImages()
@@ -86,4 +86,3 @@ export default {
     }
   }  
 </style>
-

@@ -32,7 +32,8 @@ window.isWebApp = (window.isWebApp || false)
 const ipcRenderer = require('electron').ipcRenderer
 
 // Must init resources first.
-var shell, store, log, port, appVersion
+/* eslint-disable no-redeclare */
+var shell, log, port, appVersion, store
 if (!window.isWebApp) {
   var {shell} = require('electron')
 
@@ -137,7 +138,7 @@ Vue.mixin({
       return resolvedUrl
     },
     $openModal(to) {
-      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].$refs.modal.open(to)
+      this.$root.$children[0].$refs[this.$localData.tabData.activeTabKey][0].openModal(to)
     },
     $openLink(url, auxClick = false) {
       // Open a link. Could be intra-app, external, or an assets:// uri
@@ -271,6 +272,7 @@ Vue.mixin({
         let nextLimit
 
         // Some pages don't directly link to the next page. These are manual exceptions to catch them up to speed
+        /* eslint-disable brace-style */
         if (!isSetupMode) {
           // Calculate nextLimit
           var offByOnePages = this.$archive.tweaks.offByOnePages
@@ -449,7 +451,7 @@ Vue.mixin({
   } 
 })
 
-window.Vue = Vue;
+window.Vue = Vue
 
 // Resolve all promises, then make app
 Promise.all(promises_loading).then(_ => {
@@ -470,13 +472,13 @@ Promise.all(promises_loading).then(_ => {
     },
     computed: {
       // Easy access
-      app(){ return this.$refs.App },
+      app(){ return this.$refs.App }
     },
     asyncComputed: {
       $modChoices: {
         default: {},
         get: Mods.getModChoicesAsync
-      },
+      }
     },
     router,
     render: function (h) { return h(App, {ref: 'App'}) },

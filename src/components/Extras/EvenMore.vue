@@ -106,7 +106,7 @@ export default {
         "Random": shuffle,
         "Type": sortByField('type'),
         "Alphabetical (desc)": sortByFieldIntl('name'),
-        "Alphabetical (asc)": sortByFieldIntl('name', -1),
+        "Alphabetical (asc)": sortByFieldIntl('name', -1)
       },
       extSites: [
         {

@@ -41,12 +41,12 @@
 </template>
 
 <script>
-const gifFrames = require('gif-frames');
+const gifFrames = require('gif-frames')
 const DELAY_TO_MS = 10
 
 // Cache panel lists globally in order to make use of
 // pre-page resource caching (like images do natively)
-const LRUCache = require('mnemonist/lru-cache');
+const LRUCache = require('mnemonist/lru-cache')
 const GLOBAL_FRAME_CACHE = new LRUCache(1000)
 
 export default {
@@ -57,7 +57,7 @@ export default {
       selected_index: 0,
       autoplay: false,
       autoplay_delay_multiplier: 1.0,
-      autoplay_timeout: undefined,
+      autoplay_timeout: undefined
     }
   },
   asyncComputed: {
@@ -119,7 +119,6 @@ export default {
         block: "nearest",
         inline: "center"
       })
-
     }
   }
 }

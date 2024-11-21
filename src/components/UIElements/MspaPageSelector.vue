@@ -72,7 +72,7 @@ export default {
     promptMspaMode: {
       type: Boolean,
       default: false
-    },
+    }
     // value: {
     //   type: String,
     //   default: undefined
@@ -120,8 +120,8 @@ export default {
     },
     isValidPageSet(){
       const pageId = this.selectionPageId
-      const pageInStory = this.$archive ?
-        pageId in this.$archive.mspa.story
+      const pageInStory = this.$archive
+        ? pageId in this.$archive.mspa.story
         : pageId >= '000219' &&
           pageId <= '010029' &&
           !/\D/.test(pageId)
@@ -130,7 +130,7 @@ export default {
     },
     currentInputChanged(){
       return this.selectionPageId != this.value
-    },
+    }
   },
   methods: {
     genInputString(){
@@ -155,7 +155,7 @@ export default {
           this.handleChange(this.selectionPageId)
         }
       }
-    },
+    }
   },
   watch: {
     // Any change to myFastForward should write to the actual setting.
@@ -172,7 +172,7 @@ export default {
         this.$logger.info("to viz", newto.s, from, to, newto.p)
         this.currentInputValue = newto.p
       }
-    },
+    }
   },
   mounted(){
     this.currentInputValue = this.genInputString()

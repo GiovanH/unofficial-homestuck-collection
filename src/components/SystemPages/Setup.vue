@@ -237,7 +237,7 @@ export default {
         "Content Warnings",
         "New Readers",
         "Reading Experience",
-        "Getting Started",
+        "Getting Started"
       ],
       newReaderToggle: true,
       loadingTooLongTimeout: false,
@@ -282,7 +282,7 @@ export default {
 
         'War crimes',
         'Genocide',
-        'Imperialist empires',
+        'Imperialist empires'
       ],
       loadStages: {
         "": "Awaiting reactivity",
@@ -295,7 +295,7 @@ export default {
         "EXTRACT_IMODS": "Applying day-one patch",
         "READ_MODS": "Indexing paraphernalia",
         "BAKE_ROUTES": "Convoluting routing table",
-        "MODS_DONE": "Disparaging EMCAScript",
+        "MODS_DONE": "Disparaging EMCAScript"
       },
       spiroPos: [
         "M-0.0  -71.3  Q-10.85 -10.45  -74.5  -1.35  -138.15 7.8    -181.15 -45.15 -224.1  -98.05  -221.0  -156.1  -217.9  -214.1  -184.95 -258.3",
@@ -338,7 +338,6 @@ export default {
       return this.assetDir
     },
     isLoading() {
-
       // If not in a finished load state, it's still loading
       return (this.$root.loadState != "ERROR") && (this.$root.loadState != "DONE")
     },
@@ -718,4 +717,3 @@ div.loadcard {
 }
 
 </style>
-

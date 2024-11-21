@@ -61,7 +61,7 @@ export default {
       return this.artist.alias ? `${this.artist.name} (a.k.a ${this.artist.alias})` : this.artist.name
     },
     trackographyFiltered() {
-      let filteredCredits = this.artist.credits.filter(albumCredit => {
+      const filteredCredits = this.artist.credits.filter(albumCredit => {
         if (this.$albumIsSpoiler(albumCredit.directory)) {
           let isValidAlbum = false
           albumCredit.music.forEach(track => {
@@ -71,8 +71,7 @@ export default {
             if (!this.$trackIsSpoiler(track.track)) isValidAlbum = true
           })
           return isValidAlbum
-        }
-        else return true
+        } else return true
       })
       if (filteredCredits.length < this.artist.credits.length) filteredCredits.push({})
       return filteredCredits
@@ -87,7 +86,7 @@ export default {
         url.includes('deviantart.com') ? 'DeviantArt' :
         url.includes('wikipedia.org') ? 'Wikipedia' : url}</a>`)
       return (new Intl.ListFormat('en', { style: 'long', type: 'disjunction' }).format(sources))
-    },
+    }
   },
   methods: {
     linkAlbum(album) {
@@ -99,15 +98,13 @@ export default {
     linkReference(reference) {
       if (this.$trackIsSpoiler(reference)) {
         return '??????'
-      }
-      else if (reference in this.$archive.music.tracks) {
+      } else if (reference in this.$archive.music.tracks) {
         return `<a href="/music/track/${this.$archive.music.tracks[reference].directory}">${this.$archive.music.tracks[reference].name}</a>`
-      }
-      else return reference
+      } else return reference
     },
     getUTCDate(date){
-      let d = new Date(date)
-      let month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
+      const d = new Date(date)
+      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     }
   }
@@ -191,5 +188,4 @@ export default {
     }
   }
 }
-</style>
-
+</st

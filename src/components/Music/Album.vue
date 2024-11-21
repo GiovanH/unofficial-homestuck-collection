@@ -72,15 +72,14 @@ export default {
   computed: {
     albumGroups() {
       if (this.album.usesGroups) {
-        let groups = {}
+        const groups = {}
         this.album.tracks.forEach(track => {
-          let group = this.$archive.music.tracks[track].group || "Tracks without a group"
+          const group = this.$archive.music.tracks[track].group || "Tracks without a group"
           if (!groups[group]) groups[group] = []
           groups[group].push(this.linkTrack(track)) 
         })
         return groups
-      }
-      else return false
+      } else return false
     },
     linkAndJoinComposers() {
       return this.linkAndJoinArtists(this.album.artists || ['homestuck'])
@@ -110,35 +109,33 @@ export default {
     linkTrack(dir) {
       if (this.$trackIsSpoiler(dir)) return '<span style="color:#000000">??????</span>'
       if (dir in this.$archive.music.tracks) {
-        let track = this.$archive.music.tracks[dir]
-        let href = `/music/track/${track.directory}`
-        let duration = track.duration ? `<span class="duration">${this.secondsToMinutes(track.duration)}</span>`: ''
-        let html = `<a href="${href}">${track.name}</a>${duration}`
+        const track = this.$archive.music.tracks[dir]
+        const href = `/music/track/${track.directory}`
+        const duration = track.duration ? `<span class="duration">${this.secondsToMinutes(track.duration)}</span>` : ''
+        const html = `<a href="${href}">${track.name}</a>${duration}`
         return html
-      }
-      else return dir 
+      } else return dir 
     },
     linkAndJoinArtists(array) {
-      let artists = array.map(artist => {
+      const artists = array.map(artist => {
         if (typeof artist == 'string') return `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`
-        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${!!artist.what ? ` (${artist.what})` : ''}`
+        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${artist.what ? ` (${artist.what})` : ''}`
       })
       return (new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(artists))
     },
     secondsToMinutes(time) {
       if (Number.isInteger(time)){
-        let m = Math.floor(time % 3600 / 60)
-        let s = Math.floor(time % 3600 % 60)
+        const m = Math.floor(time % 3600 / 60)
+        const s = Math.floor(time % 3600 % 60)
 
         var mDisplay = m.toString().padStart(2, '0')
         var sDisplay = s.toString().padStart(2, '0')
         return mDisplay + ':' + sDisplay
-      }
-      else return ''
+      } else return ''
     },
     getUTCDate(date){
-      let d = new Date(date)
-      let month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
+      const d = new Date(date)
+      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
@@ -191,7 +188,6 @@ export default {
     > ol, > ul, > div, > p, > iframe {
       margin-top: 16px;
     }
-    
 
     ol, ul {
       list-style-position: inside;
@@ -245,4 +241,3 @@ export default {
   }
 }
 </style>
-

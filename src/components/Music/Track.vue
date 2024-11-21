@@ -77,12 +77,12 @@ export default {
   },
   computed: {
     trackArtPath() {
-      let dirName = this.track.album.find(album => this.$archive.music.albums[album].hasTrackArt && !this.$albumIsSpoiler(album)) || this.track.album[0]
-      let fileName = this.track.coverArtists && this.$archive.music.albums[dirName].hasTrackArt ? this.track.directory : 'cover'
-      return (this.$albumIsSpoiler(dirName) ) ? `/archive/music/spoiler.png` : `/archive/music/${dirName}/${fileName}.jpg`
+      const dirName = this.track.album.find(album => this.$archive.music.albums[album].hasTrackArt && !this.$albumIsSpoiler(album)) || this.track.album[0]
+      const fileName = this.track.coverArtists && this.$archive.music.albums[dirName].hasTrackArt ? this.track.directory : 'cover'
+      return (this.$albumIsSpoiler(dirName)) ? `/archive/music/spoiler.png` : `/archive/music/${dirName}/${fileName}.jpg`
     },
     linkAndJoinAlbums() {
-      let albums = this.track.album.map(album => this.$albumIsSpoiler(album) ? '??????' : `<a href="/music/album/${album}">${this.$archive.music.albums[album].name}</a>`)
+      const albums = this.track.album.map(album => this.$albumIsSpoiler(album) ? '??????' : `<a href="/music/album/${album}">${this.$archive.music.albums[album].name}</a>`)
       return this.joinNoOxford(albums)
     },
     linkAndJoinComposers() {
@@ -97,26 +97,24 @@ export default {
     linkPages() {
       // TODO: No. None of this is okay.
       if (this.track.pages && this.track.pages.length > 0) {
-        let result = []
+        const result = []
         this.track.pages.forEach(page => {
           if (page in this.$archive.mspa.story) {
-            let flash = this.$archive.music.flashes[page]
-            let bolin = 'bolin' in flash && !this.$archive.music.flashes[page].tracks.includes(this.track.directory)
+            const flash = this.$archive.music.flashes[page]
+            const bolin = 'bolin' in flash && !this.$archive.music.flashes[page].tracks.includes(this.track.directory)
             
             if (this.$pageIsSpoiler(page)) result.push('??????')
             else {
-              let pageNum = this.$mspaOrVizNumber(page)
-              let pageTitle = this.$archive.mspa.story[page].title
+              const pageNum = this.$mspaOrVizNumber(page)
+              const pageTitle = this.$archive.mspa.story[page].title
               result.push(`<em>Page ${pageNum}</em> - <a href="/mspa/${page}" target="_blank" >${pageTitle}</a> ${bolin ? ' (Removed 11/Jun/2010)' : ''}`)
             }
-          }
-          else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/PS_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
+          } else if (page == 'ps_titlescreen') result.push(`<a href="/unlock/PS_titlescreen" target="_blank" >Problem Sleuth Titlescreen</a>`)
           else if (page == 'assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf') result.push(`<a href="assets://sweetbroandhellajeff/movies/SBAHJthemovie1.swf" target="_blank" >SBAHJthemovie1.swf</a>`)
           else result.push(page)
         })
         return result
-      }
-      else return false
+      } else return false
     },
     linkAndJoinExternalMusic() {
       if (this.track.urls) {
@@ -154,36 +152,33 @@ export default {
     linkArtists(array) {
       return array.map(artist => {
         if (typeof artist == 'string') return `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`
-        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${!!artist.what ? ` (${artist.what})` : ''}`
+        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${artist.what ? ` (${artist.what})` : ''}`
       })
     },
     linkReference(reference) {
       if (this.$trackIsSpoiler(reference)) {
         return '??????'
-      }
-      else if (reference in this.$archive.music.tracks) {
+      } else if (reference in this.$archive.music.tracks) {
         return `<a href="/music/track/${this.$archive.music.tracks[reference].directory}">${this.$archive.music.tracks[reference].name}</a> <i>by ${this.joinNoOxford(this.linkArtists(this.$archive.music.tracks[reference].artists))}</i>`
-      }
-      else return reference
+      } else return reference
     },
     secondsToMinutes(time) {
       if (Number.isInteger(time)){
-        let m = Math.floor(time % 3600 / 60)
-        let s = Math.floor(time % 3600 % 60)
+        const m = Math.floor(time % 3600 / 60)
+        const s = Math.floor(time % 3600 % 60)
 
         var mDisplay = m.toString().padStart(2, '0')
         var sDisplay = s.toString().padStart(2, '0')
         return mDisplay + ':' + sDisplay
-      }
-      else return ''
+      } else return ''
     },
     getUTCDate(date){
-      let d = new Date(date)
-      let month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
+      const d = new Date(date)
+      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     },
     filterCommentaryLinksAndImages(){
-      return this.filterLinksAndImages(this.$refs.commentary);
+      return this.filterLinksAndImages(this.$refs.commentary)
     }
   },
   mounted(){
@@ -237,7 +232,6 @@ export default {
     > ol, > ul, > div, > p, > iframe {
       margin-top: 16px;
     }
-    
 
     ol {
       list-style-position: inside;
@@ -287,4 +281,3 @@ export default {
   }
 }
 </style>
-

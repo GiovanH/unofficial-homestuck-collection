@@ -265,7 +265,7 @@ export default {
         '11931': -125,
         '17445': 1700,
         'A6A6I1': -100,
-        'darkcage': 350,
+        'darkcage': 350
       },
       pauseAt: {
         "08080": 18
@@ -317,7 +317,7 @@ export default {
         rawStyle: ''
       }
 
-      let customProps = this.indexedFlashProps[this.flashId] || {}
+      const customProps = this.indexedFlashProps[this.flashId] || {}
 
       if (Object.keys(customProps).length)
         this.$logger.info("Custom props for flash", this.flashId, customProps)
@@ -742,9 +742,9 @@ document.addEventListener('click', function (e) {
       // Return the contents of the (text) file at url.
       this.$logger.info("Retrieving file", url)
       if (this.$isWebApp) {
-        const request = new XMLHttpRequest();
-        request.open("GET", url, false); // `false` makes the request synchronous
-        request.send(null);
+        const request = new XMLHttpRequest()
+        request.open("GET", url, false) // `false` makes the request synchronous
+        request.send(null)
         if (request.status === 200) {
           return request.responseText
         } else {

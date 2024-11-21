@@ -16,13 +16,18 @@ module.exports = {
 
     // reroute improperly formatted links in 25-Nov-09 newspost
     'assets://newspost_images/scarecrowking1.gif': 'assets://archive/social/news/scarecrowking1.gif',
-    'assets://newspost_images/scarecrowking2.gif': 'assets://archive/social/news/scarecrowking2.gif',
+    'assets://newspost_images/scarecrowking2.gif': 'assets://archive/social/news/scarecrowking2.gif'
   },
   edit: true,
   async asyncComputed(api) {
     const epiloguesYaml = await api.readYamlAsync('./epilogues.yaml')
     return {
       edit(archive) {
+        // Precompute password pages
+        archive.tweaks.tzPasswordPages = Object.values(archive.mspa.story)
+          .filter(v => v.flag.includes('TZPASSWORD'))
+          .map(v => v.pageId)
+
         function editFormspring(group, id, pattern, substitution) {
           const match = archive.social.formspring[group].find((p, i) => p.id === id)
           archive.social.formspring[group].find((p, i) => p.id === id).html =

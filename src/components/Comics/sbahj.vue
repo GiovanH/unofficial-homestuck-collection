@@ -33,7 +33,6 @@
 
 <script>
 // @ is an alias to /src
-import NavBanner from '@/components/UIElements/NavBanner.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import GenericPage from '@/components/UIElements/GenericPage.vue'
 import Ad from '@/components/UIElements/Ad.vue'
@@ -44,7 +43,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, MediaEmbed, GenericPage, Ad
+    MediaEmbed, GenericPage, Ad
   },
   title: () => "sweet bro and hella jeff",
   theme: () => 'sbahj',
@@ -102,29 +101,35 @@ export default {
   },
   computed: {   
     comicUrl() {
-      let ext = ['21', '29', '34', '49'].includes(this.routeParams.cid) ? "gif" : "jpg"
-      let page = this.routeParams.cid.toString().padStart(3, "0")
+      const ext = ['21', '29', '34', '49'].includes(this.routeParams.cid) ? "gif" : "jpg"
+      const page = this.routeParams.cid.toString().padStart(3, "0")
       return `/sweetbroandhellajeff/archive/${page}.${ext}`
     },
     prevPage() {
       let cid = parseInt(this.routeParams.cid)
-      cid = (cid == 40) ? 38 : 
-        (cid <= 1) ? 1 : cid - 1
+      cid = (
+        (cid == 40)
+        ? 38
+        : (cid <= 1) ? 1 : cid - 1
+      )
       return `/sbahj/${cid}`
     },
     nextPage() {
       let cid = parseInt(this.routeParams.cid)
-      cid = (cid == 38) ? 40 : 
-        (cid >= 54) ? 54 : cid + 1
+      cid = (
+        (cid == 38)
+        ? 40
+        : (cid >= 54) ? 54 : cid + 1
+      )
       return `/sbahj/${cid}`
-    },
+    }
   },
   methods: {
     keyNavEvent(dir) {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth) this.$pushURL(this.nextPage)
     }
-  },
+  }
 }
 </script>
 
@@ -176,4 +181,3 @@ export default {
 }
 
 </style>
-

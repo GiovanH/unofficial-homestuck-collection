@@ -92,12 +92,11 @@ export default {
       this.profile = ['andrewhussie', 'mspadventures'][profile] ? ['andrewhussie', 'mspadventures'][profile] : this.profile
     },
     jumpToClass(id){
-      let className = id || ""
-      let el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
+      const className = id || ""
+      const el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
       if (el) {
         el.scrollIntoView(true)
-      }
-      else {
+      } else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
     }

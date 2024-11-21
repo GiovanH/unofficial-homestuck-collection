@@ -21,7 +21,7 @@ export default {
     src: {
       type: String,
       default: "/sweetbroandhellajeff/becomebaby.jpg"
-    },
+    }
   },
   components: {
     MediaEmbed
@@ -35,7 +35,7 @@ export default {
     projectWonderfulText() {
       return `Ads by Project Wonderful! Your ad here, right now: ${this.projectWonderfulBid}`
     }
-  },
+  }
 }
 </script>
 

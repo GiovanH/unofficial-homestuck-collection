@@ -295,7 +295,7 @@ const all_stories = [
   '5',
   '6',
   'ryanquest',
-  'snaps',
+  'snaps'
 ]
 
 function getStoryNum(pageNumber) {
@@ -467,8 +467,7 @@ function getChapter(key) {
       case 'pony2': return 'Homestuck Act 2'
       case 'darkcage2': return 'Homestuck Act 6 Act 3'
     }
-  }
-  else if (p <= 135 && p >= 1) return 'Jailbreak'
+  } else if (p <= 135 && p >= 1) return 'Jailbreak'
   else if (p <= 218 && p >= 136) return 'Bard Quest'
   else if (p <= 1892 && p >= 219) {
     let c = 'Problem Sleuth '
@@ -496,8 +495,7 @@ function getChapter(key) {
     else if (p >= 302) c += "Chapter 2"
     else if (p >= 219) c += "Chapter 1"
     return c
-  }
-  else if (p <= 1900 && p >= 1893) return 'Homestuck Beta'
+  } else if (p <= 1900 && p >= 1893) return 'Homestuck Beta'
   else if (p >= 1901) {
     let c = 'Homestuck '
     if (p >= 10027) c += "Act 7"
@@ -564,7 +562,6 @@ module.exports = {
     ipcRenderer.on('RESOURCES_RESOLVE_URL', (event, reply_channel, url) => {
       event.sender.send(reply_channel, resolveURL(url))
     })
-
   },
   isReady(){
     return assets_root !== undefined

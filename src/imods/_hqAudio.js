@@ -72,7 +72,7 @@ module.exports = {
                         {
                             href: `${base_url}/${plainname}.mp3`,
                             loop: (looping_flashes.includes(plainname))
-                        },
+                        }
                     ]
                 }
             })
