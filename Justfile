@@ -124,8 +124,8 @@ publish-webapp:
     rm build/webAppModTrees.json || :
     rsync -ri src/imods "../Asset Pack V2/archive/"
 
-    just litepack;
-    make webapp;
+    just litepack-mods; # just litepack for full resource verification
+    make webapp
 
     just upload-webapp
 

@@ -405,9 +405,15 @@
   // TODO: Replace --headerHeight with dynamic sizing
   .addressBar {
     --headerHeight: 82px;
+    &.webapp {
+      --headerHeight: 29px;
+    }
   }
   .noAddressBar {
     --headerHeight: 51px;
+    &.webapp {
+      --headerHeight: 0px;
+    }
   }
 
   html, body {

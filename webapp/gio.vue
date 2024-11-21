@@ -132,7 +132,14 @@ export default {
       overflow: auto;
     }
     .rotate {
-      animation: rotation 6.10s infinite linear;
+      animation: spin 6.10s infinite linear;
+      image-rendering: auto !important;
+    }
+    @keyframes spin {
+      100% {
+        -webkit-transform: rotate(360deg);
+        transform:rotate(360deg);
+      }
     }
   }
   // --footer-banner-image: url(https://blog.giovanh.com/theme/images/ad/bannerside.png);

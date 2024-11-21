@@ -636,7 +636,9 @@ async function getModJsAsync(mod_dir, options = {}) {
         mod_module = await Promise.resolve(window.webAppModJs[mod_dir])
         if (!Boolean(mod_module)) {
           removeModsFromEnabledList(mod_dir)
-          onModLoadFail([mod_dir], new Error("Mod missing from static webapp build"))
+          console.error("Mod missing from static webapp build", mod_dir)
+          ipcRenderer.invoke('reload')
+          // onModLoadFail([mod_dir], new Error("Mod missing from static webapp build"))
           return
         }
         mod_module = mod_module.default || mod_module
@@ -884,7 +886,7 @@ function getMainMixin(){
             logger.info(`Compiling style ${style_id}`)
             if (isWebApp) {
               // TODO: This doesn't resolve routes; would be much better to grep and replace with resolutions here
-              body = body.replace(/(assets:\/\/.+)(?=\);)/g, Resources.resolveAssetsProtocol)
+              body = body.replace(/(assets:\/\/.+)(?=\);)/g, (match) => Resources.resolveAssetsProtocol(match))
             }
             SassJs.compile(body, (result) => {
               if (result.status !== 0) throw Error(JSON.stringify(result))

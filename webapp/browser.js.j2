@@ -18,11 +18,16 @@ window.webAppOpinionatedDefaults = {
   useTabbedBrowsing: false,
   // extraMetadata: true,
   modListEnabled: [
-    "tuhc-readmspa",
     // "tuhc-commentary",
-    "oddities",
+    "semantic",
+    "tuhc-readmspa",
+    "Plaintext-Images",
+
     "Ruby Quest",
     "Nan Quest",
+
+    "oddities",
+    "click.js",
     // "Nightfall_online",
     // "Psycholonials_online",
     // "HomestuckSlurReplacement",
@@ -31,7 +36,7 @@ window.webAppOpinionatedDefaults = {
 
 window.webAppOpinionatedModDefaults = {
   "oddities": {
-    "readmeta": true,
+    "readmeta": false,
     "no2009": true,
     "calliope": true
   },
@@ -42,26 +47,31 @@ window.webAppOpinionatedModDefaults = {
 // All mods to include as options
   // "semantic", // requires node process :(
   // "Nightfall_online",
+//"eraserhead.js",
 {% set mods = [
   "404Quest_online",
-  "eraserhead.js",
-  "HomestuckSlurReplacement",
-  "oddities",
-  "Plaintext-Images",
   "Psycholonials_online",
   "Ruby Quest_online",
   "Nan Quest_online",
   "Ruby Quest",
   "Nan Quest",
 
-  "socialLinks",
+  "semantic",
+  "Plaintext-Images",
   "tuhc-commentary",
+  "tuhc-readmspa",
+
+  "HomestuckSlurReplacement",
+
+  "oddities",
+
+  "socialLinks",
   "tuhc-damara",
   "tuhc-puzzlestuck",
-  "tuhc-readmspa",
-  "zombocom.js",
+  "click.js"
 ] %}
 
+// "zombocom.js",
 // "dequirk.js", // Breaks safari
 
 var kofi_goal_progress = "Unknown";
@@ -116,6 +126,9 @@ fetch("/goals.json")
 //       }
 //     })
 // }
+
+const block_note = require('./block_note.js')
+let noted_adblock = false
 
 window.webAppModJs = {
   'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
@@ -256,12 +269,31 @@ window.webAppModJs = {
         data: { show_ad: show_ad }
       },
       {
+        matchName: "TabFrame",
+        methods: {
+          onFinishNavigate($super) {
+            $super()
+
+            if (window.goatcounter) {
+              const analytics_payload = {
+                path: this.tab.url,
+                title: this.tab.title
+              }
+              window.goatcounter.count(analytics_payload)
+            } else if (!noted_adblock) {
+              this.$logger.warn(block_note)
+              noted_adblock = true
+            }
+          }
+        }
+      },
+      {
         match(ctx) {return show_ad() && ctx.$options.name == "ad"},
         data: {
           href: "https://ko-fi.com/giovanh39142",
           src: "https://ko-fi.com/streamalerts/goaloverlay/sa_c698783d-8928-496d-8907-7d9f716c9906#iframe.html"
         },
-        computed:{
+        computed: {
           projectWonderfulText: ($super) => "This goal is to cover the costs of writing and hosting software, NOT the content, which is free."
         }
       }
