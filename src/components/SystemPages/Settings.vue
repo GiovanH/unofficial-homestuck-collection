@@ -788,6 +788,12 @@ export default {
     },
     onUpdateSortable: function(event){
       const el_active = event.target
+
+      if (!el_active) {
+        this.$logger.error("Got onUpdateSortable with no event target?")
+        throw Error("Cannot update sortable with no specified target")
+      }
+
       const setting_key = el_active.attributes['data-setting'].value
       const reordered_item = event.item.attributes['data-value'].value
 
