@@ -26,7 +26,7 @@
             :is="loadedResolvedComponent"
             :data-component="loadedResolvedComponent"
             :tab="tab" 
-            :routeParams="passedRouteParams || routeParams"
+            :routeParams="subComponentRouteParams || routeParams"
             ref="page"
         />
         
@@ -188,7 +188,7 @@ export default {
             modBrowserPages: {},
             lastContentTheme: undefined, // Cache the previous contentTheme for smoother transitions,
             loadedResolvedComponent: COMPONENT_FIRSTLOAD, // Don't change component until it's loaded so the page "hangs" a second before changing, instead of blanking out.
-            passedRouteParams: undefined // Keep routeParams tied to the resolved component so templates don't get unexpected input (e.g. unexpected params from the next, as-of-yet unloaded page component)
+            subComponentRouteParams: undefined // Keep routeParams tied to the resolved component so templates don't get unexpected input (e.g. unexpected params from the next, as-of-yet unloaded page component)
         }
     },
     created(){
@@ -570,7 +570,10 @@ export default {
         openModal(url) {
             this.$refs.modal.open(url)
         },
-        setTitle(){
+        onFinishNavigate() {
+            this.setTitle()
+        },
+        setTitle() {
             // you would not believe how bad this used to be
             let title
 
@@ -615,14 +618,14 @@ export default {
         },
         'loadedResolvedComponent'(to, from) {
             // Component and url changes
-            this.setTitle()
-            this.passedRouteParams = this.routeParams
+            this.onFinishNavigate()
+            this.subComponentRouteParams = this.routeParams
         },
         'tab.url'(to, from) {
             if (this.isComponentLoaded) {
                 // If componentObj still points to the old component,
                 // don't try to call setTitle with the new url params!
-                this.setTitle()
+                this.onFinishNavigate()
             }
             // Has the component loaded yet? If not, clean screen.
             if (COMPONENT_LOADING && !this.isComponentLoaded) {
@@ -639,7 +642,7 @@ export default {
         'routeParams'(to, from) {
             // If the route params change without the component changing, update the component too. Otherwise wait for the component.
             if (this.isComponentLoaded) {
-                this.passedRouteParams = this.routeParams
+                this.subComponentRouteParams = this.routeParams
             }
         }
     },
