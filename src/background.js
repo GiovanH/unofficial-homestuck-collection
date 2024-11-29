@@ -306,9 +306,13 @@ try {
 
   if (fs.existsSync(flashPath)) {
     app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-    if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.has('settings.smoothScrolling') && !store.get('settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
   } else throw Error(`Flash plugin not located at ${flashPath}`)
+
+  if (process.platform == 'linux')
+    app.commandLine.appendSwitch('no-sandbox')
+
+  if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
+    app.commandLine.appendSwitch('disable-smooth-scrolling')
   
   // Spin up a static file server to grab assets from.
   // Mounts on a dynamically assigned port, which is returned here as a callback.

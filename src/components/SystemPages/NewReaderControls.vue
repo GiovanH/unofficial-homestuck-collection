@@ -14,15 +14,15 @@
               <select class="vizStorySelect" 
                 v-if="!$localData.settings.mspaMode"
                 v-model="vizStory" >
+                <option
+                  value="homestuck"
+                  key="homestuck">
+                  Homestuck
+                </option>
                 <option 
                   value="problem-sleuth" 
                   key="problem-sleuth">
                   Problem Sleuth
-                </option>
-                <option 
-                  value="homestuck" 
-                  key="homestuck">
-                  Homestuck
                 </option>
               </select>
               <select class="vizStorySelect" 
@@ -60,14 +60,14 @@
                 v-if="!$localData.settings.mspaMode"
                 v-model="vizStory" >
                 <option 
-                  value="problem-sleuth" 
-                  key="problem-sleuth">
-                  Problem Sleuth
-                </option>
-                <option 
                   value="homestuck" 
                   key="homestuck">
                   Homestuck
+                </option>
+                <option
+                  value="problem-sleuth"
+                  key="problem-sleuth">
+                  Problem Sleuth
                 </option>
               </select>
               <select class="vizStorySelect" 
@@ -352,6 +352,7 @@ export default {
         const newto = this.$mspaToViz(this.newReaderPageInput)
         this.$logger.info("to viz", newto.s, from, to, newto.p)
         this.newReaderPageInput = newto.p
+        this.vizStory = newto.s
       }
     },
     newReaderPageInput(to, from){
