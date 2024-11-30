@@ -129,8 +129,17 @@ function doSearch(payload) {
 
     // Split page by breaks, and also split apart very long paragraphs by sentences.
     const page_lines = page.content.split('<br />').map(line => {
-      if (line.length > 160) {
-        return line.split(/(?<=\. )/) // non-consuming split
+      // Detect very long paragraphs, but avoid splitting lines with long or complex attributes.
+      const temp_node = document.createElement('div')
+      temp_node.innerHTML = line
+      const line_text = temp_node.innerText
+
+      if (line_text.length > 160) {
+        return line_text.split(/(?<=\. )/).map(substr => { // non-consuming split
+          const span = (temp_node.children[0] || temp_node).cloneNode()
+          span.innerText = substr
+          return span.outerHTML
+        })
       } else {
         return [line]
       }
