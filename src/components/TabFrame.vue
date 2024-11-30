@@ -9,6 +9,7 @@
                     $localData.settings.forceScrollBar
                     && resolveComponent != 'FULLSCREENFLASH'
                 ),
+                loading: !isComponentLoaded,
                 forceLoad
             }
         ]"
@@ -696,6 +697,10 @@ export default {
 
         &.forceScrollBar {
             overflow-y: scroll;
+        }
+
+        &.loading {
+            cursor: wait;
         }
     }
     ::v-deep .findBoxSelected {

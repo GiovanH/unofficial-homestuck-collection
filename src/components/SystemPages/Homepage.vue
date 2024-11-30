@@ -617,6 +617,7 @@ export default {
       }
     }
   }
+  // TODO: Don't hide border on 2nd in tablet view (see TBIY)
   .card.noHeaderCard .cardContent.cardRows .rowItem  {
     &:nth-child(1), &:nth-child(2) {
       border-top: none;

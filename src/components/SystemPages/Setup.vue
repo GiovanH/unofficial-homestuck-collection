@@ -654,6 +654,7 @@ export default {
 
 div.loadcard {
   filter: drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7));
+  cursor: wait;
 }
 .loadcard {
 
