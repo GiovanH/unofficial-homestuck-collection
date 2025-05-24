@@ -188,4 +188,4 @@ export default {
     }
   }
 }
-</st
+</style>
