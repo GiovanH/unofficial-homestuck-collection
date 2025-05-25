@@ -855,8 +855,9 @@ export default {
       }
 
       if (setting == 'useSystemWindowDecorations') {
-        // this.$localData.root.saveLocalStorage()
-        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+        setTimeout(() => {
+          ipcRenderer.invoke('restart')
+        }, 1000)
       }
     },
     locateAssets(){
