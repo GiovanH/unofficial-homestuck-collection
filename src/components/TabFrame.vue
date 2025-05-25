@@ -7,7 +7,6 @@
                 hidden: !tabIsActive,
                 forceScrollBar: (
                     $localData.settings.forceScrollBar
-                    && resolveComponent != 'FULLSCREENFLASH'
                 ),
                 loading: !isComponentLoaded,
                 forceLoad
