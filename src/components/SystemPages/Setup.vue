@@ -134,7 +134,7 @@
       </div>
 
       <div v-else-if="isLoading || !loadingTooLongTimeout">
-        <div class="loadcard" >
+        <div class="loadcard">
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
     <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c">
@@ -161,11 +161,16 @@
 
       <div class="card" v-else>
         <!-- Something went wrong. -->
+        <div class="loadcard">
+          <p v-text="loadText"></p>
+        </div>
         <div class="cardContent">
           <div class="errorWithMods" v-if="modsEnabled.length">
             <br>
             <img class="logo" src="@/assets/collection_logo.png"><br>
-            <p>Sorry! Something went critically wrong loading the program.</p><br>
+            <p v-if="loadingTooLongTimeout">Loading the Unofficial Homestuck Collection is taking unusually long. </p>
+            <p v-else>Sorry! Something went critically wrong loading the program.</p>
+            <br>
             <p>You currently have mods enabled:</p><br>
             <ol class="modlist">
               <li
@@ -412,6 +417,14 @@ export default {
     }
   },
   watch: {
+    "loadText"(to, from) {
+      if (this.loadingTooLongTimeout) {
+        this.loadingTooLongTimeout = false
+        setTimeout(function() {
+          this.loadingTooLongTimeout = true
+        }.bind(this), 16000)
+      }
+    }
   }
 }
 </script>
