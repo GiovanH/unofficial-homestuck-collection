@@ -250,12 +250,10 @@ export default {
 
 <style scoped lang="scss">
   ::v-deep {
-    a {
-      color: var(--page-links);
-      &.visited {
-        color: var(--page-links-visited);
-      }
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
+    a.visited:link { color: var(--page-links-visited); }
+
     &.darkBackground .logContent img {
       &[src="assets://storyfiles/hs2/scraps/shades.png"],
       &[src="assets://storyfiles/hs2/scraps/trollc00l.gif"],

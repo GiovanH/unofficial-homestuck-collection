@@ -122,9 +122,8 @@ export default {
     max-width: 726px;
   }
   
-  a {
-    color: var(--page-links);
-  }
+  a { color: var(--page-links); }
+  a:link:active { color: var(--page-links-active); }
 
   .trackography {
     margin-top: 20px;

@@ -316,9 +316,8 @@ export default {
   .navOptions {
     color: var(--page-nav-divider);
 
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
   }
   .meta {
     font-weight: 300;

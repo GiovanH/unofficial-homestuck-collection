@@ -197,9 +197,8 @@ export default {
         border: none;
         padding: 20px;
       }
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
       p {
         margin: 16px 0;
       }

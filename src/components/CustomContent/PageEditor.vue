@@ -304,9 +304,8 @@ export default {
       // For some reason, setting an input's background breaks the border in weird ways.
       border-width: thin;
     }
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .hint {
       margin-top: 0;
       font-family: sans-serif;

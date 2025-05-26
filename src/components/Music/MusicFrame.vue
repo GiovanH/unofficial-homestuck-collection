@@ -104,9 +104,8 @@ export default {
 
     ::v-deep {
       color: var(--font-default);
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
 
     .navBanner {

@@ -72,9 +72,8 @@ export default {
     font-weight: normal;
     color: var(--page-nav-divider);
 
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .tiltedArrow{
       display: inline-block;
       .notTiltedArrowLink {
@@ -112,9 +111,8 @@ export default {
     .navOptions {
       color: var(--page-nav-divider);
 
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
     .meta {
       font-weight: 300;

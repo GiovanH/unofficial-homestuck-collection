@@ -477,7 +477,8 @@ export default {
     align-content: center;
 
     ::v-deep a:not([disabled]) {
-      color: var(--page-links);
+      &:link { color: var(--page-links); }
+      &:link:active { color: var(--page-links-active); }
     }
 
     .a6a6graffiti {
