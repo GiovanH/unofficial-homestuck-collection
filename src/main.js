@@ -71,6 +71,7 @@ var promises_loading = []
 
 Vue.config.productionTip = false
 
+window.appVersion = appVersion
 Vue.use(localData) // Initializes and loads when Vue installs it
 
 // FontAwesomeIconComponent

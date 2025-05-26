@@ -15,7 +15,7 @@
   "engines": {
     "node": "18.20"
   },
-  "version": "2.5.7",
+  "version": "2.5.8",
   "license": "GPL-3.0*",
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,
