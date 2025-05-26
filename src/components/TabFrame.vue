@@ -83,7 +83,6 @@ const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
 
 const MUSIC = () => import('@/components/Music/MusicFrame.vue')
 
-const SOCIALS = () => import('@/components/Socials/Socials.vue')
 const DSTRIDER = () => import('@/components/Socials/DStrider.vue')
 const BLOGSPOT = () => import('@/components/Socials/Blogspot.vue')
 const MAGICALJOURNEY = () => import('@/components/Socials/MagicalJourney.vue')
@@ -163,7 +162,6 @@ export default {
         EPILOGUES,
 
         MUSIC,
-        SOCIALS,
         DSTRIDER,
         BLOGSPOT,
         MAGICALJOURNEY,
