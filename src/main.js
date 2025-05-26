@@ -3,6 +3,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import localData from './store/localData'
+import errorReporting from './js/errorReporting'
 
 import Memoization from '@/memoization.js'
 
@@ -33,15 +34,13 @@ const ipcRenderer = require('electron').ipcRenderer
 
 // Must init resources first.
 /* eslint-disable no-redeclare */
-var shell, log, port, appVersion, store
+var shell, log, port, appVersion
 if (!window.isWebApp) {
-  var {shell} = require('electron')
-
-  const Store = require('electron-store')
-  store = new Store()
+  var { shell } = require('electron')
 
   log = require('electron-log')
   log.transports.console.format = '[{level}] {text}'
+  errorReporting.registerRenderLogger(log)
 
   var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
 

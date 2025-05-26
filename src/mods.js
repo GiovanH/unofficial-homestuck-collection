@@ -10,7 +10,7 @@ var yaml
 
 if (!Array.prototype.toReversed) {
   const toReversed = require('array.prototype.toreversed')
-  var shimmed = toReversed.shim()
+  toReversed.shim()
 }
 
 var ipcMain, fs
