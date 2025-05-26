@@ -1,6 +1,6 @@
 <template>
   <div class="pageBody epilogue">
-    <NavBanner />
+    <NavBanner useCustomStyles="true"/>
     <div class="pageFrame" :class="{fakechat}" v-html="epiloguesPage" />
     <!-- <label><input type="checkbox" v-model="fakechat">fakechat</label> -->
     <PageFooter />
