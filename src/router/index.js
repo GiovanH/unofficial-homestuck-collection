@@ -307,6 +307,10 @@ const routes = [
     ]
   },
   {
+    path: '/wizardyherbert/:p',
+    props: true
+  },
+  {
     path: '/namcohigh/:play',
     props: true
   },

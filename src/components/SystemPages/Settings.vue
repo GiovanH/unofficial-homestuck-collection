@@ -681,7 +681,8 @@ export default {
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
-        {text: "MSPFA", value: "mspfa"}
+        {text: "MSPFA", value: "mspfa"},
+        {text: "MS Office 2003", value: "msword"}
       ],
       fonts: [
         {text: "Default", value: ""},

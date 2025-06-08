@@ -42,7 +42,11 @@ module.exports = {
           test: /\.(?:js|mjs|cjs)$/,
           exclude: {
             and: [/node_modules/], // Exclude libraries in node_modules ...
-            not: []
+            not: [
+              // Except for a few of them that needs to be transpiled because they use modern syntax
+              /vue-reader/,
+              /typescript-etw/
+            ]
           },
           use: {
             loader: 'babel-loader',
@@ -59,7 +63,7 @@ module.exports = {
         },
         {
           test: /\.node$/,
-          loader: "node-loader",
+          loader: "node-loader"
         }
       ]
     }

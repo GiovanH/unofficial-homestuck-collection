@@ -162,7 +162,7 @@ Vue.mixin({
       // If asset, open in modal or externally as appropriate
       if (urlObject.protocol == "assets:") {
         const to_ = Resources.resolveAssetsProtocol(url)
-        if (!/\.(html|pdf)$/i.test(url)) {
+        if (!/\.(html|pdf|epub)$/i.test(url)) {
           this.$openModal(to_)
         } else {
           _openExternal(to_)
