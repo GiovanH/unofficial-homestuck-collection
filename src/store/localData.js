@@ -134,7 +134,8 @@ class LocalData {
       assetDir: '',
       tabData: DEFAULT_TABDATA,
       saveData: DEFAULT_SAVEDATA,
-      settings: DEFAULT_SETTINGS
+      settings: DEFAULT_SETTINGS,
+      store: store
     }
 
     this.VM = new Vue({ 
@@ -171,18 +172,19 @@ class LocalData {
       },
       methods: {
         _migrateStorage(new_version) {
-          const prev_version = store.get('last_migrated_version') || '2.5.0'
+          const MIGRATION_KEY = 'last_migrated_version'
+
+          const prev_version = this.store.get(MIGRATION_KEY) || '2.5.0'
 
           if (prev_version != new_version) {
             console.log("Migrating storage from", prev_version, "to", new_version)
             for (const migration_version in migrations) {
               if (semver.gt(migration_version, prev_version)) {
-                migrations[migration_version](store)
+                console.log("Performing migration for", migration_version)
+                migrations[migration_version](this.store)
+                this.store.set(MIGRATION_KEY, migration_version)
               }
             }
-            store.set('last_migrated_version', new_version)
-          } else {
-            console.log("Not storage from", prev_version, "to", new_version)
           }
         },
         _saveLocalStorage() {
@@ -190,7 +192,7 @@ class LocalData {
             clearTimeout(this.saveDebounce)
             this.saveDebounce = undefined
           }
-          const all = store.get()
+          const all = this.store.get()
           delete all['__internal__'] // Not allowed to save this key
 
           all["timestamp"] = Date.now()
@@ -198,7 +200,7 @@ class LocalData {
           all['tabData'] = this.tabData
           all['saveData'] = this.saveData
           all['settings'] = this.settings
-          store.set(all)
+          this.store.set(all)
         },
         applySaveIfPending() {
           if (this.saveDebounce) {
@@ -211,16 +213,16 @@ class LocalData {
         },
         clearLocalStorage() {
           this.applySaveIfPending()
-          store.delete('timestamp')
-          store.delete('assetDir')
-          store.delete('tabData')
-          store.delete('saveData')
-          store.delete('settings')
+          this.store.delete('timestamp')
+          this.store.delete('assetDir')
+          this.store.delete('tabData')
+          this.store.delete('saveData')
+          this.store.delete('settings')
           this.reloadLocalStorage()
         },
         reloadLocalStorage() {
           this.applySaveIfPending()
-          const all = store.get()
+          const all = this.store.get()
           const back = {
             assetDir: all['assetDir'],
             saveData: all['saveData'] || DEFAULT_SAVEDATA,

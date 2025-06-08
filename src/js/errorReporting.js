@@ -1,12 +1,15 @@
-const Store = require('electron-store')
-const store = new Store()
+var store;
+if (typeof window !== 'undefined' && !window.isWebApp) {
+  const Store = require('electron-store')
+  store = new Store()
+}
 
 const new_issue_link = 'https://github.com/giovanh/unofficial-homestuck-collection/issues/new'
 
 const error_dialog_msg = "If you think this is an error in the application, you can submit a bug report:"
 
 function buildReportBody(error, versions) {
-  return `
+  var body = `
 Before reporting a bug:
 - Read the FAQ: https://bambosh.dev/unofficial-homestuck-collection/faq.html
 - Make absolutely sure your exact issue hasn't already been identified in the pinned issue list
@@ -38,16 +41,18 @@ If applicable, add screenshots to help explain your problem.
  - Program version: \`${versions.app}\`
  - OS: \`${versions.os}\`
  - Asset Pack Version:
-
-**Stacktrace**
+`
+  if (error) {
+    body += `**Stacktrace**
 
 \`\`\`text
 ${error.message}
 
 ${error.stack}
 \`\`\`
-
-**Settings**
+`
+  }
+  body += `**Settings**
 
 \`\`\`text
 ${store.get('settings')}
@@ -56,6 +61,7 @@ ${store.get('settings')}
 **Additional context**
 Add any other context about the problem here.
 `
+  return body
 }
 
 function registerRenderLogger(log) {
