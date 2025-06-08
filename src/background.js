@@ -9,10 +9,10 @@ import fs from 'fs'
 const { nativeImage } = require('electron')
 
 const path = require('path')
-const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
 const http = require('http')
+const semver = require("semver");
 
 const log = require('electron-log')
 const Store = require('electron-store')
@@ -29,6 +29,8 @@ const APP_VERSION = app.getVersion()
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
 const gotTheLock = app.requestSingleInstanceLock()
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
 
 if (!isDevelopment) {
   errorReporting.registerMainLogger(log)
@@ -417,8 +419,7 @@ if (assetDir && fs.existsSync(assetDir)) {
     last_app_version = '0.0.0'
   }
 
-  const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
-  if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
+  if (!last_app_version || semver.gt(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
     want_imods_extracted = true // Takes effect when client requests archive
   } else {

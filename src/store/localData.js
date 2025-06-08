@@ -1,4 +1,5 @@
 import Vue from 'vue'
+const semver = require("semver");
 
 const migrations = {
   '2.3.0': store => {
@@ -176,13 +177,12 @@ class LocalData {
       },
       methods: {
         _migrateStorage(new_version) {
-          const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
-          const prev_version = store.get('last_migrated_version', '0.0.0')
+          const prev_version = store.get('last_migrated_version') || '2.5.0'
 
           if (prev_version != new_version) {
             console.log("Migrating storage from", prev_version, "to", new_version)
             for (const migration_version in migrations) {
-              if (semverGreater(migration_version, prev_version)) {
+              if (semver.gt(migration_version, prev_version)) {
                 migrations[migration_version](store)
               }
             }
