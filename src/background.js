@@ -393,7 +393,11 @@ try {
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {
-  event.returnValue = {port: port, appVersion: APP_VERSION}
+  event.returnValue = {
+    port: port,
+    userData: app.getPath('userData'),
+    appVersion: APP_VERSION
+  }
 })
 
 ipcMain.handle('check-archive-version', async (event, payload) => {

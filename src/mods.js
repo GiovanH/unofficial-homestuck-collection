@@ -38,11 +38,6 @@ if (!isWebApp) {
   fs = require('fs')
 }
 
-if (ipcMain) {
-  logger.error("Main background process loading modsjs")
-  console.trace()
-}
-
 const path = (isWebApp ? require('path-browserify') : require('path'))
 const ipcRenderer = require('electron').ipcRenderer
 

@@ -9,6 +9,10 @@ const new_issue_link = 'https://github.com/giovanh/unofficial-homestuck-collecti
 const error_dialog_msg = "If you think this is an error in the application, you can submit a bug report:"
 
 function buildReportBody(error, versions) {
+  const versions_str = Object.entries(versions)
+    .map(kv => `- ${kv[0]}: ${kv[1]}`)
+    .join('\n')
+
   var body = `
 Before reporting a bug:
 - Read the FAQ: https://bambosh.dev/unofficial-homestuck-collection/faq.html
@@ -37,10 +41,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - Program version: \`${versions.app}\`
- - OS: \`${versions.os}\`
- - Asset Pack Version:
+**Versions**
+${versions_str}
+
 `
   if (error) {
     body += `**Stacktrace**
@@ -55,13 +58,21 @@ ${error.stack}
   body += `**Settings**
 
 \`\`\`text
-${store.get('settings')}
+${JSON.stringify(store.get('settings'), null, 2)}
 \`\`\`
 
 **Additional context**
 Add any other context about the problem here.
 `
   return body
+}
+
+function createIssueLink(versions) {
+  const url = new URL(new_issue_link)
+  url.search = new URLSearchParams({
+    body: buildReportBody(null, versions)
+  })
+  return url
 }
 
 function registerRenderLogger(log) {
@@ -86,6 +97,7 @@ function registerRenderLogger(log) {
       })
     }
   })
+  // throw Error('Render report test')
 }
 
 function registerMainLogger(log) {
@@ -111,9 +123,11 @@ function registerMainLogger(log) {
         })
     }
   })
+  // throw Error('Main report test')
 }
 
 export default {
   registerRenderLogger,
-  registerMainLogger
+  registerMainLogger,
+  createIssueLink
 }
