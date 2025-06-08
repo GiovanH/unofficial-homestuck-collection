@@ -41,7 +41,7 @@
         <div class="tool">
           <a href="/decode/damaramegido" v-if="!$pageIsSpoiler('007298')">
             <Media url="/archive/collection/decode_damara.png" /><br>
-            Damara Japanse Translations
+            Damara Japanese Translations
           </a>
           <span v-else>
             <Media url="/archive/collection/spoiler_medium.png" /><br>

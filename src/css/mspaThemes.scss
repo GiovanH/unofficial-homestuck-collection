@@ -32,6 +32,7 @@
 	--page-nav-meta: #535353;
 	--page-links: #0000EE;
 	--page-links-visited: #6300c0;
+	--page-links-active: -webkit-activelink;
 
 	--system-skycolor: #35bfff;
 	--system-background: 
@@ -547,5 +548,21 @@
 	&.mspfa {
 		--nav-bg: #000;
 		--nav-candyCornContent: url(assets://images/candycorn_mspfa.png);
+	}
+	
+	&.msword {
+		--page-pageContent: #ffffff;
+		--page-pageFrame: #9099ae;
+		--page-pageBody: #9099ae;
+		--nav-bg: #ece9d8;
+		--nav-link: black;
+
+		&.customStyles .navBanner {
+			border: 1px solid black;
+			border-top: none;
+		}
+		.pageContent {
+			border: 1px solid black;
+		}
 	}
 }

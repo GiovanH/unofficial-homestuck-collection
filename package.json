@@ -1,6 +1,7 @@
 {
   "name": "unofficial-homestuck-collection",
   "description": "An offline collection of Homestuck and its related works.",
+  "author": "GiovanH",
   "contributors": [
     {
       "name": "Bambosh",
@@ -14,8 +15,8 @@
   "engines": {
     "node": "18.20"
   },
-  "version": "2.5.6",
-  "license": "GPL-3.0",
+  "version": "2.6.0",
+  "license": "GPL-3.0*",
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
@@ -39,10 +40,11 @@
     "@sentry/vue": "^7.60.1",
     "array.prototype.toreversed": "^1.1.1",
     "caniuse-lite": "^1.0.30001621",
-    "electron-log": "^4",
+    "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "electron-window-state": "^5.0.3",
     "encoding": "^0.1.12",
+    "epubjs": "^0.3.93",
     "flexsearch": "^0.6.32",
     "gif-frames": "^1.0.1",
     "js-yaml": "^3.14.0",

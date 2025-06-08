@@ -7,7 +7,6 @@
                 hidden: !tabIsActive,
                 forceScrollBar: (
                     $localData.settings.forceScrollBar
-                    && resolveComponent != 'FULLSCREENFLASH'
                 ),
                 loading: !isComponentLoaded,
                 forceLoad
@@ -79,12 +78,12 @@ const VIGILPRINCE = () => import('@/components/Extras/VigilPrince.vue')
 const SKAIANET = () => import('@/components/Extras/Skaianet.vue')
 const SQUIDDLES = () => import('@/components/Extras/Squiddles.vue')
 const EVENMORE = () => import('@/components/Extras/EvenMore.vue')
+const WIZARDYHERBERT = () => import('@/components/Extras/WizardyHerbert.vue')
 
 const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
 
 const MUSIC = () => import('@/components/Music/MusicFrame.vue')
 
-const SOCIALS = () => import('@/components/Socials/Socials.vue')
 const DSTRIDER = () => import('@/components/Socials/DStrider.vue')
 const BLOGSPOT = () => import('@/components/Socials/Blogspot.vue')
 const MAGICALJOURNEY = () => import('@/components/Socials/MagicalJourney.vue')
@@ -160,11 +159,11 @@ export default {
         SKAIANET,
         SQUIDDLES,
         EVENMORE,
+        WIZARDYHERBERT,
 
         EPILOGUES,
 
         MUSIC,
-        SOCIALS,
         DSTRIDER,
         BLOGSPOT,
         MAGICALJOURNEY,

@@ -68,9 +68,8 @@ export default {
     p {
       max-width: 600px;
     }
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .faq {
       font-family: Verdana, Arial, Helvetica, sans-serif;
       font-size: 12px;

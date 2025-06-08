@@ -130,10 +130,30 @@ def bbToHTML(bbcode: BBCode) -> str:
 #             time.sleep(2**backoff)
 
 
+def saveYoutubeAs(story: str, src_url: str, target_name: str) -> str:
+    """Save image for story. Returns the output path."""
+    directory = os.path.join(story, "img")
+    os.makedirs(directory, exist_ok=True)
+
+    outpath = os.path.join(directory, target_name)
+
+    from yt_dlp import YoutubeDL
+
+    with YoutubeDL({"outtmpl": {"default": outpath}}) as ydl:
+        info = ydl.extract_info(src_url, download=False)
+
+        outpath += f".{info['ext']}"
+        ydl.download(src_url)
+
+    return outpath.replace("\\", "/")
+
 def saveImageAs(story: str, src_url: str, target_name: str) -> str:
     """Save image for story. Returns the output path."""
     directory = os.path.join(story, "img")
     os.makedirs(directory, exist_ok=True)
+
+    if urlparse(src_url).netloc.endswith('youtube.com'):
+        print(urlparse(src_url))
 
     ext = os.path.splitext(urlparse(src_url).path)[1]
     if "?format=jpg" in src_url:
@@ -379,6 +399,7 @@ def downloadStory(
 
         images = list(itertools.chain(
             [i['src'] for i in soup.find_all("img")],
+            [f['src'] for f in soup.find_all("iframe", src=True)],
             [o['data'] for o in soup.find_all("object", data=True)],
             [o['value'] for o in soup.find_all("param", attrs={'name': "movie"}, value=True)],
             [o['src'] for o in soup.find_all("source")],
@@ -398,6 +419,8 @@ def downloadStory(
 
         if offline:
             for i, src in enumerate(images):
+                src = src.strip()
+
                 # adv_images[src] would be the image id it first appeared as
                 if adv_images.get(src, False):
                     img_id = adv_images[src]
@@ -410,7 +433,11 @@ def downloadStory(
                 adv_images[src] = img_id
 
                 try:
-                    outpath = "assets://mspfa/" + saveImageAs(story_name, src, img_id)
+                    if urlparse(src).netloc.endswith('youtube.com'):
+                        # TODO: Convert youtube videos from iframes to html5 media
+                        outpath = "assets://mspfa/" + saveYoutubeAs(story_name, src, img_id)
+                    else:
+                        outpath = "assets://mspfa/" + saveImageAs(story_name, src, img_id)
                     # Replace text in source
                     page['b'] = page['b'].replace(src, outpath)
                 except requests.exceptions.HTTPError:

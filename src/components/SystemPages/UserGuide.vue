@@ -77,8 +77,9 @@ export default {
     font-weight: normal;
 
     color: var(--font-default);
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
     .navBanner {
       margin-bottom: 25px;

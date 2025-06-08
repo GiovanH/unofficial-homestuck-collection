@@ -338,9 +338,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  ::v-deep a{
-    color: var(--page-links);
-  }
+  ::v:deep a { color: var(--page-links); }
+  ::v:deep a:link:active { color: var(--page-links-active); }
   p {
     // fuck you *unresets your css*
     display: block;

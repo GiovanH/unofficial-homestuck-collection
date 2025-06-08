@@ -10,7 +10,7 @@ var yaml
 
 if (!Array.prototype.toReversed) {
   const toReversed = require('array.prototype.toreversed')
-  var shimmed = toReversed.shim()
+  toReversed.shim()
 }
 
 var ipcMain, fs
@@ -43,6 +43,11 @@ if (!isWebApp) {
   log = {
     scope() { return console; }
   }
+}
+
+if (ipcMain) {
+  logger.error("Main background process loading modsjs")
+  console.trace()
 }
 
 if (ipcMain) {

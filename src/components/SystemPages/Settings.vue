@@ -681,7 +681,8 @@ export default {
         {text: "Collide", value: "collide"},
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
-        {text: "MSPFA", value: "mspfa"}
+        {text: "MSPFA", value: "mspfa"},
+        {text: "MS Office 2003", value: "msword"}
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -855,8 +856,9 @@ export default {
       }
 
       if (setting == 'useSystemWindowDecorations') {
-        // this.$localData.root.saveLocalStorage()
-        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+        setTimeout(() => {
+          ipcRenderer.invoke('restart')
+        }, 1000)
       }
     },
     locateAssets(){
@@ -993,8 +995,9 @@ export default {
     background: var(--system-background);
     background-color: var(--system-skycolor);
     
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
   }
 

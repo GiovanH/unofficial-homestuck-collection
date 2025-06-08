@@ -1,6 +1,5 @@
 import Vue from 'vue'
 
-var store
 const migrations = {
   '2.3.0': store => {
     // Migrate storage
@@ -15,18 +14,27 @@ const migrations = {
     const settings_prev = store.get('settings', {})
     if (settings_prev && settings_prev.textOverride) {
       const incremented_height = Number(settings_prev.textOverride.lineHeight) + 1
-      settings_prev.textOverride.lineHeight = incremented_height
-      store.set(settings_prev)
+      store.set('settings.textOverride.lineHeight', incremented_height)
+    }
+  },
+  '2.5.8': store => {
+    console.log("Migrating text size for 2.5.8")
+    const settings_prev = store.get('settings', {})
+    if (settings_prev && settings_prev.textOverride) {
+      const incremented_size = Number(settings_prev.textOverride.fontSize) + 1
+      console.log("textOverride.fontSize:", settings_prev.textOverride.fontSize, '->', incremented_size)
+      store.set('settings.textOverride.fontSize', incremented_size)
     }
   }
 }
 
+var store;
 if (!window.isWebApp) {
   const Store = require('electron-store')
   store = new Store({migrations})
 } else {
   store = require('@/../webapp/localstore.js')
-  store.migrate(migrations, window.webAppAppVersion)
+  // store.migrate(migrations, window.webAppAppVersion)
 }
 
 const LOADED_TAB_LIMIT = 10
@@ -86,7 +94,7 @@ const DEFAULT_SETTINGS = {
   textOverride: {
     fontFamily: "",
     bold: false,
-    fontSize: 0,
+    fontSize: 1,
     lineHeight: 1,
     paragraphSpacing: false,
     highContrast: false
@@ -167,6 +175,22 @@ class LocalData {
         }
       },
       methods: {
+        _migrateStorage(new_version) {
+          const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
+          const prev_version = store.get('last_migrated_version', '0.0.0')
+
+          if (prev_version != new_version) {
+            console.log("Migrating storage from", prev_version, "to", new_version)
+            for (const migration_version in migrations) {
+              if (semverGreater(migration_version, prev_version)) {
+                migrations[migration_version](store)
+              }
+            }
+            store.set('last_migrated_version', new_version)
+          } else {
+            console.log("Not storage from", prev_version, "to", new_version)
+          }
+        },
         _saveLocalStorage() {
           if (this.saveDebounce) {
             clearTimeout(this.saveDebounce)
@@ -661,6 +685,7 @@ export default {
   // Store: LocalData,
   install (Vue, options) {
     const the_store = new LocalData()
+    the_store.VM._migrateStorage(window.appVersion)
 
     the_store.VM.reloadLocalStorage()
     // the_store.VM.saveLocalStorage()

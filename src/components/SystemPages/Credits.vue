@@ -3,7 +3,7 @@
     <div class="pageContent">
       <Media url="images/logo.gif" class="logo"/>
       <div v-if="routeParams.mode == 'artcredits'" class="credits artCredits" >
-        <div class="center">
+        <div class="centeredProse prose">
           <h2>ART CREDITS</h2>
 
           After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here.
@@ -39,10 +39,17 @@
           <div class="credit"><a href="/music/features"><Media url="/archive/collection/credits_sound.png" /><br>SOUND CREDITS</a></div>
           <div class="credit"><a href="/credits/artcredits"><Media url="/archive/collection/credits_art.png" /><br>ART CREDITS</a></div>
         </div>
-
+        <hr />
         <div class="archiveCredits">
+          <h1>The Unofficial Homestuck Collection</h1>
+          <div class="prose centeredProse">
+            <p>
+              by Bambosh and GiovanH
+            </p>
+          </div>
+          <br />
           <h2>Archive credits:</h2>
-          <dl>
+          <dl class="prose">
             <template v-for="(credit, ci) in archiveCredits">
               <dt :key="`${ci}a`">
                 <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
@@ -55,7 +62,7 @@
           <div class="legal">
             Legal:
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH, (C) 2024- GiovanH
+Copyright (C) 2025 GiovanH
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
@@ -63,15 +70,11 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 </pre>
             <p>
-              In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+              As per section 7, an additional requirement of this license is that all attribution and crediting must be preserved. Modifications that remove attribution or otherwise misrepresent the authorship or origin of material are not permitted and violate the license conditions.
             </p>
-            <br />
-            <p>
-              As per section 7, the author attributions above must
-              be preserved in all covered works. Modified versions may optionally
-              extend this list as applicable, but modifications that remove
-              attributions or otherwise misrepresent the origin of the material
-              are not permitted.
+            <hr />
+            <p class="prose">
+              In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits.
             </p>
           </div>
         </div>
@@ -108,10 +111,11 @@ export default {
         {
           name: "GiovanH",
           link: "https://im.giovanh.com/?ref=uhc",
-          desc: `After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since.`
+          desc: `After the release of v1.0, Gio stepped forward with an offer to help design some new features - and ended up becoming the single most important contributor to this project. It isn't hyperbolic to say the collection would not exist as it does today without the unfathomable quantity of passion he has poured into it since. He currently maintains this project.`
         },
         {
           name: "Niklink",
+          link: "https://github.com/Niklink",
           desc: `Helped write a bunch of text, and put together a bunch of the thumbnails that ended up being used for notifications and flash pages. Also helped source some obscure material and test changes during development.`
         },
         {
@@ -130,8 +134,8 @@ export default {
           desc: "For creating the fantastic new animated logo."
         },
         {
-          name: "sassacre",
-          link: "https://sassac.re/",
+          name: "sunsprite",
+          link: "https://sunsprite.art/",
           desc: "For ironing out some difficult issues related to macOS."
         },
         {
@@ -157,7 +161,7 @@ export default {
         {
           name: "Makin",
           link: "https://homestuck.net/",
-          desc: `Whose CSS I blatantly stole for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snaps">the Snapchat updates</a>. Has also directly contributed some code for fullscreen mode!`
+          desc: `CSS for <a href="/tso/aids">And It Don't Stop</a>, as well as some backgrounds for <a href="/snaps">the Snapchat updates</a> and additional archival materials. Has also directly contributed some code for fullscreen mode!`
         },
         {
           name: "Anthony Bailey",
@@ -170,7 +174,17 @@ export default {
           desc: `For the prerendered aliased Courier bitmap font.`
         },
         {
-          name: "Each of our GitHub contributors",
+          name: "Leo60228",
+          link: "https://vriska.dev",
+          desc: "For correcting some technical issues and keeping data up-to-date. Thanks also for your work on the hsmusic wiki!"
+        },
+        {
+          name: "Grafcube",
+          link: "https://sakurajima.social/@grafcube",
+          desc: "For leading the initial effort to produce a Flatpak build for linux users"
+        },
+        {
+          name: "Our other GitHub contributors",
           link: "https://github.com/GiovanH/unofficial-homestuck-collection/graphs/contributors",
           desc: "Every single change you guys make leaves a lasting impact on this project. We wouldn't be here without you!"
         }
@@ -315,6 +329,19 @@ export default {
     opacity: 0.6; // Not obfuscation, just coloring >.>
   }
 }
+.prose {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+}
+.centeredProse {
+  width: 480px;
+  text-align: center;
+  margin: 0 auto;
+  // font-family: Verdana, Geneva, Tahoma, sans-serif;
+  // font-weight: normal;
+  // font-size: 12px;
+}
 .artCredits {
   width: 650px;
 
@@ -322,14 +349,6 @@ export default {
     font-weight: bold;
     font-family: courier, monospace;
     font-size: 32px;
-  }
-  .center {
-    width: 480px;
-    text-align: center;
-    margin: 0 auto;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: normal;
-    font-size: 12px;
   }
   .artCreditLink {
     display: block;

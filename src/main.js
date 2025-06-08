@@ -3,6 +3,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import localData from './store/localData'
+import errorReporting from './js/errorReporting'
 
 import Memoization from '@/memoization.js'
 
@@ -33,15 +34,13 @@ const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : requi
 
 // Must init resources first.
 /* eslint-disable no-redeclare */
-var shell, log, port, appVersion, store
+var shell, log, port, appVersion
 if (!window.isWebApp) {
-  var {shell} = require('electron')
-
-  const Store = require('electron-store')
-  store = new Store()
+  var { shell } = require('electron')
 
   log = require('electron-log')
   log.transports.console.format = '[{level}] {text}'
+  errorReporting.registerRenderLogger(log)
 
   var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
 
@@ -49,7 +48,6 @@ if (!window.isWebApp) {
     assets_root: `http://127.0.0.1:${port}/`
   })
 } else {
-  store = require('@/../webapp/localstore.js')
   log = { scope() { return console; } }
 
   var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
@@ -81,6 +79,7 @@ var promises_loading = []
 
 Vue.config.productionTip = false
 
+window.appVersion = appVersion
 Vue.use(localData) // Initializes and loads when Vue installs it
 
 // FontAwesomeIconComponent
@@ -171,7 +170,7 @@ Vue.mixin({
       // If asset, open in modal or externally as appropriate
       if (urlObject.protocol == "assets:") {
         const to_ = Resources.resolveAssetsProtocol(url)
-        if (!/\.(html|pdf)$/i.test(url)) {
+        if (!/\.(html|pdf|epub)$/i.test(url)) {
           this.$openModal(to_)
         } else {
           _openExternal(to_)

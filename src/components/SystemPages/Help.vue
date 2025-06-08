@@ -213,9 +213,10 @@ export default {
   .pageMenu {
     display: flex;
     justify-content: space-evenly;
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     a {
       flex: 1;
-      color: var(--page-links);
       font-size: 24px; 
       text-decoration: none;
       &:hover {
@@ -240,8 +241,9 @@ export default {
     font-weight: normal;
 
     color: var(--font-default);
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
   }
   .card {

@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import errorReporting from './js/errorReporting'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
@@ -28,6 +29,10 @@ const APP_VERSION = app.getVersion()
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
 const gotTheLock = app.requestSingleInstanceLock()
+
+if (!isDevelopment) {
+  errorReporting.registerMainLogger(log)
+}
 
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
@@ -576,8 +581,9 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
   const title = args.title || "Notice"
   const ok_string = args.okay || "OK"
   const cancel_string = args.cancel || "Cancel"
+  const type = args.type || 'warning'
   const answer = dialog.showMessageBoxSync(win, {
-    type: 'warning',
+    type,
     buttons: [
       ok_string,
       cancel_string
@@ -585,7 +591,8 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
     cancelId: 1,
     defaultId: 1,
     title,
-    message: args.message
+    message: args.message,
+    detail: args.detail
   })
   return (answer === 0)
 })

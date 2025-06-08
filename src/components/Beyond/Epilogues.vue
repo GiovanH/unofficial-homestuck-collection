@@ -1,6 +1,6 @@
 <template>
   <div class="pageBody epilogue">
-    <NavBanner />
+    <NavBanner useCustomStyles="true"/>
     <div class="pageFrame" :class="{fakechat}" v-html="epiloguesPage" />
     <!-- <label><input type="checkbox" v-model="fakechat">fakechat</label> -->
     <PageFooter />
@@ -200,15 +200,8 @@ export default {
 .epilogue ::v-deep {
   // Epilogues uses "rows"
   .row {
-  }
-}
-
-.epilogue ::v-deep {
-  .pageFrame a[href] {
-    color: var(--page-links);
-  }
-  // Epilogues uses "rows"
-  .row {
+    a:link { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     max-width: 650px;
     margin-left: auto;
     margin-right: auto;

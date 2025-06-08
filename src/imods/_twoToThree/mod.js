@@ -4,6 +4,7 @@ module.exports = {
   modVersion: 0.1,
   trees: {
     "./pxs/": "assets://archive/comics/pxs/",
+    "./images/": "assets://images/",
     "./archive/": "assets://archive/"
   },
   routes: {

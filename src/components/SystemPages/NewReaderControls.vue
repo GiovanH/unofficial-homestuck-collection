@@ -212,7 +212,7 @@ export default {
         {
           model: "mspaMode",
           label: "Use MSPA page numbers",
-          desc: "Use the original 6-digit story.php page IDs used on mspaintadventures.com and the TopatoCo paperbacks instead of the new numbering Viz introduced."
+          desc: "Use the original 6-digit index.php page IDs used on mspaintadventures.com and the TopatoCo paperbacks instead of the new numbering Viz introduced."
         }
       ]
     }

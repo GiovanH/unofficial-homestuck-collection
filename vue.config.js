@@ -46,7 +46,7 @@ module.exports = {
             not: [
               // Except for a few of them that needs to be transpiled because they use modern syntax
               /vue-reader/,
-              /typescript-etw/,
+              /typescript-etw/
             ]
           },
           use: {
@@ -66,7 +66,7 @@ module.exports = {
         },
         {
           test: /\.node$/,
-          loader: "node-loader",
+          loader: "node-loader"
         }
       ]
     }
@@ -81,16 +81,6 @@ module.exports = {
           flags: 'g'
         }
       }
-      // config.module.rule('js')
-      //     .use('string-replace-loader')
-      //     .loader('string-replace-loader')
-      //     .before('js-loader') // After css-loader processes imports (before means after)
-      //     .tap(options => {
-      //         return {
-      //             search: /\/\/ ?!START_NO_WEBAPP.+?!END_NO_WEBAPP/m,
-      //             replace: '/* section removed */'
-      //         }
-      //     })
       // config.module.rule('vue')
       //     .use('string-replace-loader')
       //     .loader('string-replace-loader')

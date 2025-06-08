@@ -132,8 +132,7 @@
         </div>
       </div>
 
-      <div v-else-if="isLoading">
-        <!-- Spirograph spinner and load text -->
+      <div v-else-if="isLoading || !loadingTooLongTimeout">
         <div class="loadcard">
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
@@ -163,19 +162,54 @@
       </div>
 
       <div class="card" v-else>
-        <!-- No loading status or archive: Something went wrong. -->
+        <!-- Something went wrong. -->
+        <div class="loadcard">
+          <p v-text="loadText"></p>
+        </div>
         <div class="cardContent">
-          <br>
-          <img class="logo" src="@/assets/collection_logo.png"><br>
-          <p>Sorry! Something went critically wrong loading the program.</p><br>
-          <pre v-text="{
-            isLoading,
-            isNewUser,
-            loadState: $root.loadState,
-            archive: Boolean($archive),
-            assetDir: $localData.assetDir
-          }" />
-          <SetupErrorRecovery />
+          <div class="errorWithMods" v-if="modsEnabled.length">
+            <br>
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p v-if="loadingTooLongTimeout">Loading the Unofficial Homestuck Collection is taking unusually long. </p>
+            <p v-else>Sorry! Something went critically wrong loading the program.</p>
+            <br>
+            <p>You currently have mods enabled:</p><br>
+            <ol class="modlist">
+              <li
+                v-for="option in modsEnabled"
+                :key="option.key"
+                :data-value="option.key"
+              >
+                <b v-text='option.label' />
+                <span class='summary' v-if='option.summary' v-text='option.summary' />
+              </li>
+            </ol>
+            <br>
+            <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
+            <p>Please disable all mods and then restart.</p><br>
+            <div class="center">
+              <button @click="clearEnabledMods()">Disable all and reload</button><br>
+            </div>
+            <span class="hint">If this issue persists when you re-enable a specific mod, please contact the mod's author!</span>
+          </div>
+
+          <div class="errorWithoutMods" v-else>
+            <img class="logo" src="@/assets/collection_logo.png"><br>
+            <p>It looks like something went wrong with your asset pack since the last time you were here.<br />I'm looking for <strong>v{{$data.$expectedAssetVersion}}</strong> in:</p><br>
+            <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
+            <p>If you just updated the app, you might have asset pack <strong>v1</strong> installed already. This version requires <strong>v{{$data.$expectedAssetVersion}}</strong>; if you don't have it already, go to our <a href='https://bambosh.github.io/unofficial-homestuck-collection/'>website</a> for information on downloading it.</p><br>
+            <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
+            <p>If you were using v2 already but made a change and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
+            <div class="center">
+              <button @click="locateAssets()">Locate Asset Pack v{{$data.$expectedAssetVersion}}</button>
+              <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
+              <span v-if="isExpectedAssetVersion === false" class="error hint">That looks asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
+            </div>
+            
+            <div class="center">
+              <button class="letsroll" :disabled="!validatePage || !isExpectedAssetVersion" @click="errorModeRestart()">All done. Let's roll!</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -372,6 +406,14 @@ export default {
     }
   },
   watch: {
+    "loadText"(to, from) {
+      if (this.loadingTooLongTimeout) {
+        this.loadingTooLongTimeout = false
+        setTimeout(function() {
+          this.loadingTooLongTimeout = true
+        }.bind(this), 16000)
+      }
+    }
   }
 }
 </script>
