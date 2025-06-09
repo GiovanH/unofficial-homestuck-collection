@@ -64,7 +64,7 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 const GifSeeker = () => import('@/components/UIElements/GifSeeker.vue')
 
 const path = (window.isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 var fs
 if (!window.isWebApp) {

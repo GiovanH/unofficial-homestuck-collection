@@ -483,7 +483,7 @@ const SubSettingsModal = () => import('@/components/UIElements/SubSettingsModal.
 const draggable = () => import("vuedraggable")
 
 const log = (window.isWebApp ? { scope() { return console } } : require('electron-log'))
-const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'settings',

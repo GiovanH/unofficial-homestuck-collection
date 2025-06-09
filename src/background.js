@@ -393,7 +393,11 @@ try {
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {
-  event.returnValue = {port: port, appVersion: APP_VERSION}
+  event.returnValue = {
+    port: port,
+    userData: app.getPath('userData'),
+    appVersion: APP_VERSION
+  }
 })
 
 ipcMain.handle('check-archive-version', async (event, payload) => {
@@ -835,14 +839,7 @@ async function createWindow () {
 }
 
 app.removeAsDefaultProtocolClient(OPENWITH_PROTOCOL)
-if (isDevelopment && process.platform === 'win32') {
-  // Set the path of electron.exe and your app.
-  // These two additional parameters are only available on windows.
-  // Setting this is required to get this working in dev mode.
-  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL, process.execPath, [
-    path.resolve(process.argv[1])
-  ])
-} else {
+if (!isDevelopment) {
   app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL)
 }
 

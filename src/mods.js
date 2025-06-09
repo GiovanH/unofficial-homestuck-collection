@@ -55,13 +55,8 @@ if (ipcMain) {
   console.trace()
 }
 
-if (ipcMain) {
-  logger.error("Main background process loading modsjs")
-  console.trace()
-}
-
 const path = (isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 // const sass = require('sass')
 // const SassJs = require('sass.js')

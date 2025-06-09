@@ -29,7 +29,7 @@
     <div class="center" v-if="!$isWebApp">
       <button @click="locateAssets()">Locate Asset Pack v{{$data.$expectedAssetVersion}}</button>
       <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
-      <span v-if="isExpectedAssetVersion === false" class="error hint">That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
+      <span v-if="selectedAssetVersion && isExpectedAssetVersion === false" class="error hint">That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}</strong></span>
     </div>
 
     <div class="center">
@@ -39,7 +39,7 @@
 </template>
 
 <script>
-const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'SetupErrorRecovery',

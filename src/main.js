@@ -30,7 +30,7 @@ library.add([
 
 window.isWebApp = (window.isWebApp || false)
 
-const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 // Must init resources first.
 /* eslint-disable no-redeclare */

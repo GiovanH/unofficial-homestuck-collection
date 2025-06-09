@@ -213,7 +213,7 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 const UrlFilterMixin = {
   methods: {
     filterLinksAndImages(el){
-      const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+      const ipcRenderer = require('IpcRenderer')
 
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
@@ -555,7 +555,7 @@ module.exports = {
     assets_root = settings.assets_root || assets_root
     logger.info("Resources initialized to", assets_root)
 
-    const ipcRenderer = (isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+    const ipcRenderer = require('IpcRenderer')
     ipcRenderer.on('RESOURCES_RESOLVE_ASSETS_PROTOCOL', (event, reply_channel, url) => {
       event.sender.send(reply_channel, resolveAssetsProtocol(url))
     })

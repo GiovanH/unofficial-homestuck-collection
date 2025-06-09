@@ -34,7 +34,8 @@ module.exports = {
       alias: {
         // Include the vue compiler so mods can use templates
         "vue$": "vue/dist/vue.esm.js",
-        "@/*": "./src/*"
+        "@/*": "./src/*",
+        "IpcRenderer$": '/src/js/ipcRendererAlias.js'
       }
     },
     plugins: [],
@@ -59,7 +60,7 @@ module.exports = {
               ],
               plugins: [
                 '@babel/plugin-transform-nullish-coalescing-operator',
-                '@babel/plugin-transform-optional-chaining',
+                '@babel/plugin-transform-optional-chaining'
               ]
             }
           }

@@ -11,7 +11,7 @@
 
 <script>
 
-const ipcRenderer = (window.isWebApp ? require('@/../webapp/fakeIpc.js') : require('electron').ipcRenderer)
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'titleBar',
