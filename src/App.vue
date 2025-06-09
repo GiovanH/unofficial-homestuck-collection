@@ -292,7 +292,7 @@
         try {
           await Mods.editArchiveAsync(archive)
           this.$root.archive = Object.freeze(archive)
-          this.$root.loadStage = "LOADED_ARCHIVE"
+          this.$root.loadStage = "LOADED_ARCHIVE_VANILLA"
           this.$nextTick(() => {
             this.$root.loadState = "DONE"
           })
