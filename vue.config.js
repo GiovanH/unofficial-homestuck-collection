@@ -35,7 +35,8 @@ module.exports = {
         // Include the vue compiler so mods can use templates
         "vue$": "vue/dist/vue.esm.js",
         "@/*": "./src/*",
-        "IpcRenderer$": '/src/js/ipcRendererAlias.js'
+        // "IpcRenderer$": '/src/js/ipcRendererAlias.js'
+        "IpcRenderer$": '/webapp/fakeIpc.js'
       }
     },
     plugins: [],
