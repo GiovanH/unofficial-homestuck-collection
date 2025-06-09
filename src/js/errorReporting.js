@@ -1,5 +1,8 @@
 var store;
-if (typeof window !== 'undefined' && !window.isWebApp) {
+
+const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
+
+if (!isWebApp) {
   const Store = require('electron-store')
   store = new Store()
 }

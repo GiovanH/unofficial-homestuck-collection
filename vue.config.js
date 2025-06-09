@@ -34,9 +34,11 @@ module.exports = {
       alias: {
         // Include the vue compiler so mods can use templates
         "vue$": "vue/dist/vue.esm.js",
-        "@/*": "./src/*"
+        "@/*": "./src/*",
+        "IpcRenderer$": '/src/js/ipcRendererAlias.js'
       }
     },
+    plugins: [],
     module: {
       rules: [{
           test: /\.(?:js|mjs|cjs)$/,
@@ -52,11 +54,13 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               presets: [
-                ['@babel/preset-env', { targets: "defaults" }]
+                ['@babel/preset-env', {
+                  targets: "defaults"
+                }]
               ],
               plugins: [
                 '@babel/plugin-transform-nullish-coalescing-operator',
-                '@babel/plugin-transform-optional-chaining',
+                '@babel/plugin-transform-optional-chaining'
               ]
             }
           }

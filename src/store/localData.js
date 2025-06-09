@@ -29,8 +29,11 @@ const migrations = {
   }
 }
 
-const Store = require('electron-store')
-const store = new Store()
+var store;
+if (!window.isWebApp) {
+  const Store = require('electron-store')
+  store = new Store({migrations})
+}
 
 const LOADED_TAB_LIMIT = 10
 const DEAD_TAB_LIMIT = 15

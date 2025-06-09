@@ -839,14 +839,7 @@ async function createWindow () {
 }
 
 app.removeAsDefaultProtocolClient(OPENWITH_PROTOCOL)
-if (isDevelopment && process.platform === 'win32') {
-  // Set the path of electron.exe and your app.
-  // These two additional parameters are only available on windows.
-  // Setting this is required to get this working in dev mode.
-  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL, process.execPath, [
-    path.resolve(process.argv[1])
-  ])
-} else {
+if (!isDevelopment) {
   app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL)
 }
 

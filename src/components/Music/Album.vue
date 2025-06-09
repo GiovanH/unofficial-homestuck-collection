@@ -121,7 +121,12 @@ export default {
         if (typeof artist == 'string') return `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`
         else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${artist.what ? ` (${artist.what})` : ''}`
       })
-      return (new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(artists))
+      try {
+        return (new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(artists))
+      } catch (e) {
+        this.$logger.error("Couldn't format artists with ListFormat; missing Intl support?", e)
+        return artists.join(', ')
+      }
     },
     secondsToMinutes(time) {
       if (Number.isInteger(time)){

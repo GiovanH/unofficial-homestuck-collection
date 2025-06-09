@@ -96,7 +96,13 @@ import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 const { getModStoreKey, store_mods } = require('@/mods.js').default
 
-const { ipcRenderer } = require('electron')
+var store;
+if (!window.isWebApp) {
+  const Store = require('electron-store')
+  store = new Store()
+}
+
+const ipcRenderer = require('IpcRenderer')
 
 
 export default {

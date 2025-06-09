@@ -21,7 +21,7 @@
 
 <script>
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 const Color = require('ts-color-class')
 
 export default {

@@ -65,7 +65,7 @@ import AddressBar from '@/components/AppMenu/AddressBar.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'tabBar',
@@ -101,7 +101,7 @@ export default {
     },
     hasTabBarContainer() {
       if (!this.$isWebApp) return true
-      else return (this.$localData.settings.useTabbedBrowsing)
+      else return (this.$localData.settings.useTabbedBrowsing || this.$localData.settings.showAddressBar)
       //            Tabbed  Untabbed
       // Webapp      Nav     None
       // Electron    Nav     Nav

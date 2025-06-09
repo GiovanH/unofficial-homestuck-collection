@@ -10,7 +10,9 @@
 </template>
 
 <script>
-const { ipcRenderer } = require('electron')
+
+const ipcRenderer = require('IpcRenderer')
+
 export default {
   name: 'titleBar',
   components: {

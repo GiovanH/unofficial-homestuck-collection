@@ -20,8 +20,8 @@
   "repository": "github:Bambosh/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve webapp/browser.js",
+    "build": "vue-cli-service build webapp/browser.js",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",

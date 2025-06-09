@@ -39,7 +39,7 @@ if (!isWebApp) {
 }
 
 const path = (isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 
 // const sass = require('sass')
 // const SassJs = require('sass.js')
@@ -537,30 +537,32 @@ async function getModJsAsync(mod_dir, options = {}) {
 
     // Set mod name, path, and is_directory:
 
-    if (mod_dir.endsWith(".js")) {
-      // logger.debug(mod_dir, "is explicit singlefile.")
-      is_singlefile = true
-      modjs_name = mod_dir
-      modjs_path = path.join(thisModsDir, mod_dir)
-    } else {
-      // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
-      try {
-        const is_directory = !(fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile()) // allow for junctions, symlinks
-        if (is_directory) {
-          is_singlefile = false
-          modjs_name = path.join(mod_dir, "mod.js")
-          modjs_path = path.join(thisModsDir, modjs_name)
-        } else {
+    if (!isWebApp) {
+      if (mod_dir.endsWith(".js")) {
+        // logger.debug(mod_dir, "is explicit singlefile.")
+        is_singlefile = true
+        modjs_name = mod_dir
+        modjs_path = path.join(thisModsDir, mod_dir)
+      } else {
+        // Mod isn't explicitly a singlefile js, but might still be a singlefile that needs coercion
+        try {
+          const is_directory = !(fs.lstatSync(path.join(thisModsDir, mod_dir)).isFile()) // allow for junctions, symlinks
+          if (is_directory) {
+            is_singlefile = false
+            modjs_name = path.join(mod_dir, "mod.js")
+            modjs_path = path.join(thisModsDir, modjs_name)
+          } else {
+            is_singlefile = true
+            modjs_name = mod_dir + ".js"
+            modjs_path = path.join(thisModsDir, modjs_name)
+          }
+        } catch (e) {
+          // lstatsync threw error; js-less path didn't exist at all, so singlefile.
+          // logger.error(mod_dir, "must be singlefile, errored", e)
           is_singlefile = true
           modjs_name = mod_dir + ".js"
           modjs_path = path.join(thisModsDir, modjs_name)
         }
-      } catch (e) {
-        // lstatsync threw error; js-less path didn't exist at all, so singlefile.
-        // logger.error(mod_dir, "must be singlefile, errored", e)
-        is_singlefile = true
-        modjs_name = mod_dir + ".js"
-        modjs_path = path.join(thisModsDir, modjs_name)
       }
     }
 
@@ -809,15 +811,30 @@ function getMainMixin(){
   return {
     mounted() {
       const addScssStyle = (style_id, body) => {
-        importSassJs().then(SassJs => {
-          SassJs.compile(body, (result) => {
-            if (result.status !== 0) throw Error(JSON.stringify(result))
-            this.stylesheets.push({
-              id: style_id,
-              body: result.text
+        const cache_id = `stylecache.${style_id}`
+        if (store_mods.has(cache_id)) {
+          logger.info(`Using cached style ${style_id}`)
+          this.stylesheets.push({
+            id: style_id,
+            body: store_mods.get(cache_id)
+          })
+        } else {
+          importSassJs().then(SassJs => {
+            logger.info(`Compiling style ${style_id}`)
+            if (isWebApp) {
+              // TODO: This doesn't resolve routes; would be much better to grep and replace with resolutions here
+              body = body.replace(/(assets:\/\/.+)(?=\);)/g, (match) => Resources.resolveAssetsProtocol(match))
+            }
+            SassJs.compile(body, (result) => {
+              if (result.status !== 0) throw Error(JSON.stringify(result))
+              store_mods.set(cache_id, result.text)
+              this.stylesheets.push({
+                id: style_id,
+                body: result.text
+              })
             })
           })
-        })
+        }
       }
 
       enabledModsJsPromise.then(modules => {
@@ -1190,7 +1207,10 @@ async function tryExtractZipsForFilesystemIlliteratesAsync(tree) {
 async function loadModChoicesAsync(){
   // Get the list of mods players can choose to enable/disable
   var mod_folders
-  if (assetDir == undefined) {
+
+  if (isWebApp) {
+    throw new Error("Unimplemented")
+  } else if (assetDir == undefined) {
     // No mod folder at all. That's okay.
     logger.info("Asset dir not yet defined. (First run)")
     return []

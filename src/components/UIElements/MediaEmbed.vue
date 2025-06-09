@@ -64,7 +64,7 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 const GifSeeker = () => import('@/components/UIElements/GifSeeker.vue')
 
 const path = (window.isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 
 var fs
 if (!window.isWebApp) {
@@ -423,7 +423,8 @@ export default {
             this.removeEventListener("timeupdate", pause)
           }
         }
-        event.srcElement.controls = false
+        // Autoplay doesn't work consistently on the web.
+        if (!this.$isWebapp) event.srcElement.controls = false
         event.srcElement.addEventListener("timeupdate", pause)
       }
     },

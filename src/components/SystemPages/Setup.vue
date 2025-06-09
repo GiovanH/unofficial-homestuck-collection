@@ -1,16 +1,16 @@
 <template>
 <div class="setup">
   <div class="header">
-    <TitleBar />
+    <TitleBar :style="{display: $isWebApp ? 'none' : 'inherit'}"/>
   </div>
   <div class="tabFrame">
     <div class="pageBody">
       <div class="card" v-if="isNewUser">
-        <!-- First-run app setup, no error -->
+        <!-- First-run app setup wizard -->
         <div class="cardContent newUserSetup wizard">
           <div class="wizardSidebar">
             <img class="logo" src="@/assets/collection_logo.png" v-if="!$isWebApp">
-            <img class="logo" src="/archive/collection/logo_v2_static.png" v-else>
+            <img class="logo" src="assets://archive/collection/logo_v2_static.png" v-else>
             <br />
             <ol class="wizardProgress">
               <li v-for="name, i in newReaderCardNames" 
@@ -97,7 +97,7 @@
             <p>Consider this a "trial version" if you're wondering if Homestuck is something you're interested in downloading, or as a way to easily share specific pages or moments with friends by link.</p>
 
             <div class="center">
-              <button class="letsroll" @click="$localData.root.SET_ASSET_DIR('web')">All done. Let's roll!</button>
+              <button class="letsroll" @click="validateAndRestart()">All done. Let's roll!</button>
             </div>
           </div>
           <div v-else class="getStarted" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Getting Started'}">
@@ -129,7 +129,6 @@
               :disabled="wizardForwardButtonDisabled">Next &gt;</button>
             <!--<button v-if="newReaderCardIndex == lastNewReaderCard" @click="">Finish</button>-->
           </div>
-          
         </div>
       </div>
 
@@ -137,7 +136,7 @@
         <div class="loadcard">
 <svg class="spiro" xmlns:xlink="http://www.w3.org/1999/xlink" height="520px" width="520px" xmlns="http://www.w3.org/2000/svg" viewBox="-260 -260 520 520">
   <g>
-    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c">
+    <g id="halfSpiro" v-for="c in ['left', 'right']" :class="c" :key="c">
       <path id="thePath" :d="spiroPos[spiroTestindex]">
         <animate v-if="spiroTestAnimate"
           attributeName="d"
@@ -153,10 +152,13 @@
 </svg>
           <p v-text="loadText"></p>
         </div>
-        <!-- <input type="checkbox" v-model="spiroTestAnimate" />
-        <button @click="copiedPath = spiroPos[spiroTestindex]">Copy</button>
-        <select v-model="spiroTestindex"><option v-for="v, i in spiroPos" :key="i" :value="i" v-text="i" /></select>
-        <textarea v-model="spiroPos[spiroTestindex]" style="width: 100%; height: 80px" /> -->
+        <div class="card" v-if="loadingTooLongTimeout">
+          <div class="cardContent">
+            <br />
+            <p>Loading is taking longer than normal. If you think it's stuck, you can try to recover.</p>
+            <SetupErrorRecovery />
+          </div>
+        </div>
       </div>
 
       <div class="card" v-else>
@@ -210,7 +212,7 @@
           </div>
         </div>
       </div>
-      
+
     </div>
   </div>
 </div>
@@ -219,16 +221,16 @@
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
 import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import SetupErrorRecovery from '@/components/SystemPages/SetupErrorRecovery.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 // import Logo from '@/components/UIElements/Logo.vue'
 
-// import { parse } from 'querystring'
-const { ipcRenderer } = require('electron')
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'setup',
   components: {
-    TitleBar, NewReaderControls, SpoilerBox //, Logo
+    TitleBar, NewReaderControls, SpoilerBox, SetupErrorRecovery //, Logo
   },
   data: function() {
     return {
@@ -247,7 +249,6 @@ export default {
       newReaderToggle: true,
       loadingTooLongTimeout: false,
       assetDir: undefined,
-      isExpectedAssetVersion: undefined,
       selectedAssetVersion: undefined,
       contentWarnings: [
         'Slurs',
@@ -292,6 +293,7 @@ export default {
       loadStages: {
         "": "Awaiting reactivity",
         "MOUNTED": "Entangling connections",
+        "GUESTLOADING": "Skipping to the trolls",
         "WAITING_ON_DATA": "Demanding firehose",
         "ARCHIVE": "Raking filesystem",
         "MODS": "Turbulating canon",
@@ -353,17 +355,19 @@ export default {
       return this.loadStages[this.$root.loadStage] || this.$root.loadStage
     },
     isNewUser() {
+      // If setup is being shown, but guest mode is true, it's just loading
+      if (this.$root.guestMode) return false
+
       return !this.$localData.assetDir
     },
-    modsEnabled() {
-      return this.$localData.settings.modListEnabled.map((key) => 
-        this.$root.$modChoices[key]).filter(val => !!val)
+    isExpectedAssetVersion() {
+      return (this.selectedAssetVersion == this.$data.$expectedAssetVersion)
     }
   },
   mounted() {
     setTimeout(function() {
       this.loadingTooLongTimeout = true
-    }.bind(this), 16000)
+    }.bind(this), 8000)
   },
   methods: {
     wizardNextPage(direction){
@@ -388,32 +392,17 @@ export default {
     checkAssetVersion(assetDir){
       ipcRenderer.invoke('check-archive-version', {assetDir}).then(result => {
         this.selectedAssetVersion = result
-        this.isExpectedAssetVersion = (result == this.$data.$expectedAssetVersion)
         this.$logger.info("Version check: got", result, "eq?", this.$data.$expectedAssetVersion, this.isExpectedAssetVersion)
       })
     },
-    clearEnabledMods(){
-      this.$localData.settings["modListEnabled"] = []
-      this.$localData.VM._saveLocalStorage()
-
-      this.loadingTooLongTimeout = false
-
-      this.modSoftRestart()
-    },
     validateAndRestart(){
-      this.$localData.root.SET_ASSET_DIR(this.assetDir)
+      if (this.$isWebApp) {
+        this.$localData.root.SET_ASSET_DIR('web')
+      } else {
+        this.$localData.root.SET_ASSET_DIR(this.assetDir)
 
-      ipcRenderer.invoke('restart')
-    },
-    errorModeRestart() {
-      if (!!this.assetDir && this.assetDir != this.$localData.assetDir) this.$localData.root.SET_ASSET_DIR(this.assetDir)
-
-      // SET_ASSET_DIR flushes persistent store for us
-      ipcRenderer.invoke('restart')
-    },
-    modSoftRestart() {
-      this.$localData.root.applySaveIfPending()
-      ipcRenderer.send("RELOAD_ARCHIVE_DATA")
+        ipcRenderer.invoke('restart')
+      }
     }
   },
   watch: {
@@ -429,7 +418,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .setup {
   display: flex;
   flex-flow: column;
@@ -671,7 +660,11 @@ div.loadcard {
 }
 .loadcard {
 
+  text-align: center;
   margin: auto;
+
+  padding-bottom: 1em;
+
   p {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 16px;
