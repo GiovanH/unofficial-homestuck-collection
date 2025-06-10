@@ -70,10 +70,10 @@ Add any other context about the problem here.
   return body
 }
 
-function createIssueLink(versions) {
+function createIssueLink(versions, error) {
   const url = new URL(new_issue_link)
   url.search = new URLSearchParams({
-    body: buildReportBody(null, versions)
+    body: buildReportBody(error, versions)
   })
   return url
 }

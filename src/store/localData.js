@@ -29,10 +29,12 @@ const migrations = {
   }
 }
 
-var store;
+var store, log;
 if (!window.isWebApp) {
   const Store = require('electron-store')
   store = new Store({migrations})
+
+  log = require('electron-log')
 }
 
 const LOADED_TAB_LIMIT = 10
@@ -153,6 +155,7 @@ class LocalData {
         }
       }),
       computed: {
+        $logger() { return log.scope("localData") },
         activeTabIndex() {
           return this.tabData.sortedTabList.indexOf(this.tabData.activeTabKey)
         },
@@ -203,7 +206,12 @@ class LocalData {
           all['tabData'] = this.tabData
           all['saveData'] = this.saveData
           all['settings'] = this.settings
-          this.store.set(all)
+          try {
+            this.store.set(all)
+          } catch (e) {
+            this.$logger.debug(all)
+            throw e
+          }
         },
         applySaveIfPending() {
           if (this.saveDebounce) {
@@ -227,7 +235,7 @@ class LocalData {
           this.applySaveIfPending()
           const all = this.store.get()
           const back = {
-            assetDir: all['assetDir'],
+            assetDir: all['assetDir'] || '',
             saveData: all['saveData'] || DEFAULT_SAVEDATA,
             settings: {...DEFAULT_SETTINGS, ...all['settings']},
             tabData: all['tabData'] || DEFAULT_TABDATA

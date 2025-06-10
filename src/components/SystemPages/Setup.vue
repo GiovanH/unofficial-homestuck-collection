@@ -11,14 +11,14 @@
       </div>
 
       <div class="card" v-else-if="hasLoadFailed">
-        <SetupComponentLoader />
+        <h2>Loading has failed.</h2>
+        <SetupErrorRecovery />
       </div>
 
       <div v-else-if="isLoading">
         <SetupComponentLoader />
         <div class="card" v-if="loadingTooLongTimeout">
           <div class="cardContent">
-            <br />
             <p>Loading is taking longer than normal. If you think it's stuck, you can try to recover.</p>
             <SetupErrorRecovery />
           </div>
@@ -55,7 +55,7 @@ export default {
   },
   computed: {
     hasLoadFailed() {
-      return (this.$root.loadState == "ERROR")
+      return (this.$root.loadError || this.$root.loadState == "ERROR")
     },
     isLoading() {
       // If not in a finished load state, it's still loading
@@ -190,7 +190,7 @@ export default {
     }
     position: relative;
     margin: auto;
-    padding: 0 25px;
+    padding: 25px 25px;
     border: solid 5px #c6c6c6;
     box-sizing: border-box;
     width: 950px;
@@ -211,17 +211,6 @@ export default {
     .cardContent {
       width: 100%;
       padding-bottom: 25px;
-
-      .modlist li {
-        /*list-style-position: inside;*/
-        background-color: #fff;
-        border: 1px solid rgba(0, 0, 0, 0.125);
-        margin-bottom: -1px;
-        padding: 0.2em;
-        .summary:before {
-          content: " - ";
-        }
-      }
     }
   }
 }

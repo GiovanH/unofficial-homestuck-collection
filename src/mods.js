@@ -212,50 +212,59 @@ function onModLoadFail(responsible_mods, e) {
 
   debugger
 
-  store.set("needsRecovery", true)
+  if (window.vm && window.vm.loadStage) {
+    // If we have a functional VM, pass error info to error recovery
+    window.vm.$root.loadState = "ERROR"
+    window.vm.$root.loadError = e
+  } else {
+    store.set("needsRecovery", true)
 
-  logger.warn("RENDER: Mod load failure with modlist", responsible_mods)
-  logger.error(e)
+    logger.warn("RENDER: Mod load failure with modlist", responsible_mods)
+    logger.error(e)
 
-  window.doErrorRecover = () => {
-    removeModsFromEnabledList(responsible_mods)
-    // Have to invoke reload because we probably don't even have the VM at this point
-    ipcRenderer.invoke('reload')
-  }
-  window.doReloadNoRecover = () => ipcRenderer.invoke('reload')
-  window.doFullRestart = () => ipcRenderer.invoke('restart')
+    window.doErrorRecover = () => {
+      removeModsFromEnabledList(responsible_mods)
+      // Have to invoke reload because we probably don't even have the VM at this point
+      ipcRenderer.invoke('reload')
+    }
+    window.doReloadNoRecover = () => ipcRenderer.invoke('reload')
+    window.doFullRestart = () => ipcRenderer.invoke('restart')
 
-  function sanitizeHTML(str) {
-    var temp = document.createElement('div')
-    temp.textContent = str
-    return temp.innerHTML
-  };
+    function sanitizeHTML(str) {
+      var temp = document.createElement('div')
+      temp.textContent = str
+      return temp.innerHTML
+    };
 
-  document.body.innerHTML = `
-  <style>
-  div {
-    background: #fff;
-    color: #000;
-  }
-  div > * { max-width: 100% }
-  div > div { padding: 1em; }
-  p { font-family: sans-serif; }
-  pre { white-space: pre-wrap; }
-  </style>
-  <div>
-    <p style="-webkit-app-region: drag; background: #aaa;">Error</p>
+    document.body.innerHTML = `
+    <style>
+    div {
+      background: #fff;
+      color: #000;
+    }
+    div > * { max-width: 100% }
+    div > div { padding: 1em; }
+    p { font-family: sans-serif; }
+    pre { white-space: pre-wrap; }
+    </style>
     <div>
-      <p>Something went wrong while loading mods <em>${responsible_mods}</em>!
-      These have been disabled for safety.</p>
-      <pre>${sanitizeHTML(e)}</pre>
-      <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
-      <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
-      <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
-      <p>For troubleshooting, save this error message or the <a href="${log.transports ? log.transports.file.getFile() : ''}">log file</a></p><br />
-      <p>Stacktrace:</p>
-      <pre>${sanitizeHTML(e.stack)}</pre>
-    </div>
-  </div>`
+      <p style="-webkit-app-region: drag; background: #aaa;">Error</p>
+      <div>
+        <p>Something went wrong while loading mods <em>${responsible_mods}</em>!
+        These have been disabled for safety.</p>
+        <pre>${sanitizeHTML(e)}</pre>
+        <input type="button" value="1. Disable blamed mods and Reload" onclick="doErrorRecover()" /><br />
+        <input type="button" value="2. Restart and attempt auto-recovery (if 1 didn't work)" onclick="doFullRestart()" /><br />
+        <input type="button" value="3. Attempt reload without making changes (if you made external changes)" onclick="doReloadNoRecover()" /><br />
+        <p>For troubleshooting, save this error message or the <a href="${log.transports ? log.transports.file.getFile() : ''}">log file</a></p><br />
+        <p>Stacktrace:</p>
+        <pre>${sanitizeHTML(e.stack)}</pre>
+      </div>
+    </div>`
+
+  }
+
+
 }
 
 async function bakeRoutes(enabled_mods_js) {

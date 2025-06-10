@@ -304,46 +304,52 @@ function getFlashPath(){
   return flashPath
 }
 
-try {
-  if (assetDir === undefined) {
-    throw Error("Asset directory not yet defined, triggering first run")
-  }
-  // Pick the appropriate flash plugin for the user's platform
-  const flashPath = getFlashPath()
+var is_first_run = false
+if (assetDir === undefined) {
+  is_first_run = true
+} else {
+  try {
+    // Pick the appropriate flash plugin for the user's platform
+    const flashPath = getFlashPath()
 
-  if (fs.existsSync(flashPath)) {
-    app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-  } else throw Error(`Flash plugin not located at ${flashPath}`)
+    if (fs.existsSync(flashPath)) {
+      app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
+    } else throw Error(`Flash plugin not located at ${flashPath}`)
 
-  if (process.platform == 'linux')
-    app.commandLine.appendSwitch('no-sandbox')
+    if (process.platform == 'linux')
+      app.commandLine.appendSwitch('no-sandbox')
 
-  if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
-    app.commandLine.appendSwitch('disable-smooth-scrolling')
-  
-  // Spin up a static file server to grab assets from.
-  // Mounts on a dynamically assigned port, which is returned here as a callback.
-  const server = http.createServer((request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*')
-    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
-    response.setHeader('Access-Control-Max-Age', 2592000)
-    return handler(request, response, {
-      public: assetDir
+    if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
+      app.commandLine.appendSwitch('disable-smooth-scrolling')
+
+    // Spin up a static file server to grab assets from.
+    // Mounts on a dynamically assigned port, which is returned here as a callback.
+    const server = http.createServer((request, response) => {
+      response.setHeader('Access-Control-Allow-Origin', '*')
+      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
+      response.setHeader('Access-Control-Max-Age', 2592000)
+      return handler(request, response, {
+        public: assetDir
+      })
     })
-  })
 
-  server.listen(0, '127.0.0.1', (error) => {
-    if (error) throw error
-    port = server.address().port
+    server.listen(0, '127.0.0.1', (error) => {
+      if (error) throw error
+      port = server.address().port
 
-    if (port === undefined) {
-      throw Error("Could not initialize internal asset server", server, server.address())
-    } else {
-      logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
-    }
-  })
-} catch (error) {
-  logger.debug(error)
+      if (port === undefined) {
+        throw Error("Could not initialize internal asset server", server, server.address())
+      } else {
+        logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
+      }
+    })
+  } catch (error) {
+    logger.debug(error)
+    is_first_run = true
+  }
+}
+
+if (is_first_run) {
   logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
@@ -387,9 +393,9 @@ try {
       ]
     }
   ]
-} finally {
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
+
+Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {

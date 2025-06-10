@@ -66,11 +66,18 @@
           // Cannot load components without archive
           return false
         } else {
-          if (this.$localData.assetDir && this.$root.loadState !== 'ERROR') {
-            // Asset dir is defined (setup finished) and loadState is not known error
-            return true
-          } else if (this.$root.guestMode) {
-            // Preview page directly
+          // Archive data exists; possible to load
+          if (this.$localData.assetDir) {
+            // Asset dir is defined (setup finished)
+            if (this.$root.loadState !== 'ERROR') {
+              // loadState is not known error
+              // (only look for error, don't destroy app during soft reload)
+              return true
+            }
+          }
+          // Setup wizard not complete
+          if (this.$root.guestMode) {
+            // Preview page directly despite incomplete setup
             return true
           }
         }
@@ -228,7 +235,6 @@
           })
         } else {
           this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
-
         }
       }
 
@@ -288,16 +294,17 @@
       })
 
       ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
-        this.$root.loadStage = "MODS"
+        this.$root.loadStage = "LOADED_ARCHIVE_VANILLA"
         try {
+          this.$root.loadStage = "MODS"
           await Mods.editArchiveAsync(archive)
           this.$root.archive = Object.freeze(archive)
-          this.$root.loadStage = "LOADED_ARCHIVE_VANILLA"
           this.$nextTick(() => {
             this.$root.loadState = "DONE"
           })
         } catch (e) {
           this.$logger.error(e)
+          this.$root.loadError = e
           this.$root.archive = undefined
           this.$root.loadState = "ERROR"
         }

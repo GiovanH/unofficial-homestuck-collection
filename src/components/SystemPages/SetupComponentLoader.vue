@@ -39,7 +39,7 @@ export default {
         "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
         "EXTRACT_IMODS": "Applying day-one patch",
         "READ_MODS": "Indexing paraphernalia",
-        "BAKE_ROUTES": "Convoluting routing table",
+        "BAKE_ROUTES": "Convoluting routing",
         "MODS_DONE": "Disparaging EMCAScript"
       },
       spiroPos: [

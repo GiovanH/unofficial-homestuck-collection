@@ -429,6 +429,7 @@ export default {
   }
   .hint {
     font-size: 13px;
+    margin-bottom: 0;
     color: var(--page-nav-meta);
     font-weight: normal;
   }
