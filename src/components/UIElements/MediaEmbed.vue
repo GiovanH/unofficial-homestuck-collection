@@ -203,6 +203,7 @@ export default {
       },
       gameOver: {
         count: 0,
+        // Time in MS
         steps: [22433, 82300, 94800, 118566, 143930, 146973, 224876]
       },
       cropHeight: {
@@ -562,9 +563,11 @@ document.addEventListener('click', function (e) {
 
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
-            this.$logger.info("Initializing dynamic game over page")
+            this.$logger.info("Initializing game over media timer")
+
             this.$parent.gameOverPreload = false
             this.gameOver.count = 0
+
             this.startTimer(() => {
               const next_step = this.gameOver.steps[this.gameOver.count]
               if (Date.now() >= this.timer.start + next_step) {
