@@ -477,9 +477,11 @@ Promise.all(promises_loading).then(_ => {
       app(){ return this.$refs.App }
     },
     asyncComputed: {
-      $modChoices: {
+      modChoices: {
         default: {},
-        get: Mods.getModChoicesAsync
+        async get() {
+          return (await Mods.loadModChoicesAsync())
+        }
       }
     },
     router,

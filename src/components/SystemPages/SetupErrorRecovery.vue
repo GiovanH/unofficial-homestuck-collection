@@ -52,7 +52,7 @@ export default {
   computed: {
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) =>
-        this.$root.$modChoices[key]).filter(val => !!val)
+        this.$root.modChoices[key]).filter(val => !!val)
     },
     isExpectedAssetVersion() {
       return (this.selectedAssetVersion == this.$data.$expectedAssetVersion)

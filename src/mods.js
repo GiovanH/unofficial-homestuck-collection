@@ -1277,15 +1277,6 @@ async function loadModChoicesAsync(){
   return items
 }
 
-async function getModChoicesAsync() {
-  if (modChoices !== undefined) {
-    return modChoices
-  } else {
-    modChoices = await loadModChoicesAsync()
-    return modChoices
-  }
-}
-
 export default {
   store_mods, // store object
   getModStoreKey, // sync, pure, used by subsettingsmodal
@@ -1293,8 +1284,6 @@ export default {
 
   extractimods, // async, internal
 
-  modChoices, // var
-  getModChoicesAsync, // async, main mixin $modChoices
   loadModChoicesAsync, // async, called by settings to refresh (promise-resolved)
 
   getEnabledModsJsAsync, // async, internal

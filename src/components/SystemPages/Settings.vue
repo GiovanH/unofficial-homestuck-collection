@@ -718,10 +718,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$root.$modChoices[key]).filter(val => !!val)
+        this.modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$root.$modChoices).filter((choice) =>
+      return Object.values(this.modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -737,6 +737,9 @@ export default {
       if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
+    },
+    modChoices() {
+      return this.$root.modChoices
     }
   },
   methods: {
@@ -902,11 +905,11 @@ export default {
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
       try {
-        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
+        if (diff.some(key => this.modChoices[key].needsHardReload)) {
           this.$logger.info("List change requires hard reload", diff)
           this.needReload = true
         }
-        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
+        if (diff.some(key => this.modChoices[key].needsArchiveReload)) {
           this.$logger.info("List change requires archive reload", diff)
           this.queueArchiveReload()
         }
@@ -936,12 +939,7 @@ export default {
       ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      Mods.loadModChoicesAsync().then(_ => {
-        this.$root.$asyncComputed.$modChoices.update()
-        // this._computedWatchers.modsEnabled.run()
-        // this._computedWatchers.modsDisabled.run()
-        this.$forceUpdate()
-      })
+      this.$root.$asyncComputed.modChoices.update()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
