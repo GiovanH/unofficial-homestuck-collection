@@ -46,6 +46,9 @@ if (!store.get('settings.enableHardwareAcceleration')) {
   logger.info("Not disabling hardware acceleration")
 }
 
+if (process.platform == 'linux')
+  app.commandLine.appendSwitch('no-sandbox')
+
 // Log settings, for debugging
 logger.info(store.get('settings'))
 
@@ -316,8 +319,6 @@ if (assetDir === undefined) {
       app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
     } else throw Error(`Flash plugin not located at ${flashPath}`)
 
-    if (process.platform == 'linux')
-      app.commandLine.appendSwitch('no-sandbox')
 
     if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
       app.commandLine.appendSwitch('disable-smooth-scrolling')
