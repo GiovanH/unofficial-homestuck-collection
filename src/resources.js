@@ -560,7 +560,8 @@ module.exports = {
       event.sender.send(reply_channel, resolveAssetsProtocol(url))
     })
     ipcRenderer.on('RESOURCES_RESOLVE_URL', (event, reply_channel, url) => {
-      event.sender.send(reply_channel, resolveURL(url))
+      if (url) event.sender.send(reply_channel, resolveURL(url))
+      else return url
     })
   },
   isReady(){

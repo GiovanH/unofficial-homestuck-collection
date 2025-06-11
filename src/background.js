@@ -789,7 +789,7 @@ async function createWindow () {
 
     // const parsedURL = Resources.resolveURL(url)
     const reply_channel = 'RESOURCES_RESOLVE_URL_REPLY' + url
-    win.webContents.send('RESOURCES_RESOLVE_URL', url)
+    win.webContents.send('RESOURCES_RESOLVE_URL', reply_channel, url)
     ipcMain.once(reply_channel, (event, parsedURL) => {
       logger.info(`new-window: ${url} ===> ${parsedURL}`)
 
