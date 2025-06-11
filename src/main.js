@@ -39,7 +39,7 @@ if (!window.isWebApp) {
   var { shell } = require('electron')
 
   log = require('electron-log')
-  log.transports.console.format = '[{level}] {text}'
+  log.transports.console.format = '{scope} {text}'
   errorReporting.registerRenderLogger(log)
 
   var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')

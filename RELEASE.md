@@ -7,4 +7,4 @@ Notes for maintaining repository release cadence:
 3. Write release notes and publish the draft release created by the workflow
 4. Update flatpak metadata info (see `just xml_release`)
 5. Commit updated flatpak metadata to `origin/develop`
-6. Create pull request against flatpak repo (`see just flatpak`) using latest gh release for the asset and the latest `origin/develop` metadata for release notes.
+6. Create pull request against flatpak repo (see `just flatpak`) using latest gh release for the asset and the latest `origin/develop` metadata for release notes.

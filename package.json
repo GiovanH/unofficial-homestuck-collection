@@ -17,7 +17,7 @@
   },
   "version": "2.6.1",
   "license": "GPL-3.0*",
-  "repository": "github:Bambosh/unofficial-homestuck-collection",
+  "repository": "github:GiovanH/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve webapp/browser.js",
