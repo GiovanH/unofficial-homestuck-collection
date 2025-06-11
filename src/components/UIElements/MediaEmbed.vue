@@ -330,6 +330,26 @@ export default {
       this.$logger.info("Getting audio tracks for", this.url, this.url.replace("_hq.swf", ".swf"), ret)
       return ret
     },
+    ruffleEmbed() {
+      // At some point between 2025.3.14 and 2025.4.13 ruffle stopped supporting our old runtime. Damn. -->
+      if (this.$localData.settings.ruffleFallback) {
+        if (this.$isWebApp) {
+          return '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>'
+        } else {
+          // 0.1.0-nightly.2024.04.13 OK
+          // ...
+          // 0.1.0-nightly.2024.07.19 OK
+          // 0.1.0-nightly.2024.07.20 scale issue
+          // ...
+          // 0.1.0-nightly.2025.04.07 scale issue
+          // 0.1.0-nightly.2025.04.13 syntax issue
+          // return '<script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.7.19"><\/script>'
+          return `<script src="${this.$getResourceURL("assets://js/ruffle/ruffle.js")}"><\/script>`
+        }
+      } else {
+        return '<!-- Using real flash -->'
+      }
+    },
     flashSrc() {
       return `
         <html>
@@ -382,10 +402,10 @@ export default {
               }
             })
           } else {
-            console.warn("Browser does not support 'navigation' listener")
+            console.debug("Browser does not support 'navigation' listener")
           }
         <\/script>
-        ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
+        ${this.ruffleEmbed}
         </head>
         <body>
         <object type="application/x-shockwave-flash" 
