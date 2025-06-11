@@ -56,7 +56,7 @@ export default {
   computed: {
     // pageNum: PAGE.computed.pageNum,  // Page number of one of the two pages (usually the left one)
     thisPages() {
-      let thisPageId = this.pageNum
+      const thisPageId = this.pageNum
       let leftPageId, rightPageId
       if (parseInt(thisPageId) % 2 == 0) {
         leftPageId = thisPageId
@@ -83,14 +83,14 @@ export default {
       // TODO: This doesn't seem to be used anywhere or do anything.
       // Also it's a side-effect in a computed statement for no good reason.
       this.preload = []
-      let preloadPages = [
+      const preloadPages = [
         this.nextPagesArray[1][0],
         this.$archive.mspa.story[this.nextPagesArray[1][0].next[0]]
       ]
       preloadPages.forEach(page => {
         page.media.forEach(media => {
           if (/(gif|png)$/i.test(media)) {
-            let img = new Image()
+            const img = new Image()
             img.src = this.$getResourceURL(media)
             this.preload.push(img)
           }
@@ -106,7 +106,7 @@ export default {
     },
     nextPagesArray() {
       this.$logger.info(`${this.tab.url} - ${this.thisPages[1].title}`)
-      let nextPages = [[], []]
+      const nextPages = [[], []]
       this.thisPages[0].next.forEach(nextID => {
         nextPages[0].push(this.$archive.mspa.story[nextID])
       })
@@ -220,4 +220,3 @@ export default {
 }
 
 </style>
-

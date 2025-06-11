@@ -8,8 +8,11 @@
         @click.middle="historyForwardNewTab" :disabled="!activeTabHasFuture">
         <fa-icon icon="chevron-right"></fa-icon></button>
 
+      <!-- eslint-disable vue/use-v-on-exact -->
       <button class="systemButton historyButton refresh" 
-        @click="reloadTab" @click.middle="forceReload" @click.shift="archiveReload">
+        @click="reloadTab"
+        @click.middle="forceReload"
+        @click.shift="archiveReload">
         <fa-icon icon="redo"></fa-icon></button>
     </div>
     <template v-if="$localData.settings.showAddressBar">
@@ -62,7 +65,7 @@ import AddressBar from '@/components/AppMenu/AddressBar.vue'
 
 import ModBrowserToolbarMixin from '@/components/CustomContent/ModBrowserToolbarMixin.vue'
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'tabBar',
@@ -84,7 +87,7 @@ export default {
   },  
   created(){
     for (const COM in this.browserToolbars) {
-        let mixins = this.browserToolbars[COM].mixins || []
+        const mixins = this.browserToolbars[COM].mixins || []
         if (!mixins.includes(ModBrowserToolbarMixin)) {
             mixins.push(ModBrowserToolbarMixin)
             this.browserToolbars[COM].mixins = mixins
@@ -98,7 +101,7 @@ export default {
     },
     hasTabBarContainer() {
       if (!this.$isWebApp) return true
-      else return (this.$localData.settings.useTabbedBrowsing)
+      else return (this.$localData.settings.useTabbedBrowsing || this.$localData.settings.showAddressBar)
       //            Tabbed  Untabbed
       // Webapp      Nav     None
       // Electron    Nav     Nav
@@ -184,7 +187,7 @@ export default {
     },
 
     constrainXToTabArea(tabX) {
-      let tabAreaRect = document.getElementById("tabs").getBoundingClientRect()
+      const tabAreaRect = document.getElementById("tabs").getBoundingClientRect()
 
       if (tabX <= tabAreaRect.left) {
         tabX = tabAreaRect.left
@@ -220,7 +223,7 @@ export default {
       e.preventDefault()
 
       if (Math.abs(e.clientX - this.clickAnchor) > 5) {
-        let snapDistance = e.clientX - this.clickAnchor
+        const snapDistance = e.clientX - this.clickAnchor
         this.clickAnchor -= this.dragTarget.getBoundingClientRect().left
 
         this.dragTarget.style.visibility = "hidden"
@@ -236,9 +239,9 @@ export default {
         this.cursorXPrev = e.clientX
         document.onmousemove = this.elementDrag
 
-        this.$nextTick(()=>{
-          let titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 // Offsets 5px of padding on left
-          let titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
+        this.$nextTick(() => {
+          const titleWidth = this.dragTab.querySelector(".tabTitle").getBoundingClientRect().width - 5 // Offsets 5px of padding on left
+          const titleTextWidth = this.dragTab.querySelector(".tabTitle span").getBoundingClientRect().width
           this.dragTitleFade = titleWidth < titleTextWidth
 
           this.dragTab.focus()
@@ -257,8 +260,7 @@ export default {
           this.dragTab.style.left = (this.dragTab.offsetLeft + e.clientX - this.threshold) + "px"
           this.thresholdDirection = undefined
         }
-      }
-      else {
+      } else {
         dragPos = this.cursorXPrev - e.clientX
         tabX = this.constrainXToTabArea(this.dragTab.offsetLeft - dragPos)
         this.dragTab.style.left = tabX + "px"
@@ -266,13 +268,13 @@ export default {
       
       this.cursorXPrev = e.clientX
 
-      let dragTabArea = this.dragTab.getBoundingClientRect()
-      let xCenter = dragTabArea.left + ((dragTabArea.right - dragTabArea.left) / 2)
-      let yCenter = dragTabArea.top + ((dragTabArea.bottom - dragTabArea.top) / 2)
+      const dragTabArea = this.dragTab.getBoundingClientRect()
+      const xCenter = dragTabArea.left + ((dragTabArea.right - dragTabArea.left) / 2)
+      const yCenter = dragTabArea.top + ((dragTabArea.bottom - dragTabArea.top) / 2)
 
-      let tabRef = this.getTabEl(document.elementFromPoint(xCenter, yCenter)).id  
-      let hoverId = this.$refs[tabRef][0].getId()
-      let dragId = this.$refs[this.dragTarget.id][0].getId()
+      const tabRef = this.getTabEl(document.elementFromPoint(xCenter, yCenter)).id
+      const hoverId = this.$refs[tabRef][0].getId()
+      const dragId = this.$refs[this.dragTarget.id][0].getId()
 
       if (dragId != hoverId) {
         this.$localData.root.TABS_SWAP(dragId, hoverId)
@@ -298,16 +300,7 @@ export default {
       ipcRenderer.invoke('reload')
     },
     archiveReload(){
-      // Should match settings.archiveReload
-      this.memoizedClearAll()
-
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        // Don't show loading screen, "soft" reload
-        // this.$root.loadState = "LOADING"
-        this.$localData.root.applySaveIfPending()
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
+      this.$root.app.archiveReload()
     }
   }
 }

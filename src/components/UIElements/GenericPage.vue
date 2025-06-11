@@ -47,8 +47,9 @@ export default {
     > img {
       align-self: center;
     }
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
 
     //Small screen check
@@ -140,4 +141,3 @@ export default {
   //   }
   // }
 </style>
-

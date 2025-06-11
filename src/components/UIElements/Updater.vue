@@ -8,7 +8,7 @@
 </template>
 
 <script>
-const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
+const semver = require("semver");
 
 const tagToSemver = (tag_name) => tag_name.replace(/^[Vv]/, '').replace(/-\w*$/, '')
 
@@ -52,7 +52,7 @@ export default {
     },
     appHasUpdate(){
       if (!this.ghReleases) return undefined
-      return semverGreater(this.appLatestReleaseSemver, this.appVersionCurrent)
+      return semver.gt(this.appLatestReleaseSemver, this.appVersionCurrent)
     },
     assetVersionCurrent(){
       return this.$archive.version
@@ -117,4 +117,3 @@ export default {
     }
  }
 </style>
-

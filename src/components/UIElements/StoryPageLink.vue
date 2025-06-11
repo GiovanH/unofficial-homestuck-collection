@@ -42,9 +42,9 @@ export default {
       const num = this.displayNum
       if (this.isSpoiler)
         return num
-      else if (this.isTitleOnly)
+      else if (this.page && this.isTitleOnly)
         return this.page.title
-      else if (this.isLong)
+      else if (this.page && this.isLong)
         return `${num} - ${this.page.title}`
       else
         return num

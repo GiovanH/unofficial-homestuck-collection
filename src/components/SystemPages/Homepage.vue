@@ -286,6 +286,16 @@
           <template v-slot:title>The Man-On-Man Suckoff Challenge</template>
           <p>Gaze deep into the uncanny valley.</p>
         </HomeRowItem>
+
+        <HomeRowItem
+          class="rowItem"
+          href="/wizardyherbert/"
+          thumbsrc="/archive/collection/archive_wh.png"
+          date="Jul 2008">
+          <template v-slot:title>Wizardy Herbert</template>
+          <p>An unfinished book draft of a book about wizards and fanciful magicks. Last revised July 2008, discovered December 2012.</p>
+        </HomeRowItem>
+
       </div>
     </div>
 
@@ -429,7 +439,6 @@ export default {
 }
 </script>
 
-
 <style scoped lang="scss">
   @mixin tablet-size {
     @media (max-width: 950px) {
@@ -478,7 +487,8 @@ export default {
     align-content: center;
 
     ::v-deep a:not([disabled]) {
-      color: var(--page-links);
+      &:link { color: var(--page-links); }
+      &:link:active { color: var(--page-links-active); }
     }
 
     .a6a6graffiti {
@@ -618,6 +628,7 @@ export default {
       }
     }
   }
+  // TODO: Don't hide border on 2nd in tablet view (see TBIY)
   .card.noHeaderCard .cardContent.cardRows .rowItem  {
     &:nth-child(1), &:nth-child(2) {
       border-top: none;

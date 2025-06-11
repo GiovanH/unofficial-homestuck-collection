@@ -92,20 +92,20 @@ export default {
   computed: {
     trackographySorted() {
       // Always send unreleased-tracks to the bottom of the list. Otherwise, sort in chronological order of release
-      let keys = Object.keys(this.$archive.music.albums).sort((key1, key2) => {
+      const keys = Object.keys(this.$archive.music.albums).sort((key1, key2) => {
         if (key1 == 'unreleased-tracks') return 1
         else if (key2 == 'unreleased-tracks') return -1
         else return new Date(this.$archive.music.albums[key1].date) - new Date(this.$archive.music.albums[key2].date)
       })
       
-      let result = []
+      const result = []
       keys.forEach(key => {
-        let directory = key
-        let isSpoiler = this.$albumIsSpoiler(key)
-        let tracks = []
+        const directory = key
+        const isSpoiler = this.$albumIsSpoiler(key)
+        const tracks = []
         let isValidAlbum = false
         this.$archive.music.albums[key].tracks.forEach(track => {
-          let linkedTrack = this.linkTrack(track)
+          const linkedTrack = this.linkTrack(track)
           if (!isValidAlbum && !linkedTrack.includes('>??????<')) isValidAlbum = true
           tracks.push(linkedTrack)
         })
@@ -115,7 +115,7 @@ export default {
     },
     artistographySorted() {
       // Sort artists in alphabetical order, and split into a maximum of three equal-ish columns. Try to hit around a minimum of 50 per column.
-      let keys = Object.keys(this.$archive.music.artists).sort((key1, key2) => {
+      const keys = Object.keys(this.$archive.music.artists).sort((key1, key2) => {
         if (key1 < key2) return -1
         if (key1 > key2) return 1
         return 0
@@ -124,15 +124,15 @@ export default {
     },
     flashographySorted() {
       // Sort in chronological order of release
-      let keys = Object.keys(this.$archive.music.flashes).sort((key1, key2) => {
-        let timestamp1 = key1 in this.$archive.mspa.story && this.$archive.mspa.story[key1].timestamp ? this.$archive.mspa.story[key1].timestamp : new Date(this.$archive.music.flashes[key1].date).getTime()/1000
-        let timestamp2 = key2 in this.$archive.mspa.story && this.$archive.mspa.story[key2].timestamp ? this.$archive.mspa.story[key2].timestamp : new Date(this.$archive.music.flashes[key2].date).getTime()/1000
+      const keys = Object.keys(this.$archive.music.flashes).sort((key1, key2) => {
+        const timestamp1 = key1 in this.$archive.mspa.story && this.$archive.mspa.story[key1].timestamp ? this.$archive.mspa.story[key1].timestamp : new Date(this.$archive.music.flashes[key1].date).getTime() / 1000
+        const timestamp2 = key2 in this.$archive.mspa.story && this.$archive.mspa.story[key2].timestamp ? this.$archive.mspa.story[key2].timestamp : new Date(this.$archive.music.flashes[key2].date).getTime() / 1000
         
         return timestamp1 - timestamp2
       })
-      let result =  keys.filter(page => !this.$pageIsSpoiler(page) && page != '007326').map(page => {
-        let flash = this.$archive.music.flashes[page]
-        let tracks = []
+      const result =  keys.filter(page => !this.$pageIsSpoiler(page) && page != '007326').map(page => {
+        const flash = this.$archive.music.flashes[page]
+        const tracks = []
 
         flash.tracks.forEach(track => tracks.push(this.linkReference(track)))
         
@@ -142,7 +142,7 @@ export default {
           })
         }
 
-        let pageData = this.getPage(page)
+        const pageData = this.getPage(page)
         return {
           title: pageData.title, 
           pageNum: pageData.pageNum,
@@ -161,8 +161,8 @@ export default {
     },
     discographySorted() {
       // Sort in reverse-chronological order of release.
-      let keys = Object.keys(this.$archive.music.albums).filter(album => !this.$albumIsSpoiler(album))
-      let sorted = keys.sort((key1, key2) => new Date(this.$archive.music.albums[key2].date) - new Date(this.$archive.music.albums[key1].date))
+      const keys = Object.keys(this.$archive.music.albums).filter(album => !this.$albumIsSpoiler(album))
+      const sorted = keys.sort((key1, key2) => new Date(this.$archive.music.albums[key2].date) - new Date(this.$archive.music.albums[key1].date))
       return this.reverseDiscography ? sorted.reverse() : sorted
     }
   },
@@ -186,43 +186,39 @@ export default {
     linkArtists(array) {
       return array.map(artist => {
         if (typeof artist == 'string') return `<a href="/music/artist/${artist}">${this.$archive.music.artists[artist].name}</a>`
-        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${!!artist.what ? ` (${artist.what})` : ''}`
+        else return `<a href="/music/artist/${artist.who}">${this.$archive.music.artists[artist.who].name}</a>${artist.what ? ` (${artist.what})` : ''}`
       })
     },
     linkReference(reference) {
       if (this.$trackIsSpoiler(reference)) {
         return '??????'
-      }
-      else if (reference in this.$archive.music.tracks) {
+      } else if (reference in this.$archive.music.tracks) {
         return `<a href="/music/track/${this.$archive.music.tracks[reference].directory}">${this.$archive.music.tracks[reference].name}</a> <i>by ${this.joinNoOxford(this.linkArtists(this.$archive.music.tracks[reference].artists))}</i>`
-      }
-      else return reference
+      } else return reference
     },
     linkTrack(dir) {
       if (this.$trackIsSpoiler(dir)) return '<span class="spoiler">??????</span>'
       if (dir in this.$archive.music.tracks) {
-        let track = this.$archive.music.tracks[dir]
-        let href = `/music/track/${track.directory}`
-        let duration = track.duration ? `<span class="duration">${this.secondsToMinutes(track.duration)}</span>`: ''
-        let html = `<a href="${href}">${track.name}</a>${duration}`
+        const track = this.$archive.music.tracks[dir]
+        const href = `/music/track/${track.directory}`
+        const duration = track.duration ? `<span class="duration">${this.secondsToMinutes(track.duration)}</span>` : ''
+        const html = `<a href="${href}">${track.name}</a>${duration}`
         return html
-      }
-      else return dir 
+      } else return dir 
     },
     getPage(page){
       if (page in this.$archive.mspa.story) {
-        let title = this.$archive.mspa.story[page].title
-        let thumbnail = this.$mspaToViz(page).p
-        let pageNum = (!/\D/.test(page) ? 'Page ' : '') + (this.$localData.settings.mspaMode ? page : thumbnail)
-        let url = `/mspa/${page}`
+        const title = this.$archive.mspa.story[page].title
+        const thumbnail = this.$mspaToViz(page).p
+        const pageNum = (!/\D/.test(page) ? 'Page ' : '') + (this.$localData.settings.mspaMode ? page : thumbnail)
+        const url = `/mspa/${page}`
         return {
           title, 
           pageNum,
           thumbnail,
           url
         }
-      }
-      else if (page == 'ps_titlescreen') return ({
+      } else if (page == 'ps_titlescreen') return ({
         title: 'Problem Sleuth Titlescreen',
         pageNum: 'ps_titlescreen',
         thumbnail: 'ps_titlescreen',
@@ -238,23 +234,22 @@ export default {
         title: page,
         pageNum: page,
         url: undefined,
-        thumbnail: undefined,
+        thumbnail: undefined
       })
     },
     secondsToMinutes(time) {
       if (Number.isInteger(time)){
-        let m = Math.floor(time % 3600 / 60)
-        let s = Math.floor(time % 3600 % 60)
+        const m = Math.floor(time % 3600 / 60)
+        const s = Math.floor(time % 3600 % 60)
 
         var mDisplay = m.toString().padStart(2, '0')
         var sDisplay = s.toString().padStart(2, '0')
         return mDisplay + ':' + sDisplay
-      }
-      else return ''
+      } else return ''
     },
     getUTCDate(date){
-      let d = new Date(date)
-      let month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
+      const d = new Date(date)
+      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]
       return `${month} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
     }
   }
@@ -433,4 +428,3 @@ export default {
   }
 }
 </style>
-

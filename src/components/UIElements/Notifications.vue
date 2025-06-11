@@ -43,7 +43,7 @@ export default {
   computed: {
     notifCollectionPages(){
       // Map<mspa_num: List<notif>>
-      let notifs_by_page = {}
+      const notifs_by_page = {}
       Object.keys(notifPages).forEach(page_num => {
         notifPages[page_num].forEach(notif_id => {
           notifData[notif_id].notif_level = 'major'
@@ -53,8 +53,8 @@ export default {
       })
 
       let page_num
-      for (const modKey in this.$modChoices) {
-        const modChoice = this.$modChoices[modKey]
+      for (const modKey in this.$root.modChoices) {
+        const modChoice = this.$root.modChoices[modKey]
         // eslint-disable-next-line no-cond-assign
         if (page_num = modChoice.locked) {
           if (!notifs_by_page[page_num]) notifs_by_page[page_num] = []
@@ -73,11 +73,10 @@ export default {
     // },
     notifCollectionTimestamps(){
       // Map<timestamp: List<notif>>
-      let notifs_by_timestamp = {}
+      const notifs_by_timestamp = {}
       Object.values(this.$archive.news).reduce(function(acc, y){
         return acc.concat(y)
       }, []).forEach(newspost => {
-
         if (!notifs_by_timestamp[newspost.timestamp])
           notifs_by_timestamp[newspost.timestamp] = []
 
@@ -96,7 +95,7 @@ export default {
             return {
               desc
             }
-          },
+          }
         })
       })
       return notifs_by_timestamp
@@ -146,7 +145,7 @@ export default {
 
       // this.$logger.info("Searching between", time1, this.formatTimestamp(time1), "&", time2, this.formatTimestamp(time2))
 
-      let ret = []
+      const ret = []
       let newst = -1
       for (let i = fuzzyBinarySearch(corpus, time1); newst <= time2; newst = corpus[i++]) {
         if (newst > time1) {
@@ -197,13 +196,13 @@ export default {
           latestTimestamp, nextTimestamp, 
           this.notifCollectionTimestampsIndex
         )
-        this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
+        // this.$logger.debug("notif_timestamps_between", notif_timestamps_between)
 
         const notifications_between = notif_timestamps_between
             .map(t => this.notifCollectionTimestamps[t])
             .flat() // would be a List<List<notif>> otherwise b/c multi timestamps
             .filter(this.filterNotifBySetting)
-        this.$logger.debug("notifications_between", notifications_between)
+        // this.$logger.debug("notifications_between", notifications_between)
 
         // Group newsposts if too many
         if (notif_timestamps_between.length <= this.maxActiveNotifs) {
@@ -260,6 +259,7 @@ export default {
 
 .notifWrapper {
   position: absolute;
+  overflow: hidden;
   width: 400px;
   height: 100%;
   pointer-events: none;

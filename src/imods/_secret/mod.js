@@ -2,17 +2,17 @@ module.exports = {
   title: "shhhh", 
   summary: "it's a secret",
   author: "GiovanH",
-  modVersion: 0.1,
+  modVersion: 0.2,
   vueHooks: [
   {
     matchName: "unlock",
     mounted() {
-      this.$nextTick(__ => {
+      this.$nextTick(() => {
         const codemachine = this.$refs['codemachine'].$el
         codemachine.style.cursor = "help"
         codemachine.contentEditable = true // focus hack
         codemachine.addEventListener('keydown', (event) => {
-          if (event.code == "KeyT" && event.ctrlKey) {
+          if (event.code == "KeyT" && (event.ctrlKey || window.isWebApp)) {
             this.$openLink(window.location.host + "/page/c=%3F%3F%3F/m=assets%3A%2F%2Fp8%2Fwalkabout.html/")
           }
           event.stopPropagation()

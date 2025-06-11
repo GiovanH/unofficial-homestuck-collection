@@ -1,16 +1,18 @@
 // Rules for transforming intercepted URLS
 
-const Mods = require('@/mods.js').default
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 const path = (isWebApp ? require('path-browserify') : require('path'))
 
-const ipcRenderer = require('electron').ipcRenderer
-
 var logger
 if (!isWebApp) {
-  const log = require('electron-log')
-  logger = log.scope('Resources')
+  try {
+    const log = require('electron-log')
+    logger = log.scope('Resources')
+  } catch (err) {
+    // console.warn(err)
+    logger = console
+  }
 } else {
   logger = console
 }
@@ -177,12 +179,14 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 
   console.assert(asset_url.startsWith("assets://"), "resources", asset_url + " is not on the assets protocol!")
 
+  const Mods = require('@/mods.js').default
   if (Mods) {
     const mod_route = Mods.getAssetRoute(asset_url)
     if (mod_route) {
       // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
       if (loopcheck.includes(mod_route)) {
         loopcheck.push(mod_route)
+        console.error("Circular asset path!", loopcheck)
         throw Error("Circular asset path!" + loopcheck)
       } else {
         loopcheck.push(mod_route)
@@ -209,6 +213,8 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
 const UrlFilterMixin = {
   methods: {
     filterLinksAndImages(el){
+      const ipcRenderer = require('IpcRenderer')
+
       // dynamic default
       // this.$el can be a comment because fuck me of course it can
       if (!el) {
@@ -280,6 +286,17 @@ const UrlFilterMixin = {
 
 // ====================================
 // Story logic
+
+const all_stories = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  'ryanquest',
+  'snaps'
+]
 
 function getStoryNum(pageNumber) {
   // Given a MSPA page number, determine the numerical story ID it is associated with.
@@ -450,8 +467,7 @@ function getChapter(key) {
       case 'pony2': return 'Homestuck Act 2'
       case 'darkcage2': return 'Homestuck Act 6 Act 3'
     }
-  }
-  else if (p <= 135 && p >= 1) return 'Jailbreak'
+  } else if (p <= 135 && p >= 1) return 'Jailbreak'
   else if (p <= 218 && p >= 136) return 'Bard Quest'
   else if (p <= 1892 && p >= 219) {
     let c = 'Problem Sleuth '
@@ -479,8 +495,7 @@ function getChapter(key) {
     else if (p >= 302) c += "Chapter 2"
     else if (p >= 219) c += "Chapter 1"
     return c
-  }
-  else if (p <= 1900 && p >= 1893) return 'Homestuck Beta'
+  } else if (p <= 1900 && p >= 1893) return 'Homestuck Beta'
   else if (p >= 1901) {
     let c = 'Homestuck '
     if (p >= 10027) c += "Act 7"
@@ -539,10 +554,21 @@ module.exports = {
   init(settings){
     assets_root = settings.assets_root || assets_root
     logger.info("Resources initialized to", assets_root)
+
+    const ipcRenderer = require('IpcRenderer')
+    ipcRenderer.on('RESOURCES_RESOLVE_ASSETS_PROTOCOL', (event, reply_channel, url) => {
+      event.sender.send(reply_channel, resolveAssetsProtocol(url))
+    })
+    ipcRenderer.on('RESOURCES_RESOLVE_URL', (event, reply_channel, url) => {
+      if (url) event.sender.send(reply_channel, resolveURL(url))
+      else return url
+    })
   },
   isReady(){
     return assets_root !== undefined
   },
+  all_stories,
+
   UrlFilterMixin,
   resolveURL,
   toFilePath,

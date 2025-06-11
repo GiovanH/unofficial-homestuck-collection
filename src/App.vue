@@ -11,6 +11,7 @@
       <Notifications :class="theme" ref="notifications" />
       <ContextMenu :class="theme" ref="contextMenu" v-if="!$isWebApp" />
       <Updater ref="Updater" v-if="!$isWebApp" />
+      <GuestBanner ref="GuestBanner" v-if="$root.guestMode" />
       <UrlTooltip :class="theme" ref="urlTooltip" v-if="$localData.settings.urlTooltip && !$isWebApp"/>
       <component is="style" v-for="s in stylesheets" :id="s.id" :key="s.id" rel="stylesheet" v-text="s.body"/>
     </div>
@@ -22,6 +23,8 @@
 </template>
 
 <script>
+  import Mods from "./mods.js"
+
   import Setup from '@/components/SystemPages/Setup.vue'
   import AppHeader from '@/components/AppMenu/AppHeader.vue'
 
@@ -32,23 +35,23 @@
   const Updater = () => import('@/components/UIElements/Updater.vue')
   const TabFrame = () => import('@/components/TabFrame.vue')
 
-  import Mods from "./mods.js"
+  const GuestBanner = () => import('@/components/UIElements/GuestBanner.vue')
 
-  const ipcRenderer = require('electron').ipcRenderer
+  const ipcRenderer = require('IpcRenderer')
 
   var mixins = []
   var webFrame = undefined;
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
-    mixins = [ Mods.getMainMixin() ];
+    mixins = [Mods.getMainMixin()]
   }
 
   export default {
     name: 'HomestuckCollection',
     mixins,
     components: {
-      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater
+      Setup, AppHeader, TabFrame, ContextMenu, Notifications, UrlTooltip, Updater, GuestBanner
     },
     data() {
       return {
@@ -63,8 +66,18 @@
           // Cannot load components without archive
           return false
         } else {
-          if (this.$localData.assetDir && this.$root.loadState !== 'ERROR') {
-            // Asset dir is defined (setup finished) and loadState is not known error
+          // Archive data exists; possible to load
+          if (this.$localData.assetDir) {
+            // Asset dir is defined (setup finished)
+            if (this.$root.loadState !== 'ERROR') {
+              // loadState is not known error
+              // (only look for error, don't destroy app during soft reload)
+              return true
+            }
+          }
+          // Setup wizard not complete
+          if (this.$root.guestMode) {
+            // Preview page directly despite incomplete setup
             return true
           }
         }
@@ -75,7 +88,9 @@
         return this.$localData.tabData.tabList
       },
       activeTabComponent() {
+        // eslint-disable-next-line no-unused-expressions
         this.needCheckTheme; // what a truly awful hack. vue's fault
+
         // (it's because $refs isn't reactive)
         const tab_components = this.$refs[this.$localData.tabData.activeTabKey]
         if (tab_components) {
@@ -131,7 +146,7 @@
         webFrame.setZoomLevel(this.zoomLevel)
       },
       checkTheme() {
-        this.needCheckTheme = !this.needCheckTheme;
+        this.needCheckTheme = !this.needCheckTheme
       },
       zoomIn() {
         if (this.zoomLevel < 5) {
@@ -144,6 +159,17 @@
           this.zoomLevel -= 0.5
           webFrame.setZoomLevel(this.zoomLevel)
         }
+      },
+      archiveReload() {
+        this.memoizedClearAll()
+
+        this.$root.loadState = "LOADING"
+        this.$nextTick(function () {
+          // Don't show loading screen, "soft" reload
+          // this.$root.loadState = "LOADING"
+          this.$localData.root.applySaveIfPending()
+          ipcRenderer.send('RELOAD_ARCHIVE_DATA')
+        })
       },
       openJumpbox() {
         if (this.$localData.settings.showAddressBar) {
@@ -197,7 +223,10 @@
 
       this.$root.loadStage = "MOUNTED"
 
-      if (isWebApp) {
+      if (window.isWebApp) {
+        if (user_path_target != "/" && !this.$localData.assetDir) {
+          this.$root.guestMode = true
+        }
         if (user_path_target != this.$localData.root.activeTabObject.url) {
           this.$logger.warn("Navigating user to", user_path_target)
           this.$nextTick(() => {
@@ -205,8 +234,7 @@
             this.$localData.root.TABS_NEW(user_path_target)
           })
         } else {
-          // this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
-
+          this.$logger.debug(this.$localData.root.activeTabObject.url, "and", user_path_target, "match")
         }
       }
 
@@ -266,16 +294,17 @@
       })
 
       ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
-        this.$root.loadStage = "MODS"
+        this.$root.loadStage = "LOADED_ARCHIVE_VANILLA"
         try {
+          this.$root.loadStage = "MODS"
           await Mods.editArchiveAsync(archive)
           this.$root.archive = Object.freeze(archive)
-          this.$root.loadStage = "LOADED_ARCHIVE"
           this.$nextTick(() => {
             this.$root.loadState = "DONE"
           })
         } catch (e) {
           this.$logger.error(e)
+          this.$root.loadError = e
           this.$root.archive = undefined
           this.$root.loadState = "ERROR"
         }
@@ -291,6 +320,10 @@
       document.addEventListener('drop', event => event.preventDefault())
 
       window.addEventListener('keydown', event => {
+        if (event.key === "l" && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault()
+          this.openJumpbox()
+        }
         const activeFrame = document.getElementById(this.$localData.tabData.activeTabKey)
         if (activeFrame && !activeFrame.contains(document.activeElement) && document.activeElement.tagName != "INPUT") activeFrame.focus()
       })
@@ -372,9 +405,15 @@
   // TODO: Replace --headerHeight with dynamic sizing
   .addressBar {
     --headerHeight: 82px;
+    &.webapp {
+      --headerHeight: 29px;
+    }
   }
   .noAddressBar {
     --headerHeight: 51px;
+    &.webapp {
+      --headerHeight: 0px;
+    }
   }
 
   html, body {

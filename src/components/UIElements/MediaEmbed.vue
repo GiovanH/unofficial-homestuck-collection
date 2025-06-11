@@ -64,7 +64,7 @@ import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 const GifSeeker = () => import('@/components/UIElements/GifSeeker.vue')
 
 const path = (window.isWebApp ? require('path-browserify') : require('path'))
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 
 var fs
 if (!window.isWebApp) {
@@ -203,6 +203,7 @@ export default {
       },
       gameOver: {
         count: 0,
+        // Time in MS
         steps: [22433, 82300, 94800, 118566, 143930, 146973, 224876]
       },
       cropHeight: {
@@ -265,7 +266,7 @@ export default {
         '11931': -125,
         '17445': 1700,
         'A6A6I1': -100,
-        'darkcage': 350,
+        'darkcage': 350
       },
       pauseAt: {
         "08080": 18
@@ -317,7 +318,7 @@ export default {
         rawStyle: ''
       }
 
-      let customProps = this.indexedFlashProps[this.flashId] || {}
+      const customProps = this.indexedFlashProps[this.flashId] || {}
 
       if (Object.keys(customProps).length)
         this.$logger.info("Custom props for flash", this.flashId, customProps)
@@ -328,6 +329,26 @@ export default {
       const ret =  this.$archive.audioData[this.url.replace("_hq.swf", ".swf")] || []
       this.$logger.info("Getting audio tracks for", this.url, this.url.replace("_hq.swf", ".swf"), ret)
       return ret
+    },
+    ruffleEmbed() {
+      // At some point between 2025.3.14 and 2025.4.13 ruffle stopped supporting our old runtime. Damn. -->
+      if (this.$localData.settings.ruffleFallback) {
+        if (this.$isWebApp) {
+          return '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>'
+        } else {
+          // 0.1.0-nightly.2024.04.13 OK
+          // ...
+          // 0.1.0-nightly.2024.07.19 OK
+          // 0.1.0-nightly.2024.07.20 scale issue
+          // ...
+          // 0.1.0-nightly.2025.04.07 scale issue
+          // 0.1.0-nightly.2025.04.13 syntax issue
+          // return '<script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.7.19"><\/script>'
+          return `<script src="${this.$getResourceURL("assets://js/ruffle/ruffle.js")}"><\/script>`
+        }
+      } else {
+        return '<!-- Using real flash -->'
+      }
     },
     flashSrc() {
       return `
@@ -340,7 +361,11 @@ export default {
         <script>
           // JS Enhancements: ${this.$localData.settings.jsFlashes}
           // HQ Audio: ${this.$localData.settings.hqAudio}
+
+          // Frag IPC
           window.onhashchange = (e) => {
+            console.debug("srcdoc hash change: ", e, window.location.hash)
+
             if (window.location.hash != '#unset') {
               let hash = window.location.hash.substr(1).split('&')
               window.location.hash = '#unset';
@@ -349,25 +374,38 @@ export default {
               })
             }
           }
+
+          // Intercept navigation events
           window.open = function(url, name, features, replace) {
-              console.log("Flash invoked window.open")
-              vm.invokeFromFlash("link?" + url)
+            console.log("Flash invoked window.open")
+            vm.invokeFromFlash("link?" + url)
           }
+
           if (typeof navigation !== 'undefined') {
             navigation.addEventListener("navigate", (e) => {
               console.log("srcdoc navigating: ", e, e.destination,
                 e.destination.url
               )
-              if (!e.destination.sameDocument) {
+              if (!e.destination.sameDocument && !e.destination.url.startsWith('about:srcdoc')) {
                 console.log(e.destination.url)
                 vm.invokeFromFlash("link?" + e.destination.url)
+              } else {
+                // Workaround for ruffle bug https://github.com/ruffle-rs/ruffle/issues/2092
+                console.log("Internal frame navigation", e.destination, e.destination.url)
+                e.preventDefault()
+
+                const target = new URL(e.destination.url)
+                const hash = target.hash.substr(1).split('&')
+                hash.forEach((func)=>{
+                  vm.invokeFromFlash(func)
+                })
               }
             })
           } else {
-            console.warn("Browser does not support 'navigation' listener")
+            console.debug("Browser does not support 'navigation' listener")
           }
         <\/script>
-        ${this.$localData.settings.ruffleFallback ? '<script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>' : '<!-- Using real flash -->'}
+        ${this.ruffleEmbed}
         </head>
         <body>
         <object type="application/x-shockwave-flash" 
@@ -406,7 +444,8 @@ export default {
             this.removeEventListener("timeupdate", pause)
           }
         }
-        event.srcElement.controls = false
+        // Autoplay doesn't work consistently on the web.
+        if (!this.$isWebapp) event.srcElement.controls = false
         event.srcElement.addEventListener("timeupdate", pause)
       }
     },
@@ -512,7 +551,7 @@ document.addEventListener('click', function (e) {
           break
         case 'link':
           if (param != 'about:srcdoc') {
-            this.$pushURL(this.$getResourceURL(param), this.$parent.tab.key)
+            this.$pushURL(this.$getResourceURL(param))
           } else {
             this.$logger.warn("Tried to navigate page to srcdoc!")
           }
@@ -544,9 +583,11 @@ document.addEventListener('click', function (e) {
 
         case 'gameOver':
           if (this.$localData.settings.jsFlashes) {
-            this.$logger.info("Initializing dynamic game over page")
+            this.$logger.info("Initializing game over media timer")
+
             this.$parent.gameOverPreload = false
             this.gameOver.count = 0
+
             this.startTimer(() => {
               const next_step = this.gameOver.steps[this.gameOver.count]
               if (Date.now() >= this.timer.start + next_step) {
@@ -725,9 +766,9 @@ document.addEventListener('click', function (e) {
       // Return the contents of the (text) file at url.
       this.$logger.info("Retrieving file", url)
       if (this.$isWebApp) {
-        const request = new XMLHttpRequest();
-        request.open("GET", url, false); // `false` makes the request synchronous
-        request.send(null);
+        const request = new XMLHttpRequest()
+        request.open("GET", url, false) // `false` makes the request synchronous
+        request.send(null)
         if (request.status === 200) {
           return request.responseText
         } else {

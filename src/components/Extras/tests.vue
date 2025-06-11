@@ -228,7 +228,7 @@ export default {
       }
     },
     allConversations(){
-      let re = /<span style="color: #([A-Fa-f0-9]+)">([A-Z0-9^]+):/g
+      const re = /<span style="color: #([A-Fa-f0-9]+)">([A-Z0-9^]+):/g
       return this.storyPages.filter(
           page => re.exec(page.content)
         ).reduce((acc, page) => {
@@ -326,7 +326,7 @@ export default {
       return this.storyPages.filter(page => 
         page.flag.includes(this.flagLookup.toUpperCase())
       ).map(page => page.pageId)
-    },
+    }
   },
   methods: {
   },
@@ -337,11 +337,9 @@ export default {
 }
 </script>
 
-
 <style scoped lang="scss">
-  ::v-deep a{
-    color: var(--page-links);
-  }
+  ::v:deep a { color: var(--page-links); }
+  ::v:deep a:link:active { color: var(--page-links-active); }
   p {
     // fuck you *unresets your css*
     display: block;
@@ -442,7 +440,5 @@ export default {
     }
 
   }
-  
 
 </style>
-

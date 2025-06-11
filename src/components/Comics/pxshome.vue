@@ -23,7 +23,12 @@
           <div class="thumbnailWrapper">
             <transition name="thumbnails">
               <div class="thumbs" :class="{summerteen: story == 'summerteen-romance'}" v-if="story == selectedStory" ref="thumbs">
-                <a v-for="j in $archive.comics.pxs.comics[story].pages.length" @click="openStory(undefined)" :href="`/pxs/${story}/${j}`">
+                <a
+                  v-for="j in $archive.comics.pxs.comics[story].pages.length"
+                  @click="openStory(undefined)"
+                  :key="`/pxs/${story}/${j}`"
+                  :href="`/pxs/${story}/${j}`"
+                >
                   <Media :url="$archive.comics.pxs.comics[story].pages[j-1]" />
                 </a>
               </div>
@@ -38,8 +43,8 @@
           <Media class="avatar" :url="`assets://archive/comics/pxs/avatar/${c.avatar.replace(/ /g, '%20') || 'undefined.png'}`" />
           <div>
             <p class="bio" v-html="c.bio" />
-            <ul v-if="c.social" class="social">
-              <li v-if="link" v-for="link in c.social">
+            <ul v-if="c.social && c.social.filter(Boolean).length > 0" class="social">
+              <li v-for="link in c.social.filter(Boolean)" :key="link">
                 <a :href="linkToUrl(link)" v-text="link" />
               </li>
             </ul>
@@ -70,7 +75,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 // @ is an alias to /src
@@ -107,7 +111,6 @@ export default {
   }
 }
 </script>
-
 
 <style scoped lang="scss">
 .pageBody {
@@ -218,7 +221,7 @@ export default {
 
             color: #fff;
             margin-top: 2px;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             text-transform: uppercase;
             text-shadow: 3px 3px #0a3e54;
             font-size: 24px;
@@ -231,6 +234,10 @@ export default {
           }
           ul.social {
             list-style: inside;
+            padding: .5em 0;
+            a {
+              color: #72abd2;
+            }
           }
         }
       }
@@ -407,4 +414,3 @@ export default {
   max-height: 0;
 }
 </style>
-

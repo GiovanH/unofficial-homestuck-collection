@@ -84,7 +84,7 @@ const LivePage = {
     return {
       ...VanillaPage.data(),
       tab: {},
-      routeParams: {},
+      routeParams: {}
     }
   },
   props: ['thisPage'],
@@ -101,6 +101,7 @@ const LivePage = {
   }
 }
 delete LivePage.computed.thisPage
+delete LivePage.computed.__file
 
 function listEditor(prop, joiner=",") {
   return {
@@ -225,6 +226,9 @@ export default {
   },
   created () {
     this.$logger.info("Created")
+    // Sometimes this doesn't "stick"? Reapply.
+    delete LivePage.computed.thisPage
+    delete LivePage.computed.__file
     this.$nextTick(() => {
       this.tabFrame.$el.addEventListener('scroll', this.handleScroll)
       setTimeout(this.reloadBboxes(), 2000)
@@ -300,9 +304,8 @@ export default {
       // For some reason, setting an input's background breaks the border in weird ways.
       border-width: thin;
     }
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .hint {
       margin-top: 0;
       font-family: sans-serif;

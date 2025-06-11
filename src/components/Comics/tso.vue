@@ -7,7 +7,7 @@
           <a href="/tso"><Media url="/archive/collection/tso_logo.png" /></a>
         </div>
         <div class="comicContainer">
-          <div v-for="comicKey in $archive.comics.tso.list">
+          <div v-for="comicKey in $archive.comics.tso.list" :key="comicKey">
             <div v-if="typeof(comicKey) === 'string'" class="comicEntry">
               <div class="comicButtonContainer">
                 <div class="comicButton" @click="openComic(comicKey)">
@@ -19,7 +19,11 @@
               <div class="thumbnailWrapper">
                 <transition name="thumbnails">
                   <div class="thumbs" v-if="comicKey == selectedComic" ref="thumbs">
-                    <a v-for="(url, i) in $archive.comics.tso.comics[comicKey].pages" @click="openComic(undefined)" :href="`/tso/${comicKey}/${i+1}`">
+                    <a v-for="(url, i) in $archive.comics.tso.comics[comicKey].pages"
+                      @click="openComic(undefined)"
+                      :href="`/tso/${comicKey}/${i+1}`"
+                      :key="`/tso/${comicKey}/${i+1}`"
+                    >
                       <Media :url="url" />
                     </a>
                   </div>
@@ -31,7 +35,7 @@
                 <p class="groupName" v-text="comicKey.groupName" />
                 <p class="groupDesc" v-text="comicKey.groupDesc" />
               </div>
-              <div v-for="groupComic in comicKey.list"> 
+              <div v-for="groupComic in comicKey.list" :key="groupComic">
                 <div class="comicButtonContainer">
                   <div class="comicButton" @click="openComic(groupComic)">
                     <p class="comicName" v-text="$archive.comics.tso.comics[groupComic].name" />
@@ -42,7 +46,11 @@
                 <div class="thumbnailWrapper">
                   <transition name="thumbnails">
                     <div class="thumbs" v-if="groupComic == selectedComic" ref="thumbs">
-                      <a v-for="(url, i) in $archive.comics.tso.comics[groupComic].pages" @click="openComic(undefined)" :href="`/tso/${groupComic}/${i+1}`">
+                      <a v-for="(url, i) in $archive.comics.tso.comics[groupComic].pages"
+                        @click="openComic(undefined)"
+                        :href="`/tso/${groupComic}/${i+1}`"
+                        :key="`/tso/${groupComic}/${i+1}`"
+                      >
                         <Media :url="url" />
                       </a>
                     </div>
@@ -136,20 +144,24 @@ export default {
 
       // Pages are zero index, but pid is 1-indexed. So, pid can be used as the next page without adding 1. make sense? 
       // god i hope you aren't thinking 'yes' right now
-      let p = parseInt(this.routeParams.pid)
+      const p = parseInt(this.routeParams.pid)
+      const next_index = p + 1
       if (!this.comic.pages[p])  {
         return false
+      } else {
+        return `/tso/${this.routeParams.cid}/${next_index}`
       }
-      else return `/tso/${this.routeParams.cid}/${p + 1}`
     },
     prevPage() {
       if (!this.routeParams.cid) return false
 
-      let p = parseInt(this.routeParams.pid) - 1
-      if (!this.comic.pages[p-1])  {
+      const p = parseInt(this.routeParams.pid) - 1
+      const prev_index = p - 1
+      if (!this.comic.pages[prev_index])  {
         return false
+      } else {
+        return `/tso/${this.routeParams.cid}/${p}`
       }
-      else return `/tso/${this.routeParams.cid}/${p}`
     }
   },
   methods: {
@@ -161,7 +173,7 @@ export default {
       if (dir == 'left' && this.prevPage && this.$parent.$el.scrollLeft == 0 && this.prevPage) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.nextPage && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth && this.nextPage) this.$pushURL(this.nextPage)
     }
-  },
+  }
 }
 </script>
 
@@ -298,7 +310,6 @@ export default {
             overflow: auto;
             cursor: pointer;
             transition: .15s ease-in-out;
-            
 
             &:hover {
               background-color: #1a1a1a;
@@ -511,4 +522,3 @@ export default {
   max-height: 0;
 }
 </style>
-

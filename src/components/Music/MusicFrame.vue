@@ -74,15 +74,15 @@ export default {
   computed: {
     thisAlbum() {
       // let mode // unused?
-      let key = this.routeParams.id || undefined
+      const key = this.routeParams.id || undefined
       return (this.routeParams.mode == 'album' && key in this.$archive.music.albums) ? this.$archive.music.albums[key] : undefined
     },
     thisTrack() {
-      let key = this.routeParams.id || undefined
+      const key = this.routeParams.id || undefined
       return (this.routeParams.mode == 'track' && key in this.$archive.music.tracks) ? this.$archive.music.tracks[key] : undefined
     },
     thisArtist() {
-      let key = this.routeParams.id || undefined
+      const key = this.routeParams.id || undefined
       return (this.routeParams.mode == 'artist' && key in this.$archive.music.artists) ? this.$archive.music.artists[key] : undefined
     }
   },
@@ -104,9 +104,8 @@ export default {
 
     ::v-deep {
       color: var(--font-default);
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
 
     .navBanner {
@@ -189,7 +188,5 @@ export default {
     }
 
   }
-  
 
 </style>
-

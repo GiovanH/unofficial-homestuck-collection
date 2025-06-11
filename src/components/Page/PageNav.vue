@@ -109,8 +109,9 @@ export default {
     font-weight: normal;
     color: var(--page-nav-divider);
 
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
     @media (max-width: 650px) {
       font-size: 1.8em;
@@ -138,9 +139,8 @@ export default {
     .navOptions {
       color: var(--page-nav-divider);
 
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
     .meta {
       font-weight: 300;
@@ -155,4 +155,3 @@ export default {
     }
   }
 </style>
-

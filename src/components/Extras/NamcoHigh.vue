@@ -244,7 +244,7 @@
             </ul>
           </div>
           <div class="bx-pager">
-            <div v-for="i in 19" @click="slidesJump(i, true)" :class="[`pager-link`, `pager-${i}`, `${studentIndex == i ? 'pager-active' : undefined}`]"/>
+            <div v-for="i in 19" :key="i" @click="slidesJump(i, true)" :class="[`pager-link`, `pager-${i}`, `${studentIndex == i ? 'pager-active' : undefined}`]"/>
           </div>
           <div @click="slidesLeft(true)" class="bx-prev"><Media class="btn" url="/archive/namcohigh/recommend_left_btn.png" alt="" width="52" height="51" /></div>
           <div @click="slidesRight(true)" class="bx-next"><Media class="btn" url="/archive/namcohigh/recommend_right_btn.png" alt="" width="52" height="51" /></div>
@@ -509,7 +509,7 @@
             </ul>
           </div>
           <div class="bx-pager">
-            <div v-for="i in 26" @click="slidesJump(i, false)" :class="[`pager-link`, `pager-${i}`, `${artistIndex == i ? 'pager-active' : undefined}`]"/>
+            <div v-for="i in 26" :key="i" @click="slidesJump(i, false)" :class="[`pager-link`, `pager-${i}`, `${artistIndex == i ? 'pager-active' : undefined}`]"/>
           </div>
           <div @click="slidesLeft(false)" class="bx-prev"><Media class="btn" url="/archive/namcohigh/recommend_left_btn.png" alt="" width="52" height="51" /></div>
           <div @click="slidesRight(false)" class="bx-next"><Media class="btn" url="/archive/namcohigh/recommend_right_btn.png" alt="" width="52" height="51" /></div>
@@ -549,7 +549,7 @@ export default {
 
       studentIndex: 1,
 
-      artistIndex: 1,
+      artistIndex: 1
     }
   },
   computed: {
@@ -559,7 +559,7 @@ export default {
     },
     tabIsActive() {
         return this.tab.key == this.$localData.tabData.activeTabKey
-    },
+    }
   },
   methods: {
     // The slideshow functions have two modes of operation: Student, and Artist. The bool tells it which box to affect
@@ -576,19 +576,19 @@ export default {
       else this.artistIndex = this.artistIndex >= 26 ? 1 : this.artistIndex + 1
     },
     handleResize() {
-      let windowWidth = this.$el.offsetWidth
-      let windowHeight = this.$el.offsetHeight
+      const windowWidth = this.$el.offsetWidth
+      const windowHeight = this.$el.offsetHeight
 
-      if (windowWidth < (4/3)*windowHeight) {
+      if (windowWidth < (4 / 3) * windowHeight) {
         this.gameWidth = windowWidth
-        this.gameHeight = (3/4)*windowWidth
+        this.gameHeight = (3 / 4) * windowWidth
       } else {
-        this.gameWidth = (4/3)*windowHeight
+        this.gameWidth = (4 / 3) * windowHeight
         this.gameHeight = windowHeight
       }
     },
     initLocalStorage(e) {
-      let payload = []
+      const payload = []
       Object.keys(localStorage).forEach(key => {
         if (/datenighto/.test(key)) payload.push({key, value: localStorage.getItem(key)})
       })
@@ -1317,4 +1317,3 @@ export default {
   }
 }
 </style>
-

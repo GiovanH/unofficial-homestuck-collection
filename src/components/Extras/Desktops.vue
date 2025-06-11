@@ -69,7 +69,6 @@
 import GenericPage from '@/components/UIElements/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
-
 export default {
   name: 'desktops',
   props: [
@@ -80,7 +79,7 @@ export default {
   },
   title(ctx) {
     return "Desktops"
-  },
+  }
 }
 </script>
 
@@ -91,4 +90,3 @@ export default {
     font-size: 18px;
   }
 </style>
-

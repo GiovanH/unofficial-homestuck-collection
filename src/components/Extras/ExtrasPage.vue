@@ -14,7 +14,7 @@ import Resources from '@/resources.js'
 
 export default {
   name: 'extras',
-  mixins: [ Resources.UrlFilterMixin ],
+  mixins: [Resources.UrlFilterMixin],
   props: [
     'tab', 'routeParams'
   ],
@@ -49,7 +49,7 @@ export default {
     },
     thisPage() {
       return typeof this.pageData == 'string' ? this.pageData : this.pageData[this.routeParams.p].content
-    },
+    }
   },
   updated() {
     this.filterLinksAndImages()
@@ -68,9 +68,8 @@ export default {
     p {
       max-width: 600px;
     }
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .faq {
       font-family: Verdana, Arial, Helvetica, sans-serif;
       font-size: 12px;
@@ -86,4 +85,3 @@ export default {
     }
   }  
 </style>
-

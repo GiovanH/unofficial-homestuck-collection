@@ -2,16 +2,19 @@
   <div class="pageBody" :class="[comic ? 'c'+comic.name : 'c2016-10-24']">
     <NavBanner />
     <div class="pageFrame">
+      <!-- Standard panel -->
       <div class="pageContent comic" v-if="routeParams.cid" >
         <a class="edgeNav left" :href="prevPage || false"  :class="{disabled: !prevPage}"/>
         <a class="edgeNav right" :href="nextPage || false"  :class="{disabled: !nextPage}"/>
         <Media :url="comic.pages[routeParams.pid-1]" :key="comic.pages[routeParams.pid-1]" />
       </div>
       <div class="pageContent archive" v-else>
+        <!-- Phone archive menu -->
         <div class="title">
-          <Media url="/archive/comics/snaps/title.png" />
+          <Media url="assets://archive/comics/snaps/title.png" />
         </div>
-        <div v-for="story in $archive.comics.snaps.list" class="storyContainer">
+        <!-- List of stories (dates) -->
+        <div v-for="story in $archive.comics.snaps.list" :key="story" class="storyContainer">
           <div class="storyButtonContainer">
             <div class="storyButton" @click="openStory(story)">
               <p class="storyName" v-text="$archive.comics.snaps.comics[story].name" />
@@ -21,7 +24,12 @@
           <div class="thumbnailWrapper">
             <transition name="thumbnails">
               <div class="thumbs" v-if="story == selectedStory" ref="thumbs">
-                <a v-for="j in $archive.comics.snaps.comics[story].pages.length" @click="openStory(undefined)" :href="`/snaps/${story}/${j}`">
+                <!-- Each page as a thumbnail and link -->
+                <a v-for="j in $archive.comics.snaps.comics[story].pages.length"
+                  @click="openStory(undefined)"
+                  :key="`/snaps/${story}/${j}`"
+                  :href="`/snaps/${story}/${j}`"
+                >
                   <Media :url="$archive.comics.snaps.comics[story].pages[j-1].replace('.mp4', '.jpg')" />
                 </a>
               </div>
@@ -62,38 +70,39 @@ export default {
     nextPage() {
       if (!this.routeParams.cid) return ''
 
-      let nextPage = parseInt(this.routeParams.pid) + 1
+      const nextPage = parseInt(this.routeParams.pid) + 1
       if (this.comic.pages[nextPage - 1]) return `/snaps/${this.routeParams.cid}/${nextPage}`
       else return this.nextComic
     },
     nextComic() {
       if (!this.routeParams.cid) return ''
 
-      let nextComic = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) + 1
+      const nextComic = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) + 1
       if (this.$archive.comics.snaps.list[nextComic]) return `/snaps/${this.$archive.comics.snaps.list[nextComic]}/1`
       else return ''
     },
     prevPage() {
       if (!this.routeParams.cid) return ''
 
-      let prevPage = parseInt(this.routeParams.pid) - 1
+      const prevPage = parseInt(this.routeParams.pid) - 1
       if (prevPage < 1)  {
         // We're going to serve up the last page of the previous comic
-        let prevIndex = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.snaps.list[prevIndex]
+        const prevIndex = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.snaps.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/snaps/${prevComic}/${this.$archive.comics.snaps.comics[prevComic].pages.length}`
+      } else {
+        return `/snaps/${this.routeParams.cid}/${prevPage}`
       }
-      else return `/snaps/${this.routeParams.cid}/${prevPage}`
     },
     prevComic() {
       if (!this.routeParams.cid) return ''
 
       if (this.routeParams.pid != '1') return `/snaps/${this.routeParams.cid}/1`
       else {
-        let prevIndex = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) - 1
-        let prevComic = this.$archive.comics.snaps.list[prevIndex]
+        const prevIndex = this.$archive.comics.snaps.list.indexOf(this.routeParams.cid) - 1
+        const prevComic = this.$archive.comics.snaps.list[prevIndex]
 
         if (prevIndex < 0) return ''
         else return `/snaps/${prevComic}/1`
@@ -109,7 +118,7 @@ export default {
       if (dir == 'left' && this.$parent.$el.scrollLeft == 0 && this.prevPage) this.$pushURL(this.prevPage)
       else if (dir == 'right' && this.$parent.$el.scrollLeft + this.$parent.$el.clientWidth == this.$parent.$el.scrollWidth && this.nextPage) this.$pushURL(this.nextPage)
     }
-  },
+  }
 }
 </script>
 
@@ -182,7 +191,6 @@ export default {
       overflow: auto;
       margin-left: 23px;
       margin-top: 111px;
-      
 
       &.comic {
         position: relative;
@@ -320,4 +328,3 @@ export default {
   max-height: 0;
 }
 </style>
-

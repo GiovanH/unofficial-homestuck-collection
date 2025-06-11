@@ -28,7 +28,7 @@ import Media from '@/components/UIElements/MediaEmbed.vue'
 import GenericPage from '@/components/UIElements/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
-const { DateTime } = require('luxon');
+const { DateTime } = require('luxon')
 
 const sort_methods = {
     asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
@@ -64,7 +64,7 @@ export default {
           {href: "/log/2", img: "/images/archive_bq.gif", label: "Bard Quest"},
           {href: "/log/4", img: "/images/archive_ps.gif", label: "Problem Sleuth"},
           // {href: "/log/5", img: "/images/archive_beta.gif", label: "Homestuck Beta"},
-          {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"},
+          {href: "/log/6", img: "/images/archive_hs.gif", label: "Homestuck"}
           // {href: "/log/ryanquest", img: "/images/archive_rq.png", label: "Ryanquest"}
       ],
       storyLogRaw: this.memoized(story_id => {
@@ -73,7 +73,7 @@ export default {
         return this.$getAllPagesInStory(story_id).map(page_num =>
           this.getLogEntry(story_id, page_num)
         )
-      }, "storyLogRaw", 10),
+      }, "storyLogRaw", 10)
     }
   },
   computed: {
@@ -110,7 +110,7 @@ export default {
       return "View " + (this.sortNames[this.sortOrderNext] || "log")
     },
     sortOrderNext(){
-      let next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
+      const next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
       return next
     },
     sortOrder(){
@@ -119,14 +119,14 @@ export default {
         // Sort order w/o selected log???
         return undefined
 
-      let sort_order = /^\d_asc$/.test(this.routeParams.mode) ? 'asc' : 'desc'
+      const sort_order = /^\d_asc$/.test(this.routeParams.mode) ? 'asc' : 'desc'
       return sort_order
     },
     sorter(){
       // The sorter function that .sort() keys
-      let default_="asc"
+      const default_ = "asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
-    },
+    }
   },
   methods: {
     getLogEntry(story_id, page_num) {
@@ -134,10 +134,10 @@ export default {
       // needs the story_id because ryanquest
 
       // TODO: Memoize this?
-      let story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
-      let page = story[page_num];
-      let page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
-      let time_zone = "America/New_York"
+      const story = (story_id == "ryanquest" ? this.$archive.mspa.ryanquest : this.$archive.mspa.story)
+      const page = story[page_num]
+      const page_type = (story_id == "ryanquest" ? "ryanquest" : "mspa")
+      const time_zone = "America/New_York"
       return {
         title: page.title,
         page_num: page.pageId,
@@ -184,4 +184,3 @@ export default {
 }
 
 </style>
-

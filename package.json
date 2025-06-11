@@ -1,6 +1,7 @@
 {
   "name": "unofficial-homestuck-collection",
   "description": "An offline collection of Homestuck and its related works.",
+  "author": "GiovanH",
   "contributors": [
     {
       "name": "Bambosh",
@@ -12,15 +13,15 @@
     }
   ],
   "engines": {
-    "node": ">= 18.20"
+    "node": "18.20"
   },
-  "version": "2.5.2",
-  "license": "GPL-3.0",
-  "repository": "github:Bambosh/unofficial-homestuck-collection",
+  "version": "2.6.1",
+  "license": "GPL-3.0*",
+  "repository": "github:GiovanH/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve webapp/browser.js",
+    "build": "vue-cli-service build webapp/browser.js",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
@@ -38,10 +39,11 @@
     "@fortawesome/vue-fontawesome": "^2.0.10",
     "array.prototype.toreversed": "^1.1.1",
     "caniuse-lite": "^1.0.30001621",
-    "electron-log": "^4",
+    "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "electron-window-state": "^5.0.3",
     "encoding": "^0.1.12",
+    "epubjs": "^0.3.93",
     "flexsearch": "^0.6.32",
     "gif-frames": "^1.0.1",
     "js-yaml": "^3.14.0",

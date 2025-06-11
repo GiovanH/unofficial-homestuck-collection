@@ -11,19 +11,20 @@
           :handleChange="onNewReaderChange"
         />
 
+        <!-- <fa-icon v-if="!$isNewReader" :icon="$isNewReader ? 'lock' : 'unlock'" class="lockStatus"/> -->
         <SpoilerBox kind="Granular Retcon Settings" v-if="!$isNewReader">
           <div class="settings retcons" style="padding: 0;">
             <p class="settingDesc">Normally, retcons unlock as you read through the comic naturally. You can use these settings to manually enable or disable them individually.</p>
             <dl>
               <template v-for="retcon in retconList">
-                <dt :key="retcon.model"><label>
+                <dt :key="retcon.model + '-dt'"><label>
                   <input type="checkbox" 
                     :name="retcon.model" 
                     v-model="$localData.settings[retcon.model]" 
                     :disabled="$localData.settings.fastForward"
                     @click="toggleSetting(retcon.model)"
                   >{{retcon.label}}</label></dt>
-                <dd class="settingDesc">
+                <dd :key="retcon.model + '-dd'" class="settingDesc">
                   Originally enabled on page <StoryPageLink :mspaId='retcon.origPage'></StoryPageLink>.
                 </dd>
               </template>
@@ -32,30 +33,50 @@
           </div>
         </SpoilerBox>
 
+        <h3>Settings</h3>
         <dl>
-          <dt><label><input type="checkbox" name="notifications" v-model="$localData.settings['notifications']" @click="toggleSetting('notifications')">Show unlock notifications</label></dt>
-          <dd class="settingDesc">Enables a notification that lets you know when you unlock new content elsewhere in the collection.</dd>
+          <dt>
+            <label>
+              <input type="checkbox" name="notifications"
+                v-model="$localData.settings['notifications']"
+                @click="toggleSetting('notifications')"
+              />Unlock notifications
+            </label>
+          </dt>
+          <dd class="settingDesc">
+            Enables a notification that lets you know when you unlock new content elsewhere in the collection.
+          </dd>
           <div class="subOption" v-if="$localData.settings['notifications']">
-            <dt><label><input type="checkbox" name="subNotifications" v-model="$localData.settings['subNotifications']" @click="toggleSetting('subNotifications')">Show minor notifications</label></dt>
+            <dt>
+              <label>
+                <input type="checkbox" name="subNotifications"
+                  v-model="$localData.settings['subNotifications']"
+                  @click="toggleSetting('subNotifications')"
+                />Show minor notifications
+              </label>
+            </dt>
           <dd class="settingDesc">Also show notifications for minor updates like news announcements.</dd>
           </div>
         </dl>
       </div>
     </div>
+
     <div class="card">
       <div class="settings application">
-        <h2>Application Settings</h2>
+        <h2>Browser Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListBoolean">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
-                <input type="checkbox"
-                  :name="boolSetting.model"
-                  v-model="$localData.settings[boolSetting.model]"
-                  @click="toggleSetting(boolSetting.model)"
-                >{{boolSetting.label}}</label></dt>
-                <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <dt :key="boolSetting.model + '-dt'">
+                <label>
+                  <input type="checkbox"
+                    :name="boolSetting.model"
+                    v-model="$localData.settings[boolSetting.model]"
+                    @click="toggleSetting(boolSetting.model)"
+                  />{{boolSetting.label}}
+                </label>
+              </dt>
+              <label :key="boolSetting.model + '-label'" :for="boolSetting.model">
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
@@ -63,71 +84,108 @@
         </dl>
       </div>
     </div>
-    <div class="card">
-      <div class="settings enhancements">
-        <h2>Enhancements</h2>
-        <dl>
-          <dt>Theme Override</dt>
-          <dd v-if="!$isNewReader">
-            <select class="themeSelector" 
-              v-model="$localData.settings.themeOverride" 
-              @change="onChangeThemeOverride">
-              <option v-for="theme in themes" :value="theme.value" :key="theme.value">
-                {{ theme.text }}
-              </option>
-            </select>
-            <template v-if="!$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
-              <dt><label><input type="checkbox" 
-                name="forceThemeOverride" 
-                v-model="$localData.settings['forceThemeOverride']" 
-                @click="toggleSetting('forceThemeOverride')"> 
-              Override page-specific theme changes</label></dt>
-            </template>
-          </dd>
-          <dd v-else class="settingDesc">Finish Homestuck to unlock!</dd>
 
-          <template v-if="!$isNewReader">
+    <div class="card">
+      <div class="settings themes">
+        <h2>Application Theme</h2>
+        <dl>
+          <div v-if="!$isNewReader">
+            <dt>Page Theme Override</dt>
+            <!-- <fa-icon :icon="$isNewReader ? 'lock' : 'unlock'" class="lockStatus"/> -->
+            <!-- Dropdowns for archive readers -->
+            <dd v-if="!$isNewReader">
+              <select class="themeSelector"
+                v-model="$localData.settings.themeOverride"
+                @change="onChangeThemeOverride">
+                <option v-for="theme in themes" :value="theme.value" :key="theme.value">
+                  {{ theme.text }}
+                </option>
+              </select>
+              <template v-if="!$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
+                <dt><label><input type="checkbox"
+                  name="forceThemeOverride"
+                  v-model="$localData.settings['forceThemeOverride']"
+                  @click="toggleSetting('forceThemeOverride')">
+                Override page-specific theme changes</label></dt>
+              </template>
+            </dd>
             <dt>UI Theme Override</dt>
             <dd >
-              <select class="themeSelector" 
-                v-model="$localData.settings.themeOverrideUI" 
+              <select class="themeSelector"
+                v-model="$localData.settings.themeOverrideUI"
                 @change="$localData.root.saveLocalStorage()">
                 <option v-for="theme in themes" :value="theme.value" :key="theme.value+'!ui'">
                   {{ theme.text }}
                 </option>
               </select>
               <template v-if="$localData.settings.forceThemeOverrideUI || $localData.settings.themeOverrideUI != 'default'">
-                <dt><label><input type="checkbox" 
-                  name="forceThemeOverrideUI" 
-                  v-model="$localData.settings.forceThemeOverrideUI" 
-                  @click="$localData.root.saveLocalStorage()"> 
+                <dt><label><input type="checkbox"
+                  name="forceThemeOverrideUI"
+                  v-model="$localData.settings.forceThemeOverrideUI"
+                  @click="$localData.root.saveLocalStorage()">
                 Override page-specific theme changes</label></dt>
               </template>
             </dd>
-          </template>
-          <dt > 
-            <!-- v-else -->
+          </div>
+
+          <!-- Checkbox options -->
+          <dt>
             <label>
-              <input type="checkbox" name="forceThemeOverrideUIMSPA"
-              :checked.prop="forceThemeOverrideUINewReaderChecked === true"
-              :indeterminate.prop="forceThemeOverrideUINewReaderChecked === undefined"
-              @click="forceThemeOverrideUINewReader()"> Never style UI
-            </label>
-            <label>
-              <input type="checkbox" name="toggleDarkMode"
-              :checked.prop="darkModeChecked === true"
-              :indeterminate.prop="darkModeChecked === undefined"
-              @click="toggleDarkMode()"> Dark Mode
-            </label>
-            <label v-if="$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
               <input type="checkbox"
-                name="forceThemeOverride"
-                v-model="$localData.settings['forceThemeOverride']"
-                @click="toggleSetting('forceThemeOverride')">
-              Override page-specific themes
+                name="forceThemeOverrideUIMSPA"
+                :checked.prop="forceThemeOverrideUINewReaderChecked === true"
+                :indeterminate.prop="forceThemeOverrideUINewReaderChecked === undefined"
+                @click="forceThemeOverrideUINewReader()"
+              />Never style UI
             </label>
           </dt>
+          <label for="forceThemeOverrideUIMSPA">
+            <dd class="settingDesc">
+              Always keep the standard grey window decorations (title bar, tabs, etc.)
+            </dd>
+          </label>
 
+          <dt>
+            <label>
+              <input type="checkbox"
+                name="toggleDarkMode"
+                :checked.prop="darkModeChecked === true"
+                :indeterminate.prop="darkModeChecked === undefined"
+                @click="toggleDarkMode()"
+              />Dark Mode
+            </label>
+          </dt>
+          <label for="toggleDarkMode">
+            <dd class="settingDesc">
+              Use the "Dark" page theme, if you don't like your grays light.
+            </dd>
+          </label>
+
+          <!-- forceThemeOverride for new readers who don't have the dropdowns -->
+          <div v-if="$isNewReader && ($localData.settings['forceThemeOverride'] || $localData.settings.themeOverride != 'default')">
+            <dt>
+              <label>
+                <input type="checkbox"
+                  name="forceThemeOverride"
+                  v-model="$localData.settings['forceThemeOverride']"
+                  @click="toggleSetting('forceThemeOverride')"
+                />Override page-specific themes
+              </label>
+            </dt>
+            <label for="forceThemeOverride">
+              <dd class="settingDesc">
+                Always use the selected theme, even if a page has custom formatting.
+              </dd>
+            </label>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="settings enhancements">
+        <h2>Enhancements</h2>
+        <dl>
           <dt>Text Override</dt>
           <dd>
             <span class="settingDesc">Adjusts how the text looks on Homestuck pages, as well as the other MS Paint Adventures. A few pages will assume you're using the default look (14px Courier New Bold), so they might end up looking a little strange.
@@ -137,31 +195,33 @@
             <div class="knobs">
               <label>Font family:<br>
                 <select class="fontSelector" v-model="$localData.settings.textOverride.fontFamily" @change="$localData.root.saveLocalStorage()">
-                  <option v-for="font in fonts" :value="font.value">
+                  <option v-for="font in fonts" :value="font.value" :key="font.value">
                     {{ font.text }}
                   </option>
                 </select>
               </label>
               <div class="textOptions">
                 <label v-if="$localData.settings.textOverride.fontFamily"><input type="checkbox" name="bold" v-model="$localData.settings.textOverride['bold']" @click="toggleSetting('bold', 'textOverride')"> Bold Font</label>
-                <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Spacing between chat paragraphs</label>
-                <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text</label>
+                <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Add spacing between chat lines</label>
+                <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text colors</label>
               </div>
               <!-- <br><br> -->
               <label class="fontslider" v-if="$localData.settings.textOverride.fontFamily != 'courierAliased'">
               <!-- <label> -->
-                Font size:
+                Font size: <span v-if="$refs.textPreview" v-text="$refs.textPreview.fontStyle.fontSize" />
                 <input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize">
+
               </label>
               <!-- <br><br> -->
               <label class="fontslider">
-                Line height:
+                Line height: <span v-if="$refs.textPreview" v-text="$refs.textPreview.fontStyle.lineHeight" />
                 <input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight">
+
               </label>
             </div>
             <div class="textpreviews">
               <!-- PageText usually require a tab change to recalculate theme. -->
-              <PageText class="examplePrattle" 
+              <PageText ref="textPreview" class="examplePrattle"
               content="A young man stands in his bedroom. It just so happens that today, the 13th of April, 2009, is this young man's birthday. Though it was thirteen years ago he was given life, it is only <a href='/homestuck/1'>today</a> he will be given a name!<br><br>What will the name of this young man be?"/>
               <PageText class="examplePrattle" 
               content="|PESTERLOG|<br />-- turntechGodhead <span style=&quot;color: #e00707&quot;>[TG]</span> began pestering ectoBiologist <span style=&quot;color: #0715cd&quot;>[EB]</span> at 16:13 --<br /><br /><span style=&quot;color: #e00707&quot;>TG: hey so what sort of insane loot did you rake in today</span><br /><span style=&quot;color: #0715cd&quot;>EB: i got a little monsters poster, it's so awesome. i'm going to watch it again today, the applejuice scene was so funny.</span>"/>
@@ -174,22 +234,47 @@
           
           <template v-for="boolSetting in enhancementListBoolean">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
+              <dt :key="boolSetting.model + '-dt'"><label>
                 <input type="checkbox"
                   :name="boolSetting.model"
                   v-model="$localData.settings[boolSetting.model]"
                   @click="toggleSetting(boolSetting.model)"
               >{{boolSetting.label}}</label></dt> 
               <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <label :key="boolSetting.model + '-dd'" :for="boolSetting.model" >
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
           </template>
-
         </dl>
       </div>
     </div>
+
+    <div class="card">
+      <div class="settings experimental">
+        <h2>Experimental Features</h2>
+        <p class="settingDesc">
+          These are features you may find useful, but aren't guaranteed to work perfectly in all cases, and may come with performance tradeoffs.
+        </p>
+        <dl>
+          <template v-for="boolSetting in settingListExperimental">
+            <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
+              <dt :key="boolSetting.model + '-dt'"><label>
+                <input type="checkbox"
+                  :name="boolSetting.model"
+                  v-model="$localData.settings[boolSetting.model]"
+                  @click="toggleSetting(boolSetting.model)"
+                >{{boolSetting.label}}</label></dt>
+                <!-- the spacing here is made of glass -->
+              <label :key="boolSetting.model + '-label'" :for="boolSetting.model">
+                <dd class="settingDesc" v-html="boolSetting.desc" />
+              </label>
+            </template>
+          </template>
+        </dl>
+      </div>
+    </div>
+
     <div class="card">
       <div class="settings controversial" > <!-- TODO v-if="$isNewReader"> -->
         <h2>Controversial Content</h2>
@@ -249,7 +334,7 @@
           <SpoilerBox kind="Controversial Content" :start-open="controversialAny">
 
             <template v-for="cc in controversialList">
-              <dt><label>
+              <dt :key="cc.model + '-dt'"><label>
                 <input type="checkbox" 
                   :name="cc.model" 
                   v-model="$localData.settings[cc.model]" 
@@ -259,13 +344,14 @@
                 <span class="cw minor" v-for="cw in cc.cws.minor" :key="cw" v-text="cw"></span>
                 <span class="cw severe" v-for="cw in cc.cws.severe" :key="cw" v-text="cw"></span>
               </dt>
-              <dd class="settingDesc" v-html="cc.desc" />
+              <dd :key="cc.model + '-dd'" class="settingDesc" v-html="cc.desc" />
             </template>
 
           </SpoilerBox>
         </div>
       </div>
     </div>
+
     <div class="card">
       <div class="settings mod">
         <h2>Mod Settings</h2>
@@ -284,7 +370,6 @@
         <section class="modPrattle" v-else>
           <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
         </section>
-
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
@@ -337,20 +422,21 @@
         <button v-if="$localData.settings.devMode" @click="reloadModList(); archiveReload();" class="reload">Soft reload archive (refresh mods and re-run edits)</button>
       </div>
     </div>
+
     <div class="card">
       <div class="settings system">
         <h2>System Settings</h2>
         <dl>
           <template v-for="boolSetting in settingListSystem">
             <template v-if="!boolSetting.platform_whitelist || boolSetting.platform_whitelist.includes($root.platform)">
-              <dt :key="boolSetting.model"><label>
+              <dt :key="boolSetting.model + '-dt'"><label>
                 <input type="checkbox"
                   :name="boolSetting.model"
                   v-model="$localData.settings[boolSetting.model]"
                   @click="toggleSetting(boolSetting.model)"
                 >{{boolSetting.label}}</label></dt>
                 <!-- the spacing here is made of glass -->
-              <label :for="boolSetting.model" >
+              <label :key="boolSetting.model + '-dd'" :for="boolSetting.model" >
                 <dd class="settingDesc" v-html="boolSetting.desc" />
               </label>
             </template>
@@ -396,8 +482,8 @@ const SubSettingsModal = () => import('@/components/UIElements/SubSettingsModal.
 
 const draggable = () => import("vuedraggable")
 
-const log = (window.isWebApp ? { scope() { return console; } } : require('electron-log'))
-const ipcRenderer = require('electron').ipcRenderer
+const log = (window.isWebApp ? { scope() { return console } } : require('electron-log'))
+const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'settings',
@@ -406,8 +492,8 @@ export default {
   ],
   /* eslint-disable object-property-newline */
   components: {
-    NavBanner, SubSettingsModal, 
-    PageText, SpoilerBox, StoryPageLink, 
+    NavBanner, SubSettingsModal,
+    PageText, SpoilerBox, StoryPageLink,
     draggable, NewReaderControls
   },
   title: () => "Settings",
@@ -417,7 +503,7 @@ export default {
       settingListBoolean: [
         {
           model: "showAddressBar",
-          label: "Show address bar",
+          label: "Address bar",
           desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access it by clicking the jump bar button in the tab bar, or with ctrl+L (⌘+L on MacOS)."
         }, {
         //   model: "mspaMode",
@@ -432,21 +518,12 @@ export default {
           label: "Always display scroll bar",
           desc: "Opening logs on Homestuck pages can cause the scrollbar to suddenly appear, resulting in the whole page shifting to the left. This setting keeps the scrollbar visible at all times to prevent this."
         }, {
-          model: 'hideFullscreenHeader', 
-          label: "Hide header in fullscreen",
-          desc: "Hide the application header (title bar, address bar, and tabs) in fullscreen mode (F11)."
-        }, {
-          model: "smoothScrolling",
-          label: "Enable smooth scrolling",
-          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>",
-          platform_whitelist: ['electron']
-        }, {
           model: "pixelScaling",
           label: "Pixelated image scaling",
           desc: "By default, images are scaled in a way that may make them appear blurry at higher resolutions. This setting enables nearest neighbour scaling on Homestuck and MSPA pages, allowing those images to keep their sharp edges. This effect may not look too hot on certain high DPI monitors."
         }, {
           model: "urlTooltip",
-          label: "Show URL Tooltip",
+          label: "URL Tooltip",
           desc: "Adds a tooltip in the bottom-left corner of the window that shows you the destination of links when you hover over them, like browsers do. Test it: <a href='/help/newreader'>New reader</a>",
           platform_whitelist: ['electron']
         }
@@ -454,7 +531,7 @@ export default {
       enhancementListBoolean: [
         {
           model: "arrowNav",
-          label: "Enable arrow key navigation",
+          label: "Arrow key navigation",
           desc: "Allows you to navigate forward and backward between pages using the left and right arrow keys, and open textboxes with space."
         }, {
           model: "openLogs",
@@ -462,39 +539,40 @@ export default {
           desc: "Collapsed text logs begin open on each page, instead of requiring you to click them."
         }, {
           model: "hqAudio",
-          label: "Enable high quality Flash audio",
+          label: "High quality Flash audio",
           desc: "This setting replaces the original compressed audio in Homestuck's Flash animations with the high quality Bandcamp releases. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems."
         }, {
           model: "credits",
-          label: "Show inline audio credits",
+          label: "Inline audio credits",
           desc: "Inserts audio credits below pages that use music. It shows you the name of the song, the artists involved, and has a link to the track's page in the music database."
         }, {
           model: "bandcampEmbed",
-          label: "Enable online bandcamp player",
+          label: "Online bandcamp player",
           desc: "Although the vast majority of this collection works offline, the music database allows you to use Bandcamp's online player to legally play tracks from the source. You can disable this if you don't want the collection connecting to the internet.",
           platform_whitelist: ['electron']
+        }, {
+          model: "jsFlashes",
+          label: "Enhanced Flash effects",
+          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues. If you experience problems with certain flash pages, you can try disabling this option as a troubleshooting step, but it's highly recommended you leave it enabled otherwise."
         }
       ],
       settingListSystem: [
         {
           model: "devMode",
-          label: "Enable Developer Mode",
+          label: "Developer Mode",
           desc: "It's not all that exciting. It just adds an \"Inspect Element\" shortcut to the bottom of the context menu, and shows a little more log data for mod/style developers, or troubleshooting issues. This may slightly degrade performance."
         }, {
-          model: "reducedMotion",
-          label: "Reduce Motion",
-          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
+          model: 'hideFullscreenHeader',
+          label: "Hide header in fullscreen",
+          desc: "Hide the application header (title bar, address bar, and tabs) in fullscreen mode (F11)."
         }, {
-          model: "jsFlashes",
-          label: "Enable enhanced Flash effects",
-          desc: "Some Flash animations have had certain effects enhanced using JavaScript. This has a small chance of introducing performance issues, so try disabling it if you end up experiencing problems. <strong>Highly recommended.</strong>"
-        }, {
-          model: "ruffleFallback",
-          label: "Enable Ruffle flash emulation fallback",
-          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
+          model: "smoothScrolling",
+          label: "Smooth scrolling",
+          desc: "Prevents the browser from smoothing out the movement when scrolling down a page. <strong>Requires application restart to take effect. Might not do anything on some platforms!</strong>",
+          platform_whitelist: ['electron']
         }, {
           model: "enableHardwareAcceleration",
-          label: "Enable hardware acceleration",
+          label: "Hardware acceleration",
           desc: "By default, the app runs with hardware acceleration disabled, as that usually results in better performance. If you're noticing performance issues (especially on non-windows devices), enabling this may help. <strong>Will only take effect after restarting the application.</strong>",
           platform_whitelist: ['electron']
         }, {
@@ -504,14 +582,25 @@ export default {
           platform_whitelist: ['electron']
         }, {
           model: "allowSysUpdateNotifs",
-          label: "Enable update notifications",
+          label: "Update notifications",
           desc: "Unless this setting is disabled, the collection will check to see if there's a new version of the app available when it starts up and alert you if there is.",
-          platform_whitelist: ['electron'],
+          platform_whitelist: ['electron']
         }, {
           model: "useTabbedBrowsing",
-          label: "Use Tabbed Browsing",
+          label: "Tabbed Browsing",
           desc: "By default, the web app only shows one page at a time, like a standard website. This setting re-enables the in-app tab bar, and the app will store your tabs in settings.",
           platform_whitelist: ['webapp']
+        }
+      ],
+      settingListExperimental: [
+        {
+          model: "reducedMotion",
+          label: "Reduce Motion",
+          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
+        }, {
+          model: "ruffleFallback",
+          label: "Ruffle flash emulation fallback",
+          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
         }
       ],
       retconList: [
@@ -593,6 +682,7 @@ export default {
         {text: "Team Special Olympics", value: "tso"},
         {text: "Paradox Space", value: "pxs"},
         {text: "MSPFA", value: "mspfa"},
+        {text: "MS Office 2003", value: "msword"}
       ],
       fonts: [
         {text: "Default", value: ""},
@@ -628,10 +718,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$root.$modChoices[key]).filter(val => !!val)
+        this.modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$root.$modChoices).filter((choice) =>
+      return Object.values(this.modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -647,6 +737,9 @@ export default {
       if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
+    },
+    modChoices() {
+      return this.$root.modChoices
     }
   },
   methods: {
@@ -766,8 +859,9 @@ export default {
       }
 
       if (setting == 'useSystemWindowDecorations') {
-        // this.$localData.root.saveLocalStorage()
-        this.$nextTick(() => {ipcRenderer.invoke('restart')})
+        setTimeout(() => {
+          ipcRenderer.invoke('restart')
+        }, 1000)
       }
     },
     locateAssets(){
@@ -789,12 +883,18 @@ export default {
     },
     onUpdateSortable: function(event){
       const el_active = event.target
+
+      if (!el_active) {
+        this.$logger.error("Got onUpdateSortable with no event target?")
+        throw Error("Cannot update sortable with no specified target")
+      }
+
       const setting_key = el_active.attributes['data-setting'].value
       const reordered_item = event.item.attributes['data-value'].value
 
       // Get lists of values
       const old_list = this.$localData.settings[setting_key]
-      const list_active = Array(...el_active.children).map((child) =>
+      const list_active = [...el_active.children].map((child) =>
         child.attributes['data-value'].value
       )
       this.$localData.settings[setting_key] = list_active
@@ -805,11 +905,11 @@ export default {
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
       try {
-        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
+        if (diff.some(key => this.modChoices[key].needsHardReload)) {
           this.$logger.info("List change requires hard reload", diff)
           this.needReload = true
         }
-        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
+        if (diff.some(key => this.modChoices[key].needsArchiveReload)) {
           this.$logger.info("List change requires archive reload", diff)
           this.queueArchiveReload()
         }
@@ -826,18 +926,11 @@ export default {
     },
     archiveReload(){
       this.debounce = false 
-      this.memoizedClearAll()
 
-      this.$root.loadState = "LOADING"
-      this.$nextTick(function () {
-        // Don't show loading screen, "soft" reload
-        // this.$root.loadState = "LOADING"
-        this.$localData.root.applySaveIfPending()
-        ipcRenderer.send('RELOAD_ARCHIVE_DATA')
-      })
+      this.$root.app.archiveReload()
     },
-    openSubModel: function(mod, info_only=false) {
-      this.$refs.modal.openMod(mod, info_only)
+    openSubModel: function(mod, info_only) {
+      this.$refs.modal.openMod(mod, (info_only || false))
     },
     forceReload: function() {
       this.$localData.VM.saveLocalStorage()
@@ -846,12 +939,7 @@ export default {
       ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      Mods.loadModChoicesAsync().then(_ => {
-        this.$root.$asyncComputed.$modChoices.update()
-        // this._computedWatchers.modsEnabled.run()
-        // this._computedWatchers.modsDisabled.run()
-        this.$forceUpdate()
-      })
+      this.$root.$asyncComputed.modChoices.update()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
@@ -877,7 +965,6 @@ export default {
     },
     '$localData.tabData.activeTabKey'(to, from) {
       if (to == this.tab.key || from == this.tab.key) {
-
         if (this.needReload) {
           this.forceReload()
           // forceReload includes archiveReload
@@ -906,8 +993,9 @@ export default {
     background: var(--system-background);
     background-color: var(--system-skycolor);
     
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
   }
 
@@ -936,6 +1024,16 @@ export default {
 
     font-family: Verdana,Arial,Helvetica,sans-serif;
     
+  }
+  .lockStatus {
+    position: absolute;
+    margin-left: -20px;
+    &.fa-lock {
+      color: orangered;
+    }
+    &.fa-unlock {
+      color: var(--page-pageBorder, var(--page-pageFrame));
+    }
   }
   .settings {
     width: 100%;
@@ -1109,7 +1207,6 @@ export default {
     @media (max-width: 650px) {
       margin: 1em -50px;
     }
-
 
     ul, ol {  
       text-align: left;        

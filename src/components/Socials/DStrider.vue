@@ -127,12 +127,11 @@ export default {
       this.reverse = !this.reverse
     },
     jumpToClass(id){
-      let className = id || ""
-      let el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
+      const className = id || ""
+      const el = document.getElementById(this.tab.key).getElementsByClassName(className.toLowerCase())[0]
       if (el) {
         el.scrollIntoView(true)
-      }
-      else {
+      } else {
         document.getElementById(this.$localData.tabData.activeTabKey).scrollTop = 0
       }
     }
@@ -358,4 +357,3 @@ margin:.75em 0;
 }
 
 </style>
-

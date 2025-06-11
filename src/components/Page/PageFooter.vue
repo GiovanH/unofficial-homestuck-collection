@@ -20,7 +20,7 @@ export default {
     ],
     data() {
         return {
-            show_ad: false,
+            show_ad: false
         }
     },
     computed: {
@@ -87,7 +87,5 @@ export default {
             transform: scaleX(-1);
         }
     }
-
-
 
 </style>

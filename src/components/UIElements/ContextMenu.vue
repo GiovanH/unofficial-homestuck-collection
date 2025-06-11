@@ -73,7 +73,12 @@
 </template>
 
 <script>
-const {shell, clipboard, ipcRenderer} = require('electron')
+
+var shell, clipboard, ipcRenderer;
+if (!window.isWebApp) {
+  // This component should not be used in web app mode
+  var {shell, clipboard, ipcRenderer} = require('electron')
+}
 
 export default {
   name: 'contextMenu',
@@ -124,7 +129,7 @@ export default {
       if (query.startsWith('/')) return `app://.${query}`
       if (/^([a-z]+)\/([a-z0-9]+)$/.test(query)) return `app://./${query}`
       return false // `app://./${query}`
-    },
+    }
   },
   methods: {
     bind(cb, $event){
@@ -224,7 +229,7 @@ export default {
         if (target.tagName == 'IMG') this.tags.push("Image")
         if (target.closest('a') && target.closest('a').href) {
           this.targetAnchor = target.closest('a')
-          let urlObject = new URL( this.targetAnchor.href)
+          const urlObject = new URL(this.targetAnchor.href)
           if (!/(app:\/\/\.|:\/\/localhost:8080)/.test(urlObject.origin) || /\.(html|pdf)$/i.test(urlObject.pathname)) this.tags.push('External')
           else if (/\.(jpg|png|gif|swf|txt|mp3|wav|mp4|webm)$/i.test(urlObject.pathname)) this.tags.push('MediaModal')
           this.tags.push('Link')
@@ -240,14 +245,14 @@ export default {
           const boxHeight = box.clientHeight
 
           box.style.left = 
-              (boxX + boxWidth > page.scrollLeft + page.clientWidth ? 
-              page.scrollLeft + page.clientWidth - boxWidth: 
-              boxX) + 'px'
+              (boxX + boxWidth > page.scrollLeft + page.clientWidth 
+              ? page.scrollLeft + page.clientWidth - boxWidth 
+              : boxX) + 'px'
 
           box.style.top = 
-              (boxY + boxHeight > page.scrollTop + page.clientHeight ? 
-              boxY - boxHeight: 
-              boxY) + 'px'
+              (boxY + boxHeight > page.scrollTop + page.clientHeight 
+              ? boxY - boxHeight 
+              : boxY) + 'px'
           box.focus()
         })
       }

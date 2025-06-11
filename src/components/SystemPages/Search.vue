@@ -127,8 +127,7 @@ export default {
         if (setting == 'SORT' || setting == 'ORDER') {
           if (value == 'ASC' || value == 'ASCENDING') sort = 'asc'
           if (value == 'DESC' || value == 'DESCENDING') sort = 'desc'
-        }
-        else if (setting == 'IN') {
+        } else if (setting == 'IN') {
           // TODO: Now that chapters are strings, rewrite this
           // if (value in this.chapters)
           if (chapter) {
@@ -240,6 +239,4 @@ export default {
   }
 }
 
-
 </style>
-

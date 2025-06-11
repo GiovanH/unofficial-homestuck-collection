@@ -21,7 +21,7 @@
 
 <script>
 
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('IpcRenderer')
 const Color = require('ts-color-class')
 
 export default {
@@ -94,7 +94,7 @@ export default {
       return is_dark
     },
     fontStyle() {
-      const fontSizes = ['1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
+      const fontSizes = ['12px', '1em', '1.15em', '1.3em', '1.45em', '1.6em', '1.75em', '1.9em']
       const lineHeights = [1, 1.15, 1.35, 1.5, 1.65, 1.85, 2, 2.15]
       return {
         fontSize: fontSizes[this.$localData.settings.textOverride.fontSize],
@@ -250,12 +250,10 @@ export default {
 
 <style scoped lang="scss">
   ::v-deep {
-    a {
-      color: var(--page-links);
-      &.visited {
-        color: var(--page-links-visited);
-      }
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
+    a.visited:link { color: var(--page-links-visited); }
+
     &.darkBackground .logContent img {
       &[src="assets://storyfiles/hs2/scraps/shades.png"],
       &[src="assets://storyfiles/hs2/scraps/trollc00l.gif"],
@@ -321,6 +319,9 @@ export default {
       padding: initial;
       display: inline !important;
     }
+    // Fix semantic trailing whitespace (i.e. called </span><span>The Tumor) from being
+    // cut off in inline-block display mode.
+    white-space: break-spaces;
   }
 
   .authorlog {

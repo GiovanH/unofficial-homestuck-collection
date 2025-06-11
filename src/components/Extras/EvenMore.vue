@@ -106,7 +106,7 @@ export default {
         "Random": shuffle,
         "Type": sortByField('type'),
         "Alphabetical (desc)": sortByFieldIntl('name'),
-        "Alphabetical (asc)": sortByFieldIntl('name', -1),
+        "Alphabetical (asc)": sortByFieldIntl('name', -1)
       },
       extSites: [
         {
@@ -272,8 +272,9 @@ export default {
     font-weight: normal;
 
     color: var(--font-default);
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
   }
   .card {

@@ -180,7 +180,6 @@
     the tables of a boy who turned tricks and treats
     like icy halloween breeze/ so fresh were his beats
 
-
     but alone they were weak
     no revolution
     together - overtime
@@ -188,7 +187,6 @@
 
     they met on the net and there was a fusion
     like danimals yogurt breakfast frusion
-
 
     hearts
     and minds
@@ -213,8 +211,6 @@
       you may have played me
       but my heart waylayed me
       i wanna be your baby mommy too
-
-
 
       <strong>daverap:
       </strong>rose i know how you're feeling, i know your emotions
@@ -244,7 +240,6 @@
 
       <strong>roserap:</strong> yes dave.......... oh yes..................... take me away...........
 
-
       <strong><font size="4"><em><font size="3">CHORUS
 
         CHORUS X 2 with harmonies
@@ -252,7 +247,6 @@
     </em></font></strong>
     <strong>ROSE:</strong> DAVE I LIED.... IM NOT PREGNANT..... IM JUST FAT................
     <strong>dave:</strong> oh rose.............. i dont care........... being pregnant might be against the rules of the mpsa forum, but this isn't...........
-
 
     <font size="5">(worst makeout sounds ever)
     </font>
@@ -267,7 +261,6 @@
     LOOKS LIKE EVERYTHINGS GOING TO BE OK
 
     <strong>bro:</strong> dave im going to eat ur baby
-
 
     <strong>7. vs bros
     </strong>
@@ -293,7 +286,6 @@
     haha! how does it feel to be shut down by my superior rapping techniques
 
     i will show you the power of the forbidden rhyme - the words that rhyme with THEMSELVES
-
 
     <strong>john: </strong>this is entirely unimpressive
 
@@ -398,7 +390,7 @@ export default {
   computed: {
   },
   methods: {
-  },
+  }
 }
 </script>
 

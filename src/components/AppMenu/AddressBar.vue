@@ -279,6 +279,7 @@ export default {
     height: calc(var(--square-size) - 1px);
     padding: var(--padding);
     font-size: calc(var(--square-size) - 4px);
+    margin: 0 var(--padding);
 
     color: var(--font-header);   
 

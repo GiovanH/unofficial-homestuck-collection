@@ -47,12 +47,16 @@ export default {
 
       const prevRightPage = this.$archive.mspa.story[thisLeftPage.previous]
 
-      return this.$resolvePath(`${this.mspaBase}/${prevRightPage.previous}`)
+      if (prevRightPage.flag.includes("X2COMBO")) {
+        return this.$resolvePath(`${this.mspaBase}/${prevRightPage.previous}`)
+      } else {
+        return this.$resolvePath(`${this.mspaBase}/${prevRightPage.pageId}`)
+      }
     }
   },
   methods: {
     resetScroll() {
-      let key = this.$localData.tabData.activeTabKey
+      const key = this.$localData.tabData.activeTabKey
       document.getElementById(key).scrollTop = 0
       document.getElementById(key).scrollLeft = document.getElementById(key).scrollWidth
     }
@@ -68,9 +72,8 @@ export default {
     font-weight: normal;
     color: var(--page-nav-divider);
 
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     .tiltedArrow{
       display: inline-block;
       .notTiltedArrowLink {
@@ -108,9 +111,8 @@ export default {
     .navOptions {
       color: var(--page-nav-divider);
 
-      a {
-        color: var(--page-links);
-      }
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
     .meta {
       font-weight: 300;
@@ -125,4 +127,3 @@ export default {
     }
   }
 </style>
-

@@ -174,7 +174,7 @@ const routes = [
         redirect: '000001'
       },
       {
-        path: ':p',
+        path: ':p'
       }
     ]
   },
@@ -250,7 +250,7 @@ const routes = [
         redirect: '1'
       },
       {
-        path: ':cid',
+        path: ':cid'
       }
     ]
   },
@@ -263,8 +263,8 @@ const routes = [
       //   redirect: '1'
       // },
       {
-        path: ':pid',
-      },
+        path: ':pid'
+      }
     ]
   },
   {
@@ -276,8 +276,8 @@ const routes = [
         redirect: '1'
       },
       {
-        path: ':pid',
-      },
+        path: ':pid'
+      }
     ]
   },
   {
@@ -289,8 +289,8 @@ const routes = [
         redirect: '1'
       },
       {
-        path: ':pid',
-      },
+        path: ':pid'
+      }
     ]
   },
   {
@@ -302,9 +302,13 @@ const routes = [
         redirect: '1'
       },
       {
-        path: ':pid',
-      },
+        path: ':pid'
+      }
     ]
+  },
+  {
+    path: '/wizardyherbert/:p',
+    props: true
   },
   {
     path: '/namcohigh/:play',
@@ -319,12 +323,12 @@ const routes = [
     props: true,
     children: [
       {
-        path: '',
+        path: ''
         // redirect: '1'
       },
       {
-        path: ':page',
-      },
+        path: ':page'
+      }
     ]
   },
   {

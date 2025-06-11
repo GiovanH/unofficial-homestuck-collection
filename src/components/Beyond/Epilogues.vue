@@ -1,6 +1,6 @@
 <template>
   <div class="pageBody epilogue">
-    <NavBanner />
+    <NavBanner useCustomStyles="true"/>
     <div class="pageFrame" :class="{fakechat}" v-html="epiloguesPage" />
     <!-- <label><input type="checkbox" v-model="fakechat">fakechat</label> -->
     <PageFooter />
@@ -14,13 +14,13 @@ import PageFooter from '@/components/Page/PageFooter.vue'
 const Resources = require('@/resources.js')
 
 function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
 }
 
 export default {
   name: 'epilogues',
   components: { NavBanner, PageFooter },
-  mixins: [ Resources.UrlFilterMixin ],
+  mixins: [Resources.UrlFilterMixin],
   data: function() {
     return {
       fakechat: false,
@@ -72,7 +72,7 @@ export default {
         "Vomit",
         "Drugging",
         "Cannibalism",
-        "Pica",
+        "Pica"
       ],
       cw_additional: [
         "The Economy", "Robots", "Meta", "Fridging", "Honk", "Marriage", "Feet", "Clown Dynamics",
@@ -80,7 +80,7 @@ export default {
         "Theft", "Trickster Mode", "Reality Television", "Gerrymandering", "Rapping", "Guns",
         "Eggs", "Kidnapping", "Faygo", "Poisoning", "Teenagers", "Ghosts",
         "Early 20th Century Dance Movements", "Clown"
-      ],
+      ]
     }
   },
   props: [
@@ -109,6 +109,7 @@ export default {
         </div>`
     },
     filterPageHtml(html) {
+      // Replace paraphernalia with link to liveweb page
       const ext_link = `<div class="pad-r-lg--md mar-b-md type-hs-small type-hs-bottom--md type-center type-left--md"><ul class="o_game-nav"><li class="o_game-nav-item"><a href="https://www.homestuck.com${this.tab.url}">${this.tab.url}</a></li></ul></div>`
       html = html.replace(
         '<a class="nav-btn nav-btn--center type-hs-small mar-b-md" data-gamenav-open="" href="javascript:void(0)" style="text-decoration:none; text-transform: none; font-size:14px; line-height:14px;"><span>Options</span> <i class="icon-menu" style="margin:0;"></i></a>',
@@ -117,8 +118,8 @@ export default {
       if (this.filter_content_warnings && /^\/epilogues\/?$/.exec(this.tab.url)) {
         // Index page
         const content_warnings =
-          this.generateContentWarnings("Content Warning:", [...this.cw_super_serious.map(s => `<b>${s}</b>`), ...this.cws])
-          + this.generateContentWarnings("Additional Tags:", this.cw_additional)
+          this.generateContentWarnings("Content Warning:", [...this.cw_super_serious.map(s => `<b>${s}</b>`), ...this.cws]) +
+            this.generateContentWarnings("Additional Tags:", this.cw_additional)
 
         html = html.replace(/<div class="[^"]+?">Content Warning:<\/div>.+?Clown<\/div>/gs, content_warnings)
       }
@@ -167,6 +168,22 @@ export default {
     position: relative; // Allow things to align to the page
 
   }
+  //Small screen check
+  @media (max-width: 950px) {
+    &{
+      overflow-x: hidden;
+      height: max-content;
+      .navBanner {
+        max-width: 100%;
+      }
+      .pageFrame {
+        max-width: 100%;
+      }
+      ::v-deep div.footer {
+        max-width: 100%;
+      }
+    }
+  }
 }
 
 .mspa.epilogue ::v-deep {
@@ -183,15 +200,8 @@ export default {
 .epilogue ::v-deep {
   // Epilogues uses "rows"
   .row {
-  }
-}
-
-.epilogue ::v-deep {
-  .pageFrame a[href] {
-    color: var(--page-links);
-  }
-  // Epilogues uses "rows"
-  .row {
+    a:link { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     max-width: 650px;
     margin-left: auto;
     margin-right: auto;
@@ -401,13 +411,11 @@ export default {
   //     font-size: 65px;
   // }
 
-
   .clearfix:after {
     content: "";
     display: table;
     clear: both;
   }
 }
-
 
 </style>

@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable */
 export default {
   name: 'BBCode',
   props: [

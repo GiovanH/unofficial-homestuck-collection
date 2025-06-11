@@ -34,6 +34,8 @@ $Date: 2010-06-23 18:03:13 +0800 (星期三, 23 六月 2010) $
 $Revision: 3026 $
 */
 
+/* eslint-disable */
+
 if (typeof Iuppiter === 'undefined')
   Iuppiter = {
     version: '$Revision: 3026 $'.substring(11).replace(" $", ""),

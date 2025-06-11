@@ -14,15 +14,15 @@
               <select class="vizStorySelect" 
                 v-if="!$localData.settings.mspaMode"
                 v-model="vizStory" >
+                <option
+                  value="homestuck"
+                  key="homestuck">
+                  Homestuck
+                </option>
                 <option 
                   value="problem-sleuth" 
                   key="problem-sleuth">
                   Problem Sleuth
-                </option>
-                <option 
-                  value="homestuck" 
-                  key="homestuck">
-                  Homestuck
                 </option>
               </select>
               <select class="vizStorySelect" 
@@ -60,14 +60,14 @@
                 v-if="!$localData.settings.mspaMode"
                 v-model="vizStory" >
                 <option 
-                  value="problem-sleuth" 
-                  key="problem-sleuth">
-                  Problem Sleuth
-                </option>
-                <option 
                   value="homestuck" 
                   key="homestuck">
                   Homestuck
+                </option>
+                <option
+                  value="problem-sleuth"
+                  key="problem-sleuth">
+                  Problem Sleuth
                 </option>
               </select>
               <select class="vizStorySelect" 
@@ -212,7 +212,7 @@ export default {
         {
           model: "mspaMode",
           label: "Use MSPA page numbers",
-          desc: "Use the original 6-digit story.php page IDs used on mspaintadventures.com and the TopatoCo paperbacks instead of the new numbering Viz introduced."
+          desc: "Use the original 6-digit index.php page IDs used on mspaintadventures.com and the TopatoCo paperbacks instead of the new numbering Viz introduced."
         }
       ]
     }
@@ -352,6 +352,7 @@ export default {
         const newto = this.$mspaToViz(this.newReaderPageInput)
         this.$logger.info("to viz", newto.s, from, to, newto.p)
         this.newReaderPageInput = newto.p
+        this.vizStory = newto.s
       }
     },
     newReaderPageInput(to, from){
@@ -428,6 +429,7 @@ export default {
   }
   .hint {
     font-size: 13px;
+    margin-bottom: 0;
     color: var(--page-nav-meta);
     font-weight: normal;
   }

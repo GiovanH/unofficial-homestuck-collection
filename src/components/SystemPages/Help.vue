@@ -50,7 +50,7 @@
       </div>
       <div class="cardContent" v-if="cardSelection == 'usage'">
         <section>
-          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a :href="bug_report_link" target="_blank" class="anchorButton bugreport">Report a bug</a>
           <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
         <section>
@@ -144,7 +144,7 @@
           <p>Still having trouble? Reach out to us:</p>
         </section>
         <section>
-          <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=bug&template=bug_report.md" target="_blank" class="anchorButton bugreport">Report a bug</a>
+          <a :href="bug_report_link" target="_blank" class="anchorButton bugreport">Report a bug</a>
           <a href="https://github.com/GiovanH/unofficial-homestuck-collection/issues/new?labels=enhancement&template=feature_request.md" target="_blank" class="anchorButton">Request a feature</a>
         </section>
       </div>
@@ -159,6 +159,8 @@ import Logo from '@/components/UIElements/Logo.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 
 import SETUP from '@/components/SystemPages/Setup.vue'
+
+import errorReporting from '@/js/errorReporting'
 
 export default {
   name: 'help',
@@ -177,6 +179,12 @@ export default {
   computed: {
     cardSelection(){
       return this.routeParams.mode || 'newreader'
+    },
+    bug_report_link(){
+      return errorReporting.createIssueLink({
+        "App": this.$data.$appVersion,
+        "Asset Pack": this.$archive.version
+      })
     }
   }
 }
@@ -213,9 +221,10 @@ export default {
   .pageMenu {
     display: flex;
     justify-content: space-evenly;
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
     a {
       flex: 1;
-      color: var(--page-links);
       font-size: 24px; 
       text-decoration: none;
       &:hover {
@@ -240,8 +249,9 @@ export default {
     font-weight: normal;
 
     color: var(--font-default);
-    ::v-deep a {
-      color: var(--page-links);
+    ::v-deep {
+      a { color: var(--page-links); }
+      a:link:active { color: var(--page-links-active); }
     }
   }
   .card {

@@ -21,14 +21,13 @@ export default {
   },
   computed: {
     banner() {
-      let num = parseInt(this.page.pageId)
+      const num = parseInt(this.page.pageId)
       if (this.page.theme == 'scratch') {
         return {
           url: `assets://storyfiles/hs2/scratch/${this.page.scratchBanner}`,
           title: this.page.scratchTooltip ? this.page.scratchTooltip : undefined
         }
-      }
-      else if (this.page.theme == 'cascade')
+      } else if (this.page.theme == 'cascade')
         return {url: 'assets://images/header_cascade.gif', title: undefined}
       else if (this.page.theme == 'trickster' && !this.$localData.settings.reducedMotion)
         return {url: 'assets://images/trickster_sitegraphics/menu.swf', title: undefined}
@@ -92,14 +91,14 @@ export default {
         const tooltipHeight = tooltip.clientHeight
 
         tooltip.style.left = 
-          (tooltipX + tooltipWidth > page.scrollLeft + page.clientWidth ? 
-          tooltipX - tooltipWidth - 2 * offsetXY[0] : 
-          tooltipX) + 'px'
+          (tooltipX + tooltipWidth > page.scrollLeft + page.clientWidth 
+          ? tooltipX - tooltipWidth - 2 * offsetXY[0] 
+          : tooltipX) + 'px'
 
         tooltip.style.top = 
-          (tooltipY + tooltipHeight > page.scrollTop + page.clientHeight ? 
-          page.scrollTop + page.clientHeight - tooltipHeight - offsetXY[1] : 
-          tooltipY) + 'px'
+          (tooltipY + tooltipHeight > page.scrollTop + page.clientHeight 
+          ? page.scrollTop + page.clientHeight - tooltipHeight - offsetXY[1] 
+          : tooltipY) + 'px'
       } else {
         this.mouseEnter(e)
       }

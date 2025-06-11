@@ -9,5 +9,5 @@ module.exports = {
         "assets://storyfiles/hs2/05260/Sburb.min.js": "./Sburb.dev.js",
         "assets://storyfiles/hs2/05305/Sburb.min.js": "./Sburb.dev.js",
         "assets://storyfiles/hs2/05395/Sburb.min.js": "./Sburb.dev.js"
-    },
+    }
 }

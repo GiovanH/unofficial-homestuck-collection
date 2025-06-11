@@ -1,5 +1,9 @@
 ![The Unofficial Homestuck Collection](src/assets/collection_logo.png)
 
+Homepage: <https://homestuck.giovanh.com/unofficial-homestuck-collection/>
+
+---
+
 Let me tell you a story about a webcomic called *Homestuck*. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2007 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.
 
 However, with Flash finally being phased out at the end of 2020, *Homestuck* is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published *Homestuck* since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve *Homestuck's* one-of-a-kind presentation and flair, for both returning readers and those new to the story.
@@ -19,33 +23,11 @@ Building a development version of TUHC requires NPM (Node 14.18), Yarn, `make`, 
 - NPM is the node package manager, used for developing with Node.js.
 - [Yarn](https://www.npmjs.com/package/yarn) is a npm-like package manager that is itself distributed as an NPM package.
 - `tar` and `make` are basic GNU utilities used extremely commonly in software development. `tar` is used to pack files (like zip) and `make` is used to build projects with dependencies. If you don't already have them on your system (you can maintain robust CLI environments using tools like [cygwin](https://www.cygwin.com) or [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)), you can download [`tar`](http://gnuwin32.sourceforge.net/packages/gtar.htm) and [`make`](https://www.gnu.org/software/make/) individually directly from GNU.
-          
-### Compiles and hot-reloads for development
-
-```
-make test
-```
-
-### Compiles and minifies for production
-
-```
-make publish
-```
-
-### Lints and fixes files
-
-```
-make lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Legal
 
-<div class="legal">
 <pre>The Unofficial Homestuck Collection
-Copyright (C) 2020-2021 Bambosh, (C) 2021-2023 Bambosh and GiovanH, (C) 2024- GiovanH
+Copyright (C) 2025 GiovanH
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
@@ -53,10 +35,10 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 </pre>
 
-In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits (which are part of the original copyright.)
+As per section 7, an additional requirement of this license is that all attribution and crediting must be preserved. Modifications that remove
+attribution or otherwise misrepresent the authorship or origin of material
+are not permitted and violate the license conditions. 
 
-As per section 7, the author attributions in Credits.vue must
-be preserved in all covered works. Modified versions may optionally
-extend this list as applicable, but modifications that remove
-attributions or otherwise misrepresent the origin of the material
-are not permitted.
+---
+
+In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits.

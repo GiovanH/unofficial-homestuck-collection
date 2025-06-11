@@ -3,6 +3,7 @@ node_modules
 /dist
 
 __pycache__
+cypress/screenshots/
 
 # local env files
 .env.local
@@ -27,13 +28,13 @@ pnpm-debug.log*
 /dist_electron
 /dist
 
-/tools/mspfa/
-
 # install pseudofile
 install
 
 # generated file
 src/imods.tar.gz
+webapp/browser.js
+webAppModTrees.json
 
 /tools/mspfa/*/
 /tools/mspfa/*.log

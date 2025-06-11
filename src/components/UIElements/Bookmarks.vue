@@ -147,7 +147,7 @@ export default {
       })
     },
     editSave(key){
-      let name = this.sanitizeHtml(this.nameField)
+      const name = this.sanitizeHtml(this.nameField)
       this.$localData.root.SAVES_EDIT(key, name, this.urlField)
       this.editKey = undefined
     },
@@ -157,16 +157,15 @@ export default {
     blurBookmark(event, key) {
       if (key == this.editKey && this.$refs[key][0]) {
         if (document.getElementById('contextMenu').contains(event.relatedTarget)) {
-          this.$root.app.$refs.contextMenu.lendFocus(event.target.tagName =='INPUT' ? event.target :this.$refs[key][0] )
-        }
-        else if (!this.$refs[key][0].contains(event.relatedTarget)) {
+          this.$root.app.$refs.contextMenu.lendFocus(event.target.tagName == 'INPUT' ? event.target : this.$refs[key][0])
+        } else if (!this.$refs[key][0].contains(event.relatedTarget)) {
           this.cancelEditSave(this.editKey)
         }
       }
     },
 
     constrainYToBookmarkArea(bookmarkY) {
-      let bookmarksOffsetTop = this.$refs.bookmarks.$el.getBoundingClientRect().top
+      const bookmarksOffsetTop = this.$refs.bookmarks.$el.getBoundingClientRect().top
 
       if (bookmarkY <= 0) {
         bookmarkY = 0
@@ -200,8 +199,7 @@ export default {
       e.preventDefault()
       
       if (this.$localData.saveData.saveList.length > 1 && Math.abs(e.clientY - this.clickAnchor) > 5) {
-
-        let snapDistance = e.clientY - this.clickAnchor
+        const snapDistance = e.clientY - this.clickAnchor
         this.clickAnchor -= this.dragTarget.getBoundingClientRect().top
 
         this.dragTarget.style.visibility = "hidden"
@@ -232,8 +230,7 @@ export default {
           this.$refs.dragBookmark.style.top = (this.$refs.dragBookmark.offsetTop + e.clientY - this.threshold) + "px"
           this.thresholdDirection = undefined
         }
-      }
-      else {
+      } else {
         dragPos = this.cursorYPrev - e.clientY
         bookmarkY = this.constrainYToBookmarkArea(this.$refs.dragBookmark.offsetTop - dragPos)
         this.$refs.dragBookmark.style.top = bookmarkY + "px"
@@ -241,18 +238,17 @@ export default {
       
       this.cursorYPrev = e.clientY
 
-      let yCenter = this.$refs.dragBookmark.offsetTop + ((this.$refs.dragBookmark.clientHeight) / 2)
-      let targetTop = this.dragTarget.closest('.bookmark').offsetTop - 1
-      let targetBottom = targetTop + this.dragTarget.closest('.bookmark').clientHeight + 1
+      const yCenter = this.$refs.dragBookmark.offsetTop + ((this.$refs.dragBookmark.clientHeight) / 2)
+      const targetTop = this.dragTarget.closest('.bookmark').offsetTop - 1
+      const targetBottom = targetTop + this.dragTarget.closest('.bookmark').clientHeight + 1
 
-      let direction = yCenter < targetTop ? -1 : yCenter > targetBottom ? 1 : 0
+      const direction = yCenter < targetTop ? -1 : yCenter > targetBottom ? 1 : 0
 
-      let hoverKey = this.$localData.saveData.saveList[this.$localData.saveData.saveList.indexOf(this.dragKey) + direction]
+      const hoverKey = this.$localData.saveData.saveList[this.$localData.saveData.saveList.indexOf(this.dragKey) + direction]
 
       if (this.dragKey != hoverKey) {
         this.$localData.root.SAVES_SWAP(this.dragKey, hoverKey)
       }
-
     },
 
     closeDragElement() {
@@ -536,4 +532,3 @@ export default {
   }
 
 </style>
-

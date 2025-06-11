@@ -2,26 +2,26 @@
 
 import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import errorReporting from './js/errorReporting'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
 import fs from 'fs'
 
-import Resources from "./resources.js"
+const { nativeImage } = require('electron')
 
-const { nativeImage } = require('electron');
-const APP_VERSION = app.getVersion()
 const path = require('path')
-const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const handler = require('serve-handler')
 const http = require('http')
+const semver = require("semver");
 
+const log = require('electron-log')
 const Store = require('electron-store')
-const store = new Store()
 
 const windowStateKeeper = require('electron-window-state')
 
-const log = require('electron-log')
+const store = new Store()
 const logger = log.scope('ElectronMain')
+const APP_VERSION = app.getVersion()
 
 // const search = require('./search.js').default
 
@@ -29,6 +29,12 @@ const logger = log.scope('ElectronMain')
 // be closed automatically when the JavaScript object is garbage collected.
 let win = null
 const gotTheLock = app.requestSingleInstanceLock()
+
+const isDevelopment = process.env.NODE_ENV !== 'production'
+
+if (!isDevelopment) {
+  errorReporting.registerMainLogger(log)
+}
 
 // Improve overall performance by disabling GPU acceleration
 // We're not running crysis or anything its all gifs
@@ -40,13 +46,17 @@ if (!store.get('settings.enableHardwareAcceleration')) {
   logger.info("Not disabling hardware acceleration")
 }
 
+if (process.platform == 'linux')
+  app.commandLine.appendSwitch('no-sandbox')
+
 // Log settings, for debugging
 logger.info(store.get('settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },
-  { scheme: 'assets', 
+  {
+    scheme: 'assets',
     privileges: { 
       standard: true,
       secure: true,
@@ -59,12 +69,12 @@ protocol.registerSchemesAsPrivileged([
 // zoom functions
 function zoomIn() {
   if (win) {
-    win.webContents.send('ZOOM_IN');
+    win.webContents.send('ZOOM_IN')
   }
 }
 function zoomOut() {
   if (win) {
-    win.webContents.send('ZOOM_OUT');
+    win.webContents.send('ZOOM_OUT')
   }
 }
 
@@ -141,7 +151,12 @@ var menuTemplate = [
       {
         label: 'New Tab',
         accelerator: 'CmdOrCtrl+T',
-        click: () => {if (win) win.webContents.send('TABS_NEW', {parsedURL: '/', adjacent: false})}
+        click: () => {
+          if (win) win.webContents.send(
+            'TABS_NEW',
+            {parsedURL: '/', adjacent: false}
+          )
+        }
       },
       {
         label: 'Close Tab',
@@ -239,10 +254,6 @@ async function loadArchiveData(){
 
   if (!data) throw new Error("Data empty after attempted load")
 
-  data.tweaks.tzPasswordPages = Object.values(data.mspa.story)
-    .filter(v => v.flag.includes('TZPASSWORD'))
-    .map(v => v.pageId)
-
   try {
     // Sanity checks
     const required_keys = ['mspa', 'social', 'news', 'music', 'comics', 'extras']
@@ -281,6 +292,11 @@ function getFlashPath(){
     default:
       throw Error("Unknown platform", process.platform)
   }
+
+  if (assetDir === undefined) {
+    throw Error("Asset directory not yet defined")
+  }
+
   let flashPath = path.join(assetDir, flashPlugin)
 
   if (process.platform == "win32" && !fs.existsSync(flashPath)) {
@@ -291,37 +307,50 @@ function getFlashPath(){
   return flashPath
 }
 
-try {
-  // Pick the appropriate flash plugin for the user's platform
-  const flashPath = getFlashPath()
+var is_first_run = false
+if (assetDir === undefined) {
+  is_first_run = true
+} else {
+  try {
+    // Pick the appropriate flash plugin for the user's platform
+    const flashPath = getFlashPath()
 
-  if (fs.existsSync(flashPath)) {
-    app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-    if (process.platform == 'linux') app.commandLine.appendSwitch('no-sandbox')
-    if (store.has('settings.smoothScrolling') && !store.get('settings.smoothScrolling')) app.commandLine.appendSwitch('disable-smooth-scrolling')
-  } else throw Error(`Flash plugin not located at ${flashPath}`)
-  
-  // Spin up a static file server to grab assets from. Mounts on a dynamically assigned port, which is returned here as a callback.
-  const server = http.createServer((request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*'); /* @dev First, read about security */
-    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-    response.setHeader('Access-Control-Max-Age', 2592000); // 30 days
-    return handler(request, response, {
-      public: assetDir
-    })
-  })
+    if (fs.existsSync(flashPath)) {
+      app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
+    } else throw Error(`Flash plugin not located at ${flashPath}`)
 
-  server.listen(0, '127.0.0.1', (error) => {
-    if (error) throw error
-    port = server.address().port
-  
-    // Initialize Resources
-    Resources.init({
-      assets_root: `http://127.0.0.1:${port}/`
+
+    if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
+      app.commandLine.appendSwitch('disable-smooth-scrolling')
+
+    // Spin up a static file server to grab assets from.
+    // Mounts on a dynamically assigned port, which is returned here as a callback.
+    const server = http.createServer((request, response) => {
+      response.setHeader('Access-Control-Allow-Origin', '*')
+      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
+      response.setHeader('Access-Control-Max-Age', 2592000)
+      return handler(request, response, {
+        public: assetDir
+      })
     })
-  })
-} catch (error) {
-  logger.debug(error)
+
+    server.listen(0, '127.0.0.1', (error) => {
+      if (error) throw error
+      port = server.address().port
+
+      if (port === undefined) {
+        throw Error("Could not initialize internal asset server", server, server.address())
+      } else {
+        logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
+      }
+    })
+  } catch (error) {
+    logger.debug(error)
+    is_first_run = true
+  }
+}
+
+if (is_first_run) {
   logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
@@ -365,13 +394,17 @@ try {
       ]
     }
   ]
-} finally {
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
+
+Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {
-  event.returnValue = {port: port, appVersion: APP_VERSION}
+  event.returnValue = {
+    port: port,
+    userData: app.getPath('userData'),
+    appVersion: APP_VERSION
+  }
 })
 
 ipcMain.handle('check-archive-version', async (event, payload) => {
@@ -394,11 +427,10 @@ if (assetDir && fs.existsSync(assetDir)) {
   var last_app_version = store.has("appVersion") ? store.get("appVersion") : '1.0.0'
   if (app.commandLine.hasSwitch('reset-last-version')) {
     logger.warn(`Run with --reset-last-version flag, resetting version from ${last_app_version} to 0.0.0.`)
-    last_app_version = '0.0.0';
+    last_app_version = '0.0.0'
   }
 
-  const semverGreater = (a, b) => a.localeCompare(b, undefined, { numeric: true }) === 1
-  if (!last_app_version || semverGreater(APP_VERSION, last_app_version)) {
+  if (!last_app_version || semver.gt(APP_VERSION, last_app_version)) {
     logger.warn(`App updated from ${last_app_version} to ${APP_VERSION}`)
     want_imods_extracted = true // Takes effect when client requests archive
   } else {
@@ -413,13 +445,18 @@ if (assetDir && fs.existsSync(assetDir)) {
 // Speed hack, try to preload the first copy of the archive
 var first_archive
 var archive // Also, keep a reference to the latest archive, for lazy eval
-try {
-  loadArchiveData().then(result => {
-    archive = first_archive = result
-  })
-} catch (e) {
-  // logger.warn(e)
-  // don't even warn, honestly
+
+if (assetDir != undefined) {
+  try {
+    loadArchiveData().then(result => {
+      archive = first_archive = result
+    }).catch(error => {
+      logger.debug(error, "(first load or missing asset pack?)")
+    })
+  } catch (e) {
+    // logger.warn(e)
+    // don't even warn, honestly
+  }
 }
 
 ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
@@ -428,7 +465,7 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     if (first_archive) {
       // Use the preloaded "first archive"
       archive = first_archive
-      first_archive = undefined;
+      first_archive = undefined
     } else {
       // Reload the archive data
       archive = await loadArchiveData()
@@ -472,7 +509,8 @@ ipcMain.handle('win-close', async (event) => {
 ipcMain.on('win-close-sync', (e) => {
   logger.warn("Got synchronous close event!")
   win.destroy()
-  e.returnValue = true;
+  e.returnValue = true
+  process.exit()
 })
 
 ipcMain.handle('save-file', async (event, payload) => {
@@ -502,11 +540,11 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       logger.info("New asset directory", assetDir)
       await loadArchiveData() // Run to check if this thows an error
 
-      let flashPath = getFlashPath()
+      const flashPath = getFlashPath()
       // logger.info(assetDir, flashPlugin, flashPath)
       if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
-      logger.error(error)
+      logger.debug(error)
       validated = false
     }
 
@@ -556,8 +594,9 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
   const title = args.title || "Notice"
   const ok_string = args.okay || "OK"
   const cancel_string = args.cancel || "Cancel"
+  const type = args.type || 'warning'
   const answer = dialog.showMessageBoxSync(win, {
-    type: 'warning',
+    type,
     buttons: [
       ok_string,
       cancel_string
@@ -565,7 +604,8 @@ ipcMain.handle('prompt-okay-cancel', async (event, args) => {
     cancelId: 1,
     defaultId: 1,
     title,
-    message: args.message
+    message: args.message,
+    detail: args.detail
   })
   return (answer === 0)
 })
@@ -598,7 +638,7 @@ try {
           const sharpNativeImage = nativeImage.createFromBuffer(buffer)
           // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
           cb(sharpNativeImage)
-        }).catch(err => {throw err;})
+        }).catch(err => {throw err})
       // }
     } catch (err) {
       logger.error("Couldn't process image", err)
@@ -626,7 +666,7 @@ const OPENWITH_PROTOCOL = 'mspa'
 async function createWindow () {
   // Create the browser window.
 
-  let mainWindowState = windowStateKeeper({
+  const mainWindowState = windowStateKeeper({
     defaultWidth: 1280,
     defaultHeight: 780
   })
@@ -660,7 +700,7 @@ async function createWindow () {
     if (zoomDirection === 'out') {
       zoomOut()
     }
-  });
+  })
 
   // Catch-all to prevent navigating away from application page
   win.webContents.on('will-navigate', (event) => {
@@ -704,33 +744,42 @@ async function createWindow () {
     ]
   }, (details, callback) => {
     if (details.url.startsWith("assets://")) {
-      const redirectURL = Resources.resolveAssetsProtocol(details.url)
-      if (details.url == redirectURL) {
-        const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
-        logger.error(err)
-        throw Error(err)
-      } else {
-        // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
-        const redirect_callback = {redirectURL}
-        callback(redirect_callback)
-      }
-    } else {
-      const destination_url = Resources.resolveURL(details.url)
-      if (details.url == destination_url) {
-        const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
-        logger.error(err)
-        throw Error(err)
-      } else {
-        // Okay
-        const redirect_callback = {
-          redirectURL: destination_url
-        }
-        // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
-        if (details.resourceType == "subFrame")
-          win.webContents.send('TABS_PUSH_URL', destination_url)
-        else
+      // const redirectURL = Resources.resolveAssetsProtocol(details.url)
+      const reply_channel = 'RESOURCES_RESOLVE_ASSETS_PROTOCOL' + details.url
+      win.webContents.send('RESOURCES_RESOLVE_ASSETS_PROTOCOL', reply_channel, details.url)
+      ipcMain.once(reply_channel, (event, redirectURL) => {
+        if (details.url == redirectURL) {
+          const err = `${details.url} is assets url, resolved protocol to ${redirectURL} but is an infinite loop!`
+          logger.error(err)
+          throw Error(err)
+        } else {
+          // logger.info(details.url, "is assets url, resolved protocol to", redirectURL)
+          const redirect_callback = {redirectURL}
           callback(redirect_callback)
-      }
+        }
+      })
+    } else {
+      // const destination_url = Resources.resolveURL(details.url)
+
+      const reply_channel = 'RESOURCES_RESOLVE_URL' + details.url
+      win.webContents.send('RESOURCES_RESOLVE_URL', reply_channel, details.url)
+      ipcMain.once(reply_channel, (event, destination_url) => {
+        if (details.url == destination_url) {
+          const err = `${details.url} is not assets url, resolving resource to ${destination_url} but is an infinite loop!`
+          logger.error(err)
+          throw Error(err)
+        } else {
+          // Okay
+          const redirect_callback = {
+            redirectURL: destination_url
+          }
+          // logger.info(details.url, "is not assets url, resolving resource to", destination_url)
+          if (details.resourceType == "subFrame")
+            win.webContents.send('TABS_PUSH_URL', destination_url)
+          else
+            callback(redirect_callback)
+        }
+      })
     }
   })
 
@@ -740,14 +789,18 @@ async function createWindow () {
   win.webContents.on('new-window', (event, url) => {
     event.preventDefault()
 
-    const parsedURL = Resources.resolveURL(url)
-    logger.info(`new-window: ${url} ===> ${parsedURL}`)
+    // const parsedURL = Resources.resolveURL(url)
+    const reply_channel = 'RESOURCES_RESOLVE_URL_REPLY' + url
+    win.webContents.send('RESOURCES_RESOLVE_URL', reply_channel, url)
+    ipcMain.once(reply_channel, (event, parsedURL) => {
+      logger.info(`new-window: ${url} ===> ${parsedURL}`)
 
-    // If the given URL is still external, open a browser window.
-    if (/http/.test(parsedURL))
-      shell.openExternal(url) 
-    else
-      win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+      // If the given URL is still external, open a browser window.
+      if (/http/.test(parsedURL))
+        shell.openExternal(url)
+      else
+        win.webContents.send('TABS_NEW', {url: parsedURL, adjacent: true})
+    })
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -794,14 +847,7 @@ async function createWindow () {
 }
 
 app.removeAsDefaultProtocolClient(OPENWITH_PROTOCOL)
-if (isDevelopment && process.platform === 'win32') {
-  // Set the path of electron.exe and your app.
-  // These two additional parameters are only available on windows.
-  // Setting this is required to get this working in dev mode.
-  app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL, process.execPath, [
-    path.resolve(process.argv[1])
-  ])
-} else {
+if (!isDevelopment) {
   app.setAsDefaultProtocolClient(OPENWITH_PROTOCOL)
 }
 

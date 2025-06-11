@@ -6,9 +6,9 @@
     <hr />
     <a v-if="log.length > 0" @click="sortOrder = sortOrderNext" class="link switchOrder">{{ reverseText }}</a>
     <div class="logItems" v-if="log.length > 0">
-      <template v-for="page in log">
-        {{page.date}} - <a :href="page.href">{{page.title || 'Next.'}}</a><br/>
-      </template>
+      <span v-for="page in log" :key="page.page_num">
+        {{page.date}} - <a :href="page.href">{{page.title || 'Next.'}}</a><br />
+      </span>
     </div>
   </GenericPage>
   <MediaEmbed v-else url="/advimgs/jb/mspaintadventure08.gif" />
@@ -19,7 +19,7 @@
 import GenericPage from '@/components/UIElements/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
-const { DateTime } = require('luxon');
+const { DateTime } = require('luxon')
 
 const sort_methods = {
     asc: (a, b) => (a.page_num > b.page_num) ? 1 : -1,
@@ -69,12 +69,12 @@ export default {
       return "View " + (this.sortNames[this.sortOrderNext] || "log")
     },
     sortOrderNext(){
-      let next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
+      const next = (this.sortOrder == 'desc' ? 'asc' : 'desc')
       return next
     },
     sorter(){
       // The sorter function that .sort() keys
-      let default_="asc"
+      const default_ = "asc"
       return sort_methods[this.sortOrder] || sort_methods[default_]
     }
   },
@@ -83,7 +83,7 @@ export default {
       // Returns the actual entry object for a given page
       // needs the story_id because ryanquest
 
-      let time_zone = "America/New_York"
+      const time_zone = "America/New_York"
       return {
         title: page.c,
         page_num: page.i,
@@ -139,4 +139,3 @@ export default {
   }
 
 </style>
-

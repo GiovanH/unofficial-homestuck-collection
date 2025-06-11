@@ -10,7 +10,9 @@
 </template>
 
 <script>
-const { ipcRenderer } = require('electron')
+
+const ipcRenderer = require('IpcRenderer')
+
 export default {
   name: 'titleBar',
   components: {
@@ -40,11 +42,15 @@ export default {
       ipcRenderer.invoke('win-maximize')
     },
     close() {
+      ipcRenderer.sendSync('win-close-sync')
+
+      /*
       ipcRenderer.invoke('win-close')
       // Give the OS 2500 ms, then force close
       setTimeout(function() {
         ipcRenderer.sendSync('win-close-sync')
       }, 500)
+      */
     }
   },
   mounted() {

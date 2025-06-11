@@ -69,7 +69,7 @@
                           <img src="assets://archive/beyond/mspfa_pages.png" class="smol"><span v-text="story.p.length" />
                           <br>Author: <a v-text="story.a" />
                           <br>Mirrored by: 
-                          <span v-for="u, i in story.editors">
+                          <span v-for="u, i in story.editors" :key="i">
                             <a :href="`https://mspfa.com/user/?u=${u.i}`" v-text="u.n" />
                             <template v-if="i+1 < story.editors.length">, </template>
                           </span>
@@ -83,12 +83,12 @@
                                 <input type="button" value="Show Latest Pages" data-open="Show Latest Pages" data-close="Hide Latest Pages">
                               </div>
                               <div>Latest Pages:
-                                <template v-for="page in story.p.slice(-30).reverse()">
+                                <span v-for="page in story.p.slice(-30).reverse()" :key="page.i">
                                   <br>
                                   <span :data-timestamp="page.d">{{formatTimestamp(page.d)}} - 
                                     <a :href="`/mspfa/${storyId}/${page.i}`" v-text="page.c || 'Next.'" />
                                   </span>
-                                </template>
+                                </span>
                               </div>
                             </div>
                           </span>
@@ -151,7 +151,7 @@ export default {
     return {
       DateTime: require('luxon').DateTime,
       time_zone: "America/New_York",
-      show_ad: false,
+      show_ad: false
     }
   },
   computed: {
@@ -195,7 +195,7 @@ export default {
     },
     pageRangeClasses(){
       // see mspaf.js `for(var i in pageRanges)`
-      let classes = []
+      const classes = []
       for (var i in this.pageRanges) {
         if (this.pageNum >= this.pageRanges[i][0] && this.pageNum <= this.pageRanges[i][1]) {
           classes.push(i)
@@ -224,9 +224,9 @@ export default {
       else if (dir == 'right' && this.story.p[next] && frame.$el.scrollLeft + frame.$el.clientWidth == frame.$el.scrollWidth)
         this.$pushURL(`/mspfa/${this.storyId}/${next}`)
     },
-    getPageCommand(n, default_="Next."){
+    getPageCommand(n, default_){
       try {
-        return this.story.p[n - 1].c || default_
+        return this.story.p[n - 1].c || (default_ || "Next.")
       } catch {
         return default_
       }
@@ -316,9 +316,8 @@ export default {
   .navOptions {
     color: var(--page-nav-divider);
 
-    a {
-      color: var(--page-links);
-    }
+    a { color: var(--page-links); }
+    a:link:active { color: var(--page-links-active); }
   }
   .meta {
     font-weight: 300;
