@@ -1,29 +1,50 @@
 <template>
   <div>
     <div class="errorWithMods" v-if="modsEnabled.length">
-      <p>You currently have mods enabled:</p><br>
-      <ol class="modlist">
-        <li
-          v-for="option in modsEnabled"
-          :key="option.key"
-          :data-value="option.key"
-        >
-          <b v-text='option.label' />
-          <span class='summary' v-if='option.summary' v-text='option.summary' />
-        </li>
-      </ol>
-      <br>
-      <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
-      <p>Please disable all mods and then restart.</p><br>
-      <div class="center">
-        <button @click="clearEnabledMods()">Disable all and reload</button><br>
+      <div v-if="$root.loadErrorResponsibleMods && $root.loadErrorResponsibleMods.length > 0">
+        <p>This error was caused by these mods:</p><br>
+        <ol class="modlist">
+          <li
+            v-for="option in $root.loadErrorResponsibleMods.map(k => $root.modChoices[k])"
+            :key="option.key"
+            :data-value="option.key"
+          >
+            <b v-text='option.label' />
+            <span class='summary' v-if='option.summary' v-text='option.summary' />
+          </li>
+        </ol>
+        <br>
+        <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
+        <p>Please disable these mods and then restart.</p><br>
+        <div class="center">
+          <button @click="disableMods($root.loadErrorResponsibleMods)">Disable these mods and reload</button><br>
+        </div>
+      </div>
+      <div v-else>
+        <p>You currently have mods enabled:</p><br>
+        <ol class="modlist">
+          <li
+            v-for="option in modsEnabled"
+            :key="option.key"
+            :data-value="option.key"
+          >
+            <b v-text='option.label' />
+            <span class='summary' v-if='option.summary' v-text='option.summary' />
+          </li>
+        </ol>
+        <br>
+        <p>It's likely one of these is causing the problem, or else some interaction between them. </p><br>
+        <p>Please disable all mods and then restart.</p><br>
+        <div class="center">
+          <button @click="clearEnabledMods()">Disable all and reload</button><br>
+        </div>
       </div>
       <span class="hint">If this issue persists when you re-enable a specific mod, please contact the mod's author!</span><br />
 
       <p>Alternatively, you can try one of the less-common diagnostics:</p>
       <div class="center">
-        <button class="less-common" @click="doReloadNoRecover()">Attempt reload without making changes (if you made external changes)</button><br>
-        <button class="less-common"  @click="doFullRestart()">Restart and attempt auto-recovery (if 1 didn't work)</button><br>
+        <button class="less-common" @click="doReloadNoRecover()">Attempt reload without making changes</button><br>
+        <button class="less-common"  @click="doFullRestart()">Restart and attempt auto-recovery</button><br>
       </div>
     </div>
 
@@ -59,6 +80,7 @@
 
 <script>
 import errorReporting from '@/js/errorReporting'
+import Mods from "@/mods.js"
 
 const ipcRenderer = require('IpcRenderer')
 
@@ -99,6 +121,13 @@ export default {
 
       this.modSoftRestart()
     },
+    disableMods(mod_list){
+      Mods.removeModsFromEnabledList(mod_list)
+
+      this.loadingTooLongTimeout = false
+
+      this.modSoftRestart()
+    },
     locateAssets(){
       ipcRenderer.invoke('locate-assets', {restart: false}).then(result => {
         this.assetDir = result || this.assetDir
@@ -123,6 +152,7 @@ export default {
 
       this.$root.loadState = "WAITING_ON_DATA"
       this.$root.loadError = undefined
+      this.$root.loadErrorResponsibleMods = undefined
       ipcRenderer.send("RELOAD_ARCHIVE_DATA")
     }
   },

@@ -467,6 +467,7 @@ Promise.all(promises_loading).then(_ => {
         archive: undefined,
         loadState: undefined,
         loadError: undefined,
+        loadErrorResponsibleMods: undefined,
         loadStage: undefined,
         guestMode: false,
         platform: (window.isWebApp ? "webapp" : "electron"),

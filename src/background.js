@@ -49,9 +49,6 @@ if (!store.get('settings.enableHardwareAcceleration')) {
 if (process.platform == 'linux')
   app.commandLine.appendSwitch('no-sandbox')
 
-// Log settings, for debugging
-logger.debug(store.get('settings'))
-
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { standard: true, secure: true } },

@@ -81,6 +81,7 @@ export default {
         clearTimeout(this.debounce)
       }
       if (stage != "DONE") {
+        this.loadingTooLongTimeout = false
         this.$logger.info("Timing out in", 8000)
         this.debounce = setTimeout(function() {
           this.$logger.error("Timed out")

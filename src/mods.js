@@ -215,8 +215,12 @@ function onModLoadFail(responsible_mods, e) {
 
   if (window.vm && window.vm.loadStage) {
     // If we have a functional VM, pass error info to error recovery
+    logger.warn("RENDER: Mod load failure with modlist", responsible_mods)
+    logger.error(e)
+
     window.vm.$root.loadState = "ERROR"
     window.vm.$root.loadError = e
+    window.vm.$root.loadErrorResponsibleMods = responsible_mods
   } else {
     store.set("needsRecovery", true)
 
@@ -1299,6 +1303,7 @@ export default {
   modsDir, // var, referenced by settings
 
   extractimods, // async, internal
+  removeModsFromEnabledList,
 
   loadModChoicesAsync, // async, called by settings to refresh (promise-resolved)
 
