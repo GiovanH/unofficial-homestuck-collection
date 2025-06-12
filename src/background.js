@@ -248,8 +248,7 @@ async function loadArchiveData(){
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
-    logger.error(e)
-    return undefined
+    throw e
   }
 
   if (!data) throw new Error("Data empty after attempted load")
@@ -484,7 +483,6 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
   }
-  win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 // search.registerIpc(ipcMain)

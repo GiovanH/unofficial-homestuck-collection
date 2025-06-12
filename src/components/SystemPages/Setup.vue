@@ -15,7 +15,7 @@
         <SetupErrorRecovery />
       </div>
 
-      <div v-else-if="isLoading">
+      <div v-else-if="isLoading || loadingTooLongTimeout">
         <SetupComponentLoader />
         <div class="card" v-if="loadingTooLongTimeout">
           <div class="cardContent">
@@ -27,6 +27,13 @@
 
       <div v-else>
         <SetupComponentLoader />
+        <div class="card" v-if="loadingTooLongTimeout">
+          <div class="cardContent">
+            <h2>Strange situation</h2>
+            <pre v-text="{hasLoadFailed, isLoading, isNewUser, loadingTooLongTimeout, loadstate: $root.loadState}" />
+          </div>
+          <SetupErrorRecovery />
+        </div>
       </div>
 
     </div>
@@ -69,23 +76,20 @@ export default {
     }
   },
   mounted() {
-    if (this.debounce) clearTimeout(this.debounce)
-    this.debounce = setTimeout(function() {
-      this.loadingTooLongTimeout = true
-    }.bind(this), 8000)
+    this.$watch('$root.loadStage', _ => {
+      if (this.debounce) {
+        clearTimeout(this.debounce)
+      }
+      this.$logger.info("Timing out in", 8000)
+      this.debounce = setTimeout(function() {
+        this.$logger.error("Timed out")
+        this.loadingTooLongTimeout = true
+      }.bind(this), 8000)
+    })
   },
   methods: {
   },
   watch: {
-    "$root.loadStage"(to, from) {
-      if (this.loadingTooLongTimeout) {
-        this.loadingTooLongTimeout = false
-        if (this.debounce) clearTimeout(this.debounce)
-        this.debounce = setTimeout(function() {
-          this.loadingTooLongTimeout = true
-        }.bind(this), 16000)
-      }
-    }
   }
 }
 </script>

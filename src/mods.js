@@ -681,9 +681,14 @@ async function getModJsAsync(mod_dir, options = {}) {
     const e1_is_notfound = (e1.code && e1.code === "MODULE_NOT_FOUND")
     if (e1_is_notfound) {
       // Tried singlefile, missing
-      logger.error("Missing file", mod_dir, e1)
-      removeModsFromEnabledList([mod_dir])
-      return null
+      if (mod_dir.startsWith("_")) {
+        console.log("Failed loading imod. Asset pack broken.")
+        onModLoadFail([mod_dir], e1)
+      } else {
+        logger.error("Missing file", mod_dir, e1)
+        removeModsFromEnabledList([mod_dir])
+        return null
+      }
     } else {
       // Singlefile found, other error
       logger.error("File found, other error")

@@ -300,7 +300,8 @@
           await Mods.editArchiveAsync(archive)
           this.$root.archive = Object.freeze(archive)
           this.$nextTick(() => {
-            this.$root.loadState = "DONE"
+            if (this.$root.loadStage == "MODS")
+              this.$root.loadState = "DONE"
           })
         } catch (e) {
           this.$logger.error(e)
