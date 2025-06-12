@@ -160,6 +160,10 @@
             <li><a href="http://homestuck.com/mspa?s=6&p=007395">Redirect</a></li>
           </ul>
         </div>
+        <div class="testSection">
+          <h2>Error report</h2>
+          <pre v-text="errorBody" />
+        </div>
       </div>
     <PageFooter />
     </div>
@@ -171,6 +175,8 @@
 import NavBanner from '@/components/UIElements/NavBanner.vue'
 import PageFooter from '@/components/Page/PageFooter.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+
+import errorReporting from '@/js/errorReporting'
 
 // import PAGE from '@/components/Page/Page.vue'
 // import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
@@ -217,6 +223,12 @@ export default {
   computed: {
     storyPages(){
       return Object.values(this.$archive.mspa.story)
+    },
+    errorBody() {
+      return errorReporting.buildReportBody(null, {
+        "App": this.$data.$appVersion,
+        "Asset Pack": this.$archive.version
+      })
     },
     compiledResult(){
       try {

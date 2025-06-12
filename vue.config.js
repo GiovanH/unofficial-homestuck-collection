@@ -1,6 +1,21 @@
-// const { VueLoaderPlugin } = require('vue-loader')
+const webpack = require('webpack')
+const { execSync } = require('child_process')
 
-// require('ofe').call()
+const git_branch = execSync('git rev-parse --abbrev-ref HEAD').toString()
+const git_remote = execSync(`git config --get branch.${git_branch.trim()}.remote`).toString()
+const git_remote_url = execSync(`git config --get remote.${git_remote.trim()}.url`).toString()
+
+const build_info = {
+  'process.env.BUILD_GIT_REVISION': JSON.stringify(
+    execSync('git rev-parse HEAD').toString().trim()
+  ),
+  'process.env.BUILD_GIT_REMOTE': JSON.stringify(
+    git_remote_url.trim()
+  ),
+  'process.env.BUILD_DATE': JSON.stringify(new Date().toISOString()),
+  'process.env.BUILD_PLATFORM': JSON.stringify(process.platform)
+}
+
 module.exports = {
   configureWebpack: {
     // optimization: {
@@ -73,6 +88,13 @@ module.exports = {
     }
   },
   chainWebpack: config => {
+    config
+      .plugin('buildinfo')
+      .use(
+      webpack.DefinePlugin,
+      [build_info]
+    )
+
     if (process.env.ASSET_PACK_HREF) {
       console.log("Replacing for asset href", process.env.ASSET_PACK_HREF)
       const srl_options = options => {
@@ -116,7 +138,7 @@ module.exports = {
       builderOptions: {
         appId: "com.bambosh.unofficialhomestuckcollection",
         productName: "The Unofficial Homestuck Collection",
-        copyright: "Copyright © 2020-2022 Bambosh",
+        copyright: "Copyright © 2025 GiovanH",
         directories: {
           buildResources: "build"
         },

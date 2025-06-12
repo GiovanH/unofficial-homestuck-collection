@@ -76,20 +76,27 @@ export default {
     }
   },
   mounted() {
-    this.$watch('$root.loadStage', _ => {
+    this.$watch('$root.loadStage', stage => {
       if (this.debounce) {
         clearTimeout(this.debounce)
       }
-      this.$logger.info("Timing out in", 8000)
-      this.debounce = setTimeout(function() {
-        this.$logger.error("Timed out")
-        this.loadingTooLongTimeout = true
-      }.bind(this), 8000)
+      if (stage != "DONE") {
+        this.$logger.info("Timing out in", 8000)
+        this.debounce = setTimeout(function() {
+          this.$logger.error("Timed out")
+          this.loadingTooLongTimeout = true
+        }.bind(this), 8000)
+      }
     })
   },
   methods: {
   },
   watch: {
+  },
+  destroyed() {
+    if (this.debounce) {
+      clearTimeout(this.debounce)
+    }
   }
 }
 </script>

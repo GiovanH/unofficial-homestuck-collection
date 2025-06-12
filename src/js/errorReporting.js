@@ -11,7 +11,26 @@ const new_issue_link = 'https://github.com/giovanh/unofficial-homestuck-collecti
 
 const error_dialog_msg = "If you think this is an error in the application, you can submit a bug report:"
 
+// Begin webpackery
+
+const BUILD_GIT_REVISION = process.env.BUILD_GIT_REVISION
+const BUILD_GIT_REMOTE = process.env.BUILD_GIT_REMOTE
+const BUILD_DATE = process.env.BUILD_DATE
+const BUILD_PLATFORM = process.env.BUILD_PLATFORM
+
 function buildReportBody(error, versions) {
+  versions = {
+    ...versions,
+    BUILD_GIT_REMOTE,
+    BUILD_GIT_REVISION,
+    BUILD_DATE,
+    BUILD_PLATFORM
+  }
+  if (typeof process !== 'undefined') {
+    versions['Architecture'] = process.arch
+    versions['Platform'] = process.platform
+  }
+
   const versions_str = Object.entries(versions)
     .map(kv => `- ${kv[0]}: ${kv[1]}`)
     .join('\n')
@@ -132,5 +151,6 @@ function registerMainLogger(log) {
 export default {
   registerRenderLogger,
   registerMainLogger,
-  createIssueLink
+  createIssueLink,
+  buildReportBody
 }

@@ -50,7 +50,7 @@ if (process.platform == 'linux')
   app.commandLine.appendSwitch('no-sandbox')
 
 // Log settings, for debugging
-logger.info(store.get('settings'))
+logger.debug(store.get('settings'))
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([

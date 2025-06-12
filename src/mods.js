@@ -43,6 +43,7 @@ const ipcRenderer = require('IpcRenderer')
 
 // const sass = require('sass')
 // const SassJs = require('sass.js')
+log.transports.console.level = "info"
 const logger = log.scope('Mods')
 
 const assetDir = store.has('assetDir') ? store.get('assetDir') : undefined

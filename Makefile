@@ -58,7 +58,8 @@ itest:
 
 .PHONY: build
 build: install src/imods.tar.gz
-	yarn run vue-cli-service electron:build
+	env NODE_OPTIONS=--max_old_space_size=8192 \
+		yarn run vue-cli-service electron:build
 	# yarn electron:build
 
 .PHONY: publish-release
