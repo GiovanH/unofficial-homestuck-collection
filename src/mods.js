@@ -645,7 +645,8 @@ async function getModJsAsync(mod_dir, options = {}) {
       // Anything that needs to recompute vueHooks (and restart the vm)
       mod_module._needsHardReload = [
         'styles', 'vueHooks', 'themes',
-        'browserPages', 'browserActions', 'browserToolbars'
+        'browserPages', 'browserActions', 'browserToolbars',
+        'styles'
       // eslint-disable-next-line no-prototype-builtins
       ].some(k => mod_module.hasOwnProperty(k))
 
