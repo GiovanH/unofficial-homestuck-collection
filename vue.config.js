@@ -142,36 +142,52 @@ module.exports = {
         directories: {
           buildResources: "build"
         },
+        protocols: {
+          name: "Unofficial Homestuck Collection",
+          role: "Viewer",
+          schemes: ["mspa"]
+        },
         win: {
-          target: {
-            target: "zip",
-            arch: [
-              "x64",
-              "ia32"
-            ]
-          },
-          artifactName: "${productName}-${version}-${os}-${arch}.${ext}",
+          target: [
+            {
+              target: "nsis",
+              arch: [
+                "x64",
+                "ia32"
+              ]
+            },
+            {
+              target: "zip",
+              arch: [
+                "x64",
+                "ia32"
+              ]
+            }
+          ],
           asarUnpack: [
             "**/node_modules/sharp/**",
             "**/*.node"
-          ]
+          ],
+          // eslint-disable-next-line no-template-curly-in-string
+          artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
         },
         mac: {
           target: ["dmg"],
-          category: "entertainment",
-          identity: null,
           asarUnpack: [
             "**/node_modules/sharp/**",
             "**/*.node"
-          ]
+          ],
+          category: "entertainment",
+          identity: null
         },
         linux: {
-          target: ["AppImage", "tar.gz"],
-          category: "game",
+          target: ["AppImage", "tar.gz", "deb"],
           asarUnpack: [
             "**/node_modules/sharp/**",
             "**/*.node"
-          ]
+          ],
+          maintainer: "GiovanH <uhscollection@icloud.com>",
+          category: "game"
         }
       }
     }

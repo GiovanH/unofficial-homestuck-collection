@@ -69,7 +69,8 @@ export default {
   watch: {
   },
   mounted(){
-    if (this.$localData.settings.allowSysUpdateNotifs)
+    const is_flatpak = !!(process.env.container)
+    if (this.$localData.settings.allowSysUpdateNotifs && !is_flatpak)
       this.doUpdateCheck()
   }
 }

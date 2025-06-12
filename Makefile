@@ -64,7 +64,8 @@ build: install src/imods.tar.gz
 
 .PHONY: publish-release
 publish-release: install src/imods.tar.gz
-	yarn run vue-cli-service electron:build -p always
+	env NODE_OPTIONS=--max_old_space_size=8192 \
+		yarn run vue-cli-service electron:build -p always
 
 .PHONY: help
 help:
