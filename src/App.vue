@@ -40,7 +40,9 @@
   const ipcRenderer = require('IpcRenderer')
 
   var mixins = []
-  var webFrame = undefined;
+  var webFrame = undefined
+
+  const DEBUG_LOAD_FOREVER = false
 
   if (!window.isWebApp) {
     webFrame = require('electron').webFrame
@@ -62,6 +64,8 @@
     },
     computed: {
       canLoadApp() {
+        if (DEBUG_LOAD_FOREVER) return false
+
         if (this.$archive == undefined) {
           // Cannot load components without archive
           return false

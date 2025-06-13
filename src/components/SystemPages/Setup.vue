@@ -47,6 +47,7 @@ import SetupErrorRecovery from '@/components/SystemPages/SetupErrorRecovery.vue'
 import SetupComponentLoader from '@/components/SystemPages/SetupComponentLoader.vue'
 import SetupWizard from '@/components/SystemPages/SetupWizard.vue'
 
+
 export default {
   name: 'setup',
   components: {
@@ -82,7 +83,6 @@ export default {
       }
       if (stage != "DONE") {
         this.loadingTooLongTimeout = false
-        this.$logger.info("Timing out in", 8000)
         this.debounce = setTimeout(function() {
           this.$logger.error("Timed out")
           this.loadingTooLongTimeout = true

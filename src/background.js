@@ -1,29 +1,28 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
+import fs from 'fs'
+import {
+  app, ipcMain, protocol, dialog, shell, clipboard,
+  BrowserWindow, Menu
+} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import errorReporting from './js/errorReporting'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
-import fs from 'fs'
-
-const { nativeImage } = require('electron')
-
-const path = require('path')
 
 const handler = require('serve-handler')
 const http = require('http')
-const semver = require("semver");
+const path = require('path')
+const semver = require("semver")
 
+const { nativeImage } = require('electron')
 const log = require('electron-log')
 const Store = require('electron-store')
-
 const windowStateKeeper = require('electron-window-state')
 
 const store = new Store()
 const logger = log.scope('ElectronMain')
-const APP_VERSION = app.getVersion()
 
-// const search = require('./search.js').default
+const APP_VERSION = app.getVersion()
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -286,7 +285,7 @@ function getFlashPath(){
       flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
       break
     default:
-      throw Error("Unknown platform", process.platform)
+      throw Error("Unknown platform", process.platform, process.arch)
   }
 
   if (assetDir === undefined) {
@@ -651,8 +650,8 @@ try {
       clipboard.writeImage(sharpNativeImage)
     })
   })
-} catch {
-  logger.error("Couldn't install sharp!")
+} catch (e) {
+  logger.error("Couldn't install sharp!", e)
 }
 
 let openedWithUrl

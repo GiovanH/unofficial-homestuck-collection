@@ -17,10 +17,12 @@ const BUILD_GIT_REVISION = process.env.BUILD_GIT_REVISION
 const BUILD_GIT_REMOTE = process.env.BUILD_GIT_REMOTE
 const BUILD_DATE = process.env.BUILD_DATE
 const BUILD_PLATFORM = process.env.BUILD_PLATFORM
+const BUILD_BRANCH = process.env.BUILD_BRANCH
 
 function buildReportBody(error, versions) {
   versions = {
     ...versions,
+    BUILD_BRANCH,
     BUILD_GIT_REMOTE,
     BUILD_GIT_REVISION,
     BUILD_DATE,

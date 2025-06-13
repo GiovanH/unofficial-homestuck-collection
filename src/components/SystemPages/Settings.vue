@@ -596,7 +596,8 @@ export default {
         {
           model: "reducedMotion",
           label: "Reduce Motion",
-          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
+          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations.",
+          platform_whitelist: ['electron']
         }, {
           model: "ruffleFallback",
           label: "Ruffle flash emulation fallback",
