@@ -373,11 +373,15 @@
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
-            <draggable tag="ul" group="sortable-mods">
+            <draggable tag="ul" group="sortable-mods" draggable=".enabled">
               <li
                 v-for="option in modsDisabled"
                 :key="option.key"
                 :data-value="option.key"
+                :class="{
+                  enabled: option.compatible !== false,
+                  disabled: option.compatible === false
+                }"
               >
                 <b v-text='option.label' />
                 <span class='summary' v-if='option.summary' v-text='option.summary' />
@@ -1230,12 +1234,20 @@ export default {
       .summary:before {
         content: ' - '
       }
+    }
+
+    li.enabled {
       &:hover {
         cursor: grab;
       }
       &:active {
         cursor: grabbing;
       }
+    }
+
+    li.disabled {
+      background: var(--page-pageBorder);
+      cursor: not-allowed;
     }
 
     ul li {

@@ -1,11 +1,11 @@
 <template>
-  <div>
-    <div class="errorWithMods" v-if="modsEnabled.length">
-      <div v-if="$root.loadErrorResponsibleMods && $root.loadErrorResponsibleMods.length > 0">
+  <div style="max-width: 100%;">
+    <div class="errorWithMods" v-if="usingMods">
+      <div v-if="responsibleModChoices.length > 0">
         <p>This error was caused by these mods:</p><br>
         <ol class="modlist">
           <li
-            v-for="option in $root.loadErrorResponsibleMods.map(k => $root.modChoices[k])"
+            v-for="option in responsibleModChoices"
             :key="option.key"
             :data-value="option.key"
           >
@@ -43,17 +43,18 @@
 
       <p>Alternatively, you can try one of the less-common diagnostics:</p>
       <div class="center">
-        <button class="less-common" @click="doReloadNoRecover()">Attempt reload without making changes</button><br>
-        <button class="less-common"  @click="doFullRestart()">Restart and attempt auto-recovery</button><br>
+        <button class="less-common" @click="doReloadNoRecover()">Reload</button><br>
+        <button class="less-common"  @click="doFullRestart()">Restart</button><br>
       </div>
     </div>
 
     <div class="errorWithoutMods" v-else>
-      <p>This version of the program ({{$data.$appVersion}}) requires asset pack <strong>v{{$data.$expectedAssetVersion}}</strong>, which it expects in:</p><br>
+      <p>This usually means the location of the asset pack has moved. This version of the program ({{$data.$appVersion}}) requires asset pack <strong>v{{$data.$expectedAssetVersion}}</strong>, which it expects in:</p><br>
       <p class="center"><strong>{{$localData.assetDir}}</strong></p><br>
       <p>If you just updated the app, you might have asset pack <strong>v1</strong> installed already. This version requires <strong>v{{$data.$expectedAssetVersion}}</strong>; if you don't have it already, go to our <a href='https://bambosh.github.io/unofficial-homestuck-collection/'>website</a> for information on downloading it.</p><br>
-      <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things.</p><br>
-      <p>If you were using v2 already but made a change and something broke, try reverting your changes to see if it fixes anything. This program only really checks to make sure the JSON data is legible and that the Flash plugin exists, so that's probably where your problems are.</p><br>
+      <p>If you moved the asset pack somewhere else, just update the directory below and you'll be able to hop right back into things. If you were using v2 already but made a change and something broke, try reverting your changes to see if it fixes anything.</p><br>
+
+      <p>If you're getting a different kind of error, you can report a bug. </p><br>
 
       <div class="center" v-if="!$isWebApp">
         <button @click="locateAssets()">Locate Asset Pack v{{$data.$expectedAssetVersion}}</button>
@@ -68,10 +69,8 @@
     <div v-if="$root.loadError">
       <hr />
       <p>If you report this error, please provide these error details:</p>
-      <pre v-text="$root.loadError.stack" style="
-        white-space: pre-wrap;
-      "/>
-      <div v-if="!modsEnabled.length">
+      <pre v-text="$root.loadError.stack" class="stack"/>
+      <div v-if="!usingMods">
         <a :href="bug_report_link" target="_blank" class="anchorButton bugreport">Report a bug</a>
       </div>
     </div>
@@ -96,6 +95,21 @@ export default {
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) =>
         this.$root.modChoices[key]).filter(val => !!val)
+    },
+    usingMods() {
+      if (this.modsEnabled.length) return true
+      if (this.$root.loadErrorResponsibleMods) return true
+      if (this.$root.loadError) {
+        if (this.$root.loadError.stack.includes('mods')) {
+          return true
+        }
+      }
+      return false
+    },
+    responsibleModChoices() {
+      return this.$root.loadErrorResponsibleMods
+        .map(k => this.$root.modChoices[k])
+        .filter(Boolean)
     },
     isExpectedAssetVersion() {
       return (this.selectedAssetVersion == this.$data.$expectedAssetVersion)
@@ -202,5 +216,10 @@ a.anchorButton {
       background-color: #e4331c;
     }
   }
+}
+.stack {
+  // white-space: pre-wrap;
+  overflow-x: auto;
+  font-size: 14px;
 }
 </style>

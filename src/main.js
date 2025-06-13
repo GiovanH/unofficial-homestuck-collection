@@ -88,8 +88,13 @@ promises_loading.push((async function() {
 
 // Mixin mod mixins
 promises_loading.push((async function() {
-  const mixins = await Mods.getMixinsAsync()
-  mixins.forEach((m) => Vue.mixin(m))
+  try {
+    const mixins = await Mods.getMixinsAsync()
+    mixins.forEach((m) => Vue.mixin(m))
+  } catch (e) {
+    // Catch error but still allow the vm to init without mods
+    log.scope('main.js init').error(e)
+  }
 })())
 
 Vue.mixin(Memoization.mixin)

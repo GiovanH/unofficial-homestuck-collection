@@ -1,6 +1,8 @@
 // isWebApp for main-process electron execution
 const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
 
+const semver = require('semver')
+
 const importSassJs = () => import('sass.js')
 const importYaml = () => import('js-yaml')
 const importResources = import("@/resources.js")
@@ -57,6 +59,9 @@ var routes = undefined
 
 const store_modlist_key = 'settings.modListEnabled'
 // const store_devmode_key = 'settings.devMode'
+//
+
+var flag_failures_dont_interrupt = false
 
 if (ipcMain) {
   logger.error("Main background process loading modsjs")
@@ -208,7 +213,7 @@ function removeModsFromEnabledList(responsible_mods) {
 }
 
 function onModLoadFail(responsible_mods, e) {
-  if (!expectWorkingState())
+  if (!expectWorkingState() || flag_failures_dont_interrupt)
     return // Pre-setup, we're probably fine ignoring this.
 
   debugger // If you have devtools open, break here! Inspection time!
@@ -617,6 +622,12 @@ async function getModJsAsync(mod_dir, options = {}) {
       }
 
       if (!options.liteload) {
+        var b = mod_module.minAppVersion
+        var a = window.appVersion
+        if (a && b && !semver.gte(a, b)) {
+          throw Error(`${mod_module._id} ${mod_module.modVersion} requires at least app ${mod_module.minAppVersion}`)
+        }
+
         let api
         if (mod_module.computed != undefined) {
           api = api || await buildApi(mod_module)
@@ -818,7 +829,6 @@ function mergeFootnotes(archive, footObj) {
 
 function getMainMixin(){
   // A mixin that injects on the main vue process.
-  // Currently this just injects custom css
 
   const enabledModsJsPromise = getEnabledModsJsAsync() // Promise
   return {
@@ -955,9 +965,14 @@ function getMainMixin(){
 async function getMixinsAsync(){
   // This is absolutely black magic
 
+  // Since this is mixins, the vm isn't initialized yet. Try to wait.
+  flag_failures_dont_interrupt = true
+
   const nop = () => undefined
 
   const enabledModsJs = await getEnabledModsJsAsync()
+
+  flag_failures_dont_interrupt = false
 
   // List of mods, ordered
   var mixable_mods = enabledModsJs.toReversed()
@@ -1165,13 +1180,27 @@ async function getMixinsAsync(){
 }
 
 function jsToChoice(js, dir){
+  var mod_version = js.modVersion
+  if (js.version) {
+    logger.warn(`${js._id}: the 'version' property is deprecated. Use 'modVersion' and 'minAppVersion' instead.`)
+    mod_version = mod_version || js.version
+  }
+
+  var compatible = true
+  if (js.minAppVersion && !semver.gte(window.appVersion, js.minAppVersion)) {
+    // throw Error(`${js._id} ${js.modVersion} requires at least app ${js.minAppVersion}`)
+    compatible = false
+  }
+
   return {
     label: js.title,
     summary: js.summary,
     description: js.description,
     author: js.author,
-    modVersion: js.modVersion,
+    modVersion: mod_version,
     locked: js.locked,
+    compatible: compatible,
+    minAppVersion: js.minAppVersion,
 
     hasmeta: Boolean(js.author || js.modVersion || js.settings || js.description),
     needsArchiveReload: js._needsArchiveReload,

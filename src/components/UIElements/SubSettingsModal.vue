@@ -28,6 +28,7 @@
             <span v-if="modopt.summary" v-text="modopt.summary"/>
             <br />
             <span v-if="modopt.author" v-html="'by <b>' + modopt.author + '</b>'" />
+            <span class="error" v-if="modopt.compatible == false" v-html="'requires app <b>' + modopt.minAppVersion + '</b>'" />
             <span v-if="modopt.modVersion" v-html="'v<b>' + modopt.modVersion + '</b>'" />
             <span v-if="modopt.locked">unlocked at page
               <StoryPageLink :mspaId='modopt.locked'></StoryPageLink>
@@ -305,6 +306,9 @@ export default {
     font-weight: normal;
 
     display: block;
+    &.error {
+      color: red;
+    }
   }
 
   .includes {
