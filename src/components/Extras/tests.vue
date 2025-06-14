@@ -146,8 +146,8 @@
             <li><a href="/mspa/009535">The Echidna page</a></li>
             <li><a href="/mspa/009549">Sprite²</a></li>
             <li><a href="/mspa/009823">Inline images</a></li>
-            <li><a href="/mspa/009987">Collide</a></li></li>
-            <li><a href="/mspa/010019">Panel path routing</a>
+            <li><a href="/mspa/009987">Collide</a></li>
+            <li><a href="/mspa/010019">Panel path routing</a></li>
             <li><a href="/mspa/010027">Act 7</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
             <li><a href="/mspa/pony">pony</a></li>

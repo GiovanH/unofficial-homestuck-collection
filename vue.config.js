@@ -30,18 +30,6 @@ try {
 
 module.exports = {
   configureWebpack: {
-    // optimization: {
-    //     runtimeChunk: 'single',
-    //     splitChunks: {
-    //         cacheGroups: {
-    //             vendor: {
-    //                 test: /[\\/]node_modules[\\/]/,
-    //                 name: 'vendors',
-    //                 chunks: 'all'
-    //             }
-    //         }
-    //     }
-    // },
     optimization: {
       splitChunks: {
         minSize: 10000,

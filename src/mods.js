@@ -770,6 +770,13 @@ async function editArchiveAsync(archive) {
     return
   }
 
+  try {
+    fs.lstatSync(path.resolve(imodsDir, '_replaybound/Sburb.dev.js'))
+  } catch {
+    logger.warn(`Sburb.dev.js missing from disk. Overzealous antivirus? Repairing...`)
+    want_imods_extracted = true
+  }
+
   if (want_imods_extracted) {
     logger.info("Extracting imods")
     setLoadStage("EXTRACT_IMODS")

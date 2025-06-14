@@ -246,7 +246,11 @@
 
       // Sets up listener for the main process
       ipcRenderer.on('TABS_NEW', (event, payload) => {
-        this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
+        if (payload.url) {
+          this.$localData.root.TABS_NEW(this.$resolvePath(payload.url), payload.adjacent)
+        } else {
+          this.$localData.root.TABS_NEW()
+        }
       })
       ipcRenderer.on('TABS_CLOSE', (event, key) => {
         this.$localData.root.TABS_CLOSE(key)

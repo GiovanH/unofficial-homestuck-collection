@@ -150,7 +150,7 @@ var menuTemplate = [
         click: () => {
           if (win) win.webContents.send(
             'TABS_NEW',
-            {parsedURL: '/', adjacent: false}
+            {url: '/', adjacent: false}
           )
         }
       },
