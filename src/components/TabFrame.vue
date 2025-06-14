@@ -101,6 +101,7 @@ const MSPFADISAMBIG = () => import('@/components/CustomContent/MSPFADisambig.vue
 
 const TESTS = () => import('@/components/Extras/tests.vue')
 const EDITOR = () => import('@/components/CustomContent/PageEditor.vue')
+const VALIDATOR = () => import('@/components/SystemPages/Validator.vue')
 
 const preload_components = [
     HOMEPAGE,
@@ -179,6 +180,7 @@ export default {
 
         TESTS,
         EDITOR,
+        VALIDATOR,
         MSPFADISAMBIG
     },
     data() {

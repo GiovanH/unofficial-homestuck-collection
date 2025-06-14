@@ -255,12 +255,14 @@ async function loadArchiveData(){
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
+    fs.lstatSync(path.join(assetDir, "SELECT THIS FOLDER IN THE APP"))
+    fs.lstatSync(path.join(assetDir, "storyfiles/hs2/00001.gif"))
   } catch (e) {
-    dialog.showMessageBoxSync({
-      type: 'error',
-      title: 'Archive load error',
-      message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
-    })
+    // dialog.showMessageBoxSync({
+    //   type: 'error',
+    //   title: 'Archive load error',
+    //   message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
+    // })
 
     throw e
   }
@@ -578,6 +580,36 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       return undefined
     }
   }
+})
+
+ipcMain.handle('pick-file', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'openFile'
+    ]
+  })
+  return newPath
+})
+
+ipcMain.handle('pick-new-file', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'promptToCreate'
+    ]
+  })
+  return newPath
+})
+
+ipcMain.handle('pick-directory', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'openDirectory'
+    ]
+  })
+  return newPath
 })
 
 ipcMain.handle('restart', async (event) => {

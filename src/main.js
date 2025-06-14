@@ -32,6 +32,10 @@ window.isWebApp = (window.isWebApp || false)
 
 const ipcRenderer = require('IpcRenderer')
 
+const Validation = require('@/js/validation.js')
+
+window.Validation = Validation
+
 // Must init resources first.
 /* eslint-disable no-redeclare */
 var shell, log, port, appVersion

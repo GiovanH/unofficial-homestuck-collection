@@ -169,6 +169,7 @@ async function extractimods() {
   }
   // Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
+  setLoadStage("EXTRACT_IMODS")
   const Tar = await import('tar')
   let tardata
   try {
@@ -194,6 +195,18 @@ async function extractimods() {
   fs.unlink(temp_tar_path, err => {
     if (err) logger.error(err)
   })
+
+  setLoadStage("VALIDATE_IMODS_EXTRAS")
+  const Validation = await import('@/js/validation.js')
+  const crc_table_imods = await import('@/js/crc_imods.json')
+  const state = await Validation.validateFiles(imodsDir, crc_table_imods)
+  for (const extra_path of state.extra_paths) {
+    const target_path = path.join(imodsDir, extra_path)
+    logger.warn("Deleting extra imod file", target_path)
+    fs.unlink(target_path, err => {
+      if (err) logger.error(err)
+    })
+  }
 }
 
 function removeModsFromEnabledList(responsible_mods) {
@@ -779,7 +792,6 @@ async function editArchiveAsync(archive) {
 
   if (want_imods_extracted) {
     logger.info("Extracting imods")
-    setLoadStage("EXTRACT_IMODS")
     await extractimods()
     want_imods_extracted = false // we did it
   }

@@ -46,7 +46,9 @@ export default {
         "PATCHES": "Applying spackle",
         "LOADED_ARCHIVE_VANILLA": "Deferring responsibility",
         "EXTRACT_IMODS": "Applying day-one patch",
+        "VALIDATE_IMODS_EXTRAS": "Descaling deposits",
         "READ_MODS": "Indexing paraphernalia",
+        "FREEZE": "Enshrining remembrances",
         "BAKE_ROUTES": "Convoluting routing",
         "MODS_DONE": "Disparaging EMCAScript"
       },
