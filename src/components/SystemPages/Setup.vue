@@ -86,7 +86,7 @@ export default {
         this.debounce = setTimeout(function() {
           this.$logger.error("Timed out")
           this.loadingTooLongTimeout = true
-        }.bind(this), 8000)
+        }.bind(this), 15000)
       }
     })
   },
