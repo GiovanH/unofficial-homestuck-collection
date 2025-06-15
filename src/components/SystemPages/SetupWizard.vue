@@ -174,6 +174,7 @@ export default {
         'Snakes',
         'Clowns',
 
+        'Nudity (incidental, can be disabled in settings)',
         'Nonconsensual sexual relationships',
         'Unhealthy relationships',
         'Verbal abuse',

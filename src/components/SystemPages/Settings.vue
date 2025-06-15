@@ -658,6 +658,13 @@ export default {
           label: "Homestuck - CAUCASIAN!",
           desc: `During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a>`
         }, {
+          model: "notitty",
+          cws: {
+            minor: ["nudity"], severe: []
+          },
+          label: "Homestuck - Nudity",
+          desc: `In a few Homestuck panels you can glimpse an exposed human breast. Setting this option <b>censors</b> these moments. There wasn't actually any controversy about this one.`
+        }, {
           model: "pxsTavros",
           cws: {
             minor: [], severe: ["body horror"]
@@ -704,7 +711,8 @@ export default {
         'soluslunes',
         'unpeachy',
         'pxsTavros',
-        'cursedHistory'
+        'cursedHistory',
+        'notitty'
       ],
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
@@ -859,7 +867,8 @@ export default {
       // Call this before queueing archive reload
       this.$localData.root.saveLocalStorage()
 
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
+      // Some settings are just flags for mods to enable.
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes', 'notitty'].includes(setting)) {
         this.queueArchiveReload()
       }
 

@@ -78,7 +78,7 @@ export default {
       } else if (this.loadStages[this.$root.loadStage]) {
         return this.loadStages[this.$root.loadStage]
       } else {
-        this.$logger.warn("Missing label for load stage", this.$root.loadStage)
+        // this.$logger.warn("Missing label for load stage", this.$root.loadStage)
         return this.$root.loadStage
       }
     },

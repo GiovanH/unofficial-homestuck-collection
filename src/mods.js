@@ -139,7 +139,7 @@ function getAssetRoute(url) {
   }
 
   const file_route = routes[url]
-  if (file_route) logger.debug(url, "to", file_route)
+  if (file_route) logger.debug("Routing", url, "to", file_route)
   return file_route
 }
 
@@ -300,8 +300,12 @@ async function bakeRoutes(enabled_mods_js) {
 
           treeroutes.forEach(route => {
             const route_href = new URL(asset_tree + route).href
-            all_mod_routes[route_href] =
-              new URL((path.posix || path).join(mod_tree, route), js._mod_root_url).href
+            const dest_href = new URL((path.posix || path).join(mod_tree, route), js._mod_root_url).href
+            if (route_href == dest_href) {
+              console.warn(`${js._id} tried to route an asset to itself: ${route_href}`)
+            } else {
+              all_mod_routes[route_href] = dest_href
+            }
           })
         }
       }
@@ -351,12 +355,21 @@ function getEnabledMods() {
 
   // logger.debug("got mod settings", store_modlist_key, list)
 
+  // Easy tweaks
+
   list.push("_twoToThree")
 
   if (store.get('settings.unpeachy'))
     list.push("_unpeachy")
   if (store.get('settings.pxsTavros'))
     list.push("_pxsTavros")
+  if (store.get('settings.notitty'))
+    list.push("_notitty")
+  if (!store.get('settings.newReader.limit'))
+    list.push("_secret")
+
+  // Complicated flash ones
+
   if (store.get('settings.jsFlashes'))
     list.push("_replaybound")
 
@@ -371,8 +384,6 @@ function getEnabledMods() {
   if (store.get('settings.hqAudio'))
     list.push("_hqAudio")
 
-  if (!store.get('settings.newReader.limit'))
-    list.push("_secret")
 
   return list
 }
