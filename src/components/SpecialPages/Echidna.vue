@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import PAGE from '@/components/Page/Page.vue'
+import PAGE from '@/components/StoryPage/Page.vue'
 
 export default {
   extends: PAGE,

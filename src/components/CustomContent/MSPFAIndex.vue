@@ -16,7 +16,7 @@
 
 <script>
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 
 const DateTime = require('luxon').DateTime
 

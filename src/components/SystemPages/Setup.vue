@@ -43,10 +43,10 @@
 
 <script>
 import TitleBar from '@/components/AppMenu/TitleBar.vue'
+
 import SetupErrorRecovery from '@/components/SystemPages/SetupErrorRecovery.vue'
 import SetupComponentLoader from '@/components/SystemPages/SetupComponentLoader.vue'
 import SetupWizard from '@/components/SystemPages/SetupWizard.vue'
-
 
 export default {
   name: 'setup',
@@ -226,6 +226,4 @@ export default {
     }
   }
 }
-
-
 </style>

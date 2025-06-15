@@ -20,7 +20,7 @@
 
 <script>
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 export default {

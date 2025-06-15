@@ -33,8 +33,8 @@
 
 <script>
 // @ is an alias to /src
-import GenericPage from '@/components/UIElements/GenericPage.vue'
-import PageText from '@/components/Page/PageText.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
+import PageText from '@/components/StoryPage/PageText.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 // import FlexSearch from 'flexsearch'

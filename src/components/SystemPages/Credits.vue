@@ -93,9 +93,9 @@
 <script>
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import GenericCardPage from '@/components/Template/GenericCardPage.vue';
+import GenericCardPage from '@/components/Template/GenericCardPage.vue'
 
 export default {
   name: 'credits',

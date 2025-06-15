@@ -2,7 +2,7 @@
 import MSPFAPage from '@/components/CustomContent/MSPFAPage.vue'
 import MSPFALog from '@/components/CustomContent/MSPFALog.vue'
 import MSPFAIndex from '@/components/CustomContent/MSPFAIndex.vue'
-import SinglePage from '@/components/Page/SinglePage.vue'
+import SinglePage from '@/components/StoryPage/SinglePage.vue'
 
 function resolveStory(ctx, input) {
   const archive = (ctx?.$archive || ctx.parent.$archive)

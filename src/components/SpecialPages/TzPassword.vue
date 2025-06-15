@@ -26,12 +26,12 @@
 // @ is an alias to /src
 // import NavBanner from '@/components/UIElements/NavBanner.vue'
 // import Media from '@/components/UIElements/MediaEmbed.vue'
-// import TextContent from '@/components/Page/PageText.vue'
-// import PageNav from '@/components/Page/PageNav.vue'
-// import PageFooter from '@/components/Page/PageFooter.vue'
+// import TextContent from '@/components/StoryPage/PageText.vue'
+// import PageNav from '@/components/StoryPage/PageNav.vue'
+// import PageFooter from '@/components/StoryPage/PageFooter.vue'
 
-import GenericPage from '@/components/UIElements/GenericPage.vue'
-import PAGE from '@/components/Page/Page.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
+import PAGE from '@/components/StoryPage/Page.vue'
 
 export default {
   extends: PAGE,

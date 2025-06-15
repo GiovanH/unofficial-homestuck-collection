@@ -34,13 +34,13 @@
 <script>
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import Banner from '@/components/Page/PageBanner.vue'
+import Banner from '@/components/StoryPage/PageBanner.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import TextContent from '@/components/Page/PageText.vue'
-import PageNav from '@/components/Page/PageNav.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
-import Footnotes from '@/components/Page/PageFootnotes.vue'
-import Metadata from '@/components/Page/PageMetadata.vue'
+import TextContent from '@/components/StoryPage/PageText.vue'
+import PageNav from '@/components/StoryPage/PageNav.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
+import Footnotes from '@/components/StoryPage/PageFootnotes.vue'
+import Metadata from '@/components/StoryPage/PageMetadata.vue'
 
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 

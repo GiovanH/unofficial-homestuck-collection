@@ -482,10 +482,10 @@
 
 <script>
 import GenericCardPage from '@/components/Template/GenericCardPage.vue'
-import PageText from '@/components/Page/PageText.vue'
+import PageText from '@/components/StoryPage/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
 
 import Mods from "@/mods.js"
 

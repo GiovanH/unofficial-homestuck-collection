@@ -34,7 +34,7 @@
 <script>
 // @ is an alias to /src
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 import Ad from '@/components/UIElements/Ad.vue'
 
 export default {

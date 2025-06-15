@@ -36,11 +36,11 @@
 <script>
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import PageNav from '@/components/Page/PageNav.vue'
-import Footnotes from '@/components/Page/PageFootnotes.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import PageNav from '@/components/StoryPage/PageNav.vue'
+import Footnotes from '@/components/StoryPage/PageFootnotes.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 
-import PAGE from '@/components/Page/Page.vue'
+import PAGE from '@/components/StoryPage/Page.vue'
 
 export default {
   extends: PAGE,

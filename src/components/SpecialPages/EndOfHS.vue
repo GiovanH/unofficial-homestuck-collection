@@ -22,12 +22,12 @@
 <script>
 // @ is an alias to /src
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
-import PageNav from '@/components/Page/PageNav.vue'
-import Banner from '@/components/Page/PageBanner.vue'
+import PageNav from '@/components/StoryPage/PageNav.vue'
+import Banner from '@/components/StoryPage/PageBanner.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
-import Footnotes from '@/components/Page/PageFootnotes.vue'
+import Footnotes from '@/components/StoryPage/PageFootnotes.vue'
 
-import PAGE from '@/components/Page/Page.vue'
+import PAGE from '@/components/StoryPage/Page.vue'
 
 const EndOfHSMedia = {
   extends: MediaEmbed,

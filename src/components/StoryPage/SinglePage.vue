@@ -1,6 +1,6 @@
 <script>
 // @ is an alias to /src
-import VanillaPage from '@/components/Page/Page.vue'
+import VanillaPage from '@/components/StoryPage/Page.vue'
 
 function urlToArgObj(url) {
   // Can't be sure URL has a real protocol :(
