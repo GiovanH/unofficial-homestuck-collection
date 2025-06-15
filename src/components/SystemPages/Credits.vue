@@ -338,7 +338,6 @@ export default {
   }
 }
 .prose {
-  // text-align: left;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: normal;
   font-size: 12px;
@@ -353,7 +352,6 @@ export default {
 }
 .creditDisambig {
   padding: 25px 0;
-  // text-align: left;
   .creditLinks {
     display: flex;
     flex-flow: row wrap;
