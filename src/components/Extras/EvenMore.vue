@@ -1,8 +1,9 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
-    <div class="card">
-      <a class="logo" href="/"><Logo /></a>
+  <GenericCardPage>
+    <div class="card center">
+      <div class="cardContent">
+        <a class="logo" href="/"><Logo /></a>
+      </div>
       <div class="cardContent" v-if="this.$isNewReader">
         <h2>Looking for more?</h2> 
         <section>
@@ -43,11 +44,11 @@
         </section>
       </div>
     </div>
-  </div>
+  </GenericCardPage>
 </template>
 
 <script>
-import NavBanner from '@/components/UIElements/NavBanner.vue'
+import GenericCardPage from '@/components/Template/GenericCardPage.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 import Logo from '@/components/UIElements/Logo.vue'
 
@@ -96,7 +97,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    NavBanner, Media, Logo
+    GenericCardPage, Media, Logo
   },
   title: () => "Even more content",
   data: function() {
@@ -219,9 +220,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .navBanner {
-    margin-bottom: 25px;
-  }
   section.list {
     text-align: left;
     display: flex;
@@ -256,76 +254,6 @@ export default {
       p.desc {
 
       }
-    }
-  }
-  .pageBody {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
-    background: var(--system-background);
-    background-color: var(--system-skycolor);
-
-    font-family: Verdana,Arial,Helvetica,sans-serif;
-    font-weight: normal;
-
-    color: var(--font-default);
-    ::v-deep {
-      a { color: var(--page-links); }
-      a:link:active { color: var(--page-links-active); }
-    }
-  }
-  .card {
-    position: relative;
-    margin-bottom: 75px;
-    padding: 0 50px;
-    border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
-    box-sizing: border-box;
-    width: 950px;
-    background: var(--page-pageContent);
-
-    flex: 0 1 auto;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    align-content: center;
-
-    .logo {
-      margin: 25px;
-
-      img {
-        width: 700px;
-      }
-    }
-  }
-  .cardContent {
-    width: 100%;
-    padding-bottom: 25px;
-    text-align: center;
-    
-    h2 {
-      margin-bottom: 16px;
-    }
-    img {
-      display: block;
-      margin: 0 auto;
-      &:not(:last-child) {
-        margin-bottom: 16px;
-      }
-    }
-    section {
-      margin-bottom: 3em;
-    }
-    p {
-      font-size: 16px;
-      font-weight: normal;
-      font-family: Verdana,Arial,Helvetica,sans-serif;
-      margin-bottom: 1em;
-    }
-    .tiny {
-      font-size: x-small;
     }
   }
 </style>
