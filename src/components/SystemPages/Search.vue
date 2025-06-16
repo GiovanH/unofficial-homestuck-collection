@@ -1,5 +1,5 @@
 <template>
-  <GenericPage>
+  <GenericPage :style="{'cursor': busy ? 'progress' : 'unset'}">
     <div class="search">
       <h2 class="pageTitle">Search</h2>
       <div class="searchBox">
@@ -7,7 +7,18 @@
         <button class="searchButton" @click="query = inputText"><fa-icon icon="search"></fa-icon></button>
       </div>
       <div class="results" ref="markup">
-        <div v-if="freshStart"><p class="summary">First search may take a few seconds!</p></div>
+        <div v-if="freshStart">
+          <p class="summary">First search may take a few seconds!</p>
+          <br />
+          <p class="summary">
+            Originally mspaintadventures.com had a "super cool low-tech search page" that just listed
+            all the text from every page at once and prompted you to Ctrl+F in your browser for what you were looking for. 
+            When Homestuck reached critical mass this was too much text and the page regularly crashed browsers! 
+          </p>
+        </div>
+        <div v-else-if="!query" class="result summary noResult">
+          
+        </div>
         <div v-else-if="results.length < 1" class="result summary noResult">
           <h2>No results found.</h2>
         </div>
@@ -57,6 +68,7 @@ export default {
   data: function() {
     return {
       results: [],
+      busy: false,
       freshStart: true,
       inputText: '',
       lastSearch: {},
@@ -97,15 +109,14 @@ export default {
     })
     if (this.query) {
       this.inputText = this.query
-      this.search()
+      this.doSearch()
     }
   },
   methods: {
-    invokeSearch(params){
-      return Promise.resolve(search.doSearch(params))
-      // return ipcRenderer.invoke('search', params)
-    },
-    async search() {
+    async doSearch() {
+      this.busy = true
+      await this.$nextTick()
+
       let input = this.query // this.inputText
         .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
@@ -141,12 +152,13 @@ export default {
       const searchPayload = {input, sort, chapter}
 
       this.lastSearch = searchPayload
-
+      
       this.$logger.info(input, searchPayload)
-      this.invokeSearch(searchPayload).then(results => {
-        this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
-        this.onSearchDone()
-      })
+      
+      const results = await search.doSearch(searchPayload)
+
+      this.results = this.$isNewReader ? results.filter(result => !this.$pageIsSpoiler(result.mspa_num)) : results
+      this.onSearchDone()
     },
     onSearchDone(){
       this.freshStart = false
@@ -155,6 +167,7 @@ export default {
         this.$nextTick(() => {
           this.$refs.input.focus()
           this.mark.unmark().mark(this.lastSearch.input, this.markOpts)
+          this.busy = false
         })
       })
     }
@@ -163,7 +176,11 @@ export default {
     query(to, from){
       if (to) {
         this.inputText = to
-        this.search()
+        this.doSearch()
+      } else {
+        this.inputText = to
+        this.results = []
+        this.onSearchDone()
       }
     }
   }

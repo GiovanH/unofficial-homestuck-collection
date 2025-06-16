@@ -14,6 +14,8 @@ if (!isWebApp) {
 var archive
 var chapterIndex;
 
+const yieldToEventLoop = () => new Promise(resolve => setTimeout(resolve, 0));
+
 function giveArchive(care) {
   archive = care
 }
@@ -61,7 +63,9 @@ function buildChapterIndex(archive){
   chapterIndex.add(footnoteList)
 }
 
-function doSearch(payload) {
+async function doSearch(payload) {
+  await yieldToEventLoop()
+
   if (chapterIndex == undefined)
       buildChapterIndex(archive || window.vm.archive)
 
@@ -108,6 +112,8 @@ function doSearch(payload) {
   const where = payload.chapter
     ? (item => item.chapter.toUpperCase().indexOf(payload.chapter) == 0)
     : undefined
+
+  await yieldToEventLoop()
 
   // Run search
   const searchOpts = {
@@ -186,6 +192,7 @@ function doSearch(payload) {
         lines: [] // page_lines
       })
     }
+    await yieldToEventLoop()
   }
   return foundText
 }
