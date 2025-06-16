@@ -56,8 +56,8 @@
 <script>
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import PageText from '@/components/Page/PageText.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import PageText from '@/components/StoryPage/PageText.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 
 export default {
   name: 'decode',

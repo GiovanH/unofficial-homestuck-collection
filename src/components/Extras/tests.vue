@@ -173,12 +173,12 @@
 <script>
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
 import errorReporting from '@/js/errorReporting'
 
-// import PAGE from '@/components/Page/Page.vue'
+// import PAGE from '@/components/StoryPage/Page.vue'
 // import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
 // import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
 // import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'

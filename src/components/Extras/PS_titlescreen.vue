@@ -9,7 +9,7 @@
 
 <script>
 // @ is an alias to /src
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 import FlashCredit from '@/components/UIElements/FlashCredit.vue'
 

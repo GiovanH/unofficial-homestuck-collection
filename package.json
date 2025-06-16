@@ -73,6 +73,7 @@
     "@vue/cli-plugin-e2e-webdriverio": "^5.0.8",
     "@vue/cli-plugin-router": "^4.5",
     "@vue/cli-service": "^4.5",
+    "@vue/component-compiler-utils": "^3.3.0",
     "@vue/devtools": "^6.5.0",
     "@vue/eslint-config-standard": "^5.1.2",
     "acorn": "^8",

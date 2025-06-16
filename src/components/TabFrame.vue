@@ -42,7 +42,7 @@
 import Bookmarks from '@/components/UIElements/Bookmarks.vue'
 import MediaModal from '@/components/UIElements/MediaModal.vue'
 import JumpBox from '@/components/UIElements/JumpBox.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 
 import ModBrowserPageMixin from '@/components/CustomContent/ModBrowserPageMixin.vue'
 
@@ -59,8 +59,8 @@ const SEARCH = () => import('@/components/SystemPages/Search.vue')
 const SETTINGS = () => import('@/components/SystemPages/Settings.vue')
 const CREDITS = () => import('@/components/SystemPages/Credits.vue')
 
-const PAGE = () => import('@/components/Page/Page.vue')
-const SINGLEPAGE = () => import('@/components/Page/SinglePage.vue')
+const PAGE = () => import('@/components/StoryPage/Page.vue')
+const SINGLEPAGE = () => import('@/components/StoryPage/SinglePage.vue')
 const FULLSCREENFLASH = () => import('@/components/SpecialPages/fullscreenFlash.vue')
 const X2COMBO = () => import('@/components/SpecialPages/x2Combo.vue')
 const TZPASSWORD = () => import('@/components/SpecialPages/TzPassword.vue')
@@ -80,7 +80,7 @@ const SQUIDDLES = () => import('@/components/Extras/Squiddles.vue')
 const EVENMORE = () => import('@/components/Extras/EvenMore.vue')
 const WIZARDYHERBERT = () => import('@/components/Extras/WizardyHerbert.vue')
 
-const EPILOGUES = () => import('@/components/Beyond/Epilogues.vue')
+const EPILOGUES = () => import('@/components/Comics/Epilogues.vue')
 
 const MUSIC = () => import('@/components/Music/MusicFrame.vue')
 

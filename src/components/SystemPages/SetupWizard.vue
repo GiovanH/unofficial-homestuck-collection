@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 
 const ipcRenderer = require('IpcRenderer')
@@ -187,7 +187,7 @@ export default {
         'War crimes',
         'Genocide',
         'Imperialist empires'
-      ],
+      ]
     }
   },
   computed: {

@@ -2400,7 +2400,7 @@
   optionalDependencies:
     prettier "^1.18.2 || ^2.0.0"
 
-"@vue/component-compiler-utils@^3.1.0", "@vue/component-compiler-utils@^3.1.2":
+"@vue/component-compiler-utils@^3.1.0", "@vue/component-compiler-utils@^3.1.2", "@vue/component-compiler-utils@^3.3.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@vue/component-compiler-utils/-/component-compiler-utils-3.3.0.tgz#f9f5fb53464b0c37b2c8d2f3fbfe44df60f61dc9"
   integrity sha512-97sfH2mYNU+2PzGrmK2haqffDpVASuib9/w2/noxiFi31Z54hW+q3izKQXXQZSNhtiUpAI36uSuYepeBe4wpHQ==

@@ -51,8 +51,8 @@
 
 <script>
 // @ is an alias to /src
-import GenericPage from '@/components/UIElements/GenericPage.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
 import MediaEmbed from '@/components/UIElements/MediaEmbed.vue'
 
 // import VuePdfEmbed from 'vue-pdf-embed/dist/vue2-pdf-embed'

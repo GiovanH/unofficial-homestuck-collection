@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import PAGENAV from '@/components/Page/PageNav.vue'
+import PAGENAV from '@/components/StoryPage/PageNav.vue'
 
 export default {
   extends: PAGENAV,
