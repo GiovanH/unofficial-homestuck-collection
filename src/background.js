@@ -478,6 +478,11 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
   } catch (e) {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
+    const e_obj = {
+      stack: e.stack,
+      ...e
+    }
+    win.webContents.send('SET_LOAD_ERROR', JSON.stringify(e_obj))
   }
 })
 

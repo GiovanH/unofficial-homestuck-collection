@@ -300,6 +300,9 @@
       ipcRenderer.on('SET_LOAD_STAGE', (event, stage) => {
         this.$root.loadStage = stage
       })
+      ipcRenderer.on('SET_LOAD_ERROR', (event, e_str) => {
+        this.$root.loadError = JSON.parse(e_str)
+      })
 
       ipcRenderer.on('ARCHIVE_UPDATE', async (event, archive) => {
         this.$root.loadStage = "LOADED_ARCHIVE_VANILLA"

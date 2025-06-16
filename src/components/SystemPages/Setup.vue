@@ -148,11 +148,6 @@ export default {
     text-align: center;
   }
 
-    .letsroll {
-      font-size: 200% !important;
-      padding: 0.2em;
-      margin: 1rem;
-    }
 
     h1, h2 {
       text-align: center;

@@ -469,7 +469,7 @@
             <br>
             <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
             <br><br>
-            <button @click="locateAssets()">Relocate assets</button>
+            <AssetPackSelector :showRestart="true" />
             <br><br>
           </div>
           <button @click="factoryReset()">Factory reset</button>
@@ -486,6 +486,7 @@ import PageText from '@/components/StoryPage/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
+import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue'
 
 import Mods from "@/mods.js"
 
@@ -505,7 +506,7 @@ export default {
   components: {
     GenericCardPage, SubSettingsModal,
     PageText, SpoilerBox, StoryPageLink,
-    draggable, NewReaderControls
+    draggable, NewReaderControls, AssetPackSelector
   },
   title: () => "Settings",
   data: function() {
@@ -884,9 +885,6 @@ export default {
           ipcRenderer.invoke('restart')
         }, 1000)
       }
-    },
-    locateAssets(){
-      ipcRenderer.invoke('locate-assets', {restart: true})
     },
     factoryReset(){      
       const args = {

@@ -1,6 +1,11 @@
 <template>
   <div style="max-width: 100%;">
-    <div class="errorWithMods" v-if="usingMods">
+    <div v-if="$root.loadStage === 'ARCHIVE'">
+      <p>This error was caused by an invalid asset pack.</p>
+
+      <AssetPackSelector :showRestart="true" />
+    </div>
+    <div class="errorWithMods" v-else-if="usingMods">
       <div v-if="responsibleModChoices.length > 0">
         <p>This error was caused by these mods:</p><br>
         <ol class="modlist">
@@ -74,17 +79,24 @@
         <a :href="bug_report_link" target="_blank" class="anchorButton bugreport">Report a bug</a>
       </div>
     </div>
+    <div v-if="guruMediation">
+      <hr />
+      <h2>Guru Mediation</h2><br />
+      <div v-html="guruMediation" />
+    </div>
   </div>
 </template>
 
 <script>
 import errorReporting from '@/js/errorReporting'
 import Mods from "@/mods.js"
+import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue';
 
 const ipcRenderer = require('IpcRenderer')
 
 export default {
   name: 'SetupErrorRecovery',
+  components: {AssetPackSelector},
   data: function() {
     return {
       assetDir: undefined,
@@ -93,6 +105,8 @@ export default {
   },
   computed: {
     modsEnabled() {
+      if (!this.$localData.settings.modListEnabled) return []
+
       return this.$localData.settings.modListEnabled.map((key) =>
         this.$root.modChoices[key]).filter(val => !!val)
     },
@@ -107,6 +121,8 @@ export default {
       return false
     },
     responsibleModChoices() {
+      if (!this.$root.loadErrorResponsibleMods) return []
+
       return this.$root.loadErrorResponsibleMods
         .map(k => this.$root.modChoices[k])
         .filter(Boolean)
@@ -119,10 +135,24 @@ export default {
         "App": this.$data?.$appVersion,
         "Asset Pack": this.$archive?.version
       }, this.$root.loadError)
+    },
+    guruMediation() {
+      const ans = []
+      if (this.$root.loadStage === 'ARCHIVE') {
+        ans.push(`<p>It looks like something is wrong with your asset pack.</p>`)
+        if (this.$root.loadError?.code === 'ENOENT') {
+          ans.push(`<p>We checked to make sure a key file existed and it did not.</p>`)
+        }
+      }
+      if (ans.length > 0) {
+        return ans.join('')
+      } else {
+        return undefined
+      }
     }
   },
   mounted() {
-
+    window.recovery = this;
   },
   methods: {
     doReloadNoRecover: () => ipcRenderer.invoke('reload'),

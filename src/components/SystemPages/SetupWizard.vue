@@ -102,15 +102,14 @@
       </ol>
       <p>To finish setting up the collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
 
-      <div class="center">
-        <button @click="locateAssets()">Locate Assets</button>
-        <span class="hint">Directory: {{assetDir || 'None selected'}}</span>
-        <!-- TODO: Unify this warning with the popup you get for entering an incorrect path -->
-        <span v-if="selectedAssetVersion && isExpectedAssetVersion === false" class="error hint">That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}.</strong></span>
-      </div>
+      <AssetPackSelector 
+        :showRestart="false"
+        @change="(state) => {
+          this.isValidAssetPack = state.isValid; 
+          this.assetDir = state.assetDir}" />
 
       <div class="center">
-        <button class="letsroll" :disabled="!validatePage || !isExpectedAssetVersion" @click="validateAndRestart()">All done. Let's roll!</button>
+        <button class="letsroll" :disabled="!isValidAssetPack" @click="validateAndRestart()">All done. Let's roll!</button>
       </div>
     </div>
 
@@ -128,12 +127,11 @@
 <script>
 import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
-
-const ipcRenderer = require('IpcRenderer')
+import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue';
 
 export default {
   name: 'SetupWizard',
-  components: {NewReaderControls, SpoilerBox},
+  components: {NewReaderControls, SpoilerBox, AssetPackSelector},
   data: function() {
     return {
       newReaderCardIndex: 0,
@@ -145,8 +143,6 @@ export default {
         "Reading Experience",
         "Getting Started"
       ],
-      assetDir: undefined,
-      selectedAssetVersion: undefined,
       contentWarnings: [
         'Slurs',
         'Misogyny, sexism',
@@ -187,7 +183,9 @@ export default {
         'War crimes',
         'Genocide',
         'Imperialist empires'
-      ]
+      ],
+      assetDir: undefined,
+      isValidAssetPack: false
     }
   },
   computed: {
@@ -205,12 +203,6 @@ export default {
       //   else return false
       // }
       return false
-    },
-    validatePage() {
-      return this.assetDir
-    },
-    isExpectedAssetVersion() {
-      return (this.selectedAssetVersion == this.$data.$expectedAssetVersion)
     }
   },
   mounted() {
@@ -230,27 +222,7 @@ export default {
       }
       this.newReaderCardIndex = next_index
     },
-    locateAssets(){
-      ipcRenderer.invoke('locate-assets', {restart: false}).then(result => {
-        this.assetDir = result || this.assetDir
-        this.checkAssetVersion(this.assetDir)
-      })
-    },
-    checkAssetVersion(assetDir){
-      ipcRenderer.invoke('check-archive-version', {assetDir}).then(result => {
-        this.selectedAssetVersion = result
-        this.$logger.info("Version check: got", result, "eq?", this.$data.$expectedAssetVersion, this.isExpectedAssetVersion)
-      })
-    },
-    validateAndRestart(){
-      if (this.$isWebApp) {
-        this.$localData.root.SET_ASSET_DIR('web')
-      } else {
-        this.$localData.root.SET_ASSET_DIR(this.assetDir)
-
-        ipcRenderer.invoke('restart')
-      }
-    }
+    validateAndRestart: AssetPackSelector.methods.validateAndRestart
   },
   watch: {
   }
@@ -259,6 +231,12 @@ export default {
 
 <style lang="scss">
 
+    .letsroll {
+      font-size: 200% !important;
+      padding: 0.2em;
+      margin: 1rem;
+    }
+    
   .wizard {
     .wizardSidebar {
       @media (max-width: 650px) {
