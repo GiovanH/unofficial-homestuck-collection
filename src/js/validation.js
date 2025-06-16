@@ -68,7 +68,10 @@ async function validateFiles(assetDir, table, ignore, channel) {
 
   var i = 0
   for (const p of all_asset_paths) {
-    if (abort) return
+    if (abort) {
+      console.log("Aborting (signal)")
+      return
+    }
 
     seen_paths.add(p)
     channel && channel.pos(i, p)

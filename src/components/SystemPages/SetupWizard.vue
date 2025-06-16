@@ -6,7 +6,7 @@
       <img class="logo" src="assets://archive/collection/logo_v2_static.png" v-else>
       <br />
       <ol class="wizardProgress">
-        <li v-for="name, i in newReaderCardNames"
+        <li v-for="name, i in newReaderCardNames.filter(Boolean)"
           v-text="name"
           :class="{current: i==newReaderCardIndex, previous: i < newReaderCardIndex, future: i > newReaderCardIndex}"
           :key="`wizardProgress${i}`"
@@ -52,7 +52,7 @@
       <!-- <p>Were you sent here by a friend? If so, welcome! I promise it's all as good as they’ve been telling you. If it wasn’t, I wouldn’t have wasted months of my life building this thing.</p> -->
       <h2>New Readers</h2>
       <p><em>The Unofficial Homestuck Collection</em> has a <strong>New Reader Mode</strong> that will automatically track your progress in the story, and automatically hide spoiler content until you get to the point in the story where each new bit unlocks. Don't worry, you don't have to get to the end to unlock the goodies! We try to make each bonus available as soon as we can.</p>
-      <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> And, if you're already partway in, you can adjust your current page here.</p>
+      <p>Whether you’re a totally new reader, or if you’ve already made some progress on the official website, it is <strong>heavily recommended you leave this setting enabled.</strong> If you're already partway in, you can adjust your current page here.</p>
       <!-- <span class="tiny">(You can always switch it off later or tweak some of the anti-spoiler features in Settings.)</span> -->
 
       <!-- Note: this is on by default via localData, not fancy interface hacks. -->
@@ -61,7 +61,7 @@
 
       <hr />
 
-      <p>Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. If New Reader Mode is on the Settings page will be spoiler-free too.</p>
+      <p class="hint">Regardless of what you choose here, you should probably also pop into Settings once the collection loads so you can configure your reading style. If New Reader Mode is on the Settings page will be spoiler-free too.</p>
     </div>
 
     <div class="fastForward" :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Reading Experience'}">
@@ -103,19 +103,34 @@
       <p>To finish setting up the collection, you’ll have to tell it where to find the assets on your computer. Make sure you’ve unzipped the folder, then click the button below to bring it into the application. If everything checks out, the application will open up into collection proper!</p>
 
       <AssetPackSelector 
+        style="margin-bottom: 0.5em;"
         :showRestart="false"
         @change="(state) => {
           this.isValidAssetPack = state.isValid; 
           this.assetDir = state.assetDir}" />
 
       <div class="center">
+        <button
+          style="font-size: 100%;"
+          @click="newReaderCardIndex = 6" class="back"
+          >Validate?</button>
+          <br />
         <button class="letsroll" :disabled="!isValidAssetPack" @click="validateAndRestart()">All done. Let's roll!</button>
+        
       </div>
+
+    </div>
+
+    <div :class="{hidden: newReaderCardNames[newReaderCardIndex] != 'Validate'}">
+      <ValidatorWizard ref="validator" :packRootOverride="assetDir" />
+      <button
+        @click="validatorWizardOn = false; newReaderCardIndex = lastNewReaderCard" class="back"
+        :disabled="$refs.validator && $refs.validator.busy > 0">&lt; Back</button>
     </div>
 
     </div>
     <div class="wizardNavigation">
-      <button v-if="newReaderCardIndex > 0" @click="wizardNextPage(-1)" class="prev">&lt; Previous</button>
+      <button v-if="newReaderCardIndex > 0 && newReaderCardNames[newReaderCardIndex-1]" @click="wizardNextPage(-1)" class="prev">&lt; Previous</button>
       <button v-if="newReaderCardIndex < lastNewReaderCard"
         @click="wizardNextPage(1)" class="next"
         :disabled="wizardForwardButtonDisabled">Next &gt;</button>
@@ -129,9 +144,11 @@ import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue';
 
+import ValidatorWizard from '@/components/UIElements/Validator.vue'
+
 export default {
   name: 'SetupWizard',
-  components: {NewReaderControls, SpoilerBox, AssetPackSelector},
+  components: {NewReaderControls, SpoilerBox, AssetPackSelector, ValidatorWizard},
   data: function() {
     return {
       newReaderCardIndex: 0,
@@ -141,7 +158,9 @@ export default {
         "Content Warnings",
         "New Readers",
         "Reading Experience",
-        "Getting Started"
+        "Getting Started",
+        undefined,
+        "Validate"
       ],
       contentWarnings: [
         'Slurs',
@@ -185,7 +204,8 @@ export default {
         'Imperialist empires'
       ],
       assetDir: undefined,
-      isValidAssetPack: false
+      isValidAssetPack: false,
+      validatorWizardOn: false
     }
   },
   computed: {
@@ -286,7 +306,8 @@ export default {
             }
           }
         }
-        li[data-key="Reading Experience"] {
+        li[data-key="Reading Experience"],
+        li[data-key="Validate"]  {
             margin-left: 2em !important;
         }
       }

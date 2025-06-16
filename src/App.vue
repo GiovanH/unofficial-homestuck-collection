@@ -510,6 +510,16 @@
           line-height: inherit;
         }
       }
+      // Folders
+      &[href^="file://"][href$="/"]{
+        &::after{
+          @extend %fa-icon;
+          @extend .fas;
+          content: fa-content($fa-var-folder-open);
+          margin: 0 1px 0 2px;
+          line-height: inherit;
+        }
+      }
     }
   }
   

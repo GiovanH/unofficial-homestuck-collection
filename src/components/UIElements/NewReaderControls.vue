@@ -110,7 +110,7 @@
           </div>
         </div>
         <div style="height: 45px;" v-else>
-          <p class="hint">Or activate a preset:</p>
+          <p class="hint" style="margin-bottom: 0;">Or activate a preset:</p>
           <div class="bigButtonRow">
             <button @click="setupProblemSleuth()">Start Problem Sleuth</button>
             <button @click="setupHomestuck()">Start Homestuck</button>

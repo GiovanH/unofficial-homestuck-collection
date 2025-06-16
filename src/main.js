@@ -14,7 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft,
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faUnlock,
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin, faFolderOpen
 } from '@fortawesome/free-solid-svg-icons'
 
 const importAsyncComputed = import('vue-async-computed')
@@ -23,7 +23,7 @@ const importFontAwesomeIconObj = import('@fortawesome/vue-fontawesome')
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faUnlock,
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin, faFolderOpen
 ])
 
 // Global prereqs

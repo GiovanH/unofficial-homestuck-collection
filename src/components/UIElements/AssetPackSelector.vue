@@ -1,13 +1,19 @@
 <template>
   <div class="assetWizard">
-    <span class="hint">Asset Pack Location: {{assetDir || 'None selected'}}</span>
+    <span class="hint">
+      Asset Pack Location: 
+      <span v-if="assetDir">
+        <a class="value" :href="'file://' + assetDir + '/'" v-text="assetDir" />
+      </span>
+      <span v-else>None selected</span>
+    </span>
     <button @click="locateAssets()" v-text="findStr" />
     <!-- TODO: Unify this warning with the popup you get for entering an incorrect path -->
     <span v-if="selectedAssetVersion && isExpectedAssetVersion === false" class="error hint">
       That looks like asset pack v{{selectedAssetVersion}}, which is not the correct version. 
       Please locate Asset Pack <strong>v{{$data.$expectedAssetVersion}}.</strong>
     </span>
-    <button v-if="showRestart &&  this.assetDir != this.$localData.assetDir" @click="validateAndRestart()">
+    <button v-if="showRestart && state.isValid && assetDir != $localData.assetDir" @click="validateAndRestart()">
       Apply and restart
     </button>
       
@@ -26,6 +32,10 @@ export default {
     showRestart: {
       type: Boolean,
       default: false
+    },
+    default: {
+      type: String,
+      default: undefined
     }
   },
   data() {
@@ -35,7 +45,9 @@ export default {
     }
   },
   mounted() {
-    if (this.$localData.assetDir) {
+    if (this.default) {
+      this.assetDir = this.default
+    } else if (this.$localData.assetDir) {
       this.assetDir = this.$localData.assetDir
     }
   },
@@ -60,6 +72,9 @@ export default {
   watch: {
     'state'(to, from) {
       this.$emit('change', this.state)
+    },
+    'default'(to, from) {
+      this.assetDir = this.default
     }
   },
   methods: {
@@ -98,5 +113,7 @@ export default {
     display: block;
     font-size: 13px;
     color: #888888;
+    
+    line-height: 2;
   }
 </style>
