@@ -71,6 +71,11 @@
         <button class="letsroll" :disabled="!isExpectedAssetVersion" @click="errorModeRestart()">All done. Let's roll!</button>
       </div>
     </div>
+    <div v-if="guruMediation">
+      <hr />
+      <h2>Guru Mediation</h2><br />
+      <div v-html="guruMediation" />
+    </div>
     <div v-if="$root.loadError">
       <hr />
       <p>If you report this error, please provide these error details:</p>
@@ -78,11 +83,6 @@
       <div v-if="!usingMods">
         <a :href="bug_report_link" target="_blank" class="anchorButton bugreport">Report a bug</a>
       </div>
-    </div>
-    <div v-if="guruMediation">
-      <hr />
-      <h2>Guru Mediation</h2><br />
-      <div v-html="guruMediation" />
     </div>
   </div>
 </template>
@@ -142,6 +142,11 @@ export default {
         ans.push(`<p>It looks like something is wrong with your asset pack.</p>`)
         if (this.$root.loadError?.code === 'ENOENT') {
           ans.push(`<p>We checked to make sure a key file existed and it did not.</p>`)
+        }
+        if (this.$root.loadError?.code === 'EPERM') {
+          ans.push(`<p>You don't have permissions to read and write from the asset pack. 
+            The collection needs to be able to read and edit files in this directory. 
+            Please move the asset pack to another directory, or change the permissions.</p>`)
         }
       }
       if (ans.length > 0) {

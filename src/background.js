@@ -257,6 +257,8 @@ async function loadArchiveData(){
     })
     fs.lstatSync(path.join(assetDir, "SELECT THIS FOLDER IN THE APP"))
     fs.lstatSync(path.join(assetDir, "storyfiles/hs2/00001.gif"))
+    fs.accessSync(path.join(assetDir, "archive"))
+
   } catch (e) {
     // dialog.showMessageBoxSync({
     //   type: 'error',
@@ -546,7 +548,23 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
       logger.debug(error)
-      validated = false
+
+      if (error.code === 'EPERM') {
+        dialog.showMessageBoxSync(win, {
+          type: 'warning',
+          title: 'Bad asset location',
+          message: "You don't have permissions to read and write from the asset pack. The collection needs to be able to read and edit files in this directory. Please move the asset pack to another directory, or change the permissions."
+        })
+        return undefined
+      } else {
+        dialog.showMessageBoxSync(win, {
+          type: 'warning',
+          title: 'Assets not found',
+          message: "That doesn't look like the right folder. Make sure you unzipped the asset pack, and select the singular folder that contains everything else."
+        })
+      }
+
+      return undefined
     }
 
     if (validated) {
@@ -572,11 +590,6 @@ ipcMain.handle('locate-assets', async (event, payload) => {
         }
       } else return newPath[0]
     } else {
-      dialog.showMessageBoxSync(win, {
-        type: 'warning',
-        title: 'Assets not found',
-        message: "That doesn't look like the right folder. Make sure you unzipped the asset pack, and select the singular folder that contains everything else."
-      })
       return undefined
     }
   }
