@@ -132,19 +132,19 @@ export default {
       }
     }
     
-    .nav1 a{
+    .nav1 a, .nav1 a:active {
       color: var(--nav-link, #ffffff);
     }
-    .nav2 a{
+    .nav2 a, .nav2 a:active {
       color: var(--nav-link, #29ff4a);
     }
-    .nav3 a{
+    .nav3 a, .nav3 a:active {
       color: var(--nav-link, #39d5f6);
     }
-    .nav4 a{
+    .nav4 a, .nav4 a:active {
       color: var(--nav-link, #f7f72a);
     }
-    .nav5 a{
+    .nav5 a, .nav5 a:active {
       color: var(--nav-link, #ffb529);
     }
   }
@@ -156,19 +156,19 @@ export default {
     }
   }
 
-  .nav1 a{
-    color: #ffffff;
+  .nav1 a, .nav1 a:active {
+    color: #ffffff
   }
-  .nav2 a{
+  .nav2 a, .nav2 a:active {
     color: #29ff4a;
   }
-  .nav3 a{
+  .nav3 a, .nav3 a:active {
     color: #39d5f6;
   }
-  .nav4 a{
+  .nav4 a, .nav4 a:active {
     color: #f7f72a;
   }
-  .nav5 a{
+  .nav5 a, .nav5 a:active {
     color: #ffb529;
   }
   nav {

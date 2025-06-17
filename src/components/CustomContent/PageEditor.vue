@@ -155,7 +155,7 @@ export default {
       } else {
         const liverefs = this.$refs.LivePage.$refs
         // Need a fallback element in case a page renders without one of these (i.e. supercartridge)
-        const fallbackElem = this.$refs.LivePage.$el
+        const fallbackElem = this.$el.querySelector("div.page")
         this.bboxes = {
           pageTitle: (liverefs.pageTitle || fallbackElem).getBoundingClientRect(),
           media: (liverefs.media || fallbackElem).getBoundingClientRect(),

@@ -32,7 +32,7 @@
 	--page-nav-meta: #535353;
 	--page-links: #0000EE;
 	--page-links-visited: #6300c0;
-	--page-links-active: -webkit-activelink;
+	--page-links-active: var(--page-links);
 
 	--system-skycolor: #35bfff;
 	--system-background: 
@@ -55,7 +55,10 @@
 	--find--highlight: lawngreen;
 
 	&.mspa {
-		// Use all defaults with no modifications.
+		// Use all defaults
+
+		// Only apply to mspa theme
+		--page-links-active: -webkit-activelink;
 	}
 
 	&.dark {
@@ -120,6 +123,8 @@
 
 		--ctx-bg: #FFFFFF;
 		--ctx-divider: #DDDDDD;
+		
+		--page-links-active: -webkit-activelink;
 		
 		&.customStyles .navBanner .candyCorn:before {
 			color: white;
@@ -193,6 +198,9 @@
 		--page-pageBorder: #f400ec;
 		--page-pageContent: #14ff23;
 		--page-nav-meta: #000000;
+
+		// sbahj doesn't recolor links, ok to red/blue 'em
+		--page-links-active: -webkit-activelink;
 
 		--system-background:
 			url('../src/assets/themes/sbahjbigman.png') 82% -10px no-repeat fixed,
