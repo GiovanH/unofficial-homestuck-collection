@@ -207,6 +207,9 @@ async function extractimods() {
       if (err) logger.error(err)
     })
   }
+  // There may be validation entries for missing files here
+  // if imods' crc file was built with WIP files in the working tree.
+  // Since we just extracted the tar file successfully, ignore these...
 }
 
 function removeModsFromEnabledList(responsible_mods) {

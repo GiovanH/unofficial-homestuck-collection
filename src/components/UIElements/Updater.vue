@@ -60,10 +60,14 @@ export default {
     }
   },
   methods: {
-    doUpdateCheck(){
-      fetch(`https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/releases`)
-        .then(response => response.json())
-        .then(data => { this.ghReleasesRaw = data })
+    async doUpdateCheck(){
+      try {
+        const response = await fetch(`https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/releases`)
+        const data = await response.json()
+        this.ghReleasesRaw = data
+      } catch {
+        // Probably just offline, pass
+      }
     }
   },
   watch: {
