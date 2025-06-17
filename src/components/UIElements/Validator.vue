@@ -275,9 +275,22 @@ export default {
 </script>
 
 <style scoped lang="scss">
-// .wizardWrap{
-//   text-align: center;
-// }
+@import '@/css/xpProgress.scss';
+
+p {
+  // fuck you *unresets your css*
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+progress {
+  margin: 1em 0;
+  width: 100%;
+  box-sizing: content-box !important;
+}
 
 img.progress-ani {
   height: 120px;
@@ -288,15 +301,6 @@ img.progress-ani {
 button.main {
   margin: 0 auto;
   display: block;
-}
-
-p {
-  // fuck you *unresets your css*
-  display: block;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
 }
 
 button.main {
@@ -320,163 +324,4 @@ td.filepath {
   display: block;
 }
 
-progress {
-  margin: 1em 0;
-  width: 100%;
-  box-sizing: content-box !important;
-}
-/*-------------------------------------------*\
-    ProgressBar
-\*-------------------------------------------*/
-
-@keyframes sliding {
-  0% {
-    transform: translateX(-30px);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-progress {
-
-  &,
-  &[value],
-  &:not([value]) {
-    --determinate-track: repeating-linear-gradient(
-        to right,
-        #fff 0px,
-        #fff 2px,
-        transparent 2px,
-        transparent 10px
-      ),
-      linear-gradient(
-        to bottom,
-        #acedad 0%,
-        #7be47d 14%,
-        #4cda50 28%,
-        #2ed330 42%,
-        #42d845 57%,
-        #76e275 71%,
-        #8fe791 85%,
-        #ffffff 100%
-      );
-    --indeterminate-track: repeating-linear-gradient(
-        to right,
-        transparent 0px,
-        transparent 8px,
-        #fff 8px,
-        #fff 10px,
-        transparent 10px,
-        transparent 18px,
-        #fff 18px,
-        #fff 20px,
-        transparent 20px,
-        transparent 28px,
-        #fff 28px,
-        #fff 100%
-      ),
-      linear-gradient(
-        to bottom,
-        #acedad 0%,
-        #7be47d 14%,
-        #4cda50 28%,
-        #2ed330 42%,
-        #42d845 57%,
-        #76e275 71%,
-        #8fe791 85%,
-        #ffffff 100%
-      );
-    --indeterminate-track-animation: sliding 2s linear 0s infinite;
-    --track-shadow: inset 0px 0px 1px 0px rgba(104, 104, 104, 1);
-    --track-height: 14px;
-  }
-
-  box-sizing: border-box;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  height: var(--track-height);
-
-  border: 1px solid #686868;
-  border-radius: 4px;
-
-  padding: 1px 2px 1px 0px;
-
-  overflow: hidden;
-  background-color: #fff;
-
-  -webkit-box-shadow: var(--track-shadow);
-  -moz-box-shadow: var(--track-shadow);
-  box-shadow: var(--track-shadow);
-
-  /* Determinate styles */
-  &[value] {
-    /* Chrome, Safari, Edge */
-    &::-webkit-progress-bar {
-      background-color: transparent;
-    }
-    &::-webkit-progress-value {
-      border-radius: 2px;
-      background: var(--determinate-track);
-    }
-    /* Firefox */
-    &::-moz-progress-bar {
-      border-radius: 2px;
-      background: var(--determinate-track);
-    }
-  }
-
-  /* Indeterminate styles */
-  &:not([value]) {
-    /* Apply for Chrome, Safari and Edge but animation only works in Safari */
-    &::-webkit-progress-bar {
-      width: 100%;
-      background: var(--indeterminate-track);
-      animation: var(--indeterminate-track-animation);
-    }
-
-    /* Solution for Chrome and Edge: animate pseudo element :after */
-    & {
-      position: relative;
-    }
-    /* This pseudo element is to hide the not working -webkit-progress-bar animation above for Chrome and Edge */
-    &::before {
-      box-sizing: border-box;
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-
-      width: 100%;
-      height: 100%;
-
-      background-color: #fff;
-
-      -webkit-box-shadow: var(--track-shadow);
-      -moz-box-shadow: var(--track-shadow);
-      box-shadow: var(--track-shadow);
-    }
-    /* Real animated element */
-    &::after {
-      box-sizing: border-box;
-      content: "";
-      position: absolute;
-      top: 1px;
-      left: 2px;
-
-      width: 100%;
-      height: calc(100% - 2px);
-
-      padding: 1px 2px 1px 2px;
-
-      border-radius: 2px;
-
-      background: var(--indeterminate-track);
-      animation: var(--indeterminate-track-animation);
-    }
-  }
-}
 </style>
