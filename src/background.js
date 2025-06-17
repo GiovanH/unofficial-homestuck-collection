@@ -255,7 +255,9 @@ async function loadArchiveData(){
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
-    fs.lstatSync(path.join(assetDir, "SELECT THIS FOLDER IN THE APP"))
+    // This is an identifier for the real asset pack V2 but there are
+    // circulating distributions without it...
+    // fs.lstatSync(path.join(assetDir, "SELECT THIS FOLDER IN THE APP"))
     fs.lstatSync(path.join(assetDir, "storyfiles/hs2/00001.gif"))
     fs.accessSync(path.join(assetDir, "archive"))
 

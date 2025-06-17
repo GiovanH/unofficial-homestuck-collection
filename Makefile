@@ -44,8 +44,8 @@ src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 src/js/crc_imods.json: src/imods.tar.gz
 	yarn exec node src/js/validation.js src/imods/ src/js/crc_imods.json
 
-src/js/crc_pack.json:
-	yarn exec node src/js/validation.js "${ASSET_DIR}" src/js/crc_pack.json
+# src/js/crc_pack.json:
+# 	yarn exec node src/js/validation.js "${ASSET_DIR}" src/js/crc_pack.json
 
 ## Running live
 

@@ -8,15 +8,17 @@ function * crawlFileTree(root, subroot = './', ignore = []) {
 
   const dir = fs.opendirSync(path.join(root, subroot))
 
+  const effective_ignore = [...ignore, 'Thumbs.db']
+
   let dirent
   // eslint-disable-next-line no-cond-assign
   while (dirent = dir.readSync()) {
-    if (dirent.isDirectory()) {
-      if (!ignore.includes(dirent.name)) {
+    if (!effective_ignore.includes(dirent.name)) {
+      if (dirent.isDirectory()) {
         yield * crawlFileTree(root, path.join(subroot, dirent.name), ignore)
+      } else {
+        yield path.join(subroot, dirent.name)
       }
-    } else {
-      yield path.join(subroot, dirent.name)
     }
   }
   dir.close()

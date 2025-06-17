@@ -109,7 +109,8 @@ Vue.mixin({
   computed: {
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return Boolean(!this.$root.guestMode && (this.$newReaderCurrent && this.$localData.settings.newReader.limit))
+      if (this.$root.guestMode) return false
+      return (this.$newReaderCurrent && this.$localData.settings.newReader.limit)
     },
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current

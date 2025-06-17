@@ -32,6 +32,7 @@ install
 
 # generated file
 src/imods.tar.gz
+src/js/crc_imods.json
 webapp/browser.js
 webAppModTrees.json
 

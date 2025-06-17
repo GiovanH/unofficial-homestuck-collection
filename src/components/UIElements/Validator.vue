@@ -24,7 +24,7 @@
         <td v-if="$isNewReader" class="filepath" style="color: black; background: black;">REDACTED</td>
         <td v-else class="filepath">{{current_file}}</td>
       </tr>
-      <tr v-if="eta">
+      <tr v-if="in_progress && eta">
         <td>Time remaining</td>
         <td>{{Math.round(eta / 1000, 0)}} seconds</td>
       </tr>
@@ -75,7 +75,7 @@
         </ul>
       </div>
       <div v-if="missing_paths && missing_paths.length > 0">
-        <h3>Unexpected extra files</h3>
+        <h3>Missing files</h3>
         <ul class="filelist">
           <li v-for="p in missing_paths" :key="p" v-html="pathToLink(p)">
             
@@ -156,7 +156,7 @@ export default {
       if (p.startsWith('mods/')) {// || p.startsWith('archive/imods/')) {
         return false
       }
-      if (p == "readme.txt") {
+      if (["readme.txt", "Thumbs.db"].includes(p)) {
         // known error
         return false
       }
@@ -171,9 +171,10 @@ export default {
       this.eta = time_per_file * (this.total - this.progress)
     },
     pathToLink(p) {
-      const dir = this.assetDir + path.sep + p.split('/').slice(0, -1).join('/')
-      const link = 'file://' + dir + '/'
-      return `<a href="${link}"/>${dir}</a>${p.split('/').slice(-1)}`
+      const filepath = path.parse(path.join(this.assetDir, p))
+      const dir = filepath.dir
+      const link = 'file://' + dir.replace(/\\/g, '/') + '/'
+      return `<a href="${link}"/>${filepath.dir}${path.sep}</a>${filepath.name}`
     },
     validatePackAgainstTable() {
       // this.validateAgainstTable(this.assetDir + "/archive/imods", json_table_imods)
@@ -311,6 +312,7 @@ ul.filelist {
   list-style: inside;
   max-height: 20em;
   overflow-y: auto;
+  text-align: left; // Override setup wizard justification
 }
 
 td:first-child {
