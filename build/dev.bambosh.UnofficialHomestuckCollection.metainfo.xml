@@ -23,6 +23,10 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.6.5" type="stable" date="2025-06-17T04:01:28Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.5</url>
+      <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.6.1...v2.6.5&lt;/p&gt;&lt;p&gt;Features:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/2df71615dda9d77ace1291529d7bfab6ecbd5b64&#34;&gt;Feature: censor female nudity&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/8ca6869b4fba919ec9550c319f3e1c7bac31d081&#34;&gt;Feature: Asset Pack Validator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Also includes several bugfixes and stability improvements.&lt;/p&gt;</description>
+    </release>
     <release version="2.6.1" type="stable" date="2025-06-11T03:15:11Z">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.1</url>
       <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.5.6...v2.6.1&lt;/p&gt;</description>
