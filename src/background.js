@@ -632,6 +632,11 @@ ipcMain.handle('restart', async (event) => {
 
 ipcMain.handle('reload', async (event) => {
   win.reload()
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+  } else {
+    await win.loadURL('app://./index.html')
+  }
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {

@@ -145,6 +145,10 @@ module.exports = {
         },
         win: {
           target: [
+            // {
+            //   target: "portable",
+            //   arch: [ "x64" ]
+            // },
             {
               target: "nsis",
               arch: [
