@@ -170,15 +170,23 @@ async function extractimods() {
   // Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   setLoadStage("VALIDATE_IMODS_EXTRAS")
-  const Validation = await import('@/js/validation.js')
-  const crc_table_imods = await import('@/js/crc_imods.json')
-  const state = await Validation.validateFiles(imodsDir, crc_table_imods)
-  for (const extra_path of state.extra_paths) {
-    const target_path = path.join(imodsDir, extra_path)
-    logger.warn("Deleting extra imod file", target_path)
-    fs.unlink(target_path, err => {
-      if (err) logger.error(err)
-    })
+  try {
+    const Validation = await import('@/js/validation.js')
+    const crc_table_imods = await import('@/js/crc_imods.json')
+    const state = await Validation.validateFiles(imodsDir, crc_table_imods)
+    for (const extra_path of state.extra_paths) {
+      const target_path = path.join(imodsDir, extra_path)
+      logger.warn("Deleting extra imod file", target_path)
+      fs.unlink(target_path, err => {
+        if (err) logger.error(err)
+      })
+    }
+  } catch (e) {
+    if (e.code == "ENOENT") {
+      // First run, pass
+    } else {
+      throw e
+    }
   }
   // There may be validation entries for missing files here
   // if imods' crc file was built with WIP files in the working tree.

@@ -113,11 +113,11 @@ export default {
     usingMods() {
       if (this.modsEnabled.length) return true
       if (this.$root.loadErrorResponsibleMods) return true
-      if (this.$root.loadError) {
-        if (this.$root.loadError.stack.includes('mods')) {
-          return true
-        }
-      }
+      // if (this.$root.loadError) {
+      //   if (this.$root.loadError.stack.includes('mods')) {
+      //     return true
+      //   }
+      // }
       return false
     },
     responsibleModChoices() {
