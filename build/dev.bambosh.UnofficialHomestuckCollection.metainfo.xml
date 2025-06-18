@@ -23,9 +23,9 @@
     </screenshot>
   </screenshots>
   <releases>
-    <release version="2.6.6" type="stable" date="2025-06-17T21:45:34Z">
-      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.6</url>
-      <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.6.1...v2.6.6&lt;/p&gt;&lt;p&gt;Features:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/2df71615dda9d77ace1291529d7bfab6ecbd5b64&#34;&gt;Feature: censor female nudity&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/8ca6869b4fba919ec9550c319f3e1c7bac31d081&#34;&gt;Feature: Asset Pack Validator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Also includes several bugfixes and stability improvements.&lt;/p&gt;</description>
+    <release version="2.6.7" type="stable" date="2025-06-18T21:46:50Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.7</url>
+      <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.6.1...v2.6.7&lt;/p&gt;&lt;p&gt;Features:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/2df71615dda9d77ace1291529d7bfab6ecbd5b64&#34;&gt;Feature: censor female nudity&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/8ca6869b4fba919ec9550c319f3e1c7bac31d081&#34;&gt;Feature: Asset Pack Validator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Plus two emergency fixes preventing people from installing and validating the collection since 2.6.5 (now deleted)&lt;/p&gt;&lt;p&gt;Also includes several bugfixes and stability improvements.&lt;/p&gt;</description>
     </release>
     <release version="2.6.1" type="stable" date="2025-06-11T03:15:11Z">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.1</url>
