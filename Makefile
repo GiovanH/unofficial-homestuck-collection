@@ -36,9 +36,7 @@ lint: install
 
 ## Intermediate files
 
-build/webAppModTrees.json: webapp/browser.js.j2
-	mkdir -p build/
-	(cd ${ASSET_DIR}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > build/webAppModTrees.json
+SHARED_INTERMEDIATE=src/imods.tar.gz src/js/crc_imods.json
 
 src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 	# cd src && tar -czf imods.tar.gz imods/
@@ -49,6 +47,18 @@ src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 src/js/crc_imods.json: src/imods.tar.gz
 	yarn exec node src/js/validation.js src/imods/ src/js/crc_imods.json
 
+WEBAPP_INTERMEDIATE=build/webAppModTrees.json webapp/browser.js
+
+build/webAppModTrees.json: webapp/browser.js.j2
+	mkdir -p build/
+	(cd ${ASSET_DIR_LITE}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > build/webAppModTrees.json
+
+webapp/browser.js: webapp/browser.js.j2
+	env ASSET_DIR="${ASSET_DIR_LITE}" \
+		ASSET_PACK_HREF="http://localhost:8413/" \
+		APP_VERSION=`jq -r '.version' < package.json` \
+		jinja2 $< > $@
+
 # src/js/crc_pack.json:
 # 	yarn exec node src/js/validation.js "${ASSET_DIR}" src/js/crc_pack.json
 
@@ -58,46 +68,42 @@ src/js/crc_imods.json: src/imods.tar.gz
 
 # Run 'rm src/imods.tar.gz; SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test' to make imods and pass --reset-last-version through
 .PHONY: test
-test: install src/imods.tar.gz src/js/crc_imods.json
+test: install ${SHARED_INTERMEDIATE}
 	yarn run vue-cli-service electron:serve $(SERVE_FLAGS)
-
-.PHONY: serve
-serve: install src/imods.tar.gz build/webAppModTrees.json
-	(cd ${ASSET_DIR} && python3 "L:/Archive/Homestuck/TUHC/unofficial-homestuck-collection/webapp/httpserver.py") &
-	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js &
-	react webapp/browser.js.j2 \
-		env ASSET_DIR=${ASSET_DIR} \
-			ASSET_PACK_HREF="http://localhost:8413/" \
-			APP_VERSION=`jq -r '.version' < package.json` \
-			j2 webapp/browser.js.j2
 
 .PHONY: itest
 itest:
 	-rm src/imods.tar.gz
 	SERVE_FLAGS="--reset-last-version" make src/imods.tar.gz test
 
+.PHONY: ensure-asset-server
+ensure-asset-server:
+	curl http://localhost:8413 >/dev/null \
+	  || mintty --hold error -e bash -c 'ROOT_DIR="${ASSET_DIR_LITE}" python3 webapp/httpserver.py' &
+
+.PHONY: serve
+serve: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE}
+	make ensure-asset-server
+	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js &
+	react "make webapp/browser.js" webapp/browser.js.j2
+
 ## Building output
 
 .PHONY: build
-build: install src/imods.tar.gz src/js/crc_imods.json
+build: install ${SHARED_INTERMEDIATE}
 	env NODE_OPTIONS=--max_old_space_size=8192 \
 		yarn run vue-cli-service electron:build
 	# yarn electron:build
 
-.PHONY: webapp
-webapp: install build/webAppModTrees.json
-# 	cp .env_webbuild .env
-	env ASSET_DIR=${ASSET_DIR} \
-		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
-		APP_VERSION=`jq -r '.version' < package.json` \
-		j2 webapp/browser.js.j2
-	env ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
-		yarn run vue-cli-service build webapp/browser.js
-
 .PHONY: publish-release
-publish-release: install src/imods.tar.gz src/js/crc_imods.json
+publish-release: install ${SHARED_INTERMEDIATE}
 	env NODE_OPTIONS=--max_old_space_size=8192 \
 		yarn run vue-cli-service electron:build -p always
+
+.PHONY: webapp
+webapp: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE} 
+	env ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+		yarn run vue-cli-service build webapp/browser.js
 
 .PHONY: help
 help:

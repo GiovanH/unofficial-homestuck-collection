@@ -100,7 +100,6 @@ ensure-server:
 
 # Build and publish
 
-
 litepack:
     #!/bin/bash
     (cd .. && ./litepack.sh)
@@ -116,14 +115,14 @@ litepack-mods:
         fixOB &
         copyMods &
         wait
+        postprocessMods
     )
 
 # build and upload webapp to prod
 publish-webapp:
     #!/bin/bash
     rm build/webAppModTrees.json || :
-    rsync -ri src/imods "../Asset Pack V2/archive/"
-
+    
     just litepack-mods; # just litepack for full resource verification
     make webapp
 

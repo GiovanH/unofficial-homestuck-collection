@@ -184,6 +184,10 @@ async function extractimods() {
     logger.info("Not yet in working state, not extracting imods.")
     return
   }
+  if (isWebApp) {
+    logger.error("Refusing to extract imods in webapp mode. Should not have called this!")
+    return
+  }
   // Some people report occasionally getting "__webpack_require__.match is not a function or its return value is not iterable" at this line. Have not been able to reproduce the error so far.
 
   setLoadStage("VALIDATE_IMODS_EXTRAS")
@@ -550,6 +554,8 @@ async function buildApi(mod) {
     if (mod._singlefile) throw new Error(`Singlefile mods cannot use this method`)
     if (!local_path.startsWith("./")) throw new Error(`${local_path}: Paths must be mod relative (./)`)
     if (local_path.includes("/..")) throw new Error(`${local_path}: You know what you did`)
+      
+    if (isWebApp) throw new Error(`Cannot read files in webapp mode. You need to webpack these!`)
   }
   function readFileSyncLocal(local_path, method_name) {
     safetyChecks(local_path)
