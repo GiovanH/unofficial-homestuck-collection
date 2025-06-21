@@ -23,6 +23,8 @@ window.webAppOpinionatedDefaults = {
     "tuhc-readmspa",
     "Plaintext-Images",
 
+    'fallback.js',
+
     "Ruby Quest",
     "Nan Quest",
 
@@ -49,7 +51,6 @@ window.webAppOpinionatedModDefaults = {
   // "Nightfall_online",
 //"eraserhead.js",
 {% set mods = [
-  "404Quest_online",
   "Psycholonials_online",
   "Ruby Quest_online",
   "Nan Quest_online",
@@ -131,7 +132,8 @@ const block_note = require('./block_note.js')
 let noted_adblock = false
 
 window.webAppModJs = {
-  'cdn.js': lockmod(require('{{ ASSET_DIR }}mods/cdn.js')),
+  // 'cdn.js': lockmod(require('@/../webapp/mod_cdn.js')),
+  'fallback.js': require('@/../webapp/mod_fallback.js'),
 
   _bolin: import('{{ ASSET_DIR }}archive/imods/_bolin.js'),
   _hqAudio: import('{{ ASSET_DIR }}archive/imods/_hqAudio.js'),
@@ -351,6 +353,7 @@ if (!Array.prototype.toReversed) {
 }
 
 function lockmod(modjs) { // hoisted
+  modjs._internal = true
   modjs.hidden = true
   return modjs
 }

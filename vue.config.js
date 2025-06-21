@@ -24,6 +24,8 @@ try {
   console.warn("No git remote")
 }
 
+const is_webapp = Boolean(process.env.ASSET_PACK_HREF)
+
 module.exports = {
   configureWebpack: {
     optimization: {
@@ -47,7 +49,8 @@ module.exports = {
         "vue$": "vue/dist/vue.esm.js",
         "@/*": "./src/*",
         // "IpcRenderer$": '/src/js/ipcRendererAlias.js'
-        "IpcRenderer$": '/webapp/fakeIpc.js'
+        "Logger$": (is_webapp ? '/webapp/logPolyfill.js' : 'electron-log'),
+        "IpcRenderer$": (is_webapp ? '/webapp/fakeIpc.js' : '/src/js/ipcRendererAlias.js')
       }
     },
     plugins: [],
