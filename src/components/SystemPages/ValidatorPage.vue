@@ -3,7 +3,8 @@
     <div class="mousewrap" :class="{'busy': ($refs.wizard && $refs.wizard.busy>0)}">
       <div class="card dialog">
         <div class="cardContent">
-          <ValidatorWizard ref="wizard"/>
+          <ValidatorWizard ref="wizard" v-if="!$isWebApp"/>
+          <p v-else>Not applicable in webapp!</p>
         </div>
       </div>
     </div>
