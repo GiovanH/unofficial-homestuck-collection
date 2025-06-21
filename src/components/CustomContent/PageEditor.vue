@@ -68,11 +68,11 @@
 
 <script>
 // @ is an alias to /src
-import VanillaPage from '@/components/Page/Page.vue'
-import SinglePage from '@/components/Page/SinglePage.vue'
+import VanillaPage from '@/components/StoryPage/Page.vue'
+import SinglePage from '@/components/StoryPage/SinglePage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 import MspaPageSelector from '@/components/UIElements/MspaPageSelector.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
 import Settings from '@/components/SystemPages/Settings.vue'
 
 // FIXME: Vue update broke this
@@ -155,7 +155,7 @@ export default {
       } else {
         const liverefs = this.$refs.LivePage.$refs
         // Need a fallback element in case a page renders without one of these (i.e. supercartridge)
-        const fallbackElem = this.$refs.LivePage.$el
+        const fallbackElem = this.$el.querySelector("div.page")
         this.bboxes = {
           pageTitle: (liverefs.pageTitle || fallbackElem).getBoundingClientRect(),
           media: (liverefs.media || fallbackElem).getBoundingClientRect(),

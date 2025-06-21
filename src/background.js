@@ -1,29 +1,28 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Menu, protocol, dialog, shell, clipboard } from 'electron'
+import fs from 'fs'
+import {
+  app, ipcMain, protocol, dialog, shell, clipboard,
+  BrowserWindow, Menu
+} from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import errorReporting from './js/errorReporting'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-assembler'
-import fs from 'fs'
-
-const { nativeImage } = require('electron')
-
-const path = require('path')
 
 const handler = require('serve-handler')
 const http = require('http')
-const semver = require("semver");
+const path = require('path')
+const semver = require("semver")
 
+const { nativeImage } = require('electron')
 const log = require('electron-log')
 const Store = require('electron-store')
-
 const windowStateKeeper = require('electron-window-state')
 
 const store = new Store()
 const logger = log.scope('ElectronMain')
-const APP_VERSION = app.getVersion()
 
-// const search = require('./search.js').default
+const APP_VERSION = app.getVersion()
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -46,8 +45,8 @@ if (!store.get('settings.enableHardwareAcceleration')) {
   logger.info("Not disabling hardware acceleration")
 }
 
-// Log settings, for debugging
-logger.info(store.get('settings'))
+if (process.platform == 'linux')
+  app.commandLine.appendSwitch('no-sandbox')
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -151,7 +150,7 @@ var menuTemplate = [
         click: () => {
           if (win) win.webContents.send(
             'TABS_NEW',
-            {parsedURL: '/', adjacent: false}
+            {url: '/', adjacent: false}
           )
         }
       },
@@ -245,8 +244,7 @@ async function loadArchiveData(){
     }
   } catch (e) {
     // Error loading json. Probably a bad asset pack installation.
-    logger.error(e)
-    return undefined
+    throw e
   }
 
   if (!data) throw new Error("Data empty after attempted load")
@@ -257,12 +255,18 @@ async function loadArchiveData(){
     required_keys.forEach(key => {
       if (!data[key]) throw new Error("Archive object missing required key", key)
     })
+    // This is an identifier for the real asset pack V2 but there are
+    // circulating distributions without it...
+    // fs.lstatSync(path.join(assetDir, "SELECT THIS FOLDER IN THE APP"))
+    fs.lstatSync(path.join(assetDir, "storyfiles/hs2/00001.gif"))
+    fs.accessSync(path.join(assetDir, "archive"))
+
   } catch (e) {
-    dialog.showMessageBoxSync({
-      type: 'error',
-      title: 'Archive load error',
-      message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
-    })
+    // dialog.showMessageBoxSync({
+    //   type: 'error',
+    //   title: 'Archive load error',
+    //   message: `Something went wrong while loading the archive. This may be related to an incorrectly-written mod. Check the console log for details.`
+    // })
 
     throw e
   }
@@ -287,7 +291,7 @@ function getFlashPath(){
       flashPlugin = 'archive/data/plugins/libpepflashplayer.so'
       break
     default:
-      throw Error("Unknown platform", process.platform)
+      throw Error("Unknown platform", process.platform, process.arch)
   }
 
   if (assetDir === undefined) {
@@ -304,46 +308,50 @@ function getFlashPath(){
   return flashPath
 }
 
-try {
-  if (assetDir === undefined) {
-    throw Error("Asset directory not yet defined, triggering first run")
-  }
-  // Pick the appropriate flash plugin for the user's platform
-  const flashPath = getFlashPath()
+var is_first_run = false
+if (assetDir === undefined) {
+  is_first_run = true
+} else {
+  try {
+    // Pick the appropriate flash plugin for the user's platform
+    const flashPath = getFlashPath()
 
-  if (fs.existsSync(flashPath)) {
-    app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-  } else throw Error(`Flash plugin not located at ${flashPath}`)
+    if (fs.existsSync(flashPath)) {
+      app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
+    } else throw Error(`Flash plugin not located at ${flashPath}`)
 
-  if (process.platform == 'linux')
-    app.commandLine.appendSwitch('no-sandbox')
 
-  if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
-    app.commandLine.appendSwitch('disable-smooth-scrolling')
-  
-  // Spin up a static file server to grab assets from.
-  // Mounts on a dynamically assigned port, which is returned here as a callback.
-  const server = http.createServer((request, response) => {
-    response.setHeader('Access-Control-Allow-Origin', '*')
-    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
-    response.setHeader('Access-Control-Max-Age', 2592000)
-    return handler(request, response, {
-      public: assetDir
+    if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
+      app.commandLine.appendSwitch('disable-smooth-scrolling')
+
+    // Spin up a static file server to grab assets from.
+    // Mounts on a dynamically assigned port, which is returned here as a callback.
+    const server = http.createServer((request, response) => {
+      response.setHeader('Access-Control-Allow-Origin', '*')
+      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET')
+      response.setHeader('Access-Control-Max-Age', 2592000)
+      return handler(request, response, {
+        public: assetDir
+      })
     })
-  })
 
-  server.listen(0, '127.0.0.1', (error) => {
-    if (error) throw error
-    port = server.address().port
+    server.listen(0, '127.0.0.1', (error) => {
+      if (error) throw error
+      port = server.address().port
 
-    if (port === undefined) {
-      throw Error("Could not initialize internal asset server", server, server.address())
-    } else {
-      logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
-    }
-  })
-} catch (error) {
-  logger.debug(error)
+      if (port === undefined) {
+        throw Error("Could not initialize internal asset server", server, server.address())
+      } else {
+        logger.info("Successfully started server", `http://127.0.0.1:${port}/`)
+      }
+    })
+  } catch (error) {
+    logger.debug(error)
+    is_first_run = true
+  }
+}
+
+if (is_first_run) {
   logger.warn("Loading check failed, loading setup mode")
 
   // If anything fails to load, the application will start in setup mode. This will always happen on first boot! It also covers situations where the assets failed to load.
@@ -387,9 +395,9 @@ try {
       ]
     }
   ]
-} finally {
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 }
+
+Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate))
 
 // The renderer process requests the chosen port on startup, which we're happy to oblige
 ipcMain.on('STARTUP_GET_INFO', (event) => {
@@ -469,14 +477,19 @@ ipcMain.on('RELOAD_ARCHIVE_DATA', async (event) => {
     if (want_imods_extracted) {
       logger.info("mods: before loading, please extract imods")
       win.webContents.send('MODS_EXTRACT_IMODS_PLEASE')
+      want_imods_extracted = false
     }
 
     win.webContents.send('ARCHIVE_UPDATE', archive)
   } catch (e) {
     logger.error("Error reloading archive", e)
     win.webContents.send('SET_LOAD_STATE', "ERROR")
+    const e_obj = {
+      stack: e.stack,
+      ...e
+    }
+    win.webContents.send('SET_LOAD_ERROR', JSON.stringify(e_obj))
   }
-  // win.webContents.send('SET_LOAD_STATE', "DONE")
 })
 
 // search.registerIpc(ipcMain)
@@ -537,7 +550,23 @@ ipcMain.handle('locate-assets', async (event, payload) => {
       if (!fs.existsSync(flashPath)) throw Error(`Flash plugin not found at '${flashPath}'`)
     } catch (error) {
       logger.debug(error)
-      validated = false
+
+      if (error.code === 'EPERM') {
+        dialog.showMessageBoxSync(win, {
+          type: 'warning',
+          title: 'Bad asset location',
+          message: "You don't have permissions to read and write from the asset pack. The collection needs to be able to read and edit files in this directory. Please move the asset pack to another directory, or change the permissions."
+        })
+        return undefined
+      } else {
+        dialog.showMessageBoxSync(win, {
+          type: 'warning',
+          title: 'Assets not found',
+          message: "That doesn't look like the right folder. Make sure you unzipped the asset pack, and select the singular folder that contains everything else."
+        })
+      }
+
+      return undefined
     }
 
     if (validated) {
@@ -563,14 +592,39 @@ ipcMain.handle('locate-assets', async (event, payload) => {
         }
       } else return newPath[0]
     } else {
-      dialog.showMessageBoxSync(win, {
-        type: 'warning',
-        title: 'Assets not found',
-        message: "That doesn't look like the right folder. Make sure you unzipped the asset pack, and select the singular folder that contains everything else."
-      })
       return undefined
     }
   }
+})
+
+ipcMain.handle('pick-file', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'openFile'
+    ]
+  })
+  return newPath
+})
+
+ipcMain.handle('pick-new-file', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'promptToCreate'
+    ]
+  })
+  return newPath
+})
+
+ipcMain.handle('pick-directory', async (event, payload) => {
+  const newPath = dialog.showOpenDialogSync(win, {
+    defaultPath: '',
+    properties: [
+      'openDirectory'
+    ]
+  })
+  return newPath
 })
 
 ipcMain.handle('restart', async (event) => {
@@ -580,6 +634,11 @@ ipcMain.handle('restart', async (event) => {
 
 ipcMain.handle('reload', async (event) => {
   win.reload()
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+  } else {
+    await win.loadURL('app://./index.html')
+  }
 })
 
 ipcMain.handle('prompt-okay-cancel', async (event, args) => {
@@ -648,8 +707,8 @@ try {
       clipboard.writeImage(sharpNativeImage)
     })
   })
-} catch {
-  logger.error("Couldn't install sharp!")
+} catch (e) {
+  logger.error("Couldn't install sharp!", e)
 }
 
 let openedWithUrl
@@ -783,7 +842,7 @@ async function createWindow () {
 
     // const parsedURL = Resources.resolveURL(url)
     const reply_channel = 'RESOURCES_RESOLVE_URL_REPLY' + url
-    win.webContents.send('RESOURCES_RESOLVE_URL', url)
+    win.webContents.send('RESOURCES_RESOLVE_URL', reply_channel, url)
     ipcMain.once(reply_channel, (event, parsedURL) => {
       logger.info(`new-window: ${url} ===> ${parsedURL}`)
 

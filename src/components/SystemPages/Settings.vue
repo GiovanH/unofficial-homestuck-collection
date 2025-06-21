@@ -1,6 +1,5 @@
 <template>
-  <div class="pageBody customStyles">
-    <NavBanner useCustomStyles="true" />
+  <GenericCardPage>
     <div class="card">
       <div class="settings newReader">
         <h2>New Reader Mode</h2>
@@ -373,11 +372,15 @@
 
         <section class="group sortable row">
           <div class='col' title="Drag and drop!"><h2>Inactive</h2>
-            <draggable tag="ul" group="sortable-mods">
+            <draggable tag="ul" group="sortable-mods" draggable=".enabled">
               <li
                 v-for="option in modsDisabled"
                 :key="option.key"
                 :data-value="option.key"
+                :class="{
+                  enabled: option.compatible !== false,
+                  disabled: option.compatible === false
+                }"
               >
                 <b v-text='option.label' />
                 <span class='summary' v-if='option.summary' v-text='option.summary' />
@@ -414,12 +417,16 @@
 
         <!-- TODO: We need a visual indicator of the debounce here. I'm thinking a spinner that then becomes a checkmark? -->
 
-        <div class="system">
+        <div class="reload">
           <p v-if="needReload" class="needreload">Some of your changes require a quick reload before they can take effect. When you're ready, click here:</p>
           <!-- v-if="$localData.settings.devMode || needReload"  -->
           <button @click="forceReload" class="reload">Reload Application</button>
+          <button v-if="$localData.settings.devMode" 
+            @click="reloadModList(); archiveReload();"
+            class="reload">
+            Soft reload archive (refresh mods and re-run edits)
+          </button>
         </div>
-        <button v-if="$localData.settings.devMode" @click="reloadModList(); archiveReload();" class="reload">Soft reload archive (refresh mods and re-run edits)</button>
       </div>
     </div>
 
@@ -442,23 +449,27 @@
             </template>
           </template>
         </dl>
-        <div class="system">
-          <span class="hint">Application version:</span> <strong>v{{$data.$appVersion}}</strong>
-          <br><br>
-          <span class="hint">Asset pack version:</span> <strong>v{{$archive.version}}</strong>
+      </div>
+      <div class="settings system">
+        <div class="sysinfo">
+          <span class="hint">Application version: </span> 
+          <strong>v{{$data.$appVersion}}</strong>
+          <br>
+          <span class="hint">Asset pack version: </span> 
+          <strong>v{{$archive.version}}</strong>
           <span v-if="$archive.version != $data.$expectedAssetVersion">
-            <br><br>
-            <span class="hint">Expected asset pack version:</span> <strong>v{{$data.$expectedAssetVersion}}</strong>
-          </span>
-          <br><br>
-          <div v-if="!$isWebApp">
-            <span class="hint">Asset pack directory:</span>
             <br>
+            <span class="hint">Expected asset pack version: </span> 
+            <strong>v{{$data.$expectedAssetVersion}}</strong>
+          </span>
+          <br>
+          <div v-if="!$isWebApp">
+            <span class="hint">Asset pack directory: </span> 
             <strong>{{$localData.assetDir || 'None selected'}}</strong>
-            <br><br>
+            <br>
             <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
             <br><br>
-            <button @click="locateAssets()">Relocate assets</button>
+            <AssetPackSelector :showRestart="true" />
             <br><br>
           </div>
           <button @click="factoryReset()">Factory reset</button>
@@ -466,15 +477,16 @@
       </div>
     </div>
     <SubSettingsModal ref="modal" />
-  </div>
+  </GenericCardPage>
 </template>
 
 <script>
-import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageText from '@/components/Page/PageText.vue'
+import GenericCardPage from '@/components/Template/GenericCardPage.vue'
+import PageText from '@/components/StoryPage/PageText.vue'
 import SpoilerBox from '@/components/UIElements/SpoilerBox.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
-import NewReaderControls from '@/components/SystemPages/NewReaderControls.vue'
+import NewReaderControls from '@/components/UIElements/NewReaderControls.vue'
+import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue'
 
 import Mods from "@/mods.js"
 
@@ -492,9 +504,9 @@ export default {
   ],
   /* eslint-disable object-property-newline */
   components: {
-    NavBanner, SubSettingsModal,
+    GenericCardPage, SubSettingsModal,
     PageText, SpoilerBox, StoryPageLink,
-    draggable, NewReaderControls
+    draggable, NewReaderControls, AssetPackSelector
   },
   title: () => "Settings",
   data: function() {
@@ -596,7 +608,8 @@ export default {
         {
           model: "reducedMotion",
           label: "Reduce Motion",
-          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations."
+          desc: "Attempts to reduce the amount of automatic motion in the comic by replacing animated gifs with a manual scrubber, and requiring an explicit click before playing Flash animations.",
+          platform_whitelist: ['electron']
         }, {
           model: "ruffleFallback",
           label: "Ruffle flash emulation fallback",
@@ -653,6 +666,13 @@ export default {
           label: "Homestuck - CAUCASIAN!",
           desc: `During the trickster segment of Act 6 Act 5, <a href="/mspa/007623" target="_blank">there was originally a joke regarding the skin colour of the Trickster kids</a>. This was received poorly by the fanbase, <a href="/tumblr/more-so-i-just-dialed-down-the-joke-on-page" target="_blank">and toned down shortly after.</a>`
         }, {
+          model: "notitty",
+          cws: {
+            minor: ["nudity"], severe: []
+          },
+          label: "Homestuck - Nudity",
+          desc: `In a few Homestuck panels you can glimpse an exposed human breast. Setting this option <b>censors</b> these moments. There wasn't actually any controversy about this one.`
+        }, {
           model: "pxsTavros",
           cws: {
             minor: [], severe: ["body horror"]
@@ -699,7 +719,8 @@ export default {
         'soluslunes',
         'unpeachy',
         'pxsTavros',
-        'cursedHistory'
+        'cursedHistory',
+        'notitty'
       ],
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
@@ -718,10 +739,10 @@ export default {
     },
     modsEnabled() {
       return this.$localData.settings.modListEnabled.map((key) => 
-        this.$root.$modChoices[key]).filter(val => !!val)
+        this.modChoices[key]).filter(val => !!val)
     },
     modsDisabled() {
-      return Object.values(this.$root.$modChoices).filter((choice) =>
+      return Object.values(this.modChoices).filter((choice) =>
         !this.modsEnabled.includes(choice))
     },
     forceThemeOverrideUINewReaderChecked(){
@@ -737,6 +758,9 @@ export default {
       if (this.$localData.settings.themeOverride == "dark") return true
       else if (this.$localData.settings.themeOverride == "default") return false
       return undefined
+    },
+    modChoices() {
+      return this.$root.modChoices
     }
   },
   methods: {
@@ -851,7 +875,8 @@ export default {
       // Call this before queueing archive reload
       this.$localData.root.saveLocalStorage()
 
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes'].includes(setting)) {
+      // Some settings are just flags for mods to enable.
+      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes', 'notitty'].includes(setting)) {
         this.queueArchiveReload()
       }
 
@@ -860,9 +885,6 @@ export default {
           ipcRenderer.invoke('restart')
         }, 1000)
       }
-    },
-    locateAssets(){
-      ipcRenderer.invoke('locate-assets', {restart: true})
     },
     factoryReset(){      
       const args = {
@@ -902,11 +924,11 @@ export default {
       diff = diff.concat(old_list.filter(x => !list_active.includes(x)))
 
       try {
-        if (diff.some(key => this.$root.$modChoices[key].needsHardReload)) {
+        if (diff.some(key => this.modChoices[key].needsHardReload)) {
           this.$logger.info("List change requires hard reload", diff)
           this.needReload = true
         }
-        if (diff.some(key => this.$root.$modChoices[key].needsArchiveReload)) {
+        if (diff.some(key => this.modChoices[key].needsArchiveReload)) {
           this.$logger.info("List change requires archive reload", diff)
           this.queueArchiveReload()
         }
@@ -936,12 +958,7 @@ export default {
       ipcRenderer.invoke('reload')
     },
     reloadModList: function() {
-      Mods.loadModChoicesAsync().then(_ => {
-        this.$root.$asyncComputed.$modChoices.update()
-        // this._computedWatchers.modsEnabled.run()
-        // this._computedWatchers.modsDisabled.run()
-        this.$forceUpdate()
-      })
+      this.$root.$asyncComputed.modChoices.update()
     },
     scrollToSec(sectionClass) {
       this.$el.querySelector(`.settings.${sectionClass}`).scrollIntoView(true)
@@ -982,206 +999,122 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .pageBody {
-    color: var(--font-default);
-    
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-flow: column;
-    flex: 1 0 auto;
-    align-items: center;
+::v-deep .spoilerbox .settings {
+  color: var(--font-log);
+}
 
-    background: var(--system-background);
-    background-color: var(--system-skycolor);
-    
-    ::v-deep {
-      a { color: var(--page-links); }
-      a:link:active { color: var(--page-links-active); }
+.lockStatus {
+  position: absolute;
+  margin-left: -20px;
+  &.fa-lock {
+    color: orangered;
+  }
+  &.fa-unlock {
+    color: var(--page-pageBorder, var(--page-pageFrame));
+  }
+}
+
+// Explicit styles
+.needreload {
+  color: red;
+  font-weight: bold;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--page-nav-meta);
+  button {
+    font-size: 1em;
+    padding: 0 4px;
+  }
+}
+
+div.settings {
+  // Wrapper for settings options. 
+  // Used instead of cardContent
+  width: 100%;
+  padding: 25px 0;
+
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-weight: normal;
+  font-size: 14px;
+
+  // Lines between sections
+  &:not(:last-child) {
+    border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
+  }
+  // Widget styles
+  h2 { text-align: center; }
+  p {
+    font-weight: normal;
+    margin: 10px 0 5px 10px;
+    label {
+      font-weight: bolder;
     }
   }
-
-  ::v-deep .spoilerbox .settings {
-    color: var(--font-log);
+  dt { 
+    font-weight: bolder;
+    margin: 20px 0 5px 10px; 
+  }
+  button {
+    font-size: 110%;
   }
 
-  .navBanner {
-    margin-bottom: 25px;
+  .settingDesc {
+    color: var(--page-nav-meta);
+    font-weight: normal;
   }
-  .card {
-    position: relative;
-    margin-bottom: 50px;
-    padding: 0 50px;
-    border: solid 5px var(--page-pageBorder, var(--page-pageFrame));
-    box-sizing: border-box;
-    width: 950px;
-    max-width: 100vw;
-    background: var(--page-pageContent);
 
-    flex: 0 1 auto;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    align-content: center;
+  div.subOption { margin-left: 40px; }
 
-    font-family: Verdana,Arial,Helvetica,sans-serif;
-    
+  > dd.settingDesc {
+    // Descriptions of whole sections
+    margin-top: 1em;
   }
-  .lockStatus {
-    position: absolute;
-    margin-left: -20px;
-    &.fa-lock {
-      color: orangered;
-    }
-    &.fa-unlock {
-      color: var(--page-pageBorder, var(--page-pageFrame));
-    }
-  }
-  .settings {
-    width: 100%;
-    padding: 25px 0;
+  
+  // Variants for specific setting types
 
-    &:not(:last-child) {
-      border-bottom: solid 2px var(--page-pageBorder, var(--page-pageFrame));
-    }
-    h2 { text-align: center; }
-    p {
-      font-weight: normal;
-      margin: 10px 0 5px 10px;
-      label {
-        font-weight: bolder;
-      }
-    }
-    dt { margin: 20px 0 5px 10px; }
-    .settingDesc {
-      color: var(--page-nav-meta);
-      font-weight: normal;
-    }
-
-    div.subOption { margin-left: 40px; }
-
-    > dd.settingDesc {
-      // Descriptions of whole sections
-      margin-top: 1em;
-    }
-    
-    .system {
-      margin-top: 20px;
-      text-align: center;
-      font-weight: normal;
-    }
-
-    .needreload {
-      color: red;
-      font-weight: bold;
-    }
-
-    .newReaderInput {
-      margin-top: 20px;
-      text-align: center;
-
-      button {
-          margin-bottom: 1em;
-      }
-      input {
-        border: 1px solid #777;
-        width: 70px;
-        font-size: 110%;
-        border-radius: 2px;
-        padding: 2px 3px;
-        margin: 5px;
-
-        &.invalid:not(:disabled):not(.empty) {
-          background: pink;
-          border-color: rgb(187, 0, 37);
-          box-shadow: 0 0 3px 1px red;
-        }
-        &.changed {
-          border-color: #ffaa00;
-          box-shadow: 0 0 3px 1px red;
-        }
-      }
-    }
-
-    &.mod button.reload {
+  &.mod {
+    button.reload {
       margin: 0.5em;
       padding: 0.5em;
       min-width: 140px;
     }
+    div.reload {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: normal;
+    }
+  }
 
-    button {
-      font-size: 110%;
-    }
-    .hint {
-      font-size: 13px;
-      color: var(--page-nav-meta);
-      button {
-        font-size: 1em;
-        padding: 0 4px;
-      }
-    }
+  &.themes {
     .themeSelector, .fontSelector {
       font-size: 16px;
     }
     .themeSelector + dt {
       display: inline;
     }
-    // Little ones
-    &.retcons dl {
+  }
+
+  &.retcons {
+    dl {
       column-count: 2;
       dt:first-child {
         margin-top: 0;
       }
     }
-    .textOverrideSettings {
-      margin-top: 16px;
+  }
+
+  &.system {
+    div.sysinfo {
       text-align: center;
-          
-      .textOptions label {
-        display: block;
-      }
-
-      label.fontslider {
-        display: block;
-        margin-top: 1em;
-      }
-
-      .textpreviews {
-        border: 6px solid var(--page-pageFrame);
-        padding: 6px;
-        position: relative;
-        left: 0;
-      }
-
-      .knobs {
-        width: 75%;
-        margin: 0 auto 16px;
-        text-align: left;
-        select {
-          margin: 5px 0;
-        }
-        input[type="range"] {
-          width: 100%;
-        }
-      }
-      div.examplePrattle, p.examplePrattle {
-        margin-bottom: 16px;
-      }
-      .examplePrattle {
-        margin: 0 auto;
-
-        ::v-deep .text{
-          // text-align: center;
-        }
-        &.bold {
-          font-weight: bold;
-        }
-      }
+      margin: 0.5em;
+      padding: 0.5em;
+      min-width: 140px;
     }
-    .ccPageNos {
-      font-weight: normal;
-    }
+  }
 
+  &.controversial {
     span.cw {
       padding: 0 7px;
       font-size: 12px;
@@ -1200,77 +1133,137 @@ export default {
         color: #ffffff;
       }
     }
+    .ccPageNos {
+      font-weight: normal;
+    }
   }
-  .sortable {
-    font-weight: normal;
-    margin: 1em 0;
+
+  // Sections (allowed to be subsections) 
+  .textOverrideSettings {
+    margin-top: 16px;
+    text-align: center;
+        
+    .textOptions label {
+      display: block;
+    }
+
+    label.fontslider {
+      display: block;
+      margin-top: 1em;
+    }
+
+    .textpreviews {
+      border: 6px solid var(--page-pageFrame);
+      padding: 6px;
+      position: relative;
+      left: 0;
+    }
+
+    .knobs {
+      width: 75%;
+      margin: 0 auto 16px;
+      text-align: left;
+      select {
+        margin: 5px 0;
+      }
+      input[type="range"] {
+        width: 100%;
+      }
+    }
+    div.examplePrattle, p.examplePrattle {
+      margin-bottom: 16px;
+    }
+    .examplePrattle {
+      margin: 0 auto;
+
+      &.bold {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.sortable {
+  font-weight: normal;
+  margin: 1em 0;
+  
+  // Ignore card margins for sortable on tiny screens
+  @media (max-width: 650px) {
+    margin: 1em -50px;
+  }
+
+  ul, ol {     
+    border: solid var(--page-pageBorder, var(--page-pageFrame));
+    border-width: 5px 5px 0 0;
+
+    padding-bottom: 6em;
+    box-sizing: border-box;
     
-    // Ignore card margins for sortable on tiny screens
-    @media (max-width: 650px) {
-      margin: 1em -50px;
-    }
-
-    ul, ol {  
-      text-align: left;        
-      border: solid var(--page-pageBorder, var(--page-pageFrame));
-      border-width: 5px 5px 0 0;
-      padding-bottom: 6em;
-      height: 100%;
-      max-height: 60vh;
-      overflow: auto;
-    }
-
-    li {
-      // TODO Use a background color here from the theme that isn't log-bg
-      color: var(--font-log);
-      background-color: var(--page-log-bg);
-      // border: 1px solid rgba(0,0,0,.125);
-      border: 1px solid var(--page-pageBorder);
-      margin-bottom: -1px;
-      padding: .2em;
-      .summary:before {
-        content: ' - '
-      }
-      &:hover {
-        cursor: grab;
-      }
-      &:active {
-        cursor: grabbing;
-      }
-    }
-
-    ul li {
-        list-style: none;
-    }
-
-    ol li {
-      list-style: decimal;
-    }
-
-    .col {  
-      width: 100%;
-      margin: 0 20px;
-    }
-    .modButton {
-      float: right;
-      width: 18px;
-      height: 18px;
-      background: var(--saves-tab);
-      text-align: center;
-      &:hover {
-        background: var(--saves-tabHover)
-      }
-    }
-  }
-
-  .col {
-    display: flex;
-    flex-direction: column;
+    height: 100%;
+    max-height: 60vh;
     overflow: auto;
+
+    text-align: left;
   }
 
-  .row {
-    display: flex;
+  li {
+    // TODO Use a background color here from the theme that isn't log-bg
+    color: var(--font-log);
+    background-color: var(--page-log-bg);
+    // border: 1px solid rgba(0,0,0,.125);
+    border: 1px solid var(--page-pageBorder);
+    margin-bottom: -1px;
+    padding: .2em;
+    .summary:before {
+      content: ' - '
+    }
   }
 
+  li.enabled {
+    &:hover {
+      cursor: grab;
+    }
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  li.disabled {
+    background: var(--page-pageBorder);
+    cursor: not-allowed;
+  }
+
+  ul li {
+      list-style: none;
+  }
+
+  ol li {
+    list-style: decimal;
+  }
+
+  .col {  
+    width: 100%;
+    margin: 0 20px;
+  }
+  .modButton {
+    float: right;
+    width: 18px;
+    height: 18px;
+    background: var(--saves-tab);
+    text-align: center;
+    &:hover {
+      background: var(--saves-tabHover)
+    }
+  }
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+}
 </style>

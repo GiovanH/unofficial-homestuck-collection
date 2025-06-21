@@ -146,8 +146,8 @@
             <li><a href="/mspa/009535">The Echidna page</a></li>
             <li><a href="/mspa/009549">Sprite²</a></li>
             <li><a href="/mspa/009823">Inline images</a></li>
-            <li><a href="/mspa/009987">Collide</a></li></li>
-            <li><a href="/mspa/010019">Panel path routing</a>
+            <li><a href="/mspa/009987">Collide</a></li>
+            <li><a href="/mspa/010019">Panel path routing</a></li>
             <li><a href="/mspa/010027">Act 7</a></li>
             <li><a href="/mspa/010029">Credits</a></li>
             <li><a href="/mspa/pony">pony</a></li>
@@ -160,6 +160,10 @@
             <li><a href="http://homestuck.com/mspa?s=6&p=007395">Redirect</a></li>
           </ul>
         </div>
+        <div class="testSection">
+          <h2>Error report</h2>
+          <pre v-text="errorBody" />
+        </div>
       </div>
     <PageFooter />
     </div>
@@ -169,10 +173,12 @@
 <script>
 // @ is an alias to /src
 import NavBanner from '@/components/UIElements/NavBanner.vue'
-import PageFooter from '@/components/Page/PageFooter.vue'
+import PageFooter from '@/components/StoryPage/PageFooter.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
 
-// import PAGE from '@/components/Page/Page.vue'
+import errorReporting from '@/js/errorReporting'
+
+// import PAGE from '@/components/StoryPage/Page.vue'
 // import FULLSCREENFLASH from '@/components/SpecialPages/fullscreenFlash.vue'
 // import X2COMBO from '@/components/SpecialPages/x2Combo.vue'
 // import TZPASSWORD from '@/components/SpecialPages/TzPassword.vue'
@@ -217,6 +223,12 @@ export default {
   computed: {
     storyPages(){
       return Object.values(this.$archive.mspa.story)
+    },
+    errorBody() {
+      return errorReporting.buildReportBody(null, {
+        "App": this.$data.$appVersion,
+        "Asset Pack": this.$archive.version
+      })
     },
     compiledResult(){
       try {

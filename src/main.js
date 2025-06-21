@@ -14,7 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft,
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faUnlock,
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin, faFolderOpen
 } from '@fortawesome/free-solid-svg-icons'
 
 const importAsyncComputed = import('vue-async-computed')
@@ -23,7 +23,7 @@ const importFontAwesomeIconObj = import('@fortawesome/vue-fontawesome')
 library.add([
   faExternalLinkAlt, faChevronUp, faChevronRight, faChevronDown, faChevronLeft, 
   faSearch, faEdit, faSave, faTrash, faTimes, faPlus, faPen, faMusic, faLock, faUnlock,
-  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin
+  faRedo, faStar, faRandom, faMousePointer, faBookmark, faTerminal, faMapPin, faFolderOpen
 ])
 
 // Global prereqs
@@ -39,7 +39,7 @@ if (!window.isWebApp) {
   var { shell } = require('electron')
 
   log = require('electron-log')
-  log.transports.console.format = '[{level}] {text}'
+  log.transports.console.format = '{scope} {text}'
   errorReporting.registerRenderLogger(log)
 
   var {port, appVersion} = ipcRenderer.sendSync('STARTUP_GET_INFO')
@@ -96,8 +96,13 @@ promises_loading.push((async function() {
 
 // Mixin mod mixins
 promises_loading.push((async function() {
-  const mixins = await Mods.getMixinsAsync()
-  mixins.forEach((m) => Vue.mixin(m))
+  try {
+    const mixins = await Mods.getMixinsAsync()
+    mixins.forEach((m) => Vue.mixin(m))
+  } catch (e) {
+    // Catch error but still allow the vm to init without mods
+    log.scope('main.js init').error(e)
+  }
 })())
 
 Vue.mixin(Memoization.mixin)
@@ -112,7 +117,8 @@ Vue.mixin({
   computed: {
     $archive() {return this.$root.archive},
     $isNewReader() {
-      return Boolean(!this.$root.guestMode && (this.$newReaderCurrent && this.$localData.settings.newReader.limit))
+      if (this.$root.guestMode) return false
+      return (this.$newReaderCurrent && this.$localData.settings.newReader.limit)
     },
     $newReaderCurrent() {
       return this.$localData.settings.newReader.current
@@ -474,6 +480,8 @@ Promise.all(promises_loading).then(_ => {
       return {
         archive: undefined,
         loadState: undefined,
+        loadError: undefined,
+        loadErrorResponsibleMods: undefined,
         loadStage: undefined,
         guestMode: false,
         platform: (window.isWebApp ? "webapp" : "electron"),
@@ -485,9 +493,11 @@ Promise.all(promises_loading).then(_ => {
       app(){ return this.$refs.App }
     },
     asyncComputed: {
-      $modChoices: {
+      modChoices: {
         default: {},
-        get: Mods.getModChoicesAsync
+        async get() {
+          return (await Mods.loadModChoicesAsync())
+        }
       }
     },
     router,

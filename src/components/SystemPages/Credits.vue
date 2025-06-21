@@ -1,55 +1,60 @@
 <template>
-  <GenericPage>
-    <div class="pageContent">
-      <Media url="images/logo.gif" class="logo"/>
-      <div v-if="routeParams.mode == 'artcredits'" class="credits artCredits" >
-        <div class="centeredProse prose">
-          <h2>ART CREDITS</h2>
+  <GenericPage v-if="routeParams.mode == 'artcredits'">
+    <Media url="images/logo.gif" class="logo"/>
+    <div class="artCredits" >
+      <div class="centeredProse prose">
+        <h2>ART CREDITS</h2>
 
-          After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here.
+        After the first year of <a href="/mspa/6">Homestuck</a>, starting with <a href="/mspa/003701">this page</a>, MSPA began including contributions from other artists into the animations. The artists are credited here.
 
-          <br><br>
-          -------------------------------------------------------
-          <br><br>
+        <br><br>
+        -------------------------------------------------------
+        <br><br>
 
-          <template v-for="(credit, ci) in artCredits">
-            <div class="artCredit" :key="ci" v-if="!credit.pages.some(p => $pageIsSpoiler(p))">
-              <template v-for="(page, pi) in credit.pages" >
-                <span v-if="page === '-'" :key="`${pi}a`"> through </span>
-                <template v-else>
-                  <StoryPageLink
-                    :mspaId='page' credit
-                    class="artCreditLink"
-                    :key="`${pi}b`">
-                  </StoryPageLink>
-                </template>
-
+        <template v-for="(credit, ci) in artCredits">
+          <div class="artCredit" :key="ci" v-if="!credit.pages.some(p => $pageIsSpoiler(p))">
+            <template v-for="(page, pi) in credit.pages" >
+              <span v-if="page === '-'" :key="`${pi}a`"> through </span>
+              <template v-else>
+                <StoryPageLink
+                  :mspaId='page' credit
+                  class="artCreditLink"
+                  :key="`${pi}b`">
+                </StoryPageLink>
               </template>
-              <span v-html="credit.desc"></span>
-            </div>
-          </template>
 
-          <div class="artCredit" v-if="$pageIsSpoiler('010027')">
-            Keep reading to unlock!
+            </template>
+            <span v-html="credit.desc"></span>
           </div>
+        </template>
+
+        <div class="artCredit" v-if="$pageIsSpoiler('010027')">
+          Keep reading to unlock!
         </div>
       </div>
-      <div v-else class="credits noCredits">
+    </div>
+  </GenericPage>
+  <GenericCardPage v-else>
+    <div class="card">
+      <div class="creditDisambig">
         <div class="creditLinks">
           <div class="credit"><a href="/music/features"><Media url="/archive/collection/credits_sound.png" /><br>SOUND CREDITS</a></div>
           <div class="credit"><a href="/credits/artcredits"><Media url="/archive/collection/credits_art.png" /><br>ART CREDITS</a></div>
         </div>
-        <hr />
-        <div class="archiveCredits">
-          <h1>The Unofficial Homestuck Collection</h1>
-          <div class="prose centeredProse">
+      </div>
+    </div>
+        
+    <div class="card">
+      <div class="cardContent">
+        <div class="archiveCredits cardBody">
+          <div class="title center">
+            <h1>The Unofficial Homestuck Collection</h1>
             <p>
               by Bambosh and GiovanH
             </p>
           </div>
-          <br />
           <h2>Archive credits:</h2>
-          <dl class="prose">
+          <dl>
             <template v-for="(credit, ci) in archiveCredits">
               <dt :key="`${ci}a`">
                 <a v-if="credit.link" :href="credit.link">{{credit.name}}</a>
@@ -59,35 +64,38 @@
             </template>
           </dl>
           <hr />
-          <div class="legal">
+          <div class="legal prose">
             Legal:
-<pre>The Unofficial Homestuck Collection
-Copyright (C) 2025 GiovanH
+  <pre>The Unofficial Homestuck Collection
+  Copyright (C) 2025 GiovanH
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-</pre>
-            <p>
-              As per section 7, an additional requirement of this license is that all attribution and crediting must be preserved. Modifications that remove attribution or otherwise misrepresent the authorship or origin of material are not permitted and violate the license conditions.
-            </p>
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the <a href="https://www.gnu.org/licenses">GNU General Public License</a> as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  As per section 7, an additional requirement of this license is that all 
+  attribution and crediting must be preserved. Modifications that remove 
+  attribution or otherwise misrepresent the authorship or origin of material 
+  are not permitted and violate the license conditions.
+  </pre>
             <hr />
-            <p class="prose">
+            <!-- <p> -->
               In (non legally-binding) summary, you may freely use and distribute the software, as well as modify it and distribute your changes and modified versions, so long as you do not restrict the rights of others to do the same. You must clearly notate any changes and provide links to the unmodified original, and not remove credits.
-            </p>
+            <!-- </p> -->
           </div>
         </div>
       </div>
     </div>
-  </GenericPage>
+  </GenericCardPage>
 </template>
 
 <script>
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 import StoryPageLink from '@/components/UIElements/StoryPageLink.vue'
+import GenericCardPage from '@/components/Template/GenericCardPage.vue'
 
 export default {
   name: 'credits',
@@ -95,7 +103,7 @@ export default {
     'tab', 'routeParams'
   ],
   components: {
-    Media, GenericPage, StoryPageLink
+    Media, GenericPage, GenericCardPage, StoryPageLink
   },
   title(ctx) {
     return ctx.routeParams.mode == 'artcredits' ? "Art Credits" : "Credits"
@@ -342,6 +350,30 @@ export default {
   // font-weight: normal;
   // font-size: 12px;
 }
+.creditDisambig {
+  padding: 25px 0;
+  .creditLinks {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    margin: 0 auto;
+    width: 600px;
+    
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 20px;
+
+    .credit {
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.1;
+
+      img{
+        display: block;
+      }
+    }
+  }
+}
 .artCredits {
   width: 650px;
 
@@ -357,30 +389,15 @@ export default {
     margin-bottom: 2em;
   }
 }
-.noCredits {
-  width: 650px;
-  .creditLinks {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-around;
-    margin: 0 auto;
-    width: 600px;
-
-    .credit {
-      margin-bottom: 20px;
-      text-align: center;
-      line-height: 1.1;
-      font-size: 18px;
-
-      img{
-        display: block;
-      }
-    }
+.archiveCredits {
+  dt {
+    font-weight: normal;
   }
-  .archiveCredits {
+    
+  .title {
     width: 600px;
     margin: 0 auto;
-    padding-bottom: 2em;
+    padding-bottom: 1em;
     h2 {
      text-align: center;
     }

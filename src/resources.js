@@ -171,7 +171,8 @@ function getResourceURL(request_url){
 }
 
 // NOT PURE
-function resolveAssetsProtocol(asset_url, loopcheck=[]) {
+function resolveAssetsProtocol(asset_url, loopcheck) {
+  loopcheck = loopcheck || []
   // Resolves assets:// urls to real urls on the asset server, usually localhost:{random}
 
   // Examples
@@ -186,12 +187,19 @@ function resolveAssetsProtocol(asset_url, loopcheck=[]) {
       // logger.debug("[resolvA]", asset_url, "mod to", mod_route)
       if (loopcheck.includes(mod_route)) {
         loopcheck.push(mod_route)
-        console.error("Circular asset path!", loopcheck)
+        console.error("Circular asset path!")
+        console.error(Object.fromEntries(
+          loopcheck.map(k => [k, Mods.getAssetRoute(k)]
+        )))
         throw Error("Circular asset path!" + loopcheck)
       } else {
         loopcheck.push(mod_route)
         // mod_route may no longer be an assets:// url, perform full resolve
-        return resolveURL(mod_route)
+        if (asset_url.startsWith("assets://")) {
+          return resolveAssetsProtocol(mod_route, loopcheck)
+        } else {
+          return resolveURL(mod_route)
+        }
       }
     }
   }
@@ -560,7 +568,8 @@ module.exports = {
       event.sender.send(reply_channel, resolveAssetsProtocol(url))
     })
     ipcRenderer.on('RESOURCES_RESOLVE_URL', (event, reply_channel, url) => {
-      event.sender.send(reply_channel, resolveURL(url))
+      if (url) event.sender.send(reply_channel, resolveURL(url))
+      else return url
     })
   },
   isReady(){

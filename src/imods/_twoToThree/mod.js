@@ -5,6 +5,7 @@ module.exports = {
   trees: {
     "./pxs/": "assets://archive/comics/pxs/",
     "./images/": "assets://images/",
+    "./js/": "assets://js/",
     "./archive/": "assets://archive/"
   },
   routes: {

@@ -1,20 +1,22 @@
 <template>
   <div>
-    <GenericPage v-if="gameOverPreload"
-      :tab="tab" >
+    <GenericPage v-if="gameOverPreload" class="gameOverPreload" >
       <div class="pageContent">
         <div class="mediaContent">
           <h2 class="pageTitle">[S] GAME OVER.</h2>
           <div class="media" ref="media">
             <div class="panel"
-              style="width: 650px; height: 450px; background: #001800; border: none;" />
+              style="width: 650px; height: 450px; background: #001800; border: none;">
+              <Media url="assets://images/gameover_preloader.png" />
+            </div>
           </div>
         </div>
         <div class="textContent" style="height: 70px;"></div>
       </div>
     </GenericPage>
     <!-- <GenericPage v-if="gameOverPreload" /> -->
-    <div :style="{visibility: gameOverPreload ? 'hidden' : 'visible', height: gameOverPreload ? '0' : undefined}" class="pageBody" :class="[bgClass, {hiddenGameOver: gameOverPreload}]" :data-pageid="`${storyId}/${thisPage.pageId}`">
+    <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`">
+    <!-- <div class="pageBody" :class="bgClass" :data-pageid="`${storyId}/${thisPage.pageId}`"> -->
       <div class="pageFrame">
         <div class="pageContent">
           <Footnotes :pageId="thisPage.pageId" preface />
@@ -34,11 +36,11 @@
 <script>
 // @ is an alias to /src
 import Media from '@/components/UIElements/MediaEmbed.vue'
-import PageNav from '@/components/Page/PageNav.vue'
-import Footnotes from '@/components/Page/PageFootnotes.vue'
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import PageNav from '@/components/StoryPage/PageNav.vue'
+import Footnotes from '@/components/StoryPage/PageFootnotes.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 
-import PAGE from '@/components/Page/Page.vue'
+import PAGE from '@/components/StoryPage/Page.vue'
 
 export default {
   extends: PAGE,
@@ -89,7 +91,9 @@ export default {
   },
   mounted() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
+      this.$logger.info("Preparing gameover effects on page (mounted)")
       this.$parent.gameOverThemeOverride = 'A6A6'
+
       if (!this.needsNav && !this.$localData.settings.reducedMotion) // only if we're using stock flash
         this.gameOverPreload = true // unset by MediaEmbed after we get gameOver signal
 
@@ -155,6 +159,8 @@ export default {
   },
   updated() {
     if (this.thisPage.flag.includes('GAMEOVER')) {
+      this.$logger.info("Preparing gameover effects on page (updated)")
+
       this.$el.style.transition = 'none'
       this.$el.style.background = 'linear-gradient(to right, #042300 50%, #535353 50%)'
       this.$el.style.backgroundPosition = 'left bottom'
@@ -173,6 +179,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .gameOverPreload {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .hiddenGameOver {
     visibility: hidden;
     height: 0;

@@ -639,7 +639,7 @@
 </template>
 
 <script>
-import GenericPage from '@/components/UIElements/GenericPage.vue'
+import GenericPage from '@/components/Template/GenericPage.vue'
 import Media from '@/components/UIElements/MediaEmbed.vue'
 
 export default {

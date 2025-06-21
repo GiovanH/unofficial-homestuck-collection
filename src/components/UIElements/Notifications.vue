@@ -53,8 +53,8 @@ export default {
       })
 
       let page_num
-      for (const modKey in this.$modChoices) {
-        const modChoice = this.$modChoices[modKey]
+      for (const modKey in this.$root.modChoices) {
+        const modChoice = this.$root.modChoices[modKey]
         // eslint-disable-next-line no-cond-assign
         if (page_num = modChoice.locked) {
           if (!notifs_by_page[page_num]) notifs_by_page[page_num] = []

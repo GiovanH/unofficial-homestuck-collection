@@ -15,9 +15,9 @@
   "engines": {
     "node": "18.20"
   },
-  "version": "2.6.0",
+  "version": "2.6.7",
   "license": "GPL-3.0*",
-  "repository": "github:Bambosh/unofficial-homestuck-collection",
+  "repository": "github:GiovanH/unofficial-homestuck-collection",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve webapp/browser.js",
@@ -39,7 +39,7 @@
     "@fortawesome/vue-fontawesome": "^2.0.10",
     "@sentry/vue": "^7.60.1",
     "array.prototype.toreversed": "^1.1.1",
-    "caniuse-lite": "^1.0.30001621",
+    "crc": "^4.3.2",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "electron-window-state": "^5.0.3",
@@ -76,6 +76,7 @@
     "@vue/cli-plugin-e2e-webdriverio": "^5.0.8",
     "@vue/cli-plugin-router": "^4.5",
     "@vue/cli-service": "^4.5",
+    "@vue/component-compiler-utils": "^3.3.0",
     "@vue/devtools": "^6.5.0",
     "@vue/eslint-config-standard": "^5.1.2",
     "array.prototype.toreversed": "^1.1.1",

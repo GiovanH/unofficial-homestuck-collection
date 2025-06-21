@@ -1,5 +1,9 @@
 ![The Unofficial Homestuck Collection](src/assets/collection_logo.png)
 
+Homepage: <https://homestuck.giovanh.com/unofficial-homestuck-collection/>
+
+---
+
 Let me tell you a story about a webcomic called *Homestuck*. The fourth in a series of “MS Paint Adventures” authored by Andrew Hussie from 2007 to 2016, it became wildly successful, in part because of its eclectic use of web technology like Adobe Flash and GIF animations.
 
 However, with Flash finally being phased out at the end of 2020, *Homestuck* is in a precarious state. While there have been official attempts to preserve aspects of the original experience by VIZ Media (who have published *Homestuck* since 2018), the results have been mixed. With extra content scattered around the web in various states of decay, a solution was needed to preserve *Homestuck's* one-of-a-kind presentation and flair, for both returning readers and those new to the story.
@@ -19,27 +23,12 @@ Building a development version of TUHC requires NPM (Node 14.18), Yarn, `make`, 
 - NPM is the node package manager, used for developing with Node.js.
 - [Yarn](https://www.npmjs.com/package/yarn) is a npm-like package manager that is itself distributed as an NPM package.
 - `tar` and `make` are basic GNU utilities used extremely commonly in software development. `tar` is used to pack files (like zip) and `make` is used to build projects with dependencies. If you don't already have them on your system (you can maintain robust CLI environments using tools like [cygwin](https://www.cygwin.com) or [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)), you can download [`tar`](http://gnuwin32.sourceforge.net/packages/gtar.htm) and [`make`](https://www.gnu.org/software/make/) individually directly from GNU.
-          
-### Compiles and hot-reloads for development
 
-```
-make test
-```
+## Credits
 
-### Compiles and minifies for production
-
-```
-make publish
-```
-
-### Lints and fixes files
-
-```
-make lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+The Unofficial Homestuck Collection was created by [Bambosh](https://bambosh.dev) and is currently maintained by [GiovanH](https://im.giovanh.com).
+[A lot of people](https://github.com/GiovanH/unofficial-homestuck-collection/graphs/contributors) have contributed to the success of this project and I am deeply grateful to all of them. 
+A full list of contributors and thanks can be found in the program itself under the Credits page.
 
 ## Legal
 

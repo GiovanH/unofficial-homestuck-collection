@@ -23,6 +23,14 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.6.7" type="stable" date="2025-06-18T21:46:50Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.7</url>
+      <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.6.1...v2.6.7&lt;/p&gt;&lt;p&gt;Features:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/2df71615dda9d77ace1291529d7bfab6ecbd5b64&#34;&gt;Feature: censor female nudity&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&#34;https://github.com/GiovanH/unofficial-homestuck-collection/commit/8ca6869b4fba919ec9550c319f3e1c7bac31d081&#34;&gt;Feature: Asset Pack Validator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Plus two emergency fixes preventing people from installing and validating the collection since 2.6.5 (now deleted)&lt;/p&gt;&lt;p&gt;Also includes several bugfixes and stability improvements.&lt;/p&gt;</description>
+    </release>
+    <release version="2.6.1" type="stable" date="2025-06-11T03:15:11Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.6.1</url>
+      <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.5.6...v2.6.1&lt;/p&gt;</description>
+    </release>
     <release version="2.5.6" type="stable" date="2024-10-04T22:55:52Z">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.5.6</url>
       <description>&lt;p&gt;&lt;strong&gt;Full Changelog&lt;/strong&gt;: https://github.com/GiovanH/unofficial-homestuck-collection/compare/v2.5.2...v2.5.6&lt;/p&gt;&lt;h2&gt;What&#39;s Changed&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Bugfixes to resolve issues with youtube and similar external links&lt;/li&gt;&lt;li&gt;Improved skaianet systems page (thanks @kittenchilly)&lt;/li&gt;&lt;li&gt;Fixed a bug causing notifications to cause scrollbar jitter &lt;/li&gt;&lt;li&gt;mods: fix storing &lt;code&gt;false&lt;/code&gt; by @bb010g in https://github.com/GiovanH/unofficial-homestuck-collection/pull/609&lt;/li&gt;&lt;li&gt;2.5.2 -&amp;gt; 2.5.6 by @GiovanH in https://github.com/GiovanH/unofficial-homestuck-collection/pull/612&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;New Contributors&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;@bb010g made their first contribution in https://github.com/GiovanH/unofficial-homestuck-collection/pull/609&lt;/li&gt;&lt;/ul&gt;</description>
