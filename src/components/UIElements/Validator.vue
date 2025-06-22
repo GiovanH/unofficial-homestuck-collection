@@ -40,6 +40,10 @@
       <p v-if='!validation_completed && !in_progress'>
         Ready to verify.
       </p>
+      <p v-if='has_imods_issue'>
+        There's a validation issue in /archive/imods. This path is managed by the reader, and this indicates there's a bug. Please report this! 
+        In the meantime, you can <button @click="repairImods">repair imods</button>. 
+      </p>
       <p v-if='mismatch_paths.length > 0'>
         Some of your files aren't what they're supposed to be. You may have edited some files yourself, or maybe your asset pack was tampered with when you got it.
       </p>
@@ -89,6 +93,7 @@
 <script>
 
 import AssetPackSelector from '@/components/UIElements/AssetPackSelector.vue'
+import Mods from "@/mods.js"
 
 const Validation = require('@/js/validation.js')
 
@@ -148,6 +153,16 @@ export default {
   computed: {
     assetDir() {
       return this.packRootOverride || this.$localData.assetDir
+    },
+    check_imods() {
+      // Only check imods if we're using a live assetDir
+      return !this.packRootOverride
+    },
+    all_issue_paths() {
+      return [...this.mismatch_paths, ...this.extra_paths, ...this.missing_paths]
+    },
+    has_imods_issue() {
+      return this.all_issue_paths.some(p => p.startsWith(`archive/imods/`))
     }
   },
   methods: {
@@ -179,8 +194,10 @@ export default {
     validatePackAgainstTable() {
       // this.validateAgainstTable(this.assetDir + "/archive/imods", json_table_imods)
       const merged_table = {...crc_table_pack}
-      for (const key of Object.keys(crc_table_imods.checksums)) {
-        merged_table.checksums['archive/imods/' + key] = crc_table_imods.checksums[key]
+      if (this.check_imods) {
+        for (const key of Object.keys(crc_table_imods.checksums)) {
+          merged_table.checksums['archive/imods/' + key] = crc_table_imods.checksums[key]
+        }
       }
       this.validateAgainstTable(this.assetDir, merged_table)
     },
@@ -192,6 +209,10 @@ export default {
       this.in_progress = true
       this.validation_completed = false
       this.start_time = Date.now()
+      
+      this.mismatch_paths = []
+      this.extra_paths = []
+      this.missing_paths = []
 
       this.total = 0
 
@@ -218,7 +239,7 @@ export default {
       this.eta = 90000
       this.interval = setInterval(() => {
         this.setEta()
-      }, 1000)
+      }, 5000)
 
       this.busy += 1
       this.$nextTick(() => {
@@ -240,6 +261,12 @@ export default {
             this.validation_completed = false
           }
         })
+      })
+    },
+    repairImods() {
+      this.$root.loadState = 'RELOAD'
+      Mods.extractimods().then(_ => {
+        this.$root.app.archiveReload()
       })
     },
     // Create table

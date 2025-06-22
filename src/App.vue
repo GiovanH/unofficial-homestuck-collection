@@ -73,6 +73,9 @@
           // Archive data exists; possible to load
           if (this.$localData.assetDir) {
             // Asset dir is defined (setup finished)
+            if (this.$root.loadState === 'RELOAD') {
+              return false
+            }
             if (this.$root.loadState !== 'ERROR') {
               // loadState is not known error
               // (only look for error, don't destroy app during soft reload)
