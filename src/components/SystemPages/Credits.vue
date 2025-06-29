@@ -63,9 +63,20 @@
               <dd v-html="credit.desc" :key="`${ci}b`"></dd>
             </template>
           </dl>
+          <h3>Additional thanks</h3>
+          <ul class="thanks">
+            <li>
+              <a href="https://fontstruct.com/fontstructors/1639437/ducdat0507">ducdat0507</a> for 
+              <a href="https://fontstruct.com/fontstructions/show/1880599/courierstuck">Courierstuck</a>
+            </li>
+            <li>
+              <a href="https://github.com/benwiley4000">Ben Wiley</a> for 
+              <a href="https://github.com/benwiley4000/gif-frames">gif-frames</a>
+            </li>
+          </ul>
           <hr />
+          <h3>Legal</h3>
           <div class="legal prose">
-            Legal:
   <pre>The Unofficial Homestuck Collection
   Copyright (C) 2025 GiovanH
 
@@ -175,11 +186,6 @@ export default {
           name: "Anthony Bailey",
           link: "http://readmspa.org",
           desc: `For making the original offline Homestuck archive that sent me off down this rabbit hole to begin with!`
-        },
-        {
-          name: "ducdat0507",
-          link: "https://fontstruct.com/fontstructors/1639437/ducdat0507",
-          desc: `For the prerendered aliased Courier bitmap font.`
         },
         {
           name: "Leo60228",
@@ -337,6 +343,12 @@ export default {
     opacity: 0.6; // Not obfuscation, just coloring >.>
   }
 }
+
+ul.thanks {
+  margin-bottom: 1em;
+  padding-left: 3em;
+}
+
 .prose {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: normal;
