@@ -165,7 +165,6 @@ module.exports = {
             }
           ],
           asarUnpack: [
-            "**/node_modules/sharp/**",
             "**/*.node"
           ],
           // eslint-disable-next-line no-template-curly-in-string
@@ -174,7 +173,6 @@ module.exports = {
         mac: {
           target: ["dmg"],
           asarUnpack: [
-            "**/node_modules/sharp/**",
             "**/*.node"
           ],
           category: "entertainment",
@@ -183,7 +181,6 @@ module.exports = {
         linux: {
           target: ["AppImage", "tar.gz", "deb"],
           asarUnpack: [
-            "**/node_modules/sharp/**",
             "**/*.node"
           ],
           maintainer: "GiovanH <uhscollection@icloud.com>",
