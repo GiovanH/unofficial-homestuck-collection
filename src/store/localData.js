@@ -81,6 +81,7 @@ const DEFAULT_SETTINGS = {
   mspaMode: false,
   bandcampEmbed: true,
   allowSysUpdateNotifs: true,
+  lastCheckedUpdate: "",
   devMode: false,
   enableHardwareAcceleration: false,
   useSystemWindowDecorations: false,
