@@ -58,8 +58,6 @@ const imodsAssetsRoot = "assets://archive/imods/"
 var routes = undefined
 
 const store_modlist_key = 'settings.modListEnabled'
-// const store_devmode_key = 'settings.devMode'
-//
 
 var flag_failures_dont_interrupt = false
 
@@ -244,6 +242,7 @@ function onModLoadFail(responsible_mods, e) {
   if (!expectWorkingState() || flag_failures_dont_interrupt)
     return // Pre-setup, we're probably fine ignoring this.
 
+  // eslint-disable-next-line no-debugger
   debugger // If you have devtools open, break here! Inspection time!
 
   if (window.vm && window.vm.loadStage) {
@@ -381,8 +380,6 @@ function getEnabledMods() {
         ? store.get(store_modlist_key)
         : []))
 
-  // logger.debug("got mod settings", store_modlist_key, list)
-
   // Easy tweaks
 
   list.push("_twoToThree")
@@ -411,7 +408,6 @@ function getEnabledMods() {
 
   if (store.get('settings.hqAudio'))
     list.push("_hqAudio")
-
 
   return list
 }
@@ -757,13 +753,13 @@ const footnote_categories = ['story']
 // Interface
 
 async function editArchiveFromModJs(archive, js) {
-  !js._internal && setLoadStage(`${js._id} initializing`)
+  !js.hidden && setLoadStage(`${js._id} initializing`)
   // Fully await any computed properties to be resolved
   await Promise.resolve(js._fullyLoadedPromise)
 
   // Load footnotes into archive
   if (js.footnotes) {
-    !js._internal && setLoadStage(`${js._id} adding footnotes`)
+    !js.hidden && setLoadStage(`${js._id} adding footnotes`)
     if (typeof js.footnotes == "string") {
       console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
 
@@ -788,7 +784,7 @@ async function editArchiveFromModJs(archive, js) {
   // Run archive edit function
   const editfn = js.edit
   if (editfn) {
-    !js._internal && setLoadStage(`${js._id} editing story`)
+    !js.hidden && setLoadStage(`${js._id} editing story`)
     logger.debug(js._id, "editing archive")
     editfn(archive)
   }
@@ -1346,7 +1342,7 @@ async function loadModChoicesAsync(){
   const choice_promises = mod_folders.map(async (dir) => {
     try {
       const js = await getModJsAsync(dir, {liteload: true, reload: true})
-      if (js === null || js.hidden === true || js._internal)
+      if (js === null || js.hidden === true)
         return false
 
       return jsToChoice(js, dir)

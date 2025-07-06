@@ -312,7 +312,7 @@
         try {
           this.$root.loadStage = "MODS"
           await Mods.editArchiveAsync(archive)
-          this.$root.loadState = "FREEZE"
+          this.$root.loadStage = "FREEZE"
           this.$root.archive = Object.freeze(archive)
           this.$nextTick(() => {
             if (this.$root.loadStage == "MODS")
