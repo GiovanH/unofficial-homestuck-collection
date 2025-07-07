@@ -71,9 +71,9 @@ These are basic metadata attributes used in the settings screen for user selecti
 
 While are free to define your own names internally, you should not use names starting with an underscore (`_data`, for instance) as these may be overridden without warning.
 
-### `edit()`
+### `edit(archive)`
 
-The `edit()` function is the main way mods should edit data in the archive. When your mod is loaded, `yourmod.edit(archive)` is called with the entire archive passed by reference. `edit` can edit that object arbitrarily. The return value of `edit()` is ignored.
+The `edit(archive)` function is the main way mods should edit data in the archive. When your mod is loaded, `yourmod.edit(archive)` is called with the entire archive passed by reference. `edit` can edit that object arbitrarily. The return value of `edit()` is ignored.
 
 Examples:
 
@@ -123,6 +123,23 @@ edit(archive) {
 `unshift` is used here because `modHomeRowItems` is a list, and mods at the top of the list are applied last, so `unshift` puts icons from mods at the top of the list at the top of the homescreen card.
 
 **Caution: `archive.music` is currently scheduled to be restructured, and should be considered unstable.**
+
+### `editPage(page)`
+
+The `editPage()` function is similar to the `edit(archive)` function, but edits a single page instead of editing the whole archive. Crucially, unlike `edit(archive)`, this is computed lazily when a page is loaded. This means you can put computationally-intensive operations like translation in `editPage` without adding severe additional load time to process the whole archive. 
+
+Examples:
+
+```js
+  editPage(page) {
+    if (page.content.trim()) {
+      dom = dom || document.implementation.createHTMLDocument("Sandbox")
+
+      ...
+
+      page.content = new_content
+    }
+```
 
 ### Routes
 
