@@ -322,7 +322,7 @@
           class="rowItem"
           href="/blogspot"
           thumbsrc="/archive/collection/archive_blogspot.png"
-          afterpage="002821"
+          afterpage="002816"
           date="Dec 2008 - Jul 2010">
           <template v-slot:title>Blogspot</template>
           <p>Used by Andrew Hussie for behind the scenes commentary during the early days of Homestuck.</p>
