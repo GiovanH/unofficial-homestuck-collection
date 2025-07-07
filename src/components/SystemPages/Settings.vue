@@ -475,6 +475,7 @@
             <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
             <br><br>
             <AssetPackSelector :showRestart="true" />
+            <a href="/validator">Asset Pack Validator</a>
             <br><br>
           </div>
           <button @click="factoryReset()">Factory reset</button>

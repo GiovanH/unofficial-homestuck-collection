@@ -1,10 +1,12 @@
 <template>
-  <div id="window" :class="theme">
+  <div id="window" :class="[
+    theme, 
+    $root.platform // webapp or electron
+  ]">
     <div id="app"
       :class="[
         $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
         $localData.settings.reducedMotion ? 'reducedMotion' : '',
-        $root.platform // webapp or electron
       ]" v-if="canLoadApp">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
