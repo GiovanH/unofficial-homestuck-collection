@@ -90,16 +90,14 @@ serve: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE}
 build: install ${SHARED_INTERMEDIATE}
 	env NODE_OPTIONS=--max_old_space_size=8192 \
 		yarn run vue-cli-service electron:build
-	# yarn electron:build
-	# Don't bundle non-unified NSIS builds
-	-rm dist_electron/*-win-ia32.exe
-	-rm dist_electron/*-win-x64.exe
-
 
 .PHONY: publish-release
 publish-release: install ${SHARED_INTERMEDIATE}
 	env NODE_OPTIONS=--max_old_space_size=8192 \
 		yarn run vue-cli-service electron:build -p always
+	# Don't bundle non-unified NSIS builds
+	-rm dist_electron/*-win-ia32.exe
+	-rm dist_electron/*-win-x64.exe
 
 .PHONY: webapp
 webapp: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE} 
