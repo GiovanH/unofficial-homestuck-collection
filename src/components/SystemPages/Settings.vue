@@ -618,7 +618,7 @@ export default {
         }, {
           model: "ruffleFallback",
           label: "Ruffle flash emulation fallback",
-          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
+          desc: "If the built-in flash player is non-functional, use the <a href='https://ruffle.rs/'>Ruffle</a> Flash emulator in place of Flash."
         }
       ],
       retconList: [
@@ -719,6 +719,19 @@ export default {
         {text: "Courier Aliased", value: "courierAliased"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
+      // Settings that affect the main process and require a restart
+      electronMainSettings: [
+        'useSystemWindowDecorations',
+        'enableHardwareAcceleration',
+        'smoothScrolling',
+        'ruffleFallback'
+      ],
+      // Settings that affect which imods are enabled
+      imod_flag_settings: [
+        'unpeachy', 'pxsTavros', 'bolin', 'soluslunes', 'notitty',
+        'hqAudio'
+      ],
+      // Settings to opaquely set with controversial menu in new reader mode
       allControversial: [
         'bolin',
         'soluslunes',
@@ -726,10 +739,6 @@ export default {
         'pxsTavros',
         'cursedHistory',
         'notitty'
-      ],
-      imod_flag_settings: [
-        'unpeachy', 'pxsTavros', 'bolin', 'soluslunes', 'notitty',
-        'hqAudio'
       ],
       enableAllControversialConfirmMsg: "This option restores the removed \"controversial material\" without detailed content warnings, to avoid spoilers. \n\n Are you sure you want to enable this option now?",
       debounce: false,
@@ -889,7 +898,7 @@ export default {
         this.queueArchiveReload()
       }
 
-      if (setting == 'useSystemWindowDecorations') {
+      if (this.electronMainSettings.includes(setting)) {
         setTimeout(() => {
           ipcRenderer.invoke('restart')
         }, 1000)

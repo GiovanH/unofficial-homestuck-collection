@@ -314,13 +314,16 @@ if (assetDir === undefined) {
   is_first_run = true
 } else {
   try {
-    // Pick the appropriate flash plugin for the user's platform
-    const flashPath = getFlashPath()
+    if (store.has('settings.ruffleFallback') && store.get('settings.ruffleFallback') === true) {
+      logger.info("Ruffle fallback enabled, disabling ppapi-level flash player")
+    } else {
+      // Pick the appropriate flash plugin for the user's platform
+      const flashPath = getFlashPath()
 
-    if (fs.existsSync(flashPath)) {
-      app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-    } else throw Error(`Flash plugin not located at ${flashPath}`)
-
+      if (fs.existsSync(flashPath)) {
+        app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
+      } else throw Error(`Flash plugin not located at ${flashPath}`)
+    }
 
     if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
       app.commandLine.appendSwitch('disable-smooth-scrolling')
@@ -617,7 +620,7 @@ ipcMain.handle('pick-new-file', async (event, payload) => {
   })
   return newPath
 })
-
+ 
 ipcMain.handle('pick-directory', async (event, payload) => {
   const newPath = dialog.showOpenDialogSync(win, {
     defaultPath: '',
@@ -629,7 +632,12 @@ ipcMain.handle('pick-directory', async (event, payload) => {
 })
 
 ipcMain.handle('restart', async (event) => {
-  (!isDevelopment) && app.relaunch() // Can't relaunch app and maintain debugger connection
+  // Can't relaunch app and maintain debugger connection
+  if (isDevelopment) {
+    logger.info("Got relaunch request, but refusing to relaunch app in development environment")
+  } else {
+    app.relaunch() 
+  }
   app.exit()
 })
 
