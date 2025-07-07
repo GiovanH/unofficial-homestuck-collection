@@ -554,7 +554,8 @@ async function buildApi(mod) {
     readYamlAsync(asset_path, callback) {
       return readFileAsyncLocal(asset_path, "readYamlAsync").then(text => yaml.safeLoad(text)).then(callback)
     },
-    Resources
+    Resources,
+    ipcRenderer
   }
   var logger
   Object.defineProperty(api, 'logger', {
@@ -792,6 +793,15 @@ async function editArchiveFromModJs(archive, js) {
     logger.debug(js._id, "editing archive")
     editfn(archive)
   }
+  if (js.editPage) {
+    if (!archive.tweaks.postprocessors) {
+      archive.tweaks.postprocessors = []
+    }
+    archive.tweaks.postprocessors.push({
+      mod_id: js._id,
+      fn: js.editPage
+    })
+  }
 }
 
 async function editArchiveAsync(archive) {
@@ -824,6 +834,7 @@ async function editArchiveAsync(archive) {
     archive.footnotes = {}
   } catch {
     // frozen
+    logger.error("Vanilla archive object contains footnotes? Wiping.")
     for (var member in archive.footnotes) delete archive.footnotes[member]
   }
 
@@ -840,6 +851,38 @@ async function editArchiveAsync(archive) {
       throw e
     }
   }
+
+  if (archive.tweaks.postprocessors) {
+    function postprocessPage(page, page_data) {
+      // Run postprocessor functions on page-copy
+      archive.tweaks.postprocessors.forEach(p => {
+        try {
+          p.fn(page_data)
+        } catch (e) {
+          onModLoadFail([p.mod_id], e)
+        }
+      })
+
+      // Write page-copy changes back to real page object
+      // (including overwriting the getter triggering postprocessing)
+      Object.keys(page_data).forEach(key => {
+        Object.defineProperty(page, key, {value: page_data[key]})
+      })
+    }
+
+    // Note: If multiple getters ever trigger postprocessing, some work is needed
+    // to keep pages from being postprocessed multiple times by each property.
+    Object.values(archive.mspa.story).forEach(page => {
+      const page_data = {...page}
+      Object.defineProperty(page, 'content', {
+        get() {
+          postprocessPage(this, page_data)
+          return this.content
+        }
+      })
+    })
+  }
+
   setLoadStage("BAKE_ROUTES")
   await bakeRoutesPromise
   setLoadStage("MODS_DONE")
@@ -1257,7 +1300,7 @@ function jsToChoice(js, dir){
 
     includes: {
       routes: Boolean(js.routes || js.treeroute || js.trees),
-      edits: Boolean(js.edit),
+      edits: Boolean(js.edit) || Boolean(js.editPage),
       hooks: (js.vueHooks 
         ? Array.from(new Set(js.vueHooks.map(h => (h.matchName || "[complex]")))) 
         : false),
@@ -1390,6 +1433,7 @@ export default {
   getAssetRoute, // sync, used by resources, unpure (depends on routes)
 
   editArchiveAsync, // async, awaited in app.vue after loading archive
+  loadAllContent() { Object.values(vm.$archive.mspa.story).forEach(page => page.content) },
 
   crawlFileTree, // internal/debug
   doFullRouteCheck, // internal/debug
