@@ -15,6 +15,7 @@ const path = require('path')
 const semver = require("semver")
 
 const { nativeImage } = require('electron')
+const gifFrames = require('gif-frames')
 const log = require('electron-log')
 const Store = require('electron-store')
 const windowStateKeeper = require('electron-window-state')
@@ -313,13 +314,16 @@ if (assetDir === undefined) {
   is_first_run = true
 } else {
   try {
-    // Pick the appropriate flash plugin for the user's platform
-    const flashPath = getFlashPath()
+    if (store.has('settings.ruffleFallback') && store.get('settings.ruffleFallback') === true) {
+      logger.info("Ruffle fallback enabled, disabling ppapi-level flash player")
+    } else {
+      // Pick the appropriate flash plugin for the user's platform
+      const flashPath = getFlashPath()
 
-    if (fs.existsSync(flashPath)) {
-      app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
-    } else throw Error(`Flash plugin not located at ${flashPath}`)
-
+      if (fs.existsSync(flashPath)) {
+        app.commandLine.appendSwitch('ppapi-flash-path', flashPath)
+      } else throw Error(`Flash plugin not located at ${flashPath}`)
+    }
 
     if (store.has('settings.smoothScrolling') && store.get('settings.smoothScrolling') === false)
       app.commandLine.appendSwitch('disable-smooth-scrolling')
@@ -616,7 +620,7 @@ ipcMain.handle('pick-new-file', async (event, payload) => {
   })
   return newPath
 })
-
+ 
 ipcMain.handle('pick-directory', async (event, payload) => {
   const newPath = dialog.showOpenDialogSync(win, {
     defaultPath: '',
@@ -628,7 +632,12 @@ ipcMain.handle('pick-directory', async (event, payload) => {
 })
 
 ipcMain.handle('restart', async (event) => {
-  (!isDevelopment) && app.relaunch() // Can't relaunch app and maintain debugger connection
+  // Can't relaunch app and maintain debugger connection
+  if (isDevelopment) {
+    logger.info("Got relaunch request, but refusing to relaunch app in development environment")
+  } else {
+    app.relaunch() 
+  }
   app.exit()
 })
 
@@ -672,44 +681,47 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 })
 
 // Hook onto image drag events to allow images to be dragged into other programs
-try {
-  const Sharp = require('sharp')
-  ipcMain.on('ondragstart', (event, filePath) => {
-    // logger.info("Dragging file", filePath)
-    const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
-    try {
-      // // We can use nativeimages for pngs, but sharp ones are scaled nicer.
-      // const nativeIconFromPath = nativeImage.createFromPath(filePath)
-      // if (!nativeIconFromPath.isEmpty()) {
-      //   logger.info("Native icon from path", nativeIconFromPath)
-      //   cb(nativeIconFromPath)
-      // } else {
-        Sharp(filePath).resize(150, 150, {fit: 'inside', withoutEnlargement: true})
-        .png().toBuffer().then(buffer => {
-          const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-          // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-          cb(sharpNativeImage)
-        }).catch(err => {throw err})
-      // }
-    } catch (err) {
-      logger.error("Couldn't process image", err)
-      // eslint-disable-next-line no-undef
-      cb(`${__static}/img/dragSmall.png`)
-    }
-  })
+// and, more importantly, previewed by the OS
 
-  ipcMain.handle('copy-image', async (event, payload) => {
-    // logger.info(payload.url)
-    Sharp(payload.url).png().toBuffer().then(buffer => {
-      // logger.info(buffer)
-      const sharpNativeImage = nativeImage.createFromBuffer(buffer)
-      // logger.info("Sharp buffer ok", !sharpNativeImage.isEmpty())
-      clipboard.writeImage(sharpNativeImage)
+async function getFrame(filePath) {
+  if (filePath.endsWith('.gif')) {
+    const frameData = await gifFrames({
+      url: filePath,
+      frames: 0,
+      outputType: 'png'
     })
-  })
-} catch (e) {
-  logger.error("Couldn't install sharp!", e)
+    const png = frameData[0].getImage()
+    return nativeImage.createFromBuffer(
+      Buffer.from(png.data), 
+      {width: png.width, height: png.height}
+    )
+  } else {
+    return nativeImage.createFromPath(filePath)
+  }
 }
+
+ipcMain.on('ondragstart', async (event, filePath) => {
+  const cb = (icon) => event.sender.startDrag({ file: filePath, icon })
+  try {
+    var native = await getFrame(filePath)
+
+    var size = native.getSize()
+    if (size.height > 150 || size.width > 150) {
+      native = native.resize({width: 150, height: 150})
+    }
+
+    cb(native)
+  } catch (err) {
+    logger.error("Couldn't process image", err)
+    // eslint-disable-next-line no-undef
+    cb(`${__static}/img/dragSmall.png`)
+  }
+})
+
+ipcMain.handle('copy-image', async (event, payload) => {
+  var native = await getFrame(payload.url)
+  clipboard.writeImage(native)
+})
 
 let openedWithUrl
 const OPENWITH_PROTOCOL = 'mspa'

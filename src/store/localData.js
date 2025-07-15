@@ -1,6 +1,9 @@
 import Vue from 'vue'
 const semver = require("semver");
 
+// isWebApp for main-process electron execution
+const isWebApp = ((typeof window !== 'undefined') && window.isWebApp) || false
+
 const migrations = {
   '2.3.0': store => {
     // Migrate storage
@@ -25,6 +28,12 @@ const migrations = {
       const incremented_size = Number(settings_prev.textOverride.fontSize) + 1
       console.log("textOverride.fontSize:", settings_prev.textOverride.fontSize, '->', incremented_size)
       store.set('settings.textOverride.fontSize', incremented_size)
+    }
+  },
+  '2.6.9': store => {
+    const settings_prev = store.get('settings', {})
+    if (settings_prev && !isWebApp && settings_prev.ruffleFallback) {
+      store.set('settings.ruffleFallback', false)
     }
   }
 }
@@ -83,6 +92,7 @@ const DEFAULT_SETTINGS = {
   mspaMode: false,
   bandcampEmbed: true,
   allowSysUpdateNotifs: true,
+  lastCheckedUpdate: "",
   devMode: false,
   enableHardwareAcceleration: false,
   useSystemWindowDecorations: false,
@@ -122,7 +132,7 @@ const DEFAULT_SETTINGS = {
   unpeachy: false,
   pxsTavros: false,
   cursedHistory: false,
-  ruffleFallback: true,
+  ruffleFallback: false,
 
   modListEnabled: [],  // name hardcoded in mods.js, be careful
   ...(window.webAppOpinionatedDefaults || {})

@@ -16,8 +16,9 @@ git-future *args:
     done
 
 xml_release:
-    #!/bin/bash -x
-    release="$(gh release view --json tagName,publishedAt,url,body)"
+    #!/bin/bash
+    latest_incl_pre="$(gh release list --json tagName | jq -r '.[0].tagName' | dos2unix)"
+    release="$(gh release view $latest_incl_pre --json tagName,publishedAt,url,body)"
     export body="$(echo "$release" | yq -p json '.body' | /usr/bin/env python3 -m markdown)"
 
     echo "$release" | yq -p json -o xml '. | {
@@ -26,7 +27,7 @@ xml_release:
           "+@type": "stable",
           "+@date": (.publishedAt),
           "url": .url,
-          "description": strenv(body)
+          "description": strenv(body) | sub("\n", "")
         }
       }'
 

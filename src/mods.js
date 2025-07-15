@@ -75,8 +75,6 @@ const imodsAssetsRoot = "assets://archive/imods/"
 var routes = undefined
 
 const store_modlist_key = 'settings.modListEnabled'
-// const store_devmode_key = 'settings.devMode'
-//
 
 var flag_failures_dont_interrupt = false
 
@@ -261,6 +259,7 @@ function onModLoadFail(responsible_mods, e) {
   if (!expectWorkingState() || flag_failures_dont_interrupt)
     return // Pre-setup, we're probably fine ignoring this.
 
+  // eslint-disable-next-line no-debugger
   debugger // If you have devtools open, break here! Inspection time!
 
   if (window.vm && window.vm.loadStage) {
@@ -397,8 +396,6 @@ function getEnabledMods() {
     : (store.has(store_modlist_key)
         ? store.get(store_modlist_key)
         : []))
-
-  // logger.debug("got mod settings", store_modlist_key, list)
 
   // Easy tweaks
 
@@ -614,7 +611,8 @@ async function buildApi(mod) {
     readYamlAsync(asset_path, callback) {
       return readFileAsyncLocal(asset_path, "readYamlAsync").then(text => yaml.safeLoad(text)).then(callback)
     },
-    Resources
+    Resources,
+    ipcRenderer
   }
   var logger
   Object.defineProperty(api, 'logger', {
@@ -825,13 +823,13 @@ const footnote_categories = ['story']
 // Interface
 
 async function editArchiveFromModJs(archive, js) {
-  !js._internal && setLoadStage(`${js._id} initializing`)
+  !js.hidden && setLoadStage(`${js._id} initializing`)
   // Fully await any computed properties to be resolved
   await Promise.resolve(js._fullyLoadedPromise)
 
   // Load footnotes into archive
   if (js.footnotes) {
-    !js._internal && setLoadStage(`${js._id} adding footnotes`)
+    !js.hidden && setLoadStage(`${js._id} adding footnotes`)
     if (typeof js.footnotes == "string") {
       console.assert(!js._singlefile, js.title, "Single file mods cannot use footnote files!")
 
@@ -856,9 +854,18 @@ async function editArchiveFromModJs(archive, js) {
   // Run archive edit function
   const editfn = js.edit
   if (editfn) {
-    !js._internal && setLoadStage(`${js._id} editing story`)
+    !js.hidden && setLoadStage(`${js._id} editing story`)
     logger.debug(js._id, "editing archive")
     editfn(archive)
+  }
+  if (js.editPage) {
+    if (!archive.tweaks.postprocessors) {
+      archive.tweaks.postprocessors = []
+    }
+    archive.tweaks.postprocessors.push({
+      mod_id: js._id,
+      fn: js.editPage
+    })
   }
 }
 
@@ -892,6 +899,7 @@ async function editArchiveAsync(archive) {
     archive.footnotes = {}
   } catch {
     // frozen
+    logger.error("Vanilla archive object contains footnotes? Wiping.")
     for (var member in archive.footnotes) delete archive.footnotes[member]
   }
 
@@ -908,6 +916,38 @@ async function editArchiveAsync(archive) {
       throw e
     }
   }
+
+  if (archive.tweaks.postprocessors) {
+    function postprocessPage(page, page_data) {
+      // Run postprocessor functions on page-copy
+      archive.tweaks.postprocessors.forEach(p => {
+        try {
+          p.fn(page_data)
+        } catch (e) {
+          onModLoadFail([p.mod_id], e)
+        }
+      })
+
+      // Write page-copy changes back to real page object
+      // (including overwriting the getter triggering postprocessing)
+      Object.keys(page_data).forEach(key => {
+        Object.defineProperty(page, key, {value: page_data[key]})
+      })
+    }
+
+    // Note: If multiple getters ever trigger postprocessing, some work is needed
+    // to keep pages from being postprocessed multiple times by each property.
+    Object.values(archive.mspa.story).forEach(page => {
+      const page_data = {...page}
+      Object.defineProperty(page, 'content', {
+        get() {
+          postprocessPage(this, page_data)
+          return this.content
+        }
+      })
+    })
+  }
+
   setLoadStage("BAKE_ROUTES")
   await bakeRoutesPromise
   setLoadStage("MODS_DONE")
@@ -1325,7 +1365,7 @@ function jsToChoice(js, dir){
 
     includes: {
       routes: Boolean(js.routes || js.treeroute || js.trees),
-      edits: Boolean(js.edit),
+      edits: Boolean(js.edit) || Boolean(js.editPage),
       hooks: (js.vueHooks 
         ? Array.from(new Set(js.vueHooks.map(h => (h.matchName || "[complex]")))) 
         : false),
@@ -1414,7 +1454,7 @@ async function loadModChoicesAsync(){
   const choice_promises = mod_folders.map(async (dir) => {
     try {
       const js = await getModJsAsync(dir, {liteload: true, reload: true})
-      if (js === null || js.hidden === true || js._internal)
+      if (js === null || js.hidden === true)
         return false
 
       return jsToChoice(js, dir)
@@ -1458,6 +1498,7 @@ export default {
   getAssetRoute, // sync, used by resources, unpure (depends on routes)
 
   editArchiveAsync, // async, awaited in app.vue after loading archive
+  loadAllContent() { Object.values(vm.$archive.mspa.story).forEach(page => page.content) },
 
   crawlFileTree, // internal/debug
   doFullRouteCheck, // internal/debug

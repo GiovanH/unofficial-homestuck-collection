@@ -204,14 +204,14 @@
                 <label><input type="checkbox" name="paragraphSpacing" v-model="$localData.settings.textOverride['paragraphSpacing']" @click="toggleSetting('paragraphSpacing', 'textOverride')"> Add spacing between chat lines</label>
                 <label><input type="checkbox" name="highContrast" v-model="$localData.settings.textOverride['highContrast']" @click="toggleSetting('highContrast', 'textOverride')"> High contrast text colors</label>
               </div>
-              <!-- <br><br> -->
+              
               <label class="fontslider" v-if="$localData.settings.textOverride.fontFamily != 'courierAliased'">
               <!-- <label> -->
                 Font size: <span v-if="$refs.textPreview" v-text="$refs.textPreview.fontStyle.fontSize" />
                 <input type="range" v-model="$localData.settings.textOverride.fontSize" min="0" max="6" step="1" list="fontSize">
 
               </label>
-              <!-- <br><br> -->
+              
               <label class="fontslider">
                 Line height: <span v-if="$refs.textPreview" v-text="$refs.textPreview.fontStyle.lineHeight" />
                 <input type="range" v-model="$localData.settings.textOverride.lineHeight" min="0" max="7" step="1" list="lineHeight">
@@ -310,10 +310,14 @@
             <li><StoryPageLink long mspaId='002926'></StoryPageLink></li>
             <li><StoryPageLink long mspaId='002970'></StoryPageLink></li>
             <li><StoryPageLink long mspaId='003620'></StoryPageLink></li>
+            <!-- notitty -->
+            <li><StoryPageLink long mspaId='003228'></StoryPageLink></li>
+            <li><StoryPageLink long mspaId='006844'></StoryPageLink></li>
             <!-- peachy -->
             <li><StoryPageLink long mspaId='007623'></StoryPageLink></li>
             </ol>
           </div>
+          <br />
           <div class="right col">
             <h3>Side content</h3>
             <ol>
@@ -360,11 +364,12 @@
             Content, patches, and localization. Add mods to your local <a :href="'file://' + modsDir">mods directory</a>.
             You can get mods from anywhere, but a good place to start is the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/wiki/Third-Party-Mods'>Third Party Mods</a> github page.
 
-            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.</p>
-            <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
-        <div class='hint'>
-          <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
-        </div>
+            For a detailed explanation of how mods work and how you can build your mods, take a look at the <a href='https://github.com/GiovanH/unofficial-homestuck-collection/blob/main/MODDING.md'>modding readme</a>.
+          </p>
+          <p>Mods are software just like the collection, and a malicious mod could be malware. Use normal caution and only run trusted code.</p>
+          <div class='hint'>
+            <p>If you've added mods to your mods directory with the application open, you can <button @click="reloadModList">refresh mod list</button> </p>
+          </div>
         </section>
         <section class="modPrattle" v-else>
           <p class="settingDesc">Because you are using the webapp version of the collection, you only have access to these preloaded mods.</p>
@@ -470,6 +475,7 @@
             <a :href="log.transports.file.getFile()">Log File (for troubleshooting)</a>
             <br><br>
             <AssetPackSelector :showRestart="true" />
+            <a href="/validator">Asset Pack Validator</a>
             <br><br>
           </div>
           <button @click="factoryReset()">Factory reset</button>
@@ -516,7 +522,7 @@ export default {
         {
           model: "showAddressBar",
           label: "Address bar",
-          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access it by clicking the jump bar button in the tab bar, or with ctrl+L (⌘+L on MacOS)."
+          desc: "Embeds the jump bar at the top of the window, just like a regular address bar. When this is disabled, you can access it by clicking the jump bar button in the tab bar, or with Ctrl+L (⌘+L on MacOS)."
         }, {
         //   model: "mspaMode",
         //   label: "Use MSPA page numbers",
@@ -613,7 +619,7 @@ export default {
         }, {
           model: "ruffleFallback",
           label: "Ruffle flash emulation fallback",
-          desc: "If the built-in flash player is non-functional, use the latest distribution of <a href='https://ruffle.rs/'>Ruffle</a> to emulate flash."
+          desc: "If the built-in flash player is non-functional, use the <a href='https://ruffle.rs/'>Ruffle</a> Flash emulator in place of Flash."
         }
       ],
       retconList: [
@@ -714,6 +720,19 @@ export default {
         {text: "Courier Aliased", value: "courierAliased"},
         {text: "OpenDyslexic", value: "openDyslexic"}
       ],
+      // Settings that affect the main process and require a restart
+      electronMainSettings: [
+        'useSystemWindowDecorations',
+        'enableHardwareAcceleration',
+        'smoothScrolling',
+        'ruffleFallback'
+      ],
+      // Settings that affect which imods are enabled
+      imod_flag_settings: [
+        'unpeachy', 'pxsTavros', 'bolin', 'soluslunes', 'notitty',
+        'hqAudio'
+      ],
+      // Settings to opaquely set with controversial menu in new reader mode
       allControversial: [
         'bolin',
         'soluslunes',
@@ -876,11 +895,11 @@ export default {
       this.$localData.root.saveLocalStorage()
 
       // Some settings are just flags for mods to enable.
-      if (['unpeachy', 'pxsTavros', 'bolin', 'hqAudio', 'soluslunes', 'notitty'].includes(setting)) {
+      if (this.imod_flag_settings.includes(setting)) {
         this.queueArchiveReload()
       }
 
-      if (setting == 'useSystemWindowDecorations') {
+      if (this.electronMainSettings.includes(setting)) {
         setTimeout(() => {
           ipcRenderer.invoke('restart')
         }, 1000)
@@ -1135,6 +1154,10 @@ div.settings {
     }
     .ccPageNos {
       font-weight: normal;
+      ol {
+        padding-left: 2em;
+        list-style: circle;
+      }
     }
   }
 

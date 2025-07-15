@@ -277,7 +277,7 @@ module.exports = {
     "002340": [ // During third Rose GameFAQs, after Nanna expodump (override)
       "notif_hsvol1"
     ],
-    "002821": [ // Just after grandpa strife
+    "002816": [ // Just after grandpa strife
       "notif_blogspot"
     ],
     "002921": [ // Just after AR introduction

@@ -1,10 +1,12 @@
 <template>
-  <div id="window" :class="theme">
+  <div id="window" :class="[
+    theme, 
+    $root.platform // webapp or electron
+  ]">
     <div id="app"
       :class="[
         $localData.settings.showAddressBar ? 'addressBar' : 'noAddressBar',
         $localData.settings.reducedMotion ? 'reducedMotion' : '',
-        $root.platform // webapp or electron
       ]" v-if="canLoadApp">
       <AppHeader :class="theme" ref="uistyle" />
       <TabFrame v-for="key in tabList" :key="key" :ref="key"  :tabKey="key"/>
@@ -80,6 +82,9 @@
           // Archive data exists; possible to load
           if (this.$localData.assetDir) {
             // Asset dir is defined (setup finished)
+            if (this.$root.loadState === 'RELOAD') {
+              return false
+            }
             if (this.$root.loadState !== 'ERROR') {
               // loadState is not known error
               // (only look for error, don't destroy app during soft reload)
@@ -316,7 +321,7 @@
         try {
           this.$root.loadStage = "MODS"
           await Mods.editArchiveAsync(archive)
-          this.$root.loadState = "FREEZE"
+          this.$root.loadStage = "FREEZE"
           this.$root.archive = Object.freeze(archive)
           this.$nextTick(() => {
             if (this.$root.loadStage == "MODS")

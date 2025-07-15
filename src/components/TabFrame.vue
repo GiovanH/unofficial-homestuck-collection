@@ -419,7 +419,7 @@ export default {
                 case 'BLOGSPOT': {
                     if (this.routeParams.id === 'magicaljourney') component = 'MagicalJourney'
                     else if (this.routeParams.id === 'offeryoucantrefuse') component = 'OfferYouCantRefuse'
-                    else if (this.$pageIsSpoiler('002821')) component = 'Spoiler'
+                    else if (this.$pageIsSpoiler('002816')) component = 'Spoiler'
                     break
                 }
                 case 'DSTRIDER': {

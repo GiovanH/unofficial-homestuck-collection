@@ -74,8 +74,17 @@ export default {
   },
   mounted(){
     const is_flatpak = !!(process.env.container)
-    if (this.$localData.settings.allowSysUpdateNotifs && !is_flatpak)
-      this.doUpdateCheck()
+    if (this.$localData.settings.allowSysUpdateNotifs && !is_flatpak) {
+      const now = new Date()
+      const last_checked = new Date(this.$localData.settings.lastCheckedUpdate)
+      const one_day = (12 * 60 * 60 * 1000)
+      if (last_checked == "Invalid Date" || now - last_checked > one_day) {
+        this.doUpdateCheck()
+        this.$localData.settings.lastCheckedUpdate = now.toISOString()
+      } else {
+        this.$logger.info("Skipping update check, already checked", last_checked)
+      }
+    }
   }
 }
 </script>

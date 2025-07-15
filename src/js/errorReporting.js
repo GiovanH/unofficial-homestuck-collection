@@ -41,7 +41,7 @@ function buildReportBody(error, versions) {
 
   var body = `
 Before reporting a bug:
-- Read the FAQ: https://bambosh.dev/unofficial-homestuck-collection/faq.html
+- Read the FAQ: https://homestuck.giovanh.com/unofficial-homestuck-collection/faq.html
 - Make absolutely sure your exact issue hasn't already been identified in the pinned issue list
 - Search the issues to see your problem is already being tracked.
 - See if the issue has already been fixed in the latest prerelease build
