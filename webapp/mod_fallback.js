@@ -27,13 +27,18 @@ function mapToSupplemental(media_url) {
 
   let ret
   
-  ret = tryMapAndReplace(u.pathname, /^\/storyfiles\/(.+)\/Sfiles\/(.+?)\/\2/, 
+  ret = tryMapAndReplace(u.pathname, 
+    /^(?:.*AssetPackV2Lite)\/storyfiles\/(.+)\/Sfiles\/(.+?)\/\2/, 
     asset_pack_supplemental_href + "/$1/$2/$3")
   if (ret) return ret
-  ret = tryMapAndReplace(u.pathname, /^\/storyfiles\/(.+)\/(.+?)\/\2([0-9a-z_]+)?(\.swf|\.mp4|\.mp3)/, 
+
+  ret = tryMapAndReplace(u.pathname, 
+    /^(?:.*AssetPackV2Lite)\/storyfiles\/(.+)\/(.+?)\/\2([0-9a-z_]+)?(\.swf|\.mp4|\.mp3)/, 
     asset_pack_supplemental_href + "/$1/$2/$2$3$4")
   if (ret) return ret
-  ret = tryMapAndReplace(u.pathname, /^\/storyfiles\/hs2\/(06276\/A6A6I1\.swf)/, 
+
+  ret = tryMapAndReplace(u.pathname, 
+    /^(?:.*AssetPackV2Lite)\/storyfiles\/hs2\/(06276\/A6A6I1\.swf)/, 
     asset_pack_supplemental_href + "/$1")
   if (ret) return ret
 }
@@ -42,15 +47,20 @@ function mapToVizCanonical(cdn_domain, media_url) {
 
   let ret
 
-  ret = tryMapAndReplace(u.pathname, /^\/storyfiles\/(.+(?:\.gif|\.png|\.jpg))/, '/images/storyfiles/$1')
+  ret = tryMapAndReplace(u.pathname, 
+    /^(?:.*AssetPackV2Lite)\/storyfiles\/(.+(?:\.gif|\.png|\.jpg))/, '/images/storyfiles/$1')
   if (ret) return cdn_domain + ret.slice(1)
-  ret = tryMapAndReplace(u.pathname, /^\/ryanquest\//, '/images/ryanquest/')
+  ret = tryMapAndReplace(u.pathname, 
+/^(?:.*AssetPackV2Lite)\/ryanquest\//, '/images/ryanquest/')
   if (ret) return cdn_domain + ret.slice(1)
-  ret = tryMapAndReplace(u.pathname, /^\/advimgs\//, '/images/advimgs/')
+  ret = tryMapAndReplace(u.pathname, 
+/^(?:.*AssetPackV2Lite)\/advimgs\//, '/images/advimgs/')
   if (ret) return cdn_domain + ret.slice(1)
-  ret = tryMapAndReplace(u.pathname, /^\/scraps\//, '/images/scraps/')
+  ret = tryMapAndReplace(u.pathname, 
+/^(?:.*AssetPackV2Lite)\/scraps\//, '/images/scraps/')
   if (ret) return cdn_domain + ret.slice(1)
-  ret = tryMapAndReplace(u.pathname, /^\/storyfiles\/hs2\/waywardvagabond\//, '/images/storyfiles/hs2/waywardvagabond/')
+  ret = tryMapAndReplace(u.pathname, 
+/^(?:.*AssetPackV2Lite)\/storyfiles\/hs2\/waywardvagabond\//, '/images/storyfiles/hs2/waywardvagabond/')
   if (ret) return cdn_domain + ret.slice(1)
 }
 
@@ -74,6 +84,8 @@ function fallbacksFor(src_orig) {
     ret.push(supplemental_src)
   } else {
     ret.push(mapToVizCanonical("https://www.homestuck.com/", src_orig))
+    ret.push(mapToVizCanonical("https://mspaintadventures.com/", src_orig))
+    ret.push(mapToVizCanonical("https://file.garden/ZMykmy0EPHK4dlCG/", src_orig))
     ret.push(mapToVizCanonical("https://homestuck.kici.moe/", src_orig))
     ret.push(mapToVizCanonical("https://mspa.chadthundercock.com/", src_orig).replace("/images/", "/mspa/"))
   }

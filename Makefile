@@ -47,17 +47,17 @@ src/imods.tar.gz: $(wildcard src/imods/*) $(wildcard src/imods/*/*)
 src/js/crc_imods.json: src/imods.tar.gz
 	yarn exec node src/js/validation.js src/imods/ src/js/crc_imods.json
 
-WEBAPP_INTERMEDIATE=build/webAppModTrees.json webapp/browser.js
+# browser.js must be built with known environment variables, not static
+WEBAPP_INTERMEDIATE=build/webAppModTrees.json
 
 build/webAppModTrees.json: webapp/browser.js.j2
 	mkdir -p build/
 	(cd ${ASSET_DIR_LITE}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > build/webAppModTrees.json
 
-webapp/browser.js: webapp/browser.js.j2
-	env ASSET_DIR="${ASSET_DIR_LITE}" \
-		ASSET_PACK_HREF="http://localhost:8413/" \
-		APP_VERSION=`jq -r '.version' < package.json` \
-		jinja2 $< > $@
+.PHONY: webapp/browser.js
+webapp/browser.js:
+	env APP_VERSION=`jq -r '.version' < package.json` \
+		jinja2 webapp/browser.js.j2 > webapp/browser.js
 
 # src/js/crc_pack.json:
 # 	yarn exec node src/js/validation.js "${ASSET_DIR}" src/js/crc_pack.json
@@ -104,9 +104,15 @@ publish-release: install ${SHARED_INTERMEDIATE}
 
 .PHONY: webapp
 webapp: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE} 
-	env ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
-		yarn run vue-cli-service build webapp/browser.js
+	env ASSET_DIR="${ASSET_DIR_LITE}" \
+		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+			make webapp/browser.js
+	env NODE_OPTIONS=--max_old_space_size=8192 \
+		ASSET_DIR="${ASSET_DIR_LITE}" \
+		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+			yarn run vue-cli-service build webapp/browser.js
 
+			
 .PHONY: help
 help:
 	grep -E '(^[^.#[:space:]].*:)|(##)' Makefile
