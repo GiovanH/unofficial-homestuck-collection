@@ -684,6 +684,9 @@ ipcMain.handle('steam-open', async (event, browserUrl) => {
 // and, more importantly, previewed by the OS
 
 async function getFrame(filePath) {
+  if (filePath.startsWith('data:')) {
+    return nativeImage.createFromDataURL(filePath)
+  }
   if (filePath.endsWith('.gif')) {
     const frameData = await gifFrames({
       url: filePath,
