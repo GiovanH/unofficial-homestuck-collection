@@ -693,10 +693,14 @@ async function getFrame(filePath) {
       frames: 0,
       outputType: 'png'
     })
-    const png = frameData[0].getImage()
+    const pngBuffer = await new Promise((resolve, reject) => {
+      const chunks = []
+      frameData[0].getImage().on('data', chunk => chunks.push(chunk))
+      frameData[0].getImage().on('end', () => resolve(Buffer.concat(chunks)))
+      frameData[0].getImage().on('error', reject)
+    })
     return nativeImage.createFromBuffer(
-      Buffer.from(png.data), 
-      {width: png.width, height: png.height}
+      pngBuffer
     )
   } else {
     return nativeImage.createFromPath(filePath)
