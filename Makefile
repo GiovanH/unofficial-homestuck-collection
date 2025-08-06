@@ -54,15 +54,18 @@ build/webAppModTrees.json: webapp/browser.js.j2
 	mkdir -p build/
 	(cd ${ASSET_DIR_LITE}; tree archive/imods mods -J | jq '. | walk(if type == "object" then (if .type == "file" then ({"key": (.name), "value": true}) elif has("contents") then {"key": (.name), "value": .contents|from_entries} else . end) else . end) | .[:-1] | from_entries') > build/webAppModTrees.json
 
+# Requires `python3 -m pip install jinja2-cli`
 .PHONY: webapp/browser.js
 webapp/browser.js:
 	env APP_VERSION=`jq -r '.version' < package.json` \
+		ASSET_PACK_HREF="http://localhost:8413/" \
+		ASSET_DIR="${ASSET_DIR_LITE}" \
 		jinja2 webapp/browser.js.j2 > webapp/browser.js
 
 # src/js/crc_pack.json:
 # 	yarn exec node src/js/validation.js "${ASSET_DIR}" src/js/crc_pack.json
 
-# Note: browser.js is not a determinate intermediate file because it depends on parameters!
+# Note: browser.js is not a determinate intermediate file because it depends on envars and parameters!
 
 ## Running live
 
@@ -85,7 +88,7 @@ ensure-asset-server:
 serve: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE}
 	make ensure-asset-server
 	env ASSET_PACK_HREF="http://localhost:8413/" yarn run vue-cli-service serve webapp/browser.js &
-	react "make webapp/browser.js" webapp/browser.js.j2
+	nodemon --exec "make webapp/browser.js" --watch "webapp" -e "j2"
 
 ## Building output
 
@@ -105,11 +108,11 @@ publish-release: install ${SHARED_INTERMEDIATE}
 .PHONY: webapp
 webapp: install ${SHARED_INTERMEDIATE} ${WEBAPP_INTERMEDIATE} 
 	env ASSET_DIR="${ASSET_DIR_LITE}" \
-		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+		ASSET_PACK_HREF="${ASSET_PACK_HREF}" \
 			make webapp/browser.js
 	env NODE_OPTIONS=--max_old_space_size=8192 \
 		ASSET_DIR="${ASSET_DIR_LITE}" \
-		ASSET_PACK_HREF="https://filedn.com/lANSiYhDVpD4ou6Gt17Ij9m/AssetPackV2Lite/" \
+		ASSET_PACK_HREF="${ASSET_PACK_HREF}" \
 			yarn run vue-cli-service build webapp/browser.js
 
 			

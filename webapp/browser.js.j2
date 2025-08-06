@@ -18,6 +18,8 @@ window.webAppOpinionatedDefaults = {
   useTabbedBrowsing: false,
   // extraMetadata: true,
   modListEnabled: [
+    // CHANGEME: Set these based on what mods you have installed and
+    // want enabled by default
     // "tuhc-commentary",
     "semantic",
     "tuhc-readmspa",
@@ -50,6 +52,13 @@ window.webAppOpinionatedModDefaults = {
   // "semantic", // requires node process :(
   // "Nightfall_online",
 //"eraserhead.js",
+
+// CHANGEME
+// Whatever mods you bundle with the webapp have to be set in both
+// litepack.sh:copyMods and browser.js.j2:mods
+// litepack includes them in the litepack, browser.js.j2 tells yarn to
+// include them in webpack
+
 {% set mods = [
   "Psycholonials_online",
   "Ruby Quest_online",
@@ -87,6 +96,7 @@ const show_ad = (_) => {
   // }
 }
 
+/*
 fetch("/goals.json")
   .then(result => result.json())
   .then(data => {
@@ -107,6 +117,7 @@ fetch("/goals.json")
     // // kofi_goal_progress = sandbox_body.querySelector('[name="Goal Widget"] span.kfds-font-bold').innerText.trim()
 
   })
+  */
 
 // if (show_ad()) {
 //   store.set("last_goal_met", "2023-07")
