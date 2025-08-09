@@ -18,8 +18,8 @@ module.exports = {
     // Just remove the second image.
     archive.mspa.story['003228'].media[1] = ''
 
-    archive.mspa.story['006844'].media[0] = 'assets://mods/notitty/04941_sfw.swf'
-    archive.audioData['assets://mods/notitty/04941_sfw.swf'] = [
+    archive.mspa.story['006844'].media[0] = 'assets://notitty/04941_sfw.swf'
+    archive.audioData['assets://notitty/04941_sfw.swf'] = [
       {
         href: "assets://storyfiles/hs2/04941/04941.mp3",
         loop: false
