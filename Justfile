@@ -27,7 +27,7 @@ xml_release:
           "+@type": "stable",
           "+@date": (.publishedAt),
           "url": .url,
-          "description": strenv(body) | sub("\n", "")
+          "description": (strenv(body) | fromxml)
         }
       }'
 
@@ -73,6 +73,10 @@ flatpak:
 
     flat_branch="update-$release_tag"
     logparam "Creating new working branch" "$flat_branch"
+    git checkout master
+    git pull
+    git branch -D "$flat_branch" || :;
+    # git branch -d "origin/$flat_branch" || :;
     git checkout -b "$flat_branch"
 
     j2 ../build/dev.bambosh.UnofficialHomestuckCollection.yml.j2 \
