@@ -28,7 +28,7 @@
         </div>
         <div class="mediaContent" >
           <a :href="nextPage || false">
-            <Media :url="comicPage" :title="titleText[page_num]" :key="comicPage" />
+            <Media :url="comicPage" :title="titleText" :key="comicPage" />
           </a>
         </div>
         <div class="nav bottomNav" v-if="!is404">
@@ -134,8 +134,8 @@ export default {
     },
     titleText() {
       return this.comic.titleText 
-        ? this.comic.titleText[this.page_num] || {} 
-        : {}
+        ? this.comic.titleText[this.page_num] || null
+        : null
     },
     pageTags() {
       if (this.comic.tags) return (this.comic.tags[this.page_num] || [])
