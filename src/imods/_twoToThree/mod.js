@@ -249,9 +249,9 @@ module.exports = {
         archive.music.tracks['the-la2t-frontiier'].urls[0] = archive.music.tracks['the-la2t-frontiier'].urls[0].slice(0, -2)
         archive.music.tracks['skaian-summoning'].urls[0] = archive.music.tracks['skaian-summoning'].urls[0].slice(0, -2)
         archive.music.tracks['the-thirteenth-hour'].urls.shift()
-        archive.music.tracks['spiders-claw'].urls[0] + "-bonus"
-        archive.music.tracks['staring'].urls[0] + "-bonus"
-        archive.music.tracks['keepers'].urls[0] + "-bonus"
+        archive.music.tracks['spiders-claw'].urls[0] += "-bonus"
+        archive.music.tracks['staring'].urls[0] += "-bonus"
+        archive.music.tracks['keepers'].urls[0] += "-bonus"
         archive.music.tracks['theme'].urls.shift()
         archive.music.tracks['walls-covered-in-blood-dx'].urls.shift()
         // SQUIDDLES
