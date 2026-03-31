@@ -1,21 +1,22 @@
 #!/bin/python3
 
-import re
-import json
-import os
-import requests
-import bs4
-import urllib.parse
-import logging
 import difflib
 import itertools
-from urllib.parse import urlparse
-from lib import TriadLogger, saveStreamChunked
+import json
+import logging
+import os
+import re
 import typing
+import urllib.parse
+from urllib.parse import urlparse
+import urllib3.exceptions
 
+import bs4
+import requests
 import ruamel.yaml
-
 import urllib3
+from lib import TriadLogger, saveStreamChunked
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 yaml = ruamel.yaml.YAML()
@@ -137,7 +138,11 @@ def saveYoutubeAs(story: str, src_url: str, target_name: str) -> str:
 
     outpath = os.path.join(directory, target_name)
 
-    from yt_dlp import YoutubeDL
+    try:
+        from yt_dlp import YoutubeDL
+    except ImportError:
+        print("yt_dlp not installed, unable to save youtube link")
+        return "notimplemented"
 
     with YoutubeDL({"outtmpl": {"default": outpath}}) as ydl:
         info = ydl.extract_info(src_url, download=False)
@@ -186,7 +191,8 @@ def getStream(url, prev_url=None) -> requests.models.Response:
     Returns:
         Requests stream
     """
-    url = urllib.parse.urljoin(prev_url, url)
+    if prev_url:
+        url = urllib.parse.urljoin(prev_url, url)
     headers = {}
 
     # Workarounds
@@ -246,7 +252,7 @@ def swfhack(pageno: int, bbcode: BBCode, soup: bs4.BeautifulSoup) -> BBCode:
         if panel_video and Hacks.swflinks_vidreplace:
             videomirror = "Mirror: " + ", ".join([
                 f"[url={source['src']}]{source['type']}[/url]"
-                for source in panel_video.findAll("source")
+                for source in panel_video.find_all("source")
             ])
             re_video = r"<video.+?</video>"
             if re.search(re_video, bbcode, flags=re.I | re.DOTALL):
@@ -354,6 +360,7 @@ def downloadStory(
 
     if story_name is None:
         story_name = story_resp['n'].replace(':', '-')
+        assert isinstance(story_name, str)
         if (not offline):
             story_name += "_online"
 
@@ -440,8 +447,11 @@ def downloadStory(
                         outpath = "assets://mspfa/" + saveImageAs(story_name, src, img_id)
                     # Replace text in source
                     page['b'] = page['b'].replace(src, outpath)
-                except requests.exceptions.HTTPError:
+                except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError):
                     logger.warning(f"Could not replace path {img_id} in page {pageno}")
+                    logger.warning(src)
+                    if Hacks.swflinks and src.endswith(".swf"):
+                        logger.info("Try running the program with --no-swfhack")
                     with open(f"{story_name}/missing_urls.txt", "a", encoding="utf-8") as linklist:
                         linklist.write(src + "\n")
 
