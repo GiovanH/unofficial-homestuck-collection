@@ -1,17 +1,19 @@
-![The Unofficial Homestuck Collection](src/assets/collection_logo.png)
+# Notice
 
-Homepage: <https://homestuck.giovanh.com/unofficial-homestuck-collection/>
-
----
-
-The future of The Unofficial Homestuck Collection is currently uncertain. 
+The Unofficial Homestuck Collection is currently in maintenance mode. 
+It is an offline archive, so it is still fully-functional if you have the necessary files, but I am not currently planning continued feature development. 
 
 The surrounding websites have been taken down by legal action initiated by Homestuck, Inc. and The Homestuck Independent Creative Union as part of an attempted hostile takeover. [More details here.](https://blog.giovanh.com/blog/2025/08/08/uhc-end/)
 
-There have currently been no legal attacks on this, the codebase for the reader. 
-The question of whether this repository can remain up or maintained without the threat of retaliatory legal action is under active investigation. 
+There have currently been no legal attacks on this, the codebase for the reader itself, and it will remain available if possible.
 
----
+<!-- The question of whether this repository can remain up or maintained without the threat of retaliatory legal action is under active investigation.  -->
+
+# Readme
+
+![The Unofficial Homestuck Collection](src/assets/collection_logo.png)
+
+Homepage: <https://homestuck.giovanh.com/unofficial-homestuck-collection/>
 
 This is the repository for a self-contained collection that contains Homestuck (with Flash elements fully intact), the other MS Paint Adventures, official Homestuck side-stories, and a variety of goodies for the enquiring reader, as well as a variety of unintrusive enhancements to the overall presentation, both for quality and convenience.
 
