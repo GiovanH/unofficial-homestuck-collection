@@ -64,10 +64,10 @@ export default {
       const filteredCredits = this.artist.credits.filter(albumCredit => {
         if (this.$albumIsSpoiler(albumCredit.directory)) {
           let isValidAlbum = false
-          albumCredit.music.forEach(track => {
+          albumCredit.music && albumCredit.music.forEach(track => {
             if (!this.$trackIsSpoiler(track.track)) isValidAlbum = true
           })
-          albumCredit.art.forEach(track => {
+          albumCredit.art && albumCredit.art.forEach(track => {
             if (!this.$trackIsSpoiler(track.track)) isValidAlbum = true
           })
           return isValidAlbum
