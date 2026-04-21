@@ -1,2 +1,3 @@
 yt_dlp
 ruyaml
+tqdm

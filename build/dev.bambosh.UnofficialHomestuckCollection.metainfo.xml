@@ -15,14 +15,23 @@
   <screenshots>
     <screenshot type="default">
       <caption>Collection interface</caption>
-      <image type="source" width="998" height="900">https://homestuck.giovanh.com/unofficial-homestuck-collection/images/collection.gif</image>
+      <image type="source" width="998" height="900">https://web.archive.org/web/20240917005408if_/https://homestuck.giovanh.com/unofficial-homestuck-collection/images/collection.gif</image>
     </screenshot>
     <screenshot>
       <caption>Bandcamp support</caption>
-      <image type="source" width="1015" height="708">https://homestuck.giovanh.com/unofficial-homestuck-collection/images/bandcamp.gif</image>
+      <image type="source" width="1015" height="708">https://web.archive.org/web/20240917005408if_/https://homestuck.giovanh.com/unofficial-homestuck-collection/images/bandcamp.gif</image>
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.8.0" type="stable" date="2026-03-06T06:04:50Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.8.0</url>
+      <description>
+        <ul>
+          <li>Bugfix: Paradox Space title hovers work again</li>
+          <li>Fix: Update bandcamp urls to match reorg (thanks @Niklink)</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.7.2" type="stable" date="2025-08-15T23:06:04Z">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.7.2</url>
       <description>
