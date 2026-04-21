@@ -23,6 +23,12 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="2.8.1" type="stable" date="2026-04-21T00:41:46Z">
+      <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.8.1</url>
+      <description>
+        <p>Bugfix: Handle artist pages in new reader mode using Niklink&#39;s new music data</p>
+      </description>
+    </release>
     <release version="2.8.0" type="stable" date="2026-03-06T06:04:50Z">
       <url>https://github.com/GiovanH/unofficial-homestuck-collection/releases/tag/v2.8.0</url>
       <description>
