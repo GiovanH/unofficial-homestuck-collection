@@ -64,7 +64,7 @@ jobs:
     # Platform-agnostic build
     steps:
     - uses: actions/checkout@v6
-    - uses: mskelton/setup-yarn@v1.4.0
+    - uses: mskelton/setup-yarn@v3
       with:
         node-version: "${{ env.NODE_VERSION }}"
     - run: make install
