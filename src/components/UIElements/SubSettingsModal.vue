@@ -159,8 +159,8 @@ export default {
       this.storeKey = undefined
       this.info_only = undefined
 
-      if (this.modopt.needsArchiveReload && this.$parent.queueArchiveReload) {
-        this.$parent.queueArchiveReload()
+      if (this.modopt.needsArchiveReload) {
+        this.$emit('needs-archive-reload')
       }
       // TODO: Track if options have been changed, and hardreload
       // if a reload is required & options have changed requiring it
