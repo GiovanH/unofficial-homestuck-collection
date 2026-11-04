@@ -482,7 +482,7 @@
         </div>
       </div>
     </div>
-    <SubSettingsModal ref="modal" />
+    <SubSettingsModal ref="modal" @needs-archive-reload="queueArchiveReload" />
   </GenericCardPage>
 </template>
 
